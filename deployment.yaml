@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: health-mall-product
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: health-mall-product
+  template:
+    metadata:
+      labels:
+        app: health-mall-product
+    spec:
+      containers:
+        - env:
+            - name: SERVER_PORT
+              value: '9092'
+            - name: JVM_OPTS
+              value: ENV_JVM_OPTS
+#            - name: JVM_AGENT
+#              value: ENV_JVM_AGENT
+          name: health-mall-product
+          image: FULL_IMAGE
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9092
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: health-mall-product
+  namespace: backend
+spec:
+  ports:
+    - port: 9092
+      targetPort: 9092
+      name: health-mall-product
+  selector:
+    app: health-mall-product
+  type: LoadBalancer
