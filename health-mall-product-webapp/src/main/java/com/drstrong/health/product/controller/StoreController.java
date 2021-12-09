@@ -1,6 +1,6 @@
 package com.drstrong.health.product.controller;
 
-import cn.strong.common.base.Result;
+import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.request.store.*;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
@@ -27,72 +27,72 @@ public class StoreController {
 
 	@ApiOperation("获取所有的店铺信息")
 	@GetMapping("/query")
-	public Result<List<StoreInfoResponse>> frontQuery(StoreRequest storeRequest) {
+	public ResultVO<List<StoreInfoResponse>> frontQuery(StoreRequest storeRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("添加店铺")
 	@PostMapping("/add")
-	public Result<Object> add(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest) {
+	public ResultVO<Object> add(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("更新店铺")
 	@PostMapping("/update")
-	public Result<Object> update(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest) {
+	public ResultVO<Object> update(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("禁用店铺")
 	@PostMapping("/updateState")
-	public Result<Object> updateState(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest) {
+	public ResultVO<Object> updateState(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("查询店铺的配送费")
 	@GetMapping("/postage/get")
-	public Result<StorePostageResponse> getPostage(Long storeId) {
+	public ResultVO<StorePostageResponse> getPostage(Long storeId) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("更新店铺的配送费")
 	@PostMapping("/postage/update")
-	public Result<Object> updatePostage(@RequestBody UpdatePostageRequest updatePostageRequest) {
+	public ResultVO<Object> updatePostage(@RequestBody UpdatePostageRequest updatePostageRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("分页查询店铺的 sku 列表")
 	@GetMapping("/sku/page")
-	public Result<PageVO<StoreSkuResponse>> pageSkuList(StoreSkuRequest storeSkuRequest) {
+	public ResultVO<PageVO<StoreSkuResponse>> pageSkuList(StoreSkuRequest storeSkuRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("修改三方的进货单价")
 	@PostMapping("/purchasePrice/update")
-	public Result<Object> updatePurchasePrice(@RequestBody UpdateThreeRequest updateThreeRequest) {
+	public ResultVO<Object> updatePurchasePrice(@RequestBody UpdateThreeRequest updateThreeRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("关联药店商品")
 	@PostMapping("/relevance/add")
-	public Result<Object> relevanceAdd(@RequestBody UpdateThreeRequest updateThreeRequest) {
+	public ResultVO<Object> relevanceAdd(@RequestBody UpdateThreeRequest updateThreeRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("上架/下架 合作商品")
 	@PostMapping("/sku/updateState")
-	public Result<Object> updateSkuState(@RequestBody UpdateSkuRequest updateSkuRequest) {
+	public ResultVO<Object> updateSkuState(@RequestBody UpdateSkuRequest updateSkuRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 

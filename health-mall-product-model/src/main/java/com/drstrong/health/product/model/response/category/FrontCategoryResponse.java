@@ -3,9 +3,11 @@ package com.drstrong.health.product.model.response.category;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 前台分类的返回值
@@ -13,13 +15,11 @@ import java.time.LocalDateTime;
  * @author liuqiuyi
  * @date 2021/12/6 09:50
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel("前台分类的返回值")
-public class FrontCategoryResponse implements Serializable {
+public class FrontCategoryResponse extends BaseTree implements Serializable {
 	private static final long serialVersionUID = -4324918492956801359L;
-
-	@ApiModelProperty("前台分类 id")
-	private Long id;
 
 	@ApiModelProperty("前台层级")
 	private Integer level;

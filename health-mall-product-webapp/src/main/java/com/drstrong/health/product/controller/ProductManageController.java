@@ -1,6 +1,6 @@
 package com.drstrong.health.product.controller;
 
-import cn.strong.common.base.Result;
+import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.request.product.AddRevenueRequest;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
@@ -38,16 +38,16 @@ public class ProductManageController {
 			@ApiImplicitParam(name = "categoryId", value = "分类 id", dataType = "long", paramType = "query", required = true)
 	})
 	@GetMapping("/property/get")
-	public Result<List<PropertyInfoResponse>> getProperty(@NotNull(message = "categoryId 不能为空") Long categoryId) {
+	public ResultVO<List<PropertyInfoResponse>> getProperty(@NotNull(message = "categoryId 不能为空") Long categoryId) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("商品上传")
 	@PostMapping("/save")
-	public Result<Object> saveProperty(@RequestBody SaveProductRequest saveProductRequest) {
+	public ResultVO<Object> saveProperty(@RequestBody SaveProductRequest saveProductRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("根据 spuCode 查看商品信息")
@@ -55,29 +55,29 @@ public class ProductManageController {
 			@ApiImplicitParam(name = "spuCode", value = "spu编码", dataType = "String", paramType = "query", required = true)
 	})
 	@GetMapping("/getBySpuCode")
-	public Result<List<ProductManageResponse>> getBySpuCode(@NotEmpty(message = "spuCode 不能为空") String spuCode) {
+	public ResultVO<List<ProductManageResponse>> getBySpuCode(@NotEmpty(message = "spuCode 不能为空") String spuCode) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("分页查询 spu 信息")
 	@GetMapping("/pageSpu")
-	public Result<PageVO<ProductSpuResponse>> pageSpu(QuerySpuRequest querySpuRequest) {
+	public ResultVO<PageVO<ProductSpuResponse>> pageSpu(QuerySpuRequest querySpuRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("分页查询 sku 信息")
 	@GetMapping("/pageSku")
-	public Result<PageVO<ProductSkuResponse>> pageSku(QuerySkuRequest querySkuRequest) {
+	public ResultVO<PageVO<ProductSkuResponse>> pageSku(QuerySkuRequest querySkuRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("保存税收编码")
 	@PostMapping("/revenue/add")
-	public Result<Object> revenueAdd(@RequestBody AddRevenueRequest addRevenueRequest) {
+	public ResultVO<Object> revenueAdd(@RequestBody AddRevenueRequest addRevenueRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 }

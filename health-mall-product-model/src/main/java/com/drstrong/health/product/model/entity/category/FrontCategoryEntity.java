@@ -2,9 +2,9 @@ package com.drstrong.health.product.model.entity.category;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * 前台分类
@@ -13,9 +13,10 @@ import java.time.LocalDateTime;
  * @date 2021/12/7 17:21
  */
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("pms_product_front_category")
-public class FrontCategoryEntity implements Serializable {
+public class FrontCategoryEntity extends BaseEntity implements Serializable {
 	private static final long serialVersionUID = -1403402300574048172L;
 
 	/**
@@ -26,7 +27,7 @@ public class FrontCategoryEntity implements Serializable {
 	/**
 	 * 父类 id(一级父类 id 为 0)
 	 */
-	private Integer parentId;
+	private Long parentId;
 
 	/**
 	 * 分类名称
@@ -57,29 +58,4 @@ public class FrontCategoryEntity implements Serializable {
 	 * 分类状态(1-启用;0-禁用)
 	 */
 	private Integer state;
-
-	/**
-	 * 删除状态(1-已删除;0-未删除)
-	 */
-	private Integer deleteStatus;
-
-	/**
-	 * 创建人 id
-	 */
-	private Integer createdBy;
-
-	/**
-	 * 创建时间
-	 */
-	private LocalDateTime createdTime;
-
-	/**
-	 * 修改人 id
-	 */
-	private Integer updatedBy;
-
-	/**
-	 * 修改时间
-	 */
-	private LocalDateTime updatedTime;
 }

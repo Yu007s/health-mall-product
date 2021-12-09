@@ -1,12 +1,12 @@
 package com.drstrong.health.product.controller;
 
-import cn.strong.common.base.Result;
 import com.drstrong.health.product.model.request.category.AddFrontCategoryRequest;
 import com.drstrong.health.product.model.request.category.CategoryIdRequest;
 import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
 import com.drstrong.health.product.model.request.category.UpdateFrontCategoryRequest;
 import com.drstrong.health.product.model.response.category.BackCategoryResponse;
 import com.drstrong.health.product.model.response.category.FrontCategoryResponse;
+import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.service.FrontCategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,43 +33,43 @@ public class CategoryController {
 
 	@ApiOperation(value = "获取所有前台分类", notes = "前台分类较少,前后端讨论后决定不进行分页查询")
 	@GetMapping("/front/query")
-	public Result<List<FrontCategoryResponse>> frontQuery(CategoryQueryRequest categoryQueryRequest) {
-		List<FrontCategoryResponse> frontCategoryResponses = frontCategoryService.queryAll();
-		return Result.ok(frontCategoryResponses);
+	public ResultVO<List<FrontCategoryResponse>> frontQuery(CategoryQueryRequest categoryQueryRequest) {
+		List<FrontCategoryResponse> frontCategoryResponses = frontCategoryService.queryByParam(categoryQueryRequest);
+		return ResultVO.success(frontCategoryResponses);
 	}
 
 	@ApiOperation("获取所有后台分类")
 	@GetMapping("/back/query")
-	public Result<List<BackCategoryResponse>> backQuery(CategoryQueryRequest categoryQueryRequest) {
+	public ResultVO<List<BackCategoryResponse>> backQuery(CategoryQueryRequest categoryQueryRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("添加前台分类")
 	@PostMapping("/front/add")
-	public Result<Object> addFront(@RequestBody @Valid AddFrontCategoryRequest addFrontCategoryRequest) {
+	public ResultVO<Object> addFront(@RequestBody @Valid AddFrontCategoryRequest addFrontCategoryRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("更新前台分类")
 	@PostMapping("/front/update")
-	public Result<Object> updateFront(@RequestBody @Valid UpdateFrontCategoryRequest updateFrontCategoryRequest) {
+	public ResultVO<Object> updateFront(@RequestBody @Valid UpdateFrontCategoryRequest updateFrontCategoryRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("更新分类状态")
 	@PostMapping("/front/updateState")
-	public Result<Object> updateStateFront(@RequestBody @Valid CategoryIdRequest categoryIdRequest) {
+	public ResultVO<Object> updateStateFront(@RequestBody @Valid CategoryIdRequest categoryIdRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("删除分类信息")
 	@PostMapping("/front/delete")
-	public Result<Object> deleteFront(@RequestBody @Valid CategoryIdRequest categoryIdRequest) {
+	public ResultVO<Object> deleteFront(@RequestBody @Valid CategoryIdRequest categoryIdRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 }

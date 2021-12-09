@@ -1,6 +1,6 @@
 package com.drstrong.health.product.controller;
 
-import cn.strong.common.base.Result;
+import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ProductDetailResponse;
@@ -32,16 +32,16 @@ public class ProductApiController {
 
 	@ApiOperation("商品搜索-获取商品名称列表(分页)")
 	@GetMapping("/searchByName")
-	public Result<PageVO<SpuBaseInfoResponse>> pageSearchByName(ProductSearchRequest productSearchRequest) {
+	public ResultVO<PageVO<SpuBaseInfoResponse>> pageSearchByName(ProductSearchRequest productSearchRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("商品搜索-获取搜索的商品列表(分页)")
 	@GetMapping("/search/detail")
-	public Result<PageVO<ProductSearchResponse>> pageSearchDetail(ProductSearchRequest productSearchRequest) {
+	public ResultVO<PageVO<ProductSearchResponse>> pageSearchDetail(ProductSearchRequest productSearchRequest) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("根据 spuCode 查询 spu 信息")
@@ -49,9 +49,9 @@ public class ProductApiController {
 			@ApiImplicitParam(name = "spuCode", value = "spu 编码", dataType = "string", paramType = "query", required = true)
 	})
 	@GetMapping("/spu/get")
-	public Result<ProductDetailResponse> getSpu(String spuCode) {
+	public ResultVO<ProductDetailResponse> getSpu(String spuCode) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 
 	@ApiOperation("根据 spuCode 查询所有的 sku 信息")
@@ -59,8 +59,8 @@ public class ProductApiController {
 			@ApiImplicitParam(name = "spuCode", value = "spu 编码", dataType = "string", paramType = "query", required = true)
 	})
 	@GetMapping("/sku/listBySpuCode")
-	public Result<List<SkuBaseInfoResponse>> listSkuBySpuCode(String spuCode) {
+	public ResultVO<List<SkuBaseInfoResponse>> listSkuBySpuCode(String spuCode) {
 
-		return Result.ok();
+		return ResultVO.success();
 	}
 }

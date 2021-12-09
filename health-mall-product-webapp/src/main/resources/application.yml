@@ -3,3 +3,11 @@ spring:
     url: jdbc:mysql:replication://192.168.21.3:3306/mall_product?rewriteBatchedStatements=true&useUnicode=true&characterEncoding=UTF8&useSSL=false
     username: strongEhp
     password: WgqciKVG
+  jackson:
+    #日期格式化
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+# 扫描 Mapper 文件
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*Mapper.xml
