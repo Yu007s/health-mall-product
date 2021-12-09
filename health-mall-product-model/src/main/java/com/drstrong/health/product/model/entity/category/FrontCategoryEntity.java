@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.entity.category;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
  */
 
 @Data
+@TableName("pms_product_front_category")
 public class FrontCategoryEntity implements Serializable {
 	private static final long serialVersionUID = -1403402300574048172L;
 

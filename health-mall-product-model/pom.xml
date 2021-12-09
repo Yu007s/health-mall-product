@@ -27,6 +27,10 @@
             <version>1.5.20</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>cn.strong</groupId>
+            <artifactId>strong-mybatis-plus-extend</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

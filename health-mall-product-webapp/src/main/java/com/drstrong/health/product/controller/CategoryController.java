@@ -7,11 +7,13 @@ import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
 import com.drstrong.health.product.model.request.category.UpdateFrontCategoryRequest;
 import com.drstrong.health.product.model.response.category.BackCategoryResponse;
 import com.drstrong.health.product.model.response.category.FrontCategoryResponse;
+import com.drstrong.health.product.service.FrontCategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -26,12 +28,14 @@ import java.util.List;
 @Slf4j
 @Api(tags = {"商品分类"}, description = "商品分类")
 public class CategoryController {
+	@Resource
+	FrontCategoryService frontCategoryService;
 
 	@ApiOperation(value = "获取所有前台分类", notes = "前台分类较少,前后端讨论后决定不进行分页查询")
 	@GetMapping("/front/query")
 	public Result<List<FrontCategoryResponse>> frontQuery(CategoryQueryRequest categoryQueryRequest) {
-
-		return Result.ok();
+		List<FrontCategoryResponse> frontCategoryResponses = frontCategoryService.queryAll();
+		return Result.ok(frontCategoryResponses);
 	}
 
 	@ApiOperation("获取所有后台分类")
