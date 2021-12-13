@@ -15,8 +15,14 @@ import java.util.List;
  */
 @Data
 @ApiModel("商品的管理信息")
-public class ProductManageResponse implements Serializable {
+public class ProductManageVO implements Serializable {
 	private static final long serialVersionUID = -844091335147592121L;
+
+	@ApiModelProperty("商品 id")
+	private Long productId;
+
+	@ApiModelProperty("spu 编码")
+	private String spuCode;
 
 	@ApiModelProperty("分类 id")
 	private Long categoryId;
@@ -26,6 +32,12 @@ public class ProductManageResponse implements Serializable {
 
 	@ApiModelProperty("商品的标题")
 	private String title;
+
+	@ApiModelProperty("品牌名称")
+	private String brandName;
+
+	@ApiModelProperty("商品通用名称")
+	private String aliasName;
 
 	@ApiModelProperty("商品描述")
 	private String description;

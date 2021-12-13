@@ -22,16 +22,35 @@ import java.util.List;
 public class SaveProductRequest implements Serializable {
 	private static final long serialVersionUID = -4015905101502960465L;
 
+	@ApiModelProperty(value = "分类 id", notes = "保存商品信息时非必填,更新商品信息时该值必填")
+	private Long productId;
+
 	@ApiModelProperty(value = "分类 id", required = true)
 	@NotNull(message = "categoryId 不能为空")
 	private Long categoryId;
 
-	@ApiModelProperty(value = "商品标题", required = true)
+	@ApiModelProperty(value = "商品名称", required = true)
 	@NotEmpty(message = "title 不能为空")
 	private String title;
 
+	@ApiModelProperty(value = "商品品牌", required = true)
+	@NotEmpty(message = "brandName 不能为空")
+	private String brandName;
+
+	@ApiModelProperty(value = "商品通用名", required = true)
+	@NotEmpty(message = "aliasName 不能为空")
+	private String aliasName;
+
 	@ApiModelProperty("商品描述")
 	private String description;
+
+	@ApiModelProperty(value = "批文编号", required = true)
+	@NotEmpty(message = "approvalNumber 不能为空")
+	private String approvalNumber;
+
+	@ApiModelProperty(value = "生产厂商", required = true)
+	@NotEmpty(message = "vendorName 不能为空")
+	private String vendorName;
 
 	@ApiModelProperty(value = "店铺 id", required = true)
 	@NotNull(message = "storeId 不能为空")
@@ -53,21 +72,24 @@ public class SaveProductRequest implements Serializable {
 	@NotNull(message = "detailUrlList 不能为空")
 	private List<String> detailUrlList;
 
+	@ApiModelProperty(value = "操作人 id", hidden = true)
+	private Long userId;
+
 	@Data
 	@ApiModel("商品属性的入参")
-	private static class PropertyInfoRequest implements Serializable {
+	public static class PropertyInfoRequest implements Serializable {
 		private static final long serialVersionUID = 1827746211368213777L;
 
 		@ApiModelProperty("属性 id")
-		private Long propertyId;
+		private Long attributeItemId;
 
 		@ApiModelProperty("属性名称")
-		private String propertyValue;
+		private String attributeValue;
 	}
 
 	@Data
 	@ApiModel("商品规格的入参")
-	private static class PackInfoRequest implements Serializable {
+	public static class PackInfoRequest implements Serializable {
 		private static final long serialVersionUID = 4311064924147174227L;
 
 		@ApiModelProperty("规格名称")

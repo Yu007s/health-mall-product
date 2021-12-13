@@ -24,6 +24,16 @@ public interface BackCategoryService {
 	List<BackCategoryEntity> queryByIdList(Set<Long> categoryIdList);
 
 	/**
+	 * 根据 id 查询后台分类
+	 *
+	 * @param categoryId 后台分类 id
+	 * @return 后台分类信息
+	 * @author liuqiuyi
+	 * @date 2021/12/13 14:37
+	 */
+	BackCategoryEntity queryById(Long categoryId);
+
+	/**
 	 * 查询后台分类集合
 	 *
 	 * @param categoryQueryRequest 查询条件

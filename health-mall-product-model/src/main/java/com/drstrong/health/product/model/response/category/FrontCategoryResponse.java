@@ -33,6 +33,9 @@ public class FrontCategoryResponse extends BaseTree implements Serializable {
 	@ApiModelProperty("商品数量")
 	private Integer productCount;
 
+	@ApiModelProperty("icon 图片地址")
+	private String icon;
+
 	@ApiModelProperty("排序字段")
 	private Integer sort;
 
