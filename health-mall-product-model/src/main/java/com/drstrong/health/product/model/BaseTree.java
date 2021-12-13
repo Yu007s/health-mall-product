@@ -1,9 +1,10 @@
-package com.drstrong.health.product.model.response.category;
+package com.drstrong.health.product.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -29,6 +30,9 @@ public class BaseTree implements Serializable {
 	private List<? super BaseTree> children = Lists.newArrayList();
 
 	public static <T extends BaseTree> List<T> listToTree(List<T> list) {
+		if (CollectionUtils.isEmpty(list)) {
+			return Lists.newArrayList();
+		}
 		Set<Long> parentIdSet = list.stream().map(BaseTree::getParentId).collect(Collectors.toSet());
 		Set<Long> idSet = list.stream().map(BaseTree::getId).collect(Collectors.toSet());
 		parentIdSet.removeAll(idSet);

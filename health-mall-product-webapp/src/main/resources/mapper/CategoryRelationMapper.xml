@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.CategoryRelationMapper">
+
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.category.CategoryRelationEntity">
+        <result column="id" property="id"/>
+        <result column="front_category_id" property="frontCategoryId"/>
+        <result column="back_category_id" property="backCategoryId"/>
+        <result column="version" property="version"/>
+        <result column="state" property="state"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="changed_at" property="changedAt"/>
+        <result column="changed_by" property="changedBy"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                id,
+                front_category_id,
+                back_category_id,
+                state,
+                version,
+                created_at,
+                created_by,
+                changed_at,
+                changed_by,
+                del_flag
+    </sql>
+
+    <insert id="batchInsert">
+        INSERT INTO pms_product_category_relation
+        (
+        front_category_id,
+        back_category_id,
+        created_by,
+        changed_by
+        )
+        VALUES
+        <foreach collection="saveParamList" item="item" index="index" separator=",">
+            (
+            #{item.frontCategoryId}, #{item.backCategoryId}, #{item.createdBy},#{item.changedBy}
+            )
+        </foreach>
+    </insert>
+
+
+    <update id="updateStateByFrontCategoryId">
+        UPDATE pms_product_category_relation
+        set state = #{state} , changed_at = now(),changed_by = #{userId}
+        where front_category_id = #{frontCategoryId} and del_flag = 0;
+    </update>
+</mapper>

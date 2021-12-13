@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.response.category;
 
+import com.drstrong.health.product.model.BaseTree;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -7,7 +8,6 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * 前台分类的返回值

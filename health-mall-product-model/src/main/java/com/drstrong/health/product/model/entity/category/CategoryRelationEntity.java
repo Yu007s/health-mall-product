@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 前后台分类关联表
@@ -32,4 +33,16 @@ public class CategoryRelationEntity extends BaseEntity implements Serializable {
 	 * 后台商品分类 id
 	 */
 	private Long backCategoryId;
+
+	/**
+	 * 分类状态(1-启用;0-禁用)
+	 */
+	private Integer state;
+
+	public static CategoryRelationEntity buildUpdateEntity(Long userId) {
+		CategoryRelationEntity entity = new CategoryRelationEntity();
+		entity.setChangedAt(LocalDateTime.now());
+		entity.setChangedBy(userId);
+		return entity;
+	}
 }

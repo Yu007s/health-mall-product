@@ -1,10 +1,12 @@
 package com.drstrong.health.product.model.entity.category;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.drstrong.health.product.model.BaseTree;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 前台分类
@@ -16,18 +18,8 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("pms_product_front_category")
-public class FrontCategoryEntity extends BaseEntity implements Serializable {
+public class FrontCategoryEntity extends BaseTree implements Serializable {
 	private static final long serialVersionUID = -1403402300574048172L;
-
-	/**
-	 * 自增主键 id
-	 */
-	private Long id;
-
-	/**
-	 * 父类 id(一级父类 id 为 0)
-	 */
-	private Long parentId;
 
 	/**
 	 * 分类名称
@@ -58,4 +50,34 @@ public class FrontCategoryEntity extends BaseEntity implements Serializable {
 	 * 分类状态(1-启用;0-禁用)
 	 */
 	private Integer state;
+
+	/**
+	 * 乐观锁字段
+	 */
+	private Integer version;
+
+	/**
+	 * 创建时间
+	 */
+	private LocalDateTime createdAt;
+
+	/**
+	 * 创建人
+	 */
+	private Long createdBy;
+
+	/**
+	 * 修改时间
+	 */
+	private LocalDateTime changedAt;
+
+	/**
+	 * 修改人
+	 */
+	private Long changedBy;
+
+	/**
+	 * 是否删除 0：正常 1：删除
+	 */
+	private Integer delFlag;
 }

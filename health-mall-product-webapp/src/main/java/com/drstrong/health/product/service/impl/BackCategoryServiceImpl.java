@@ -2,7 +2,9 @@ package com.drstrong.health.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.drstrong.health.product.dao.BackCategoryMapper;
+import com.drstrong.health.product.model.BaseTree;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
+import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
 import com.drstrong.health.product.service.BackCategoryService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -43,5 +45,18 @@ public class BackCategoryServiceImpl implements BackCategoryService {
 		// 之前老表的删除状态是 -1
 		backWrapper.in(BackCategoryEntity::getId, categoryIdList).ne(BackCategoryEntity::getStatus, -1);
 		return backCategoryMapper.selectList(backWrapper);
+	}
+
+	/**
+	 * 查询后台分类集合
+	 *
+	 * @param categoryQueryRequest 查询条件
+	 * @return 后台分类的集合, 按照树形结构排列
+	 * @author liuqiuyi
+	 * @date 2021/12/7 20:37
+	 */
+	@Override
+	public List<BackCategoryEntity> queryByParam(CategoryQueryRequest categoryQueryRequest) {
+		return null;
 	}
 }

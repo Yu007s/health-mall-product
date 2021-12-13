@@ -17,6 +17,16 @@ public interface CategoryRelationService {
 	/**
 	 * 根据前台分类 id 获取关联信息
 	 *
+	 * @param frontCategoryId 前台分类 id
+	 * @return 分类关联信息
+	 * @author liuqiuyi
+	 * @date 2021/12/9 16:32
+	 */
+	List<CategoryRelationEntity> getRelationByFrontCategoryId(Long frontCategoryId);
+
+	/**
+	 * 根据前台分类 id 集合获取关联信息
+	 *
 	 * @param frontCategoryIdList 前台分类 id 集合
 	 * @return 分类关联信息
 	 * @author liuqiuyi
@@ -34,4 +44,43 @@ public interface CategoryRelationService {
 	 * @date 2021/12/9 16:36
 	 */
 	Map<Long, List<Long>> getFrontAndBackCategoryToMap(Set<Long> frontCategoryIdList);
+
+	/**
+	 * 批量保存关联信息
+	 *
+	 * @param relationEntityList 入参集合
+	 * @author liuqiuyi
+	 * @date 2021/12/10 17:59
+	 */
+	void batchSave(List<CategoryRelationEntity> relationEntityList);
+
+	/**
+	 * 根据主键 id 集合进行逻辑删除
+	 *
+	 * @param relationIdList 关联关系的主键 id 集合
+	 * @author liuqiuyi
+	 * @date 2021/12/13 10:52
+	 */
+	void deletedByIdList(Set<Long> relationIdList);
+
+	/**
+	 * 根据前台分类 id 进行逻辑删除
+	 *
+	 * @param frontCategoryId 前台分类 id
+	 * @param userId          用户 id
+	 * @author liuqiuyi
+	 * @date 2021/12/13 11:10
+	 */
+	void deletedByFrontCategoryId(Long frontCategoryId, Long userId);
+
+	/**
+	 * 根据前台分类 id,更新关联信息的状态
+	 *
+	 * @param frontCategoryId 前台分类 id
+	 * @param userId          用户 id
+	 * @param state 状态
+	 * @author liuqiuyi
+	 * @date 2021/12/13 11:20
+	 */
+	void updateStateByFrontCategoryId(Long frontCategoryId, Integer state, Long userId);
 }

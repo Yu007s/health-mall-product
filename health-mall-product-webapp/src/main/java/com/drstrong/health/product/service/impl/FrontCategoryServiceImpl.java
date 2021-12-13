@@ -1,27 +1,34 @@
 package com.drstrong.health.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.drstrong.health.product.dao.FrontCategoryMapper;
+import com.drstrong.health.product.model.BaseTree;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
+import com.drstrong.health.product.model.entity.category.CategoryRelationEntity;
 import com.drstrong.health.product.model.entity.category.FrontCategoryEntity;
+import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.LevelEnum;
+import com.drstrong.health.product.model.request.category.AddOrUpdateFrontCategoryRequest;
 import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
-import com.drstrong.health.product.model.response.category.BaseTree;
 import com.drstrong.health.product.model.response.category.FrontCategoryResponse;
+import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.BackCategoryService;
 import com.drstrong.health.product.service.CategoryRelationService;
 import com.drstrong.health.product.service.FrontCategoryService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toMap;
 
 /**
  * 前台分类 service
@@ -43,7 +50,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 	BackCategoryService backCategoryService;
 
 	/**
-	 * 查询所有的前台分类
+	 * 查询所有的前台分类,并组装树形结构
 	 *
 	 * @param categoryQueryRequest 查询的参数信息
 	 * @return 前台分类的集合
@@ -51,13 +58,13 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 	 * @date 2021/12/7 20:37
 	 */
 	@Override
-	public List<FrontCategoryResponse> queryByParam(CategoryQueryRequest categoryQueryRequest) {
+	public List<FrontCategoryResponse> queryTreeByParam(CategoryQueryRequest categoryQueryRequest) {
 		// 1.获取所有的前台分类
 		List<FrontCategoryEntity> frontCategoryEntityList = frontCategoryMapper.queryByParam(categoryQueryRequest);
 		if (CollectionUtils.isEmpty(frontCategoryEntityList)) {
 			return Lists.newArrayList();
 		}
-		// 组装返回值
+		// 组装返回值的树形结构
 		List<FrontCategoryResponse> frontCategoryResponseList = buildResponse(frontCategoryEntityList);
 		// 2.获取前台分类关联的后台分类
 		Set<Long> frontCategoryIdList = frontCategoryEntityList.stream().map(FrontCategoryEntity::getId).collect(Collectors.toSet());
@@ -65,29 +72,215 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		if (CollectionUtils.isEmpty(frontIdBackIdMap)) {
 			return frontCategoryResponseList;
 		}
-		// 3.获取所有的后台分类
+		// 3.获取关联的后台分类信息
 		Set<Long> backCategoryIdList = frontIdBackIdMap.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
 		List<BackCategoryEntity> backCategoryEntityList = backCategoryService.queryByIdList(backCategoryIdList);
-		if (CollectionUtils.isEmpty(backCategoryEntityList)) {
-			return frontCategoryResponseList;
-		}
-		// 4.获取后台分类的商品数量
-		// TODO 这里需要优化,前台关联的可能是后台分类的父分类
-		Map<Long, Integer> backIdAndNumMap = backCategoryEntityList.stream()
-				.filter(backCategoryEntity -> Objects.nonNull(backCategoryEntity.getPNumber()))
-				.collect(toMap(BackCategoryEntity::getId, BackCategoryEntity::getPNumber, (v1, v2) -> v1));
-		// 6.设置商品数量
-		Map<Long, Integer> frontIdProductCountMap = buildFrontCategoryProductNumMap(frontIdBackIdMap, backIdAndNumMap);
-		frontCategoryResponseList.forEach(frontCategoryResponse -> {
-			frontCategoryResponse.setProductCount(frontIdProductCountMap.getOrDefault(frontCategoryResponse.getId(), 0));
-			if (!CollectionUtils.isEmpty(frontCategoryResponse.getChildren())) {
-				frontCategoryResponse.getChildren().forEach(children -> {
-					FrontCategoryResponse response = (FrontCategoryResponse) children;
-					response.setProductCount(frontIdProductCountMap.getOrDefault(response.getId(), 0));
-				});
-			}
-		});
+		// 4.组装后台分类的商品数量
+		Map<Long, Integer> backIdProductNumMap = BackCategoryEntity.buildCategoryProductCount(backCategoryEntityList, true);
+		// 5.组装前台分类对应的商品数量
+		Map<Long, Integer> frontIdProductCountMap = buildFrontCategoryProductNumMap(frontIdBackIdMap, backIdProductNumMap);
+		// 6.设置返回值
+		frontCategoryResponseList.forEach(frontCategoryResponse -> buildResponseProductNum(frontCategoryResponse, frontIdProductCountMap));
 		return frontCategoryResponseList;
+	}
+
+	/**
+	 * 根据分类 id 集合查询分类信息
+	 *
+	 * @param categoryIdList 分类 id 集合
+	 * @return 前台分类集合信息
+	 * @author liuqiuyi
+	 * @date 2021/12/10 17:41
+	 */
+	@Override
+	public List<FrontCategoryEntity> queryByIdList(Set<Long> categoryIdList) {
+		if (CollectionUtils.isEmpty(categoryIdList)) {
+			return Lists.newArrayList();
+		}
+		LambdaQueryWrapper<FrontCategoryEntity> wrapper = new LambdaQueryWrapper<>();
+		wrapper.in(FrontCategoryEntity::getId, categoryIdList).eq(FrontCategoryEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+		return frontCategoryMapper.selectList(wrapper);
+	}
+
+	/**
+	 * 根据分类 id 查询分类信息
+	 *
+	 * @param categoryId 分类 id
+	 * @return 前台分类信息
+	 * @author liuqiuyi
+	 * @date 2021/12/10 17:41
+	 */
+	@Override
+	public FrontCategoryEntity queryById(Long categoryId) {
+		if (Objects.isNull(categoryId)) {
+			return new FrontCategoryEntity();
+		}
+		LambdaQueryWrapper<FrontCategoryEntity> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(FrontCategoryEntity::getId, categoryId).eq(FrontCategoryEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+		return frontCategoryMapper.selectOne(wrapper);
+	}
+
+
+	/**
+	 * 添加前台分类
+	 *
+	 * @param categoryRequest 入参信息
+	 * @author liuqiuyi
+	 * @date 2021/12/10 17:19
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void add(AddOrUpdateFrontCategoryRequest categoryRequest) {
+		FrontCategoryEntity parentCategoryEntity = null;
+		if (!Objects.isNull(categoryRequest.getParentId()) && !Objects.equals(0L, categoryRequest.getParentId())) {
+			// 添加的不是一级分类,校验上级分类是否存在
+			parentCategoryEntity = queryById(categoryRequest.getParentId());
+			if (Objects.isNull(parentCategoryEntity) || Objects.isNull(parentCategoryEntity.getId())) {
+				throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
+			}
+		}
+		// 如果关联的后台 id 不为空,进行校验
+		if (!CollectionUtils.isEmpty(categoryRequest.getBackCategoryIdList())) {
+			List<BackCategoryEntity> backCategoryEntityList = backCategoryService.queryByIdList(categoryRequest.getBackCategoryIdList());
+			if (CollectionUtils.isEmpty(backCategoryEntityList) || !Objects.equals(backCategoryEntityList.size(), categoryRequest.getBackCategoryIdList().size())) {
+				throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
+			}
+		}
+		// 1.保存前台分类信息
+		FrontCategoryEntity categoryEntity = new FrontCategoryEntity();
+		categoryEntity.setName(categoryRequest.getCategoryName());
+		categoryEntity.setIcon(categoryRequest.getIconUrl());
+		categoryEntity.setLevel(Objects.isNull(parentCategoryEntity) ? 1 : parentCategoryEntity.getLevel() + 1);
+		categoryEntity.setParentId(Objects.isNull(parentCategoryEntity) ? 0 : parentCategoryEntity.getId());
+		categoryEntity.setSort(categoryRequest.getSort());
+		categoryEntity.setCreatedBy(categoryRequest.getUserId());
+		categoryEntity.setChangedBy(categoryRequest.getUserId());
+		categoryEntity.setState(0);
+		frontCategoryMapper.insert(categoryEntity);
+		if (CollectionUtils.isEmpty(categoryRequest.getBackCategoryIdList())) {
+			return;
+		}
+		// 2.保存前后台分类的关联信息
+		batchSaveRelation(categoryRequest, categoryEntity.getId());
+	}
+
+	private void batchSaveRelation(AddOrUpdateFrontCategoryRequest categoryRequest, Long categoryId) {
+		List<CategoryRelationEntity> saveRelationList = Lists.newArrayListWithCapacity(categoryRequest.getBackCategoryIdList().size());
+		for (Long backCategoryId : categoryRequest.getBackCategoryIdList()) {
+			CategoryRelationEntity entity = new CategoryRelationEntity();
+			entity.setFrontCategoryId(categoryId);
+			entity.setBackCategoryId(backCategoryId);
+			entity.setCreatedBy(categoryRequest.getUserId());
+			entity.setChangedBy(categoryRequest.getUserId());
+			saveRelationList.add(entity);
+		}
+		categoryRelationService.batchSave(saveRelationList);
+	}
+
+	/**
+	 * 更新前台分类信息
+	 *
+	 * @param updateFrontCategoryRequest 更新前台分类的参数
+	 * @author liuqiuyi
+	 * @date 2021/12/13 10:14
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void update(AddOrUpdateFrontCategoryRequest updateFrontCategoryRequest) {
+		FrontCategoryEntity frontEntity = new FrontCategoryEntity();
+		frontEntity.setId(updateFrontCategoryRequest.getCategoryId());
+		frontEntity.setName(updateFrontCategoryRequest.getCategoryName());
+		frontEntity.setSort(updateFrontCategoryRequest.getSort());
+		if (StringUtils.isEmpty(updateFrontCategoryRequest.getIconUrl())) {
+			frontEntity.setIcon(updateFrontCategoryRequest.getIconUrl());
+		}
+		int updateNum = frontCategoryMapper.updateById(frontEntity);
+		if (updateNum <= 0) {
+			throw new BusinessException(ErrorEnums.SAVE_UPDATE_NOT_EXIST);
+		}
+		if (CollectionUtils.isEmpty(updateFrontCategoryRequest.getBackCategoryIdList())) {
+			return;
+		}
+		// 判断是添加分类关系还是更新分类关系
+		List<CategoryRelationEntity> relationEntityList = categoryRelationService.getRelationByFrontCategoryId(updateFrontCategoryRequest.getCategoryId());
+		if (!CollectionUtils.isEmpty(relationEntityList)) {
+			// 如果不为空,先删除,在更新(可能存在之前只关联了一个,更新时关联多个的情况)
+			Set<Long> relationIdList = relationEntityList.stream().map(CategoryRelationEntity::getId).collect(Collectors.toSet());
+			categoryRelationService.deletedByIdList(relationIdList);
+		}
+		batchSaveRelation(updateFrontCategoryRequest, updateFrontCategoryRequest.getCategoryId());
+	}
+
+	/**
+	 * 更新前台分类状态
+	 *
+	 * @param categoryId 前台分类 id
+	 * @author liuqiuyi
+	 * @date 2021/12/13 11:05
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void updateStateFront(Long categoryId, Long userId) {
+		if (Objects.isNull(categoryId) || Objects.isNull(userId)) {
+			log.error("com.drstrong.health.product.service.impl.FrontCategoryServiceImpl#updateStateFront() param is null");
+			return;
+		}
+		FrontCategoryEntity categoryEntity = queryById(categoryId);
+		if (Objects.isNull(categoryEntity)) {
+			throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
+		}
+		if (Objects.equals(0, categoryEntity.getState())) {
+			// 更新为启用
+			categoryEntity.setState(1);
+		} else {
+			categoryEntity.setState(0);
+		}
+		categoryEntity.setChangedBy(userId);
+		categoryEntity.setChangedAt(LocalDateTime.now());
+		frontCategoryMapper.updateById(categoryEntity);
+		categoryRelationService.updateStateByFrontCategoryId(categoryId, categoryEntity.getState(), userId);
+	}
+
+	/**
+	 * 逻辑删除前台分类状态
+	 *
+	 * @param categoryId 前台分类 id
+	 * @param userId     用户 id
+	 * @author liuqiuyi
+	 * @date 2021/12/13 11:05
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteFrontCategoryById(Long categoryId, Long userId) {
+		if (Objects.isNull(categoryId) || Objects.isNull(userId)) {
+			log.error("com.drstrong.health.product.service.impl.FrontCategoryServiceImpl#updateStateFront() param is null");
+			return;
+		}
+		FrontCategoryEntity categoryEntity = queryById(categoryId);
+		if (Objects.isNull(categoryEntity)) {
+			throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
+		}
+		categoryEntity.setChangedAt(LocalDateTime.now());
+		categoryEntity.setChangedBy(userId);
+		categoryEntity.setDelFlag(DelFlagEnum.IS_DELETED.getCode());
+		frontCategoryMapper.updateById(categoryEntity);
+		categoryRelationService.deletedByFrontCategoryId(categoryId, userId);
+	}
+
+
+
+	/**
+	 * 设置返回值中,前台分类对应的商品数量
+	 */
+	private void buildResponseProductNum(FrontCategoryResponse frontCategoryResponse, Map<Long, Integer> frontIdProductCountMap) {
+		if (CollectionUtils.isEmpty(frontCategoryResponse.getChildren())) {
+			frontCategoryResponse.setProductCount(frontIdProductCountMap.getOrDefault(frontCategoryResponse.getId(), 0));
+		} else {
+			for (Object child : frontCategoryResponse.getChildren()) {
+				FrontCategoryResponse childResponse = (FrontCategoryResponse) child;
+				buildResponseProductNum(childResponse, frontIdProductCountMap);
+			}
+		}
 	}
 
 	/**
@@ -105,10 +298,6 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		return frontIdProductCountMap;
 	}
 
-	private Map<Long, Integer> buildBackIdAndNumMap(List<BackCategoryEntity> backCategoryEntityList){
-		return null;
-
-	}
 	/**
 	 * 组装返回值的树形结构
 	 */

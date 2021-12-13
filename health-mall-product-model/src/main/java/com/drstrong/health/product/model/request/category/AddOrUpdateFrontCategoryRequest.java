@@ -7,7 +7,7 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 /**
  * 添加前台分类的入参
@@ -16,9 +16,13 @@ import java.util.List;
  * @date 2021/12/6 11:37
  */
 @Data
-@ApiModel("添加前台分类的入参")
-public class AddFrontCategoryRequest implements Serializable {
+@ApiModel("添加或更新前台分类的入参")
+public class AddOrUpdateFrontCategoryRequest implements Serializable {
 	private static final long serialVersionUID = 4836203995959321293L;
+
+	@ApiModelProperty(value = "分类 id", notes = "添加分类的时候不需要传该参数,更新分类时必传")
+	@NotNull(message = "categoryId 不能为空")
+	private Long categoryId;
 
 	@ApiModelProperty("父类 id")
 	private Long parentId;
@@ -35,5 +39,8 @@ public class AddFrontCategoryRequest implements Serializable {
 	private String iconUrl;
 
 	@ApiModelProperty(value = "关联的后台分类 id 集合")
-	private List<Long> backCategoryIdList;
+	private Set<Long> backCategoryIdList;
+
+	@ApiModelProperty(value = "操作人 id", hidden = true)
+	private Long userId;
 }
