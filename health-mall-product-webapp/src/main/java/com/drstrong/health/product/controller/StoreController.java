@@ -5,11 +5,13 @@ import com.drstrong.health.product.model.request.store.*;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreSkuResponse;
+import com.drstrong.health.product.service.StoreService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -25,45 +27,52 @@ import java.util.List;
 @Api(tags = {"店铺管理"}, description = "店铺管理")
 public class StoreController {
 
+	@Resource
+	private StoreService storeService;
+
 	@ApiOperation("获取所有的店铺信息")
 	@GetMapping("/query")
-	public ResultVO<List<StoreInfoResponse>> frontQuery(StoreRequest storeRequest) {
-
-		return ResultVO.success();
+	public ResultVO<List<StoreInfoResponse>> frontQuery() {
+		List<StoreInfoResponse> storeInfoResponses = storeService.queryAll();
+		return ResultVO.success(storeInfoResponses);
 	}
 
 	@ApiOperation("添加店铺")
 	@PostMapping("/add")
 	public ResultVO<Object> add(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest) {
-
+		//TODO 获取当前操作人
+		storeService.add(storeAddOrUpdateRequest,888L);
 		return ResultVO.success();
 	}
 
 	@ApiOperation("更新店铺")
 	@PostMapping("/update")
 	public ResultVO<Object> update(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest) {
-
+		//TODO 获取当前操作人
+		storeService.update(storeAddOrUpdateRequest,888L);
 		return ResultVO.success();
 	}
 
 	@ApiOperation("禁用店铺")
 	@PostMapping("/updateState")
-	public ResultVO<Object> updateState(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest) {
-
+	public ResultVO<Object> updateState(@RequestBody @Valid StoreIdRequest storeIdRequest) {
+		//TODO 获取当前操作人
+		storeService.disable(storeIdRequest,888L);
 		return ResultVO.success();
 	}
 
 	@ApiOperation("查询店铺的配送费")
 	@GetMapping("/postage/get")
-	public ResultVO<StorePostageResponse> getPostage(Long storeId) {
-
-		return ResultVO.success();
+	public ResultVO<StorePostage> getPostage(Long storeId) {
+		StorePostage storePostage = storeService.getPostage(storeId);
+		return ResultVO.success(storePostage);
 	}
 
 	@ApiOperation("更新店铺的配送费")
 	@PostMapping("/postage/update")
-	public ResultVO<Object> updatePostage(@RequestBody UpdatePostageRequest updatePostageRequest) {
-
+	public ResultVO<Object> updatePostage(@RequestBody StorePostage storePostage) {
+		//TODO 获取当前操作人
+		storeService.updatePostage(storePostage,888L);
 		return ResultVO.success();
 	}
 

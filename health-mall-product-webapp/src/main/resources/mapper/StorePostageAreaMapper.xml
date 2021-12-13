@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.StorePostageAreaMapper">
+
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.store.StorePostageAreaEntity">
+        <result column="id" property="id"/>
+        <result column="store_id" property="storeId"/>
+        <result column="area_id" property="areaId"/>
+        <result column="area_name" property="areaName"/>
+        <result column="postage" property="postage"/>
+        <result column="version" property="version"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="changed_at" property="changedAt"/>
+        <result column="changed_by" property="changedBy"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+
+    <insert id="batchInsert">
+        INSERT INTO product_store_postage_area
+        (
+        store_id,
+        area_id,
+        area_name,
+        postage,
+        created_by,
+        changed_by
+        )
+        VALUES
+        <foreach collection="items" item="item" index="index" separator=",">
+            (
+            #{item.storeId}, #{item.areaId}, #{item.areaName},#{item.postage},#{item.createdBy},#{item.changedBy}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

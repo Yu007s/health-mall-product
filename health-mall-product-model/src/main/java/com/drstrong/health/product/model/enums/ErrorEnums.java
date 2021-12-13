@@ -19,6 +19,7 @@ import com.drstrong.health.product.model.response.result.IBaseResult;
  * 			14：物流
  * 			15：优惠券
  * 			16：用户
+ * 			17:店铺
  * 			20：库存
  * </p>
  *
@@ -32,6 +33,9 @@ public enum ErrorEnums implements IBaseResult {
 	PARAM_IS_NOT_NULL("11000","参数不能为空"),
 	CATEGORY_NOT_EXIST("11100","分类不存在"),
 	SAVE_UPDATE_NOT_EXIST("11101","更新或者保存的数据不存在"),
+	STORE_NAME_LENGTH("17000","店铺名称长度不正确"),
+	STORE_NAME_REPEAT("17100","店铺名称已存在"),
+	STORE_NOT_EXIST("17110","店铺不存在"),
 	;
 
 	private String code;
