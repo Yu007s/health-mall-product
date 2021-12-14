@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @ApiModel("商品的 spu 信息返回值")
-public class ProductSpuResponse implements Serializable {
+public class ProductSpuVO implements Serializable {
 	private static final long serialVersionUID = -6531793503018149420L;
 
 	@ApiModelProperty("商品 id")

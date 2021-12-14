@@ -1,14 +1,20 @@
 package com.drstrong.health.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.ProductBasicsInfoMapper;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.entity.product.*;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.request.product.SaveProductRequest;
+import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.product.PackInfoResponse;
 import com.drstrong.health.product.model.response.product.ProductManageVO;
+import com.drstrong.health.product.model.response.product.ProductSpuVO;
+import com.drstrong.health.product.model.response.product.PropertyInfoResponse;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.*;
 import com.google.common.base.Joiner;
@@ -16,12 +22,10 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -134,8 +138,67 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		// 5.查询 sku 信息
 		List<ProductSkuEntity> skuEntityList = productSkuService.queryByProductId(productId);
 		// 6.组装返回值
+		return buildProductManageVO(basicsInfoEntity, extendEntity, backCategoryEntity, attributeEntityList, idEntityMap, skuEntityList);
+	}
 
-		return null;
+	/**
+	 * 分页查询 spu 信息
+	 *
+	 * @param querySpuRequest 查询参数
+	 * @return 分页返回值
+	 * @author liuqiuyi
+	 * @date 2021/12/14 10:25
+	 */
+	@Override
+	public PageVO<ProductSpuVO> pageQuerySpuByParam(QuerySpuRequest querySpuRequest) {
+		// 1.分页查询 spu 信息
+		Page<ProductBasicsInfoEntity> queryPage = new Page<>(querySpuRequest.getPageNo(), querySpuRequest.getPageSize());
+		Page<ProductBasicsInfoEntity> infoEntityPage = productBasicsInfoMapper.selectPage(queryPage, buildQuerySpuParam(querySpuRequest));
+		if (Objects.isNull(infoEntityPage) || CollectionUtils.isEmpty(infoEntityPage.getRecords())) {
+			return PageVO.emptyPageVo(querySpuRequest.getPageNo(), querySpuRequest.getPageSize());
+		}
+		// 2.获取 productId 集合,查询 sku 信息
+		List<ProductBasicsInfoEntity> basicsInfoEntityList = infoEntityPage.getRecords();
+		Set<Long> productIdList = basicsInfoEntityList.stream().map(ProductBasicsInfoEntity::getId).collect(Collectors.toSet());
+		Map<Long, List<ProductSkuEntity>> productIdSkuListMap = productSkuService.queryByProductIdListToMap(productIdList);
+		// 3.组装返回值
+		List<ProductSpuVO> spuVOList = Lists.newArrayListWithCapacity(basicsInfoEntityList.size());
+		for (ProductBasicsInfoEntity infoEntity : basicsInfoEntityList) {
+			ProductSpuVO productSpuVO = new ProductSpuVO();
+			productSpuVO.setProductId(infoEntity.getId());
+			productSpuVO.setSpuCode(infoEntity.getSpuCode());
+			productSpuVO.setSpuName(infoEntity.getTitle());
+			productSpuVO.setSpuIcon(infoEntity.getMasterImageUrl());
+			List<ProductSkuEntity> skuList = productIdSkuListMap.getOrDefault(infoEntity.getId(), new ArrayList<>());
+			productSpuVO.setSkuCount(skuList.size());
+			productSpuVO.setStoreId(infoEntity.getSourceId());
+			productSpuVO.setStoreName(infoEntity.getSourceName());
+			productSpuVO.setCreateTime(infoEntity.getCreatedAt());
+			productSpuVO.setUpdateTime(infoEntity.getChangedAt());
+			spuVOList.add(productSpuVO);
+		}
+		return PageVO.toPageVo(spuVOList, infoEntityPage.getTotal(), infoEntityPage.getSize(), infoEntityPage.getCurrent());
+	}
+
+	private LambdaQueryWrapper<ProductBasicsInfoEntity> buildQuerySpuParam(QuerySpuRequest querySpuRequest) {
+		LambdaQueryWrapper<ProductBasicsInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(ProductBasicsInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+		if (Objects.nonNull(querySpuRequest.getSpuCode())) {
+			queryWrapper.eq(ProductBasicsInfoEntity::getSpuCode, querySpuRequest.getSpuCode());
+		}
+		if (Objects.nonNull(querySpuRequest.getProductName())) {
+			queryWrapper.like(ProductBasicsInfoEntity::getTitle, querySpuRequest.getProductName());
+		}
+		if (Objects.nonNull(querySpuRequest.getStoreId())) {
+			queryWrapper.eq(ProductBasicsInfoEntity::getSourceId, querySpuRequest.getStoreId());
+		}
+		if (Objects.nonNull(querySpuRequest.getCreateStart())) {
+			queryWrapper.gt(ProductBasicsInfoEntity::getCreatedAt, querySpuRequest.getCreateStart());
+		}
+		if (Objects.nonNull(querySpuRequest.getCreateEnd())) {
+			queryWrapper.lt(ProductBasicsInfoEntity::getCreatedAt, querySpuRequest.getCreateEnd());
+		}
+		return queryWrapper;
 	}
 
 	private ProductManageVO buildProductManageVO(ProductBasicsInfoEntity basicsInfoEntity, ProductExtendEntity extendEntity, BackCategoryEntity backCategoryEntity
@@ -155,6 +218,37 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		productManageVO.setImageUrlList(Lists.newArrayList(extendEntity.getImageUrl().split(",")));
 		productManageVO.setDetailUrlList(Lists.newArrayList(extendEntity.getDetailUrl().split(",")));
 
+		List<PropertyInfoResponse> propertyInfoResponseList = Lists.newArrayListWithCapacity(attributeEntityList.size());
+		for (ProductAttributeEntity attributeEntity : attributeEntityList) {
+			CategoryAttributeItemEntity categoryAttEntity = idEntityMap.getOrDefault(attributeEntity.getAttributeItemId(), new CategoryAttributeItemEntity());
+
+			PropertyInfoResponse propertyInfoResponse = new PropertyInfoResponse();
+			propertyInfoResponse.setAttributeItemId(attributeEntity.getAttributeItemId());
+			propertyInfoResponse.setAttributeKey(categoryAttEntity.getAttributeKey());
+			propertyInfoResponse.setAttributeName(categoryAttEntity.getAttributeName());
+			propertyInfoResponse.setAttributeValue(attributeEntity.getAttributeValue());
+			propertyInfoResponse.setAttributeType(categoryAttEntity.getAttributeType());
+			propertyInfoResponse.setFormType(categoryAttEntity.getFormType());
+			propertyInfoResponse.setAttributeOptions(categoryAttEntity.getAttributeOptions());
+			propertyInfoResponse.setRequired(categoryAttEntity.getRequired());
+			propertyInfoResponse.setOrderNumber(categoryAttEntity.getOrderNumber());
+
+			propertyInfoResponseList.add(propertyInfoResponse);
+		}
+		productManageVO.setPropertyValueList(propertyInfoResponseList);
+
+		List<PackInfoResponse> packInfoList = Lists.newArrayListWithCapacity(skuEntityList.size());
+		for (ProductSkuEntity productSkuEntity : skuEntityList) {
+			PackInfoResponse packInfoResponse = new PackInfoResponse();
+			packInfoResponse.setPackName(productSkuEntity.getPackName());
+			packInfoResponse.setPackValue(productSkuEntity.getPackValue());
+//			packInfoResponse.setPrice(productSkuEntity.getSkuPrice());
+			packInfoResponse.setCommAttributeId(productSkuEntity.getCommAttribute());
+//			packInfoResponse.setCommAttributeName();
+			packInfoResponse.setSkuCode(productSkuEntity.getSkuCode());
+			packInfoList.add(packInfoResponse);
+		}
+		productManageVO.setPackInfoList(packInfoList);
 
 		return productManageVO;
 	}

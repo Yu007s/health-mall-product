@@ -8,10 +8,12 @@
         <result column="product_id" property="productId"/>
         <result column="sku_code" property="skuCode"/>
         <result column="sku_name" property="skuName"/>
-        <result column="icon" property="icon"/>
+        <result column="source_id" property="sourceId"/>
+        <result column="source_name" property="sourceName"/>
         <result column="pack_name" property="packName"/>
         <result column="pack_value" property="packValue"/>
         <result column="sku_price" property="skuPrice"/>
+        <result column="state" property="state"/>
         <result column="comm_attribute" property="commAttribute"/>
         <result column="version" property="version"/>
         <result column="created_at" property="createdAt"/>
@@ -26,10 +28,12 @@
                 product_id,
                 sku_code,
                 sku_name,
-                icon,
+                source_id,
+                source_name,
                 pack_name,
                 pack_value,
                 sku_price,
+                state,
                 comm_attribute,
                 version,
                 created_at,
@@ -45,10 +49,12 @@
         product_id,
         sku_code,
         sku_name,
-        icon,
+        source_id,
+        source_name,
         pack_name,
         pack_value,
         sku_price,
+        state,
         comm_attribute,
         created_by,
         changed_by
@@ -59,10 +65,12 @@
             #{item.productId},
             #{item.skuCode},
             #{item.skuName},
-            #{item.icon},
+            #{item.sourceId},
+            #{item.sourceName},
             #{item.packName},
             #{item.packValue},
             #{item.skuPrice},
+            #{item.state},
             #{item.commAttribute},
             #{createdBy},
             #{changedBy}

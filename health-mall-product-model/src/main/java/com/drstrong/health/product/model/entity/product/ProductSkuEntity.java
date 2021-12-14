@@ -30,19 +30,24 @@ public class ProductSkuEntity extends BaseEntity implements Serializable {
 	private Long productId;
 
 	/**
-	 * sku编码
-	 */
-	private String skuCode;
-
-	/**
 	 * sku 名称
 	 */
 	private String skuName;
 
 	/**
-	 * icon 图片地址
+	 * sku编码
 	 */
-	private String icon;
+	private String skuCode;
+
+	/**
+	 * 来源 id,就是店铺 id
+	 */
+	private Long sourceId;
+
+	/**
+	 * 来源名称,就是店铺名称
+	 */
+	private String sourceName;
 
 	/**
 	 * 规格名称
@@ -58,6 +63,11 @@ public class ProductSkuEntity extends BaseEntity implements Serializable {
 	 * sku价格
 	 */
 	private Integer skuPrice;
+
+	/**
+	 * 上架状态(0-未上架,1-已上架)
+	 */
+	private Integer state;
 
 	/**
 	 * 商品属性 以数字字典配置为准
