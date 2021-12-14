@@ -3,7 +3,7 @@ package com.drstrong.health.product.service;
 import com.drstrong.health.product.model.entity.category.FrontCategoryEntity;
 import com.drstrong.health.product.model.request.category.AddOrUpdateFrontCategoryRequest;
 import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
-import com.drstrong.health.product.model.response.category.FrontCategoryResponse;
+import com.drstrong.health.product.model.response.category.FrontCategoryVO;
 
 import java.util.List;
 import java.util.Set;
@@ -23,7 +23,7 @@ public interface FrontCategoryService {
 	 * @author liuqiuyi
 	 * @date 2021/12/7 20:37
 	 */
-	List<FrontCategoryResponse> queryTreeByParam(CategoryQueryRequest categoryQueryRequest);
+	List<FrontCategoryVO> queryByParamToTree(CategoryQueryRequest categoryQueryRequest);
 
 	/**
 	 * 根据分类 id 集合查询分类信息

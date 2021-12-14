@@ -2,6 +2,7 @@ package com.drstrong.health.product.service;
 
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
+import com.drstrong.health.product.model.response.category.BackCategoryVO;
 
 import java.util.List;
 import java.util.Set;
@@ -34,12 +35,12 @@ public interface BackCategoryService {
 	BackCategoryEntity queryById(Long categoryId);
 
 	/**
-	 * 查询后台分类集合
+	 * 查询后台分类集合,组装成树形结构
 	 *
 	 * @param categoryQueryRequest 查询条件
-	 * @return 后台分类的集合
+	 * @return 后台分类的集合,树形结构
 	 * @author liuqiuyi
 	 * @date 2021/12/7 20:37
 	 */
-	List<BackCategoryEntity> queryByParam(CategoryQueryRequest categoryQueryRequest);
+	List<BackCategoryVO> queryByParamToTree(CategoryQueryRequest categoryQueryRequest);
 }

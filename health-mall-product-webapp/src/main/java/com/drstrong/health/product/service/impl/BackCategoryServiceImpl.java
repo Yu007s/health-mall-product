@@ -5,9 +5,11 @@ import com.drstrong.health.product.dao.BackCategoryMapper;
 import com.drstrong.health.product.model.BaseTree;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
+import com.drstrong.health.product.model.response.category.BackCategoryVO;
 import com.drstrong.health.product.service.BackCategoryService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -76,7 +78,27 @@ public class BackCategoryServiceImpl implements BackCategoryService {
 	 * @date 2021/12/7 20:37
 	 */
 	@Override
-	public List<BackCategoryEntity> queryByParam(CategoryQueryRequest categoryQueryRequest) {
-		return null;
+	public List<BackCategoryVO> queryByParamToTree(CategoryQueryRequest categoryQueryRequest) {
+		LambdaQueryWrapper<BackCategoryEntity> backWrapper = new LambdaQueryWrapper<>();
+		backWrapper.gt(BackCategoryEntity::getLevel, 0);
+		if (Objects.nonNull(categoryQueryRequest.getLevel())) {
+			backWrapper.le(BackCategoryEntity::getLevel, categoryQueryRequest.getLevel());
+		}
+		if (Objects.nonNull(categoryQueryRequest.getState())) {
+			backWrapper.eq(BackCategoryEntity::getStatus, categoryQueryRequest.getState());
+		}
+		backWrapper.orderByAsc(BackCategoryEntity::getOrderNumber).orderByAsc(BackCategoryEntity::getId);
+		List<BackCategoryEntity> backCategoryEntityList = backCategoryMapper.selectList(backWrapper);
+		if (CollectionUtils.isEmpty(backCategoryEntityList)) {
+			return Lists.newArrayList();
+		}
+		// 组装返回值
+		List<BackCategoryVO> backCategoryVOList = Lists.newArrayListWithCapacity(backCategoryEntityList.size());
+		for (BackCategoryEntity backCategoryEntity : backCategoryEntityList) {
+			BackCategoryVO backCategoryVO = new BackCategoryVO();
+			BeanUtils.copyProperties(backCategoryEntity, backCategoryVO);
+			backCategoryVOList.add(backCategoryVO);
+		}
+		return BaseTree.listToTree(backCategoryVOList);
 	}
 }

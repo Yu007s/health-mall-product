@@ -23,6 +23,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import java.nio.file.AccessDeniedException;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -97,6 +98,11 @@ public class DefaultExceptionAdvice {
 
 	@ExceptionHandler({MissingServletRequestParameterException.class})
 	public ResultVO<String> handMissingServletRequestParameterException(MissingServletRequestParameterException me) {
+		return this.defHandler((IBaseResult) ResultStatus.PARAM_ERROR, me);
+	}
+
+	@ExceptionHandler({SQLIntegrityConstraintViolationException.class})
+	public ResultVO<String> sqlIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException me) {
 		return this.defHandler((IBaseResult) ResultStatus.PARAM_ERROR, me);
 	}
 

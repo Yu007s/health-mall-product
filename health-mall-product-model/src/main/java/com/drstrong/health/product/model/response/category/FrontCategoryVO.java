@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel("前台分类的返回值")
-public class FrontCategoryResponse extends BaseTree implements Serializable {
+public class FrontCategoryVO extends BaseTree implements Serializable {
 	private static final long serialVersionUID = -4324918492956801359L;
 
 	@ApiModelProperty("前台层级")

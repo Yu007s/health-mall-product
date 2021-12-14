@@ -11,7 +11,7 @@ import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.LevelEnum;
 import com.drstrong.health.product.model.request.category.AddOrUpdateFrontCategoryRequest;
 import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
-import com.drstrong.health.product.model.response.category.FrontCategoryResponse;
+import com.drstrong.health.product.model.response.category.FrontCategoryVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.BackCategoryService;
 import com.drstrong.health.product.service.CategoryRelationService;
@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -58,19 +59,19 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 	 * @date 2021/12/7 20:37
 	 */
 	@Override
-	public List<FrontCategoryResponse> queryTreeByParam(CategoryQueryRequest categoryQueryRequest) {
+	public List<FrontCategoryVO> queryByParamToTree(CategoryQueryRequest categoryQueryRequest) {
 		// 1.获取所有的前台分类
 		List<FrontCategoryEntity> frontCategoryEntityList = frontCategoryMapper.queryByParam(categoryQueryRequest);
 		if (CollectionUtils.isEmpty(frontCategoryEntityList)) {
 			return Lists.newArrayList();
 		}
 		// 组装返回值的树形结构
-		List<FrontCategoryResponse> frontCategoryResponseList = buildResponse(frontCategoryEntityList);
+		List<FrontCategoryVO> frontCategoryVOList = buildResponse(frontCategoryEntityList);
 		// 2.获取前台分类关联的后台分类
 		Set<Long> frontCategoryIdList = frontCategoryEntityList.stream().map(FrontCategoryEntity::getId).collect(Collectors.toSet());
 		Map<Long, List<Long>> frontIdBackIdMap = categoryRelationService.getFrontAndBackCategoryToMap(frontCategoryIdList);
 		if (CollectionUtils.isEmpty(frontIdBackIdMap)) {
-			return frontCategoryResponseList;
+			return frontCategoryVOList;
 		}
 		// 3.获取关联的后台分类信息
 		Set<Long> backCategoryIdList = frontIdBackIdMap.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
@@ -80,8 +81,8 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		// 5.组装前台分类对应的商品数量
 		Map<Long, Integer> frontIdProductCountMap = buildFrontCategoryProductNumMap(frontIdBackIdMap, backIdProductNumMap);
 		// 6.设置返回值
-		frontCategoryResponseList.forEach(frontCategoryResponse -> buildResponseProductNum(frontCategoryResponse, frontIdProductCountMap));
-		return frontCategoryResponseList;
+		frontCategoryVOList.forEach(frontCategoryVO -> buildResponseProductNum(frontCategoryVO, frontIdProductCountMap));
+		return frontCategoryVOList;
 	}
 
 	/**
@@ -156,7 +157,11 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		categoryEntity.setCreatedBy(categoryRequest.getUserId());
 		categoryEntity.setChangedBy(categoryRequest.getUserId());
 		categoryEntity.setState(0);
-		frontCategoryMapper.insert(categoryEntity);
+		try {
+			frontCategoryMapper.insert(categoryEntity);
+		} catch (DuplicateKeyException e) {
+			throw new BusinessException(ErrorEnums.CATEGORY_NAME_IS_EXIST);
+		}
 		if (CollectionUtils.isEmpty(categoryRequest.getBackCategoryIdList())) {
 			return;
 		}
@@ -194,7 +199,12 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		if (StringUtils.isEmpty(updateFrontCategoryRequest.getIconUrl())) {
 			frontEntity.setIcon(updateFrontCategoryRequest.getIconUrl());
 		}
-		int updateNum = frontCategoryMapper.updateById(frontEntity);
+		int updateNum = 0;
+		try {
+			updateNum = frontCategoryMapper.updateById(frontEntity);
+		} catch (DuplicateKeyException e) {
+			throw new BusinessException(ErrorEnums.CATEGORY_NAME_IS_EXIST);
+		}
 		if (updateNum <= 0) {
 			throw new BusinessException(ErrorEnums.SAVE_UPDATE_NOT_EXIST);
 		}
@@ -268,16 +278,15 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 	}
 
 
-
 	/**
 	 * 设置返回值中,前台分类对应的商品数量
 	 */
-	private void buildResponseProductNum(FrontCategoryResponse frontCategoryResponse, Map<Long, Integer> frontIdProductCountMap) {
-		if (CollectionUtils.isEmpty(frontCategoryResponse.getChildren())) {
-			frontCategoryResponse.setProductCount(frontIdProductCountMap.getOrDefault(frontCategoryResponse.getId(), 0));
+	private void buildResponseProductNum(FrontCategoryVO frontCategoryVO, Map<Long, Integer> frontIdProductCountMap) {
+		if (CollectionUtils.isEmpty(frontCategoryVO.getChildren())) {
+			frontCategoryVO.setProductCount(frontIdProductCountMap.getOrDefault(frontCategoryVO.getId(), 0));
 		} else {
-			for (Object child : frontCategoryResponse.getChildren()) {
-				FrontCategoryResponse childResponse = (FrontCategoryResponse) child;
+			for (Object child : frontCategoryVO.getChildren()) {
+				FrontCategoryVO childResponse = (FrontCategoryVO) child;
 				buildResponseProductNum(childResponse, frontIdProductCountMap);
 			}
 		}
@@ -301,10 +310,10 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 	/**
 	 * 组装返回值的树形结构
 	 */
-	private List<FrontCategoryResponse> buildResponse(List<FrontCategoryEntity> categoryEntityList) {
-		List<FrontCategoryResponse> frontCategoryResponseList = Lists.newArrayListWithCapacity(categoryEntityList.size());
+	private List<FrontCategoryVO> buildResponse(List<FrontCategoryEntity> categoryEntityList) {
+		List<FrontCategoryVO> frontCategoryVOList = Lists.newArrayListWithCapacity(categoryEntityList.size());
 		categoryEntityList.forEach(frontCategoryEntity -> {
-			FrontCategoryResponse categoryResponse = new FrontCategoryResponse();
+			FrontCategoryVO categoryResponse = new FrontCategoryVO();
 			BeanUtils.copyProperties(frontCategoryEntity, categoryResponse);
 			categoryResponse.setLevelName(LevelEnum.getValueByCode(categoryResponse.getLevel()));
 			categoryResponse.setCategoryName(frontCategoryEntity.getName());
@@ -312,8 +321,8 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 			categoryResponse.setCategoryStatus(frontCategoryEntity.getState());
 			categoryResponse.setCreateTime(frontCategoryEntity.getCreatedAt());
 
-			frontCategoryResponseList.add(categoryResponse);
+			frontCategoryVOList.add(categoryResponse);
 		});
-		return BaseTree.listToTree(frontCategoryResponseList);
+		return BaseTree.listToTree(frontCategoryVOList);
 	}
 }

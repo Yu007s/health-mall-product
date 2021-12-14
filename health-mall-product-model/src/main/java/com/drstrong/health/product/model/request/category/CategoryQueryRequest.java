@@ -22,4 +22,7 @@ public class CategoryQueryRequest implements Serializable {
 
 	@ApiModelProperty("分类状态 0-启用,1-禁用")
 	private Integer state;
+
+	@ApiModelProperty("分类级别")
+	private Integer level;
 }

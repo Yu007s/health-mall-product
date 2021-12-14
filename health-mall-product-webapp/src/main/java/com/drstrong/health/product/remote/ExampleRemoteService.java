@@ -1,5 +1,4 @@
 package com.drstrong.health.product.remote;
-import com.drstrong.health.product.remote.api.ExampleRemoteApi;
 import org.apache.dubbo.config.annotation.DubboService;
 
 /**
@@ -7,5 +6,5 @@ import org.apache.dubbo.config.annotation.DubboService;
  * @since 2021/6/21 14:45.
  */
 @DubboService
-public class ExampleRemoteService implements ExampleRemoteApi {
+public class ExampleRemoteService {
 }

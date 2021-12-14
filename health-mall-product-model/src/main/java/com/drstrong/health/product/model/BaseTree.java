@@ -1,5 +1,8 @@
 package com.drstrong.health.product.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiModelProperty;
@@ -20,11 +23,13 @@ public class BaseTree implements Serializable {
 	private static final long serialVersionUID = 814912167792587389L;
 
 	@ApiModelProperty(value = "节点 id")
+	@TableId(value = "id", type = IdType.AUTO)
 	private Long id;
 
 	@ApiModelProperty(value = "父节点")
 	private Long parentId;
 
+	@TableField(exist = false)
 	@ApiModelProperty(value = "子节点")
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private List<? super BaseTree> children = Lists.newArrayList();
