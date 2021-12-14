@@ -133,6 +133,15 @@
             <version>2.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>cn.strong</groupId>
+            <artifactId>lettuce-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- xxl-job -->
+        <dependency>
+            <groupId>cn.strong</groupId>
+            <artifactId>xxl-job-spring-boot-starter</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
