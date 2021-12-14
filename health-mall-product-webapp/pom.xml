@@ -120,7 +120,6 @@
         <dependency>
             <groupId>cn.strong</groupId>
             <artifactId>strong-mybatis-plus-extend</artifactId>
-<!--            <scope>test</scope>-->
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
