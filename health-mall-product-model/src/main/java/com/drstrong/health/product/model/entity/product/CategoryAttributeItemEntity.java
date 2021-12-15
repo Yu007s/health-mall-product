@@ -71,7 +71,7 @@ public class CategoryAttributeItemEntity implements Serializable {
 	/**
 	 * 创建人
 	 */
-	private Long createdBy;
+	private String createdBy;
 	/**
 	 * 修改时间
 	 */
@@ -79,7 +79,7 @@ public class CategoryAttributeItemEntity implements Serializable {
 	/**
 	 * 修改人
 	 */
-	private Long changedBy;
+	private String changedBy;
 	/**
 	 * 版本号
 	 */

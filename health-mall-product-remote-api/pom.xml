@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!-- 打包时注释掉父 pom 依赖 -->
     <parent>
         <groupId>com.drstrong.health</groupId>
         <artifactId>health-mall-product</artifactId>
@@ -7,6 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- 打包时放开这个注释 -->
+<!--    <groupId>com.drstrong.health</groupId>
+    <version>1.0-SNAPSHOT</version>-->
     <artifactId>health-mall-product-remote-api</artifactId>
     <packaging>jar</packaging>
 
@@ -25,7 +30,22 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.12</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Team Nexus Snapshot Repository</name>
+            <url>http://192.168.21.125:8081/repository/maven-snapshots/</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+        <repository>
+            <id>release</id>
+            <name>Team Nexus Release Repository</name>
+            <url>http://192.168.21.125:8081/repository/maven-snapshots/</url>
+        </repository>
+    </distributionManagement>
 </project>

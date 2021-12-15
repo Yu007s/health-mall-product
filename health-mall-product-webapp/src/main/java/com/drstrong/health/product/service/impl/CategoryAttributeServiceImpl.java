@@ -80,11 +80,16 @@ public class CategoryAttributeServiceImpl implements CategoryAttributeService {
 	public List<CategoryAttributeItemVO> getItems(Long categoryId) {
 		BackCategoryEntity category = backCategoryService.queryById(categoryId);
 		if (category == null) {
-			return Collections.emptyList();
+			return Lists.newArrayList();
 		}
 		//获取该分类和所有上级分类的属性项
 		Set<String> categoryIdItems = StringUtils.commaDelimitedListToSet(category.getIdPath());
 		Set<Long> categoryIds = categoryIdItems.stream().map(Long::parseLong).collect(Collectors.toSet());
+
+		// 这里为空直接返回,避免下面的查询语句出错
+		if (CollectionUtils.isEmpty(categoryIds)) {
+			return Lists.newArrayList();
+		}
 
 		QueryWrapper<CategoryAttributeItemEntity> query = Wrappers.query();
 		query.in("category_id", categoryIds);

@@ -19,7 +19,7 @@ public class ProductSkuInfoDTO implements Serializable {
 	private static final long serialVersionUID = 814358534732690036L;
 
 	@ApiModelProperty("商品skuId")
-	private String skuId;
+	private Long skuId;
 
 	@ApiModelProperty("商品id")
 	private String productId;
@@ -40,7 +40,7 @@ public class ProductSkuInfoDTO implements Serializable {
 	private String productIcon;
 
 	@ApiModelProperty(value = "店铺id")
-	private String storeId;
+	private Long storeId;
 
 	@ApiModelProperty(value = "店铺名称")
 	private String storeName;

@@ -20,7 +20,7 @@ import java.util.Set;
 public class AddOrUpdateFrontCategoryRequest implements Serializable {
 	private static final long serialVersionUID = 4836203995959321293L;
 
-	@ApiModelProperty(value = "分类 id", notes = "添加分类的时候不需要传该参数,更新分类时必传")
+	@ApiModelProperty(value = "分类 id,添加分类的时候不需要传该参数,更新分类时必传")
 	private Long categoryId;
 
 	@ApiModelProperty("父类 id")
