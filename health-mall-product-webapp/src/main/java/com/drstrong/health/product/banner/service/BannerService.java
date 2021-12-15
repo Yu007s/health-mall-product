@@ -2,7 +2,10 @@ package com.drstrong.health.product.banner.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.banner.Banner;
+import com.drstrong.health.product.model.request.banner.BannerListRequest;
 import com.drstrong.health.product.model.request.banner.BannerRequest;
+import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.banner.BannerListResponse;
 import com.drstrong.health.product.model.response.banner.BannerResponse;
 
 import java.util.List;
@@ -37,4 +40,11 @@ public interface BannerService extends IService<Banner> {
      * @return 更新条目数量
      */
     Integer pollingStatus();
+
+    /**
+     * 分页 条件 查询 轮播图列表
+     * @param request 查询请求
+     * @return 轮播图
+     */
+    PageVO<BannerListResponse> queryList(BannerListRequest request);
 }

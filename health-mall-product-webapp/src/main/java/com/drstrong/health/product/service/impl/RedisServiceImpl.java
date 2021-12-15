@@ -22,7 +22,6 @@ import java.util.function.Supplier;
  * @Date: 2021-12-13 15:10
  * @program health-mall-postsale
  */
-@Component
 @Service
 public class RedisServiceImpl implements IRedisService {
     private static RedisUtils redisUtils;

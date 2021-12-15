@@ -60,4 +60,18 @@
             #{item}
         </foreach>
     </update>
+
+    <select id="queryList" resultType="com.drstrong.health.product.model.response.banner.BannerListResponse">
+        SELECT
+        mall_banner.id,banner_name,photo_url,link_address,location,link_type,product_spu_sn,mall_banner.sort,start_time,end_time,show_status,master_image_url
+        FROM mall_banner LEFT JOIN pms_product_basics_info ON spu_code =
+        product_spu_sn
+        WHERE mall_banner.del_flag = 0
+        <if test="bannerName != null">
+            AND banner_name LIKE CONCAT('%',#{bannerName},'%')
+        </if>
+        <if test="showStatus != null">
+            AND show_status = #{showStatus}
+        </if>
+    </select>
 </mapper>

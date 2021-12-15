@@ -2,10 +2,14 @@ package com.drstrong.health.product.banner.service.impl;
 
 
 import cn.strong.common.utils.CollectionUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.constans.banner.BannerConstants;
 import com.drstrong.health.product.banner.dao.mybatis.BannerMapper;
 import com.drstrong.health.product.model.entity.banner.Banner;
+import com.drstrong.health.product.model.request.banner.BannerListRequest;
 import com.drstrong.health.product.model.request.banner.BannerRequest;
+import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.banner.BannerListResponse;
 import com.drstrong.health.product.model.response.banner.BannerResponse;
 import com.drstrong.health.product.banner.service.BannerService;
 import cn.strong.mybatis.plus.extend.CustomServiceImpl;
@@ -19,6 +23,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -118,6 +123,23 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
             banner.setShowStatus(BannerConstants.ON_SALE);
         } else if (banner.getEndTime().before(new Date())) {
             banner.setShowStatus(BannerConstants.OFF_ON_SHELF);
+        }
+    }
+
+    @Override
+    public PageVO<BannerListResponse> queryList(BannerListRequest request) {
+        Page<BannerListResponse>  page = new Page<BannerListResponse> (request.getPageNo(),request.getPageSize());
+        bannerDao.queryList( request.getBannerName(),request.getShowStatus(), page);
+        List<BannerListResponse> list = page.getRecords();
+        if (CollectionUtils.isNotEmpty(list)){
+            list.forEach(i->{
+                if (i.getLinkType() != 2){
+                    i.setMasterImageUrl(null);
+                }
+            });
+            return PageVO.toPageVo(list,page.getTotal(),page.getCurrent(),page.getTotal());
+        }else {
+            return PageVO.emptyPageVo(request.getPageNo(),request.getPageSize());
         }
     }
 }

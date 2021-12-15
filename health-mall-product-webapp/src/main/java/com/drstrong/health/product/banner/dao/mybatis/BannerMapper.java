@@ -1,7 +1,9 @@
 package com.drstrong.health.product.banner.dao.mybatis;
 
 import cn.strong.mybatis.plus.extend.CustomBaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.entity.banner.Banner;
+import com.drstrong.health.product.model.response.banner.BannerListResponse;
 import com.drstrong.health.product.model.response.banner.BannerResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -48,4 +50,12 @@ public interface BannerMapper extends CustomBaseMapper<Banner> {
      * @return
      */
     Integer updateBannerStatus(@Param("list") List<Long> list, @Param("showStatus") Integer showStatus);
+
+    /**
+     * 根据 轮播图名称，状态 分页查询
+     * @param bannerName 轮播图
+     * @param showStatus 展示状态
+     * @return 轮播图列表
+     */
+    Page<BannerListResponse> queryList(@Param("bannerName") String bannerName , @Param("showStatus") Integer showStatus,Page page);
 }

@@ -53,4 +53,11 @@ public interface ProductBasicsInfoService {
 	 * @date 2021/12/14 10:25
 	 */
 	PageVO<ProductSpuVO> pageQuerySpuByParam(QuerySpuRequest querySpuRequest);
+
+	/**
+	 * 通过SkuCode 查询 已上架条数
+	 * @param spuCode spu_code
+	 * @return 上架条目条数
+	 */
+	Integer getCountBySPUCode(String spuCode);
 }

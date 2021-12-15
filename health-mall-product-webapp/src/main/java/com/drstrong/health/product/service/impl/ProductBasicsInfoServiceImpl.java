@@ -298,4 +298,11 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		saveOrUpdate(infoEntity);
 		return infoEntity;
 	}
+
+	@Override
+	public Integer getCountBySPUCode(String spuCode){
+		LambdaQueryWrapper<ProductBasicsInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(ProductBasicsInfoEntity::getSpuCode,spuCode).eq(ProductBasicsInfoEntity::getDelFlag,0).eq(ProductBasicsInfoEntity::getState,1);
+		return productBasicsInfoMapper.selectCount(queryWrapper);
+	}
 }

@@ -57,5 +57,5 @@ public class BannerListResponse {
     private Integer showStatus;
 
     @ApiModelProperty("商品主图")
-    private String spuMainUrl;
+    private String masterImageUrl;
 }
