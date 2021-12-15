@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service;
 
+import com.drstrong.health.product.model.dto.ProductSkuDTO;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -44,7 +45,7 @@ public interface ProductSkuService {
 	 * @author liuqiuyi
 	 * @date 2021/12/14 10:51
 	 */
-	List<ProductSkuEntity> queryByProductIdList(Set<Long> productIdList);
+	List<ProductSkuDTO> queryByProductIdList(Set<Long> productIdList);
 
 	/**
 	 * 根据 商品id 集合,查询 sku 集合,组装为 map
@@ -54,7 +55,7 @@ public interface ProductSkuService {
 	 * @author liuqiuyi
 	 * @date 2021/12/14 10:54
 	 */
-	Map<Long, List<ProductSkuEntity>> queryByProductIdListToMap(Set<Long> productIdList);
+	Map<Long, List<ProductSkuDTO>> queryByProductIdListToMap(Set<Long> productIdList);
 
 	/**
 	 * 根据条件分页查询 sku 信息

@@ -3,6 +3,7 @@ package com.drstrong.health.product.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.dao.ProductSkuMapper;
+import com.drstrong.health.product.model.dto.ProductSkuDTO;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
@@ -78,13 +79,23 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 	 * @date 2021/12/14 10:51
 	 */
 	@Override
-	public List<ProductSkuEntity> queryByProductIdList(Set<Long> productIdList) {
+	public List<ProductSkuDTO> queryByProductIdList(Set<Long> productIdList) {
 		if (CollectionUtils.isEmpty(productIdList)) {
 			return Lists.newArrayList();
 		}
 		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.in(ProductSkuEntity::getProductId, productIdList).eq(ProductSkuEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
-		return productSkuMapper.selectList(queryWrapper);
+		List<ProductSkuEntity> productSkuEntities = productSkuMapper.selectList(queryWrapper);
+		if (CollectionUtils.isEmpty(productSkuEntities)) {
+			return Lists.newArrayList();
+		}
+		List<ProductSkuDTO> skuDTOList = Lists.newArrayListWithCapacity(productSkuEntities.size());
+		for (ProductSkuEntity productSkuEntity : productSkuEntities) {
+			ProductSkuDTO productSkuDTO = new ProductSkuDTO();
+			BeanUtils.copyProperties(productSkuEntity, productSkuDTO);
+			skuDTOList.add(productSkuDTO);
+		}
+		return skuDTOList;
 	}
 
 	/**
@@ -96,12 +107,12 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 	 * @date 2021/12/14 10:54
 	 */
 	@Override
-	public Map<Long, List<ProductSkuEntity>> queryByProductIdListToMap(Set<Long> productIdList) {
-		List<ProductSkuEntity> productSkuEntities = queryByProductIdList(productIdList);
+	public Map<Long, List<ProductSkuDTO>> queryByProductIdListToMap(Set<Long> productIdList) {
+		List<ProductSkuDTO> productSkuEntities = queryByProductIdList(productIdList);
 		if (CollectionUtils.isEmpty(productSkuEntities)) {
 			return Maps.newHashMap();
 		}
-		return productSkuEntities.stream().collect(groupingBy(ProductSkuEntity::getProductId));
+		return productSkuEntities.stream().collect(groupingBy(ProductSkuDTO::getProductId));
 	}
 
 	/**

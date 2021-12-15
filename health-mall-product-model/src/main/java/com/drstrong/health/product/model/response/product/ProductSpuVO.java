@@ -1,11 +1,15 @@
 package com.drstrong.health.product.model.response.product;
 
+import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 商品 spu
@@ -32,6 +36,12 @@ public class ProductSpuVO implements Serializable {
 
 	@ApiModelProperty("商品下 sku 数量")
 	private Integer skuCount;
+
+	@ApiModelProperty(value = "商品下 sku 集合")
+	private List<ProductSkuEntity> skuList;
+
+	@ApiModelProperty(value = "商品下 sku 集合")
+	private BigDecimal highPrice;
 
 	@ApiModelProperty("店铺 id")
 	private Long storeId;

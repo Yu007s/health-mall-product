@@ -3,7 +3,11 @@ package com.drstrong.health.product.service;
 import com.drstrong.health.product.model.entity.category.FrontCategoryEntity;
 import com.drstrong.health.product.model.request.category.AddOrUpdateFrontCategoryRequest;
 import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
+import com.drstrong.health.product.model.request.category.PageCategoryIdRequest;
+import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.category.FrontCategoryVO;
+import com.drstrong.health.product.model.response.category.HomeCategoryVO;
+import com.drstrong.health.product.model.response.product.ProductSpuVO;
 
 import java.util.List;
 import java.util.Set;
@@ -82,4 +86,24 @@ public interface FrontCategoryService {
 	 * @date 2021/12/13 11:05
 	 */
 	void deleteFrontCategoryById(Long categoryId, Long userId);
+
+	/**
+	 * 获取首页的分类信息
+	 *
+	 * @param level 查询的前台分类层级,1-表示查询一级分类,2-表示查询一级分类和二级分类,不传默认查询一级分类
+	 * @return 分类信息
+	 * @author liuqiuyi
+	 * @date 2021/12/15 16:24
+	 */
+	List<HomeCategoryVO> getHomeCategory(Integer level);
+
+	/**
+	 * 根据分类 id 查询分类的商品信息(分页)
+	 *
+	 * @param pageCategoryIdRequest 查询参数
+	 * @return 分类商品信息
+	 * @author liuqiuyi
+	 * @date 2021/12/15 20:33
+	 */
+	PageVO<ProductSpuVO> pageCategoryProduct(PageCategoryIdRequest pageCategoryIdRequest);
 }

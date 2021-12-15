@@ -82,7 +82,7 @@ public class ProductManageController {
 	@ApiOperation("分页查询 spu 信息")
 	@GetMapping("/pageSpu")
 	public ResultVO<PageVO<ProductSpuVO>> pageSpu(QuerySpuRequest querySpuRequest) {
-		PageVO<ProductSpuVO> resultPageVO = productBasicsInfoService.pageQuerySpuByParam(querySpuRequest);
+		PageVO<ProductSpuVO> resultPageVO = productBasicsInfoService.managePageQuerySpuByParam(querySpuRequest);
 		return ResultVO.success(resultPageVO);
 	}
 
