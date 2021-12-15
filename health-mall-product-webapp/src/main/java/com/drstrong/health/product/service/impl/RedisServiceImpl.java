@@ -1,12 +1,18 @@
 package com.drstrong.health.product.service.impl;
 
 import cn.strong.common.utils.CollectionUtils;
-import cn.strong.springboot.redis.utils.CacheLettuceUtils;
+
+import static com.drstrong.health.redis.utils.RedisUtils.*;
 
 import com.drstrong.health.product.service.IRedisService;
+import com.drstrong.health.redis.utils.RedisUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -16,20 +22,29 @@ import java.util.function.Supplier;
  * @Date: 2021-12-13 15:10
  * @program health-mall-postsale
  */
+@Component
 @Service
 public class RedisServiceImpl implements IRedisService {
-
+    private static RedisUtils redisUtils;
+    @Autowired
+    public RedisServiceImpl(RedisUtils redisUtils) {
+        RedisServiceImpl.redisUtils = redisUtils;
+    }
     @Override
     public <T extends Serializable> List<T> lrange(String key, int ttl, int start, int end, Supplier<List<T>> supplier){
-        List<T> result = CacheLettuceUtils.lrange(key, start, end);
+        List<Object> r = redisUtils.lGet(key, start, end);
+        List<T> result =  new ArrayList<>();
+        for (Object item : r) {
+            result.add((T) item);
+        }
         if(CollectionUtils.isNotEmpty(result)){
             return result;
         }
         result = supplier.get();
         if(CollectionUtils.isNotEmpty(result)){
-            result.forEach(i -> CacheLettuceUtils.rpush(key, i));
+            result.forEach(i -> redisUtils.lSet(key, i));
             if(ttl > 0){
-                CacheLettuceUtils.expire(key, ttl);
+                redisUtils.expire(key, ttl);
             }
         }
         return result;

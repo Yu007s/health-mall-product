@@ -1,7 +1,7 @@
 package com.drstrong.health.product.banner.service.impl;
 
-import cn.strong.leke.common.utils.CollectionUtils;
-import cn.strong.springboot.redis.utils.CacheLettuceUtils;
+
+import cn.strong.common.utils.CollectionUtils;
 import com.drstrong.health.product.model.constans.banner.BannerConstants;
 import com.drstrong.health.product.banner.dao.mybatis.BannerMapper;
 import com.drstrong.health.product.model.entity.banner.Banner;
@@ -10,7 +10,9 @@ import com.drstrong.health.product.model.response.banner.BannerResponse;
 import com.drstrong.health.product.banner.service.BannerService;
 import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.drstrong.health.product.service.IRedisService;
+import com.drstrong.health.redis.utils.RedisUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,6 +35,11 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
     BannerMapper bannerDao;
     @Resource
     IRedisService redisService;
+    private static RedisUtils redisUtils;
+    @Autowired
+    public BannerServiceImpl(RedisUtils redisUtils) {
+        BannerServiceImpl.redisUtils = redisUtils;
+    }
 
     @Override
     public List<BannerResponse> get(Integer location, Integer pageSize) {
@@ -74,7 +81,7 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
         }
         // 如果 该轮播图上架 清空缓存
         if (banner.getShowStatus() == BannerConstants.ON_SALE){
-            CacheLettuceUtils.delete(BannerConstants.BANNER_INDEX_KEY);
+            redisUtils.del(BannerConstants.BANNER_INDEX_KEY);
         }
         return true;
     }

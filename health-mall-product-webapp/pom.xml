@@ -97,7 +97,16 @@
 
 
         <!--    自定义区域结束    -->
-
+        <dependency>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-redis-spring-boot-starter</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- xxl-job -->
+        <dependency>
+            <groupId>cn.strong</groupId>
+            <artifactId>xxl-job-spring-boot-starter</artifactId>
+        </dependency>
         <!--    junit    -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -133,17 +142,7 @@
             <version>2.2</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>cn.strong</groupId>
-            <artifactId>lettuce-spring-boot-starter</artifactId>
-        </dependency>
-        <!-- xxl-job -->
-        <dependency>
-            <groupId>cn.strong</groupId>
-            <artifactId>xxl-job-spring-boot-starter</artifactId>
-        </dependency>
     </dependencies>
-
     <build>
         <finalName>health-mall-product</finalName>
         <resources>
