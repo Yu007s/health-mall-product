@@ -1,108 +1,130 @@
-variables: #环境变量
-  #项目名称
-  APP_NAME: 'health-mall-product'
-  #项目所在namespace
-  APP_NAMESPACE: 'backend'
-  # image group
-  REGISTRY_GROUP: 'campus'
-  # image name
-  REGISTRY_IMAGE: '${APP_NAME}:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}'
-  # maven cache
-  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+include:
+  - local: '/.developer-vars.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/.huihui-ops-vars.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/maven-huihui.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/docker-image.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/inside-deploy-java.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/uat-deploy-java.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/prod-deploy-java.yml'
 
-stages: #这是 Gitlab CI 中的概念，Stages 表示构建阶段，就是一些按序执行的流程，具体执行是依赖于 Jobs 的
+
+variables:
+  # image group, sre define
+  REGISTRY_GROUP: '$BUSINESS_NAME'
+  # image name, sre define
+  REGISTRY_IMAGE: '${APP_NAME}:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}'
+  # k8s config, sre define
+  KUBECONFIG: '/config'
+  # k8s deployments, sre define
+  CD_REPO: 'gitlab.leke.cn/deployments/${BUSINESS_NAME}/backend/${APP_NAME}.git'
+
+
+stages:
   - maven package
   - build docker image
   - deploy to dev
   - deploy to testing
-  - deploy to uat
+  - deploy to pre
   - deploy to prod
 
-maven-build: #定义的 Jobs 之一，用于构建 jar 包。script 为具体执行的脚本
-  image: ${DEV_REGISTRY_HOST}/basic/maven:3.6.2-jdk-14
+
+Maven build:
   stage: maven package
   tags:
     - k8s
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - health-mall-product-webapp/target/*.jar
-      - .m2/repository
+  extends: .maven-build
   script:
-    - mvn -DskipTests clean package
+    - mvn -DskipTests clean package -P !dev $MAVEN_OPTS
 
-.git_init: &git_init
-  before_script:
-    - git init
-    - git config --global user.email "gitlab@git.k8s.local"
-    - git config --global user.name "GitLab CI/CD"
 
-docker-build: #定义的 Jobs 之一，将当前项目按照预先定义好的Dockerfile文件打包成docker镜像并上传到指定的docker仓库中
-  image: ${DEV_REGISTRY_HOST}/basic/docker:stable
+Image build:
   stage: build docker image
-  tags:
-    - k8s
-  except: #以dev开头的分支不执行此阶段
-    - /^dev.*/
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - health-mall-product-webapp/target/*.jar
-    policy: pull
-  script:
-    - echo $DEV_REGISTRY_PASSWORD | docker login --username $DEV_REGISTRY_USERNAME --password-stdin $DEV_REGISTRY_HOST
-    - docker build --build-arg APP_NAME=$APP_NAME -t $DEV_REGISTRY_HOST/$REGISTRY_GROUP/$REGISTRY_IMAGE .
-    - docker push $DEV_REGISTRY_HOST/$REGISTRY_GROUP/$REGISTRY_IMAGE
+  extends: .docker
 
-deploy-testing:
-  image: ${DEV_REGISTRY_HOST}/basic/kustomize:v4.3.0
+
+dev-169:
+  stage: deploy to dev
+  variables:
+    # sre and developer define
+    ENV_NAME: 'dev-169'
+    # sre define
+    APP_CONFIG: '${JVM_OPTS_DEV169}'
+    # sre define
+    ARGO_PROJ: '${BUSINESS_NAME}-dev'
+    # sre define
+    CD_GIT_PATH: 'dev'
+    DNS: '$DNS_DEV169'
+  extends: .deploy
+  only:
+    - master
+
+
+testing-1:
   stage: deploy to testing
   variables:
-    GIT_STRATEGY: none
-  tags:
-    - k8s
-  <<: *git_init
-  script:
-    - git clone https://${CI_USERNAME}:${CI_PASSWORD}@gitlab.leke.cn/deployments/campus/backend/health-mall-product.git
-    - sed -i "s/APPNAME/uat.${APP_NAME}/g" health-mall-product/base/fluent-bit-sidecar-config.yaml
-    - git checkout -B master && cd health-mall-product/overlays/testing
-    - kustomize edit set image registry=${DEV_REGISTRY_HOST}/$REGISTRY_GROUP/$REGISTRY_IMAGE
-    - git commit -am "[skip ci] image update tag:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}(pipeline-hash)" || /bin/true
-    - git push origin master
+    ENV_NAME: 'testing-1'
+    APP_CONFIG: '${JVM_OPTS_TEST1}'
+    ARGO_PROJ: '${BUSINESS_NAME}-dev'
+    CD_GIT_PATH: 'testing'
+    DNS: '$DNS_TESTING1'
+  extends: .deploy
+  only:
+    - /^testing-1-.*/
+    - /^hotfix-.*/
+    - master
 
 
-deploy-uat:
-  image: ${DEV_REGISTRY_HOST}/basic/kustomize:v4.3.0
-  stage: deploy to uat
+testing-2:
+  stage: deploy to testing
   variables:
-    GIT_STRATEGY: none
-  tags:
-    - k8s
-  <<: *git_init
-  script:
-    - git clone https://${CI_USERNAME}:${CI_PASSWORD}@gitlab.leke.cn/deployments/campus/backend/health-mall-product.git
-    - sed -i "s/APPNAME/uat.${APP_NAME}/g" health-mall-product/base/fluent-bit-sidecar-config.yaml
-    - git checkout -B master && cd health-mall-product/overlays/uat
-    - kustomize edit set image registry=${DEV_REGISTRY_HOST}/$REGISTRY_GROUP/$REGISTRY_IMAGE
-    - git commit -am "[skip ci] image update tag:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}(pipeline-hash)" || /bin/true
-    - git push origin master
+    ENV_NAME: 'testing-2'
+    APP_CONFIG: '${JVM_OPTS_TESTING2}'
+    ARGO_PROJ: '${BUSINESS_NAME}-dev'
+    CD_GIT_PATH: 'testing'
+    DNS: '$DNS_TESTING2'
+  extends: .deploy
+  only:
+    - /^testing-2-.*/
+    - /^hotfix-.*/
+    - master
 
 
-deploy-prod:
-  image: ${DEV_REGISTRY_HOST}/basic/kustomize:v4.3.0
-  stage: deploy to prod
+testing-3:
+  stage: deploy to testing
   variables:
-    GIT_STRATEGY: none
-  tags:
-    - k8s
-  <<: *git_init
-  script:
-    - git clone https://${CI_USERNAME}:${CI_PASSWORD}@gitlab.leke.cn/deployments/campus/backend/health-mall-product.git
-    - sed -i "s/APPNAME/prod.${APP_NAME}/g" health-mall-product/base/fluent-bit-sidecar-config.yaml
-    - git checkout -B master && cd health-mall-product/overlays/prod
-    - kustomize edit set image registry=${DEV_REGISTRY_HOST}/$REGISTRY_GROUP/$REGISTRY_IMAGE
-    - git commit -am "[skip ci] image update tag:${CI_PIPELINE_ID}-${CI_COMMIT_SHORT_SHA}(pipeline-hash)" || /bin/true
-    - git push origin master
+    ENV_NAME: 'testing-3'
+    APP_CONFIG: '${JVM_OPTS_TESTING3}'
+    ARGO_PROJ: '${BUSINESS_NAME}-dev'
+    CD_GIT_PATH: 'testing'
+    DNS: '$DNS_TESTING3'
+  extends: .deploy
+  only:
+    - /^testing-3-.*/
+    - /^hotfix-.*/
+    - master
+
+
+pre:
+  stage: deploy to pre
+  variables:
+    ENV_NAME: 'pre'
+    APP_CONFIG: '${JVM_OPTS_PRE}'
+    ARGO_PROJ: '${BUSINESS_NAME}-pre'
+    DNS: '$DNS_PRE'
+  extends: .prod-deploy
   only:
     - release
-  when: manual
+    - /^hotfix-.*/
+
+
+prod:
+  stage: deploy to prod
+  variables:
+    APP_CONFIG: '${JVM_OPTS_PROD}'
+    ARGO_PROJ: '${BUSINESS_NAME}-prod'
+    DNS: '$DNS_PROD'
+  extends: .prod-deploy
+  only:
+    - release
+    - /^hotfix-.*/
+
