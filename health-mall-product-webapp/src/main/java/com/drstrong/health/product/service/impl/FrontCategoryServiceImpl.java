@@ -81,7 +81,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		// 5.组装前台分类对应的商品数量
 		Map<Long, Integer> frontIdProductCountMap = buildFrontCategoryProductNumMap(frontIdBackIdMap, backIdProductNumMap);
 		// 6.设置返回值
-		frontCategoryVOList.forEach(frontCategoryVO -> buildResponseProductNum(frontCategoryVO, frontIdProductCountMap));
+		frontCategoryVOList.forEach(frontCategoryVO -> buildResponseProductNum(frontCategoryVO, frontIdProductCountMap, frontIdBackIdMap));
 		return frontCategoryVOList;
 	}
 
@@ -281,13 +281,14 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 	/**
 	 * 设置返回值中,前台分类对应的商品数量
 	 */
-	private void buildResponseProductNum(FrontCategoryVO frontCategoryVO, Map<Long, Integer> frontIdProductCountMap) {
+	private void buildResponseProductNum(FrontCategoryVO frontCategoryVO, Map<Long, Integer> frontIdProductCountMap, Map<Long, List<Long>> frontIdBackIdMap) {
 		if (CollectionUtils.isEmpty(frontCategoryVO.getChildren())) {
 			frontCategoryVO.setProductCount(frontIdProductCountMap.getOrDefault(frontCategoryVO.getId(), 0));
+			frontCategoryVO.setBackCategoryIdList(frontIdBackIdMap.getOrDefault(frontCategoryVO.getId(), Lists.newArrayList()));
 		} else {
 			for (Object child : frontCategoryVO.getChildren()) {
 				FrontCategoryVO childResponse = (FrontCategoryVO) child;
-				buildResponseProductNum(childResponse, frontIdProductCountMap);
+				buildResponseProductNum(childResponse, frontIdProductCountMap,frontIdBackIdMap);
 			}
 		}
 	}

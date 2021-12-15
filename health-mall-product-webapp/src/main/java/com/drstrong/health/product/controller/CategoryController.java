@@ -1,6 +1,5 @@
 package com.drstrong.health.product.controller;
 
-import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.request.category.AddOrUpdateFrontCategoryRequest;
 import com.drstrong.health.product.model.request.category.CategoryIdRequest;
@@ -43,8 +42,8 @@ public class CategoryController {
 	@ApiOperation(value = "获取所有前台分类", notes = "前台分类较少,前后端讨论后决定不进行分页查询")
 	@GetMapping("/front/query")
 	public ResultVO<List<FrontCategoryVO>> frontQuery(CategoryQueryRequest categoryQueryRequest) {
-		List<FrontCategoryVO> frontCategoryRespons = frontCategoryService.queryByParamToTree(categoryQueryRequest);
-		return ResultVO.success(frontCategoryRespons);
+		List<FrontCategoryVO> frontCategoryVoList = frontCategoryService.queryByParamToTree(categoryQueryRequest);
+		return ResultVO.success(frontCategoryVoList);
 	}
 
 	@ApiOperation(value = "获取所有后台分类", notes = "后台分类较少,前后端讨论后决定不进行分页查询")
@@ -86,4 +85,7 @@ public class CategoryController {
 		frontCategoryService.deleteFrontCategoryById(categoryIdRequest.getCategoryId(), 999L);
 		return ResultVO.success();
 	}
+
+//	@ApiOperation("小程序-获取金刚区分类")
+//	@GetMapping("/api/get")
 }
