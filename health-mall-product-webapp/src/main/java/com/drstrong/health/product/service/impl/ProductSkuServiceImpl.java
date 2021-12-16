@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.dao.ProductSkuMapper;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
@@ -144,11 +145,11 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 	 * @date 2021/12/14 15:05
 	 */
 	@Override
-	public ProductSkuEntity queryBySkuIdOrCode(Long skuId, String skuCode) {
+	public ProductSkuEntity queryBySkuIdOrCode(Long skuId, String skuCode, UpOffEnum upOffEnum) {
 		if (Objects.isNull(skuId) && Objects.isNull(skuCode)) {
 			return null;
 		}
-		List<ProductSkuEntity> productSkuEntities = queryBySkuIdOrCode(Sets.newHashSet(skuId), Sets.newHashSet(skuCode));
+		List<ProductSkuEntity> productSkuEntities = queryBySkuIdOrCode(Sets.newHashSet(skuId), Sets.newHashSet(skuCode), upOffEnum);
 		if (CollectionUtils.isEmpty(productSkuEntities)) {
 			return null;
 		}
@@ -165,7 +166,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 	 * @date 2021/12/16 09:59
 	 */
 	@Override
-	public List<ProductSkuEntity> queryBySkuIdOrCode(Set<Long> skuIdList, Set<String> skuCodeList) {
+	public List<ProductSkuEntity> queryBySkuIdOrCode(Set<Long> skuIdList, Set<String> skuCodeList, UpOffEnum upOffEnum) {
 		if (CollectionUtils.isEmpty(skuCodeList) && CollectionUtils.isEmpty(skuIdList)) {
 			return Lists.newArrayList();
 		}
@@ -176,6 +177,9 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 		}
 		if (!CollectionUtils.isEmpty(skuCodeList)) {
 			queryWrapper.in(ProductSkuEntity::getSkuCode, skuCodeList);
+		}
+		if (Objects.nonNull(upOffEnum)) {
+			queryWrapper.eq(ProductSkuEntity::getState, upOffEnum.getCode());
 		}
 		return productSkuMapper.selectList(queryWrapper);
 	}
