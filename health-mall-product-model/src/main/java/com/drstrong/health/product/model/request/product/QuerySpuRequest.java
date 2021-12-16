@@ -36,4 +36,10 @@ public class QuerySpuRequest extends PageRequest implements Serializable {
 
 	@ApiModelProperty("结束时间")
 	private LocalDateTime createEnd;
+
+	@ApiModelProperty(value = "上架状态", hidden = true)
+	private Integer state;
+
+	@ApiModelProperty(value = "后台分类集合", hidden = true)
+	private Set<Long> backCategoryIdList;
 }

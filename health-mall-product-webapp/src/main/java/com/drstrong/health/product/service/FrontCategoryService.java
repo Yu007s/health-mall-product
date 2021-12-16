@@ -5,6 +5,7 @@ import com.drstrong.health.product.model.request.category.AddOrUpdateFrontCatego
 import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
 import com.drstrong.health.product.model.request.category.PageCategoryIdRequest;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.category.CategoryProductVO;
 import com.drstrong.health.product.model.response.category.FrontCategoryVO;
 import com.drstrong.health.product.model.response.category.HomeCategoryVO;
 import com.drstrong.health.product.model.response.product.ProductSpuVO;
@@ -105,5 +106,5 @@ public interface FrontCategoryService {
 	 * @author liuqiuyi
 	 * @date 2021/12/15 20:33
 	 */
-	PageVO<ProductSpuVO> pageCategoryProduct(PageCategoryIdRequest pageCategoryIdRequest);
+	PageVO<CategoryProductVO> pageCategoryProduct(PageCategoryIdRequest pageCategoryIdRequest);
 }

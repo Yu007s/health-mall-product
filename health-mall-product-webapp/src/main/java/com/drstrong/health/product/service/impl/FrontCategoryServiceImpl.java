@@ -1,13 +1,14 @@
 package com.drstrong.health.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.dao.FrontCategoryMapper;
 import com.drstrong.health.product.model.BaseTree;
-import com.drstrong.health.product.model.dto.ProductBasicsInfoDTO;
-import com.drstrong.health.product.model.dto.ProductQueryDTO;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.entity.category.CategoryRelationEntity;
 import com.drstrong.health.product.model.entity.category.FrontCategoryEntity;
+import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
+import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.LevelEnum;
@@ -16,6 +17,7 @@ import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
 import com.drstrong.health.product.model.request.category.PageCategoryIdRequest;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.category.CategoryProductVO;
 import com.drstrong.health.product.model.response.category.FrontCategoryVO;
 import com.drstrong.health.product.model.response.category.HomeCategoryVO;
 import com.drstrong.health.product.model.response.product.ProductSpuVO;
@@ -35,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -345,7 +348,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 	 * @date 2021/12/15 20:33
 	 */
 	@Override
-	public PageVO<ProductSpuVO> pageCategoryProduct(PageCategoryIdRequest pageCategoryIdRequest) {
+	public PageVO<CategoryProductVO> pageCategoryProduct(PageCategoryIdRequest pageCategoryIdRequest) {
 		// 1.校验传入的二级分类是否存在
 		FrontCategoryEntity categoryEntity = queryById(pageCategoryIdRequest.getCategoryId());
 		if (Objects.isNull(categoryEntity)) {
@@ -365,14 +368,38 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		// 4.获取后台 id
 		Set<Long> backIdList = relationByFrontCategoryIds.stream().map(CategoryRelationEntity::getBackCategoryId).collect(Collectors.toSet());
 		// 5.根据后台 id 集合,分页查询商品 spu 表
-		ProductQueryDTO queryDTO = new ProductQueryDTO();
-		queryDTO.setBackCategoryIdList(backIdList);
-		queryDTO.setPageNo(pageCategoryIdRequest.getPageNo());
-		queryDTO.setPageSize(pageCategoryIdRequest.getPageSize());
-		PageVO<ProductBasicsInfoDTO> spuVOPageVO = productBasicsInfoService.pageQueryProductByParam(queryDTO);
+		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
+		querySpuRequest.setState(1);
+		querySpuRequest.setBackCategoryIdList(backIdList);
+		Page<ProductBasicsInfoEntity> productBasicsInfoEntityPage = productBasicsInfoService.pageQueryProductByParam(querySpuRequest);
+		Map<Long, List<ProductSkuEntity>> productIdSkusMap = productBasicsInfoService.buildSkuMap(productBasicsInfoEntityPage.getRecords());
 		// 6.封装返回值
-//		List<ProductSpuVO>
-		return null;
+		List<CategoryProductVO> productVOList = Lists.newArrayListWithCapacity(productBasicsInfoEntityPage.getRecords().size());
+		for (ProductBasicsInfoEntity record : productBasicsInfoEntityPage.getRecords()) {
+			CategoryProductVO categoryProductVO = new CategoryProductVO();
+			categoryProductVO.setProductId(record.getId());
+			categoryProductVO.setProductName(record.getTitle());
+			categoryProductVO.setMasterImageUrl(record.getMasterImageUrl());
+			Map<String, BigDecimal> priceSectionMap = getPriceSectionMap(productIdSkusMap.get(record.getId()));
+			categoryProductVO.setLowPrice(priceSectionMap.get("lowPrice"));
+			productVOList.add(categoryProductVO);
+		}
+		return PageVO.toPageVo(productVOList, productBasicsInfoEntityPage.getTotal(), pageCategoryIdRequest.getPageNo(), pageCategoryIdRequest.getPageSize());
+	}
+
+	private Map<String, BigDecimal> getPriceSectionMap(List<ProductSkuEntity> productSkuEntities){
+		Map<String, BigDecimal> priceMap = Maps.newHashMapWithExpectedSize(4);
+		if (CollectionUtils.isEmpty(productSkuEntities)) {
+			priceMap.put("lowPrice", new BigDecimal("0"));
+			priceMap.put("highPrice", new BigDecimal("0"));
+			return priceMap;
+		}
+		productSkuEntities.sort(Comparator.comparing(ProductSkuEntity::getSkuPrice));
+		Integer lowPrice = productSkuEntities.get(0).getSkuPrice();
+		Integer highPrice = productSkuEntities.get(productSkuEntities.size() - 1).getSkuPrice();
+		priceMap.put("lowPrice", new BigDecimal(lowPrice));
+		priceMap.put("highPrice", new BigDecimal(highPrice));
+		return priceMap;
 	}
 
 	/**

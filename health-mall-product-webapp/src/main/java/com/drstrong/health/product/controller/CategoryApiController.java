@@ -2,6 +2,7 @@ package com.drstrong.health.product.controller;
 
 import com.drstrong.health.product.model.request.category.PageCategoryIdRequest;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.category.CategoryProductVO;
 import com.drstrong.health.product.model.response.category.HomeCategoryVO;
 import com.drstrong.health.product.model.response.product.ProductSpuVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -46,8 +47,8 @@ public class CategoryApiController {
 
 	@ApiOperation("小程序-根据分类 id 获取商品列表(分页)")
 	@GetMapping("/page/queryById")
-	public ResultVO<PageVO<ProductSpuVO>> pageCategoryProduct(PageCategoryIdRequest pageCategoryIdRequest) {
-		PageVO<ProductSpuVO> categoryPageVO = frontCategoryService.pageCategoryProduct(pageCategoryIdRequest);
+	public ResultVO<PageVO<CategoryProductVO>> pageCategoryProduct(PageCategoryIdRequest pageCategoryIdRequest) {
+		PageVO<CategoryProductVO> categoryPageVO = frontCategoryService.pageCategoryProduct(pageCategoryIdRequest);
 		return ResultVO.success(categoryPageVO);
 	}
 }

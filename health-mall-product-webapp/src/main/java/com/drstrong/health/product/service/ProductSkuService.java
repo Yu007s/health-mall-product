@@ -1,6 +1,5 @@
 package com.drstrong.health.product.service;
 
-import com.drstrong.health.product.model.dto.ProductSkuDTO;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -45,7 +44,7 @@ public interface ProductSkuService {
 	 * @author liuqiuyi
 	 * @date 2021/12/14 10:51
 	 */
-	List<ProductSkuDTO> queryByProductIdList(Set<Long> productIdList);
+	List<ProductSkuEntity> queryByProductIdList(Set<Long> productIdList);
 
 	/**
 	 * 根据 商品id 集合,查询 sku 集合,组装为 map
@@ -55,7 +54,7 @@ public interface ProductSkuService {
 	 * @author liuqiuyi
 	 * @date 2021/12/14 10:54
 	 */
-	Map<Long, List<ProductSkuDTO>> queryByProductIdListToMap(Set<Long> productIdList);
+	Map<Long, List<ProductSkuEntity>> queryByProductIdListToMap(Set<Long> productIdList);
 
 	/**
 	 * 根据条件分页查询 sku 信息
@@ -71,10 +70,21 @@ public interface ProductSkuService {
 	 * 根据 skuId 或者 skuCode 查询 sku 信息
 	 *
 	 * @param skuCode sku 编码
-	 * @param skuId sku 的 id
-	 * @return  sku 信息
+	 * @param skuId   sku 的 id
+	 * @return sku 信息
 	 * @author liuqiuyi
 	 * @date 2021/12/14 15:05
 	 */
 	ProductSkuEntity queryBySkuIdOrCode(Long skuId, String skuCode);
+
+	/**
+	 * 根据 skuId 集合或者 skuCode 集合查询 sku 信息
+	 *
+	 * @param skuIdList   skuId 集合
+	 * @param skuCodeList sku编码集合
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2021/12/16 09:59
+	 */
+	List<ProductSkuEntity> queryBySkuIdOrCode(Set<Long> skuIdList, Set<String> skuCodeList);
 }

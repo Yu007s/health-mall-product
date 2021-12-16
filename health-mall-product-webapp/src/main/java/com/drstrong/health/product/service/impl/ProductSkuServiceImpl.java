@@ -3,7 +3,6 @@ package com.drstrong.health.product.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.dao.ProductSkuMapper;
-import com.drstrong.health.product.model.dto.ProductSkuDTO;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
@@ -12,6 +11,7 @@ import com.drstrong.health.product.model.response.product.ProductSkuVO;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -79,23 +79,13 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 	 * @date 2021/12/14 10:51
 	 */
 	@Override
-	public List<ProductSkuDTO> queryByProductIdList(Set<Long> productIdList) {
+	public List<ProductSkuEntity> queryByProductIdList(Set<Long> productIdList) {
 		if (CollectionUtils.isEmpty(productIdList)) {
 			return Lists.newArrayList();
 		}
 		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.in(ProductSkuEntity::getProductId, productIdList).eq(ProductSkuEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
-		List<ProductSkuEntity> productSkuEntities = productSkuMapper.selectList(queryWrapper);
-		if (CollectionUtils.isEmpty(productSkuEntities)) {
-			return Lists.newArrayList();
-		}
-		List<ProductSkuDTO> skuDTOList = Lists.newArrayListWithCapacity(productSkuEntities.size());
-		for (ProductSkuEntity productSkuEntity : productSkuEntities) {
-			ProductSkuDTO productSkuDTO = new ProductSkuDTO();
-			BeanUtils.copyProperties(productSkuEntity, productSkuDTO);
-			skuDTOList.add(productSkuDTO);
-		}
-		return skuDTOList;
+		return productSkuMapper.selectList(queryWrapper);
 	}
 
 	/**
@@ -107,12 +97,12 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 	 * @date 2021/12/14 10:54
 	 */
 	@Override
-	public Map<Long, List<ProductSkuDTO>> queryByProductIdListToMap(Set<Long> productIdList) {
-		List<ProductSkuDTO> productSkuEntities = queryByProductIdList(productIdList);
+	public Map<Long, List<ProductSkuEntity>> queryByProductIdListToMap(Set<Long> productIdList) {
+		List<ProductSkuEntity> productSkuEntities = queryByProductIdList(productIdList);
 		if (CollectionUtils.isEmpty(productSkuEntities)) {
 			return Maps.newHashMap();
 		}
-		return productSkuEntities.stream().collect(groupingBy(ProductSkuDTO::getProductId));
+		return productSkuEntities.stream().collect(groupingBy(ProductSkuEntity::getProductId));
 	}
 
 	/**
@@ -158,15 +148,36 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 		if (Objects.isNull(skuId) && Objects.isNull(skuCode)) {
 			return null;
 		}
+		List<ProductSkuEntity> productSkuEntities = queryBySkuIdOrCode(Sets.newHashSet(skuId), Sets.newHashSet(skuCode));
+		if (CollectionUtils.isEmpty(productSkuEntities)) {
+			return null;
+		}
+		return productSkuEntities.get(0);
+	}
+
+	/**
+	 * 根据 skuId 集合或者 skuCode 集合查询 sku 信息
+	 *
+	 * @param skuIdList   skuId 集合
+	 * @param skuCodeList sku编码集合
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2021/12/16 09:59
+	 */
+	@Override
+	public List<ProductSkuEntity> queryBySkuIdOrCode(Set<Long> skuIdList, Set<String> skuCodeList) {
+		if (CollectionUtils.isEmpty(skuCodeList) && CollectionUtils.isEmpty(skuIdList)) {
+			return Lists.newArrayList();
+		}
 		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(ProductSkuEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
-		if (Objects.nonNull(skuId)) {
-			queryWrapper.eq(ProductSkuEntity::getId, skuId);
+		if (!CollectionUtils.isEmpty(skuIdList)) {
+			queryWrapper.in(ProductSkuEntity::getId, skuIdList);
 		}
-		if (Objects.nonNull(skuCode)) {
-			queryWrapper.eq(ProductSkuEntity::getSkuCode, skuCode);
+		if (!CollectionUtils.isEmpty(skuCodeList)) {
+			queryWrapper.in(ProductSkuEntity::getSkuCode, skuCodeList);
 		}
-		return productSkuMapper.selectOne(queryWrapper);
+		return productSkuMapper.selectList(queryWrapper);
 	}
 
 	private LambdaQueryWrapper<ProductSkuEntity> buildQuerySkuParam(QuerySkuRequest querySkuRequest) {
