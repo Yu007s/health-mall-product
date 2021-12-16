@@ -42,6 +42,12 @@ public class ProductManageVO implements Serializable {
 	@ApiModelProperty("商品描述")
 	private String description;
 
+	@ApiModelProperty("批文编号")
+	private String approvalNumber;
+
+	@ApiModelProperty("生产厂商名称")
+	private String vendorName;
+
 	@ApiModelProperty("店铺 id")
 	private Long storeId;
 

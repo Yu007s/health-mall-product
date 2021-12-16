@@ -65,16 +65,18 @@ public class ProductManageController {
 	@ApiOperation("商品上传")
 	@PostMapping("/saveOrUpdate")
 	public ResultVO<Object> saveProperty(@RequestBody @Valid SaveProductRequest saveProductRequest) {
+		// TODO
+		saveProductRequest.setUserId(999L);
 		productBasicsInfoService.saveOrUpdateProduct(saveProductRequest);
 		return ResultVO.success();
 	}
 
 	@ApiOperation("根据商品 id 查看商品信息")
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "spuCode", value = "spu编码", dataType = "String", paramType = "query", required = true)
+			@ApiImplicitParam(name = "productId", value = "商品 id", dataType = "Long", paramType = "query", required = true)
 	})
 	@GetMapping("/getByProductId")
-	public ResultVO<ProductManageVO> getByProductId(@NotEmpty(message = "productId 不能为空") Long productId) {
+	public ResultVO<ProductManageVO> getByProductId(@NotNull(message = "productId 不能为空") Long productId) {
 		ProductManageVO productManageVO = productBasicsInfoService.queryManageProductInfo(productId);
 		return ResultVO.success(productManageVO);
 	}
@@ -95,7 +97,9 @@ public class ProductManageController {
 
 	@ApiOperation("保存税收编码")
 	@PostMapping("/revenue/add")
-	public ResultVO<Object> revenueAdd(@RequestBody AddRevenueRequest addRevenueRequest) {
+	public ResultVO<Object> revenueAdd(@Valid @RequestBody AddRevenueRequest addRevenueRequest) {
+		// TODO
+		addRevenueRequest.setUserId(999L);
 		productSkuRevenueService.revenueAdd(addRevenueRequest);
 		return ResultVO.success();
 	}

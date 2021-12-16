@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,14 @@ public interface ProductSkuService {
 	void batchSave(List<ProductSkuEntity> skuEntityList);
 
 	/**
+	 * 批量保存或者更新
+	 *
+	 * @author liuqiuyi
+	 * @date 2021/12/16 15:55
+	 */
+	boolean saveOrUpdateBatch(Collection<ProductSkuEntity> entityList, int batchSize);
+
+	/**
 	 * 根据 商品id 查询 sku 集合
 	 *
 	 * @param productId 商品 id
@@ -36,6 +45,16 @@ public interface ProductSkuService {
 	 * @date 2021/12/13 21:13
 	 */
 	List<ProductSkuEntity> queryByProductId(Long productId);
+
+	/**
+	 * 根据 商品id 查询 sku 集合,转成 skuMap
+	 *
+	 * @param productId 商品 id
+	 * @return 商品 sku 集合,key=skuId,value=sku 信息
+	 * @author liuqiuyi
+	 * @date 2021/12/13 21:13
+	 */
+	Map<Long, ProductSkuEntity> queryByProductIdToMap(Long productId);
 
 	/**
 	 * 根据 商品id 集合,查询 sku 集合
@@ -70,8 +89,8 @@ public interface ProductSkuService {
 	/**
 	 * 根据 skuId 或者 skuCode 查询 sku 信息
 	 *
-	 * @param skuCode  sku 编码
-	 * @param skuId    sku 的 id
+	 * @param skuCode   sku 编码
+	 * @param skuId     sku 的 id
 	 * @param upOffEnum 上架状态(0-未上架,1-已上架)
 	 * @return sku 信息
 	 * @author liuqiuyi
@@ -84,12 +103,23 @@ public interface ProductSkuService {
 	 *
 	 * @param skuIdList   skuId 集合
 	 * @param skuCodeList sku编码集合
-	 * @param upOffEnum    上架状态(0-未上架,1-已上架)
+	 * @param upOffEnum   上架状态(0-未上架,1-已上架)
 	 * @return sku 信息
 	 * @author liuqiuyi
 	 * @date 2021/12/16 09:59
 	 */
 	List<ProductSkuEntity> queryBySkuIdOrCode(Set<Long> skuIdList, Set<String> skuCodeList, UpOffEnum upOffEnum);
 
-	void updateState(List<Long> skuIdList,Integer state,Long userId);
+	void updateState(List<Long> skuIdList, Integer state, Long userId);
+
+	/**
+	 * 获取下一个 sku 编码,参照之前的逻辑
+	 *
+	 * @param productId 商品 id
+	 * @param spuCode   spu 编码
+	 * @return 生成的 sku 编码
+	 * @author liuqiuyi
+	 * @date 2021/12/16 14:48
+	 */
+	String createNextSkuCode(String spuCode, Long productId);
 }

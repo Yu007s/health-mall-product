@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.ProductBasicsInfoMapper;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.entity.product.*;
-import com.drstrong.health.product.model.enums.DelFlagEnum;
-import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.enums.*;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.request.product.SaveProductRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -17,15 +17,20 @@ import com.drstrong.health.product.model.response.product.ProductSpuVO;
 import com.drstrong.health.product.model.response.product.PropertyInfoResponse;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.*;
+import com.drstrong.health.product.util.BigDecimalUtil;
+import com.drstrong.health.product.util.DateUtil;
+import com.drstrong.health.product.util.RedisKeyUtils;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,6 +60,12 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 
 	@Resource
 	BackCategoryService backCategoryService;
+
+	@Resource
+	IRedisService redisService;
+
+	@Resource
+	StoreService storeService;
 
 	/**
 	 * 根据条件,分页查询商品基础信息
@@ -129,29 +140,18 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	@Transactional(rollbackFor = Exception.class)
 	public void saveOrUpdateProduct(SaveProductRequest saveProductRequest) {
 		// 1.校验店铺 id 是否存在
-		// TODO 需要调用店铺的接口
-		// 2.保存基础信息
-		ProductBasicsInfoEntity infoEntity = saveProductBaseInfo(saveProductRequest);
-		// 3.保存扩展信息
+		StoreEntity storeEntity = storeService.getByStoreId(saveProductRequest.getStoreId());
+		if (Objects.isNull(storeEntity)) {
+			throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
+		}
+		// 2.保存或更新基础信息
+		ProductBasicsInfoEntity infoEntity = saveProductBaseInfo(saveProductRequest, storeEntity);
+		// 3.保存或更新扩展信息
 		saveProductExtend(saveProductRequest, infoEntity.getId());
 		// 4.保存商品分类属性信息
 		saveAttribute(saveProductRequest, infoEntity.getId());
-		// 5.保存 sku 信息
-		List<ProductSkuEntity> skuEntityList = Lists.newArrayListWithCapacity(saveProductRequest.getPackInfoList().size());
-		for (SaveProductRequest.PackInfoRequest packInfoRequest : saveProductRequest.getPackInfoList()) {
-			ProductSkuEntity skuEntity = new ProductSkuEntity();
-			skuEntity.setProductId(infoEntity.getId());
-//			skuEntity.setSkuCode();
-//			skuEntity.setSkuName();
-			skuEntity.setPackName(packInfoRequest.getPackName());
-			skuEntity.setPackValue(packInfoRequest.getPackValue());
-//			skuEntity.setSkuPrice(packInfoRequest.getPrice());
-			skuEntity.setCommAttribute(packInfoRequest.getCommAttribute());
-			skuEntity.setCreatedBy(saveProductRequest.getUserId());
-			skuEntity.setChangedBy(saveProductRequest.getUserId());
-			skuEntityList.add(skuEntity);
-		}
-		productSkuService.batchSave(skuEntityList);
+		// 5.保存或更新 sku 信息
+		saveOrUpdateSku(saveProductRequest, storeEntity, infoEntity);
 	}
 
 	/**
@@ -227,14 +227,10 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			, List<ProductAttributeEntity> attributeEntityList, Map<Long, CategoryAttributeItemEntity> idEntityMap, List<ProductSkuEntity> skuEntityList) {
 
 		ProductManageVO productManageVO = new ProductManageVO();
+		BeanUtils.copyProperties(basicsInfoEntity, productManageVO);
+		BeanUtils.copyProperties(extendEntity, productManageVO);
 		productManageVO.setProductId(basicsInfoEntity.getId());
-		productManageVO.setSpuCode(basicsInfoEntity.getSpuCode());
-		productManageVO.setCategoryId(basicsInfoEntity.getCategoryId());
 		productManageVO.setCategoryPathName(backCategoryEntity.getName());
-		productManageVO.setTitle(basicsInfoEntity.getTitle());
-		productManageVO.setBrandName(basicsInfoEntity.getBrandName());
-		productManageVO.setAliasName(basicsInfoEntity.getAliasName());
-		productManageVO.setDescription(extendEntity.getDescription());
 		productManageVO.setStoreId(basicsInfoEntity.getSourceId());
 		productManageVO.setStoreName(basicsInfoEntity.getSourceName());
 		productManageVO.setImageUrlList(Lists.newArrayList(extendEntity.getImageUrl().split(",")));
@@ -243,18 +239,9 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		List<PropertyInfoResponse> propertyInfoResponseList = Lists.newArrayListWithCapacity(attributeEntityList.size());
 		for (ProductAttributeEntity attributeEntity : attributeEntityList) {
 			CategoryAttributeItemEntity categoryAttEntity = idEntityMap.getOrDefault(attributeEntity.getAttributeItemId(), new CategoryAttributeItemEntity());
-
 			PropertyInfoResponse propertyInfoResponse = new PropertyInfoResponse();
-			propertyInfoResponse.setAttributeItemId(attributeEntity.getAttributeItemId());
-			propertyInfoResponse.setAttributeKey(categoryAttEntity.getAttributeKey());
-			propertyInfoResponse.setAttributeName(categoryAttEntity.getAttributeName());
-			propertyInfoResponse.setAttributeValue(attributeEntity.getAttributeValue());
-			propertyInfoResponse.setAttributeType(categoryAttEntity.getAttributeType());
-			propertyInfoResponse.setFormType(categoryAttEntity.getFormType());
-			propertyInfoResponse.setAttributeOptions(categoryAttEntity.getAttributeOptions());
-			propertyInfoResponse.setRequired(categoryAttEntity.getRequired());
-			propertyInfoResponse.setOrderNumber(categoryAttEntity.getOrderNumber());
-
+			BeanUtils.copyProperties(attributeEntity, propertyInfoResponse);
+			BeanUtils.copyProperties(categoryAttEntity, propertyInfoResponse);
 			propertyInfoResponseList.add(propertyInfoResponse);
 		}
 		productManageVO.setPropertyValueList(propertyInfoResponseList);
@@ -264,15 +251,47 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			PackInfoResponse packInfoResponse = new PackInfoResponse();
 			packInfoResponse.setPackName(productSkuEntity.getPackName());
 			packInfoResponse.setPackValue(productSkuEntity.getPackValue());
-//			packInfoResponse.setPrice(productSkuEntity.getSkuPrice());
+			packInfoResponse.setPrice(BigDecimalUtil.F2Y(productSkuEntity.getSkuPrice().longValue()));
 			packInfoResponse.setCommAttributeId(productSkuEntity.getCommAttribute());
-//			packInfoResponse.setCommAttributeName();
+			// TODO 这里需要 cms 提供远程接口
+			packInfoResponse.setCommAttributeName(CommAttributeEnum.getValueByCode(productSkuEntity.getCommAttribute()));
 			packInfoResponse.setSkuCode(productSkuEntity.getSkuCode());
 			packInfoList.add(packInfoResponse);
 		}
 		productManageVO.setPackInfoList(packInfoList);
 
 		return productManageVO;
+	}
+
+	private void saveOrUpdateSku(SaveProductRequest saveProductRequest, StoreEntity storeEntity, ProductBasicsInfoEntity infoEntity) {
+		Map<Long, ProductSkuEntity> skuIdEntityMap = productSkuService.queryByProductIdToMap(infoEntity.getId());
+
+		List<ProductSkuEntity> skuEntityList = Lists.newArrayListWithCapacity(saveProductRequest.getPackInfoList().size());
+		for (SaveProductRequest.PackInfoRequest packInfoRequest : saveProductRequest.getPackInfoList()) {
+			ProductSkuEntity skuEntity = new ProductSkuEntity();
+			if (Objects.nonNull(packInfoRequest.getSkuId()) && skuIdEntityMap.containsKey(packInfoRequest.getSkuId())) {
+				// 更新
+				skuEntity = skuIdEntityMap.get(packInfoRequest.getSkuId());
+				if (Objects.equals(UpOffEnum.UP.getCode(), skuEntity.getState())) {
+					throw new BusinessException(ErrorEnums.UPDATE_NOT_ALLOW);
+				}
+			} else {
+				skuEntity.setSkuCode(productSkuService.createNextSkuCode(infoEntity.getSpuCode(), infoEntity.getId()));
+				skuEntity.setCreatedBy(saveProductRequest.getUserId());
+			}
+			skuEntity.setProductId(infoEntity.getId());
+			skuEntity.setPackName(packInfoRequest.getPackName());
+			skuEntity.setPackValue(packInfoRequest.getPackValue());
+			skuEntity.setSkuName(infoEntity.getTitle() + " " + packInfoRequest.getPackName() + packInfoRequest.getPackValue());
+			skuEntity.setSkuPrice(BigDecimalUtil.Y2F(packInfoRequest.getPrice()).intValue());
+			skuEntity.setCommAttribute(packInfoRequest.getCommAttribute());
+			skuEntity.setChangedBy(saveProductRequest.getUserId());
+			skuEntity.setChangedAt(LocalDateTime.now());
+			skuEntity.setSourceId(storeEntity.getId());
+			skuEntity.setSourceName(storeEntity.getName());
+			skuEntityList.add(skuEntity);
+		}
+		productSkuService.saveOrUpdateBatch(skuEntityList, skuEntityList.size());
 	}
 
 	private void saveAttribute(SaveProductRequest saveProductRequest, Long product) {
@@ -292,31 +311,41 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 
 	private void saveProductExtend(SaveProductRequest saveProductRequest, Long productId) {
 		ProductExtendEntity extendEntity = productExtendService.queryByProductId(saveProductRequest.getProductId());
+		if (Objects.isNull(extendEntity)) {
+			extendEntity = new ProductExtendEntity();
+			extendEntity.setCreatedBy(saveProductRequest.getUserId());
+		}
 		extendEntity.setProductId(productId);
 		extendEntity.setDescription(saveProductRequest.getDescription());
 		extendEntity.setApprovalNumber(saveProductRequest.getApprovalNumber());
 		extendEntity.setVendorName(saveProductRequest.getVendorName());
 		extendEntity.setImageUrl(Joiner.on(",").join(saveProductRequest.getImageUrlList()));
 		extendEntity.setDetailUrl(Joiner.on(",").join(saveProductRequest.getDetailUrlList()));
+		extendEntity.setChangedBy(saveProductRequest.getUserId());
+		extendEntity.setChangedAt(LocalDateTime.now());
 		productExtendService.saveOrUpdate(extendEntity);
 	}
 
-	private ProductBasicsInfoEntity saveProductBaseInfo(SaveProductRequest saveProductRequest) {
-		if (!Objects.isNull(saveProductRequest.getProductId())) {
-			ProductBasicsInfoEntity infoEntity = queryBasicsInfoByProductId(saveProductRequest.getProductId());
+	private ProductBasicsInfoEntity saveProductBaseInfo(SaveProductRequest saveProductRequest, StoreEntity storeEntity) {
+		ProductBasicsInfoEntity infoEntity = new ProductBasicsInfoEntity();
+		if (Objects.nonNull(saveProductRequest.getProductId()) && !Objects.equals(saveProductRequest.getProductId(), 0L)) {
+			infoEntity = queryBasicsInfoByProductId(saveProductRequest.getProductId());
 			if (Objects.isNull(infoEntity)) {
 				throw new BusinessException(ErrorEnums.PRODUCT_NOT_EXIST);
 			}
+		} else {
+			infoEntity.setSpuCode(getNextProductNumber(ProductTypeEnum.PRODUCT));
+			infoEntity.setCreatedBy(saveProductRequest.getUserId());
 		}
-		ProductBasicsInfoEntity infoEntity = new ProductBasicsInfoEntity();
-		infoEntity.setId(saveProductRequest.getProductId());
-		infoEntity.setCategoryId(saveProductRequest.getCategoryId());
 		infoEntity.setTitle(saveProductRequest.getTitle());
 		infoEntity.setBrandName(saveProductRequest.getBrandName());
 		infoEntity.setAliasName(saveProductRequest.getAliasName());
-		infoEntity.setSourceId(saveProductRequest.getStoreId());
 		infoEntity.setMasterImageUrl(saveProductRequest.getImageUrlList().get(0));
-		// TODO 设置店铺名称 和 spuCode
+		infoEntity.setCategoryId(saveProductRequest.getCategoryId());
+		infoEntity.setSourceId(storeEntity.getId());
+		infoEntity.setSourceName(storeEntity.getName());
+		infoEntity.setChangedBy(saveProductRequest.getUserId());
+		infoEntity.setChangedAt(LocalDateTime.now());
 		saveOrUpdate(infoEntity);
 		return infoEntity;
 	}
@@ -326,6 +355,23 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		LambdaQueryWrapper<ProductBasicsInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(ProductBasicsInfoEntity::getSpuCode, spuCode).eq(ProductBasicsInfoEntity::getDelFlag, 0).eq(ProductBasicsInfoEntity::getState, 1);
 		return productBasicsInfoMapper.selectCount(queryWrapper);
+	}
+
+	/**
+	 * 生成商品或者药品编码,参照之前的方法
+	 *
+	 * @author liuqiuyi
+	 * @date 2021/12/16 14:13
+	 */
+	@Override
+	public String getNextProductNumber(ProductTypeEnum productTypeEnum) {
+		// 生成规则：药品编码M开头 + 建码日期六位：年后两位+月份+日期（190520）+ 5位顺序码    举例：M19052000001
+		StringBuilder number = new StringBuilder();
+		number.append(productTypeEnum.getMark());
+		number.append(DateUtil.formatDate(new Date(), "yyMMdd"));
+		long serialNumber = redisService.incr(RedisKeyUtils.getSerialNum());
+		number.append(String.format("%05d", serialNumber));
+		return number.toString();
 	}
 
 	private LambdaQueryWrapper<ProductBasicsInfoEntity> buildQuerySpuParam(QuerySpuRequest querySpuRequest) {

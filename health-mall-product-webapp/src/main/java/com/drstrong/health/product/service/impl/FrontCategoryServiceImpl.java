@@ -26,6 +26,7 @@ import com.drstrong.health.product.service.BackCategoryService;
 import com.drstrong.health.product.service.CategoryRelationService;
 import com.drstrong.health.product.service.FrontCategoryService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
+import com.drstrong.health.redis.utils.RedisUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -331,7 +332,9 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		}
 		if (Objects.isNull(level) || Objects.equals(level, 1)) {
 			// 一级分类,进行返回值大小裁剪,并添加最后的全部分类
-			homeCategoryVOList = homeCategoryVOList.subList(0, FIRST_CATEGORY_SIZE);
+			if (homeCategoryVOList.size() > FIRST_CATEGORY_SIZE) {
+				homeCategoryVOList = homeCategoryVOList.subList(0, FIRST_CATEGORY_SIZE);
+			}
 			homeCategoryVOList.add(HomeCategoryVO.buildDefault(ALL_CATEGORY, ALL_CATEGORY_ICON));
 		} else {
 			homeCategoryVOList = BaseTree.listToTree(homeCategoryVOList);

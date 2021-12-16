@@ -3,6 +3,7 @@ package com.drstrong.health.product.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.ProductSkuMapper;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
@@ -10,11 +11,15 @@ import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
+import com.drstrong.health.product.service.IRedisService;
 import com.drstrong.health.product.service.ProductSkuService;
+import com.drstrong.health.product.util.BigDecimalUtil;
+import com.drstrong.health.product.util.RedisKeyUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,12 +27,10 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author liuqiuyi
@@ -35,9 +38,12 @@ import static java.util.stream.Collectors.groupingBy;
  */
 @Slf4j
 @Service
-public class ProductSkuServiceImpl implements ProductSkuService {
+public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, ProductSkuEntity> implements ProductSkuService {
 	@Resource
 	ProductSkuMapper productSkuMapper;
+
+	@Resource
+	IRedisService redisService;
 
 	/**
 	 * 批量保存 sku 信息
@@ -53,6 +59,11 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 			return;
 		}
 		productSkuMapper.batchInsert(skuEntityList);
+	}
+
+	@Override
+	public boolean saveOrUpdateBatch(Collection<ProductSkuEntity> entityList, int batchSize) {
+		return super.saveOrUpdateBatch(entityList, batchSize);
 	}
 
 	/**
@@ -71,6 +82,20 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(ProductSkuEntity::getProductId, productId).eq(ProductSkuEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
 		return productSkuMapper.selectList(queryWrapper);
+	}
+
+	/**
+	 * 根据 商品id 查询 sku 集合,转成 skuMap
+	 *
+	 * @param productId 商品 id
+	 * @return 商品 sku 集合,key=skuId,value=sku 信息
+	 * @author liuqiuyi
+	 * @date 2021/12/13 21:13
+	 */
+	@Override
+	public Map<Long, ProductSkuEntity> queryByProductIdToMap(Long productId) {
+		List<ProductSkuEntity> productSkuEntities = queryByProductId(productId);
+		return productSkuEntities.stream().collect(toMap(ProductSkuEntity::getId, dto -> dto, (v1, v2) -> v1));
 	}
 
 	/**
@@ -128,10 +153,13 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 		for (ProductSkuEntity record : productSkuEntityPage.getRecords()) {
 			ProductSkuVO productSkuVO = new ProductSkuVO();
 			BeanUtils.copyProperties(record, productSkuVO);
-//			productSkuVO.setPrice(record.getSkuPrice());
+			productSkuVO.setSkuId(record.getId());
+			productSkuVO.setPrice(BigDecimalUtil.F2Y(record.getSkuPrice().longValue()));
 			productSkuVO.setCreateTime(record.getCreatedAt());
 			productSkuVO.setUpdateTime(record.getChangedAt());
 			productSkuVO.setSkuState(record.getState());
+			productSkuVO.setStoreId(record.getSourceId());
+			productSkuVO.setStoreName(record.getSourceName());
 			productSkuVOList.add(productSkuVO);
 		}
 		return PageVO.toPageVo(productSkuVOList, productSkuEntityPage.getTotal(), productSkuEntityPage.getSize(), productSkuEntityPage.getCurrent());
@@ -148,10 +176,17 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 	 */
 	@Override
 	public ProductSkuEntity queryBySkuIdOrCode(Long skuId, String skuCode, UpOffEnum upOffEnum) {
-		if (Objects.isNull(skuId) && Objects.isNull(skuCode)) {
-			return null;
+		Set<Long> skuIdList = null;
+		if (Objects.nonNull(skuId)) {
+			skuIdList = Sets.newHashSetWithExpectedSize(2);
+			skuIdList.add(skuId);
 		}
-		List<ProductSkuEntity> productSkuEntities = queryBySkuIdOrCode(Sets.newHashSet(skuId), Sets.newHashSet(skuCode), upOffEnum);
+		Set<String> skuCodeList = null;
+		if (StringUtils.isNotBlank(skuCode)) {
+			skuCodeList = Sets.newHashSetWithExpectedSize(2);
+			skuCodeList.add(skuCode);
+		}
+		List<ProductSkuEntity> productSkuEntities = queryBySkuIdOrCode(skuIdList, skuCodeList, upOffEnum);
 		if (CollectionUtils.isEmpty(productSkuEntities)) {
 			return null;
 		}
@@ -187,15 +222,32 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 	}
 
 	@Override
-	public void updateState(List<Long> skuIdList, Integer state,Long userId) {
+	public void updateState(List<Long> skuIdList, Integer state, Long userId) {
 		ProductSkuEntity productSkuEntity = new ProductSkuEntity();
 		LambdaUpdateWrapper<ProductSkuEntity> updateWrapper = new LambdaUpdateWrapper();
 		productSkuEntity.setState(state);
 		productSkuEntity.setChangedAt(LocalDateTime.now());
 		productSkuEntity.setChangedBy(userId);
-		updateWrapper.eq(ProductSkuEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode())
-				.in(ProductSkuEntity::getId,skuIdList);
-		productSkuMapper.update(productSkuEntity,updateWrapper);
+		updateWrapper.eq(ProductSkuEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+				.in(ProductSkuEntity::getId, skuIdList);
+		productSkuMapper.update(productSkuEntity, updateWrapper);
+	}
+
+	/**
+	 * 获取下一个 sku 编码,参照之前的逻辑
+	 *
+	 * @param productId 商品 id
+	 * @return 生成的 sku 编码
+	 * @author liuqiuyi
+	 * @date 2021/12/16 14:48
+	 */
+	@Override
+	public String createNextSkuCode(String spuCode, Long productId) {
+		if (Objects.isNull(productId)) {
+			return null;
+		}
+		long serialNumber = redisService.incr(RedisKeyUtils.getSkuNum(productId));
+		return spuCode + "-" + serialNumber;
 	}
 
 	private LambdaQueryWrapper<ProductSkuEntity> buildQuerySkuParam(QuerySkuRequest querySkuRequest) {

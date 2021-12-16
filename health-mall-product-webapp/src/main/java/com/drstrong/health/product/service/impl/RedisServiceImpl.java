@@ -1,18 +1,13 @@
 package com.drstrong.health.product.service.impl;
 
 import cn.strong.common.utils.CollectionUtils;
-
-import static com.drstrong.health.redis.utils.RedisUtils.*;
-
 import com.drstrong.health.product.service.IRedisService;
 import com.drstrong.health.redis.utils.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -48,4 +43,17 @@ public class RedisServiceImpl implements IRedisService {
         }
         return result;
     }
+
+	/**
+	 * 根据 key 进行自增
+	 *
+	 * @param serialNum
+	 * @param l
+	 * @author liuqiuyi
+	 * @date 2021/12/16 14:43
+	 */
+	@Override
+	public long incr(String key) {
+		return redisUtils.incr(key, 1L);
+	}
 }

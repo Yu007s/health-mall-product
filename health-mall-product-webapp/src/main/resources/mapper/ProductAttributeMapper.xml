@@ -42,8 +42,8 @@
             #{item.productId},
             #{item.attributeItemId},
             #{item.attributeValue},
-            #{created_by},
-            #{changed_by}
+            #{item.createdBy},
+            #{item.changedBy}
             )
         </foreach>
     </insert>

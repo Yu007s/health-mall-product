@@ -1,5 +1,7 @@
 package com.drstrong.health.product.model.entity.product;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.model.entity.category.BaseEntity;
 import lombok.Data;
@@ -22,6 +24,7 @@ public class ProductAttributeEntity extends BaseEntity implements Serializable {
 	/**
 	 * 主键
 	 */
+	@TableId(value = "id", type = IdType.AUTO)
 	private Long id;
 
 	/**

@@ -12,10 +12,12 @@ import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.ProductSkuRevenueService;
 import com.drstrong.health.product.service.ProductSkuService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -41,7 +43,7 @@ public class ProductSkuRevenueServiceImpl extends ServiceImpl<ProductSkuRevenueM
 	 */
 	@Override
 	public ProductSkuRevenueEntity getSkuRevenue(Long skuId, String skuCode) {
-		if (Objects.isNull(skuId) && Objects.isNull(skuCode)) {
+		if (Objects.isNull(skuId) && StringUtils.isBlank(skuCode)) {
 			return new ProductSkuRevenueEntity();
 		}
 		LambdaQueryWrapper<ProductSkuRevenueEntity> queryWrapper = new LambdaQueryWrapper<>();
@@ -49,7 +51,7 @@ public class ProductSkuRevenueServiceImpl extends ServiceImpl<ProductSkuRevenueM
 		if (Objects.nonNull(skuId)) {
 			queryWrapper.eq(ProductSkuRevenueEntity::getSkuId, skuId);
 		}
-		if (Objects.nonNull(skuCode)) {
+		if (StringUtils.isNotBlank(skuCode)) {
 			queryWrapper.eq(ProductSkuRevenueEntity::getSkuCode, skuCode);
 		}
 		return productSkuRevenueMapper.selectOne(queryWrapper);
@@ -72,11 +74,17 @@ public class ProductSkuRevenueServiceImpl extends ServiceImpl<ProductSkuRevenueM
 		}
 		// 2.保存 or 更新
 		ProductSkuRevenueEntity skuRevenueEntity = getSkuRevenue(addRevenueRequest.getSkuId(), addRevenueRequest.getSkuCode());
+		if (Objects.isNull(skuRevenueEntity)) {
+			skuRevenueEntity = new ProductSkuRevenueEntity();
+			skuRevenueEntity.setCreatedBy(addRevenueRequest.getUserId());
+		}
 		skuRevenueEntity.setProductId(productSkuEntity.getProductId());
-		skuRevenueEntity.setSkuId(addRevenueRequest.getSkuId());
-		skuRevenueEntity.setSkuCode(addRevenueRequest.getSkuCode());
+		skuRevenueEntity.setSkuId(productSkuEntity.getId());
+		skuRevenueEntity.setSkuCode(productSkuEntity.getSkuCode());
 		skuRevenueEntity.setRevenueCode(addRevenueRequest.getRevenueCode());
 		skuRevenueEntity.setRevenueRate(addRevenueRequest.getRevenueRate());
+		skuRevenueEntity.setChangedAt(LocalDateTime.now());
+		skuRevenueEntity.setChangedBy(addRevenueRequest.getUserId());
 		saveOrUpdate(skuRevenueEntity);
 	}
 }

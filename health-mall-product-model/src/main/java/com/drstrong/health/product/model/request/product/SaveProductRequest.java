@@ -92,6 +92,9 @@ public class SaveProductRequest implements Serializable {
 	public static class PackInfoRequest implements Serializable {
 		private static final long serialVersionUID = 4311064924147174227L;
 
+		@ApiModelProperty(value = "skuId", notes = "保存商品规格信息时非必填,更新商品规格信息时该值必填")
+		private Long skuId;
+
 		@ApiModelProperty("规格名称")
 		@NotEmpty(message = "packName 不能为空")
 		private String packName;

@@ -3,6 +3,7 @@ package com.drstrong.health.product.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
+import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.request.product.SaveProductRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -95,4 +96,15 @@ public interface ProductBasicsInfoService {
 	 * @return 上架条目条数
 	 */
 	Integer getCountBySPUCode(String spuCode);
+
+
+	/**
+	 * 生成商品或者药品编码,参照之前的方法
+	 *
+	 * @param productTypeEnum 商品类型
+	 * @return 编码
+	 * @author liuqiuyi
+	 * @date 2021/12/16 14:13
+	 */
+	String getNextProductNumber(ProductTypeEnum productTypeEnum);
 }

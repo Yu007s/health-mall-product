@@ -22,6 +22,9 @@ public class ProductSkuVO implements Serializable {
 	@ApiModelProperty("商品 id")
 	private Long productId;
 
+	@ApiModelProperty("skuId")
+	private Long skuId;
+
 	@ApiModelProperty("商品 sku 编码")
 	private String skuCode;
 
