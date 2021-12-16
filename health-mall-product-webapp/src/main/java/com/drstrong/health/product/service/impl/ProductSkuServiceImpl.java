@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.dao.ProductSkuMapper;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -143,19 +145,43 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 	 * @date 2021/12/14 15:05
 	 */
 	@Override
-	public ProductSkuEntity queryBySkuIdOrCode(Long skuId, String skuCode) {
+	public ProductSkuEntity queryBySkuIdOrCode(Long skuId, String skuCode, UpOffEnum upOffEnum) {
 		if (Objects.isNull(skuId) && Objects.isNull(skuCode)) {
 			return null;
 		}
+		List<ProductSkuEntity> productSkuEntities = queryBySkuIdOrCode(Sets.newHashSet(skuId), Sets.newHashSet(skuCode), upOffEnum);
+		if (CollectionUtils.isEmpty(productSkuEntities)) {
+			return null;
+		}
+		return productSkuEntities.get(0);
+	}
+
+	/**
+	 * 根据 skuId 集合或者 skuCode 集合查询 sku 信息
+	 *
+	 * @param skuIdList   skuId 集合
+	 * @param skuCodeList sku编码集合
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2021/12/16 09:59
+	 */
+	@Override
+	public List<ProductSkuEntity> queryBySkuIdOrCode(Set<Long> skuIdList, Set<String> skuCodeList, UpOffEnum upOffEnum) {
+		if (CollectionUtils.isEmpty(skuCodeList) && CollectionUtils.isEmpty(skuIdList)) {
+			return Lists.newArrayList();
+		}
 		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(ProductSkuEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
-		if (Objects.nonNull(skuId)) {
-			queryWrapper.eq(ProductSkuEntity::getId, skuId);
+		if (!CollectionUtils.isEmpty(skuIdList)) {
+			queryWrapper.in(ProductSkuEntity::getId, skuIdList);
 		}
-		if (Objects.nonNull(skuCode)) {
-			queryWrapper.eq(ProductSkuEntity::getSkuCode, skuCode);
+		if (!CollectionUtils.isEmpty(skuCodeList)) {
+			queryWrapper.in(ProductSkuEntity::getSkuCode, skuCodeList);
 		}
-		return productSkuMapper.selectOne(queryWrapper);
+		if (Objects.nonNull(upOffEnum)) {
+			queryWrapper.eq(ProductSkuEntity::getState, upOffEnum.getCode());
+		}
+		return productSkuMapper.selectList(queryWrapper);
 	}
 
 	private LambdaQueryWrapper<ProductSkuEntity> buildQuerySkuParam(QuerySkuRequest querySkuRequest) {

@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  * 查询 spu 的入参
@@ -35,4 +36,10 @@ public class QuerySpuRequest extends PageRequest implements Serializable {
 
 	@ApiModelProperty("结束时间")
 	private LocalDateTime createEnd;
+
+	@ApiModelProperty(value = "上架状态", hidden = true)
+	private Integer state;
+
+	@ApiModelProperty(value = "后台分类集合", hidden = true)
+	private Set<Long> backCategoryIdList;
 }

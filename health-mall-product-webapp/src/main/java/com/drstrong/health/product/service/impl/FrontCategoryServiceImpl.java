@@ -1,25 +1,35 @@
 package com.drstrong.health.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.dao.FrontCategoryMapper;
 import com.drstrong.health.product.model.BaseTree;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.entity.category.CategoryRelationEntity;
 import com.drstrong.health.product.model.entity.category.FrontCategoryEntity;
+import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
+import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.LevelEnum;
 import com.drstrong.health.product.model.request.category.AddOrUpdateFrontCategoryRequest;
 import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
+import com.drstrong.health.product.model.request.category.PageCategoryIdRequest;
+import com.drstrong.health.product.model.request.product.QuerySpuRequest;
+import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.category.CategoryProductVO;
 import com.drstrong.health.product.model.response.category.FrontCategoryVO;
+import com.drstrong.health.product.model.response.category.HomeCategoryVO;
+import com.drstrong.health.product.model.response.product.ProductSpuVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.BackCategoryService;
 import com.drstrong.health.product.service.CategoryRelationService;
 import com.drstrong.health.product.service.FrontCategoryService;
+import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -27,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,6 +52,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FrontCategoryServiceImpl implements FrontCategoryService {
 
+	/**
+	 * 一级分类展示的条数
+	 */
+	public static final int FIRST_CATEGORY_SIZE = 7;
+
+	private static final String ALL_CATEGORY = "全部分类";
+	/**
+	 * 全部分类的 icon 地址
+	 */
+	private static final String ALL_CATEGORY_ICON = "";
+
 	@Resource
 	FrontCategoryMapper frontCategoryMapper;
 
@@ -49,6 +71,9 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 
 	@Resource
 	BackCategoryService backCategoryService;
+
+	@Resource
+	ProductBasicsInfoService productBasicsInfoService;
 
 	/**
 	 * 查询所有的前台分类,并组装树形结构
@@ -114,7 +139,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 	@Override
 	public FrontCategoryEntity queryById(Long categoryId) {
 		if (Objects.isNull(categoryId)) {
-			return new FrontCategoryEntity();
+			return null;
 		}
 		LambdaQueryWrapper<FrontCategoryEntity> wrapper = new LambdaQueryWrapper<>();
 		wrapper.eq(FrontCategoryEntity::getId, categoryId).eq(FrontCategoryEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
@@ -136,7 +161,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		if (!Objects.isNull(categoryRequest.getParentId()) && !Objects.equals(0L, categoryRequest.getParentId())) {
 			// 添加的不是一级分类,校验上级分类是否存在
 			parentCategoryEntity = queryById(categoryRequest.getParentId());
-			if (Objects.isNull(parentCategoryEntity) || Objects.isNull(parentCategoryEntity.getId())) {
+			if (Objects.isNull(parentCategoryEntity)) {
 				throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
 			}
 		}
@@ -196,9 +221,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		frontEntity.setId(updateFrontCategoryRequest.getCategoryId());
 		frontEntity.setName(updateFrontCategoryRequest.getCategoryName());
 		frontEntity.setSort(updateFrontCategoryRequest.getSort());
-		if (StringUtils.isEmpty(updateFrontCategoryRequest.getIconUrl())) {
-			frontEntity.setIcon(updateFrontCategoryRequest.getIconUrl());
-		}
+		frontEntity.setIcon(updateFrontCategoryRequest.getIconUrl());
 		int updateNum = 0;
 		try {
 			updateNum = frontCategoryMapper.updateById(frontEntity);
@@ -277,6 +300,107 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		categoryRelationService.deletedByFrontCategoryId(categoryId, userId);
 	}
 
+	/**
+	 * 获取首页的分类信息
+	 *
+	 * @param level 查询的前台分类层级,1-表示查询一级分类,2-表示查询一级分类和二级分类,不传默认查询一级分类
+	 * @return 分类信息
+	 * @author liuqiuyi
+	 * @date 2021/12/15 16:24
+	 */
+	@Override
+	public List<HomeCategoryVO> getHomeCategory(Integer level) {
+		LambdaQueryWrapper<FrontCategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(FrontCategoryEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+		if (Objects.isNull(level)) {
+			queryWrapper.eq(FrontCategoryEntity::getLevel, 1);
+		} else {
+			queryWrapper.le(FrontCategoryEntity::getLevel, level);
+		}
+		List<FrontCategoryEntity> categoryEntityList = frontCategoryMapper.selectList(queryWrapper);
+		if (CollectionUtils.isEmpty(categoryEntityList)) {
+			return Lists.newArrayList();
+		}
+		// 封装返回值
+		List<HomeCategoryVO> homeCategoryVOList = Lists.newArrayListWithCapacity(categoryEntityList.size());
+		for (FrontCategoryEntity categoryEntity : categoryEntityList) {
+			HomeCategoryVO categoryVO = new HomeCategoryVO();
+			BeanUtils.copyProperties(categoryEntity, categoryVO);
+			categoryVO.setCategoryName(categoryEntity.getName());
+			homeCategoryVOList.add(categoryVO);
+		}
+		if (Objects.isNull(level) || Objects.equals(level, 1)) {
+			// 一级分类,进行返回值大小裁剪,并添加最后的全部分类
+			homeCategoryVOList = homeCategoryVOList.subList(0, FIRST_CATEGORY_SIZE);
+			homeCategoryVOList.add(HomeCategoryVO.buildDefault(ALL_CATEGORY, ALL_CATEGORY_ICON));
+		} else {
+			homeCategoryVOList = BaseTree.listToTree(homeCategoryVOList);
+		}
+		return homeCategoryVOList;
+	}
+
+	/**
+	 * 根据分类 id 查询分类的商品信息(分页)
+	 *
+	 * @param pageCategoryIdRequest 查询参数
+	 * @return 分类商品信息
+	 * @author liuqiuyi
+	 * @date 2021/12/15 20:33
+	 */
+	@Override
+	public PageVO<CategoryProductVO> pageCategoryProduct(PageCategoryIdRequest pageCategoryIdRequest) {
+		// 1.校验传入的二级分类是否存在
+		FrontCategoryEntity categoryEntity = queryById(pageCategoryIdRequest.getCategoryId());
+		if (Objects.isNull(categoryEntity)) {
+			throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
+		}
+		// 2.获取前台分类 id (如果是二级分类,还需要拿到父类的 id,然后查询关联信息)
+		Set<Long> frontCategoryIdList = Sets.newHashSetWithExpectedSize(4);
+		frontCategoryIdList.add(categoryEntity.getId());
+		if (Objects.equals(2, categoryEntity.getLevel())) {
+			frontCategoryIdList.add(categoryEntity.getParentId());
+		}
+		// 3.查询前后台关联关系
+		List<CategoryRelationEntity> relationByFrontCategoryIds = categoryRelationService.getRelationByFrontCategoryIds(frontCategoryIdList);
+		if (CollectionUtils.isEmpty(relationByFrontCategoryIds)) {
+			return PageVO.emptyPageVo(pageCategoryIdRequest.getPageNo(), pageCategoryIdRequest.getPageSize());
+		}
+		// 4.获取后台 id
+		Set<Long> backIdList = relationByFrontCategoryIds.stream().map(CategoryRelationEntity::getBackCategoryId).collect(Collectors.toSet());
+		// 5.根据后台 id 集合,分页查询商品 spu 表
+		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
+		querySpuRequest.setState(1);
+		querySpuRequest.setBackCategoryIdList(backIdList);
+		Page<ProductBasicsInfoEntity> productBasicsInfoEntityPage = productBasicsInfoService.pageQueryProductByParam(querySpuRequest);
+		Map<Long, List<ProductSkuEntity>> productIdSkusMap = productBasicsInfoService.buildSkuMap(productBasicsInfoEntityPage.getRecords());
+		// 6.封装返回值
+		List<CategoryProductVO> productVOList = Lists.newArrayListWithCapacity(productBasicsInfoEntityPage.getRecords().size());
+		for (ProductBasicsInfoEntity record : productBasicsInfoEntityPage.getRecords()) {
+			CategoryProductVO categoryProductVO = new CategoryProductVO();
+			categoryProductVO.setProductId(record.getId());
+			categoryProductVO.setProductName(record.getTitle());
+			categoryProductVO.setMasterImageUrl(record.getMasterImageUrl());
+			Map<String, BigDecimal> priceSectionMap = getPriceSectionMap(productIdSkusMap.get(record.getId()));
+			categoryProductVO.setLowPrice(priceSectionMap.get("lowPrice"));
+			productVOList.add(categoryProductVO);
+		}
+		return PageVO.toPageVo(productVOList, productBasicsInfoEntityPage.getTotal(), pageCategoryIdRequest.getPageNo(), pageCategoryIdRequest.getPageSize());
+	}
+
+	private Map<String, BigDecimal> getPriceSectionMap(List<ProductSkuEntity> productSkuEntities){
+		Map<String, BigDecimal> priceMap = Maps.newHashMapWithExpectedSize(4);
+		if (CollectionUtils.isEmpty(productSkuEntities)) {
+			priceMap.put("lowPrice", new BigDecimal("0"));
+			priceMap.put("highPrice", new BigDecimal("0"));
+			return priceMap;
+		}
+		productSkuEntities.sort(Comparator.comparing(ProductSkuEntity::getSkuPrice));
+		Integer lowPrice = productSkuEntities.get(0).getSkuPrice();
+		Integer highPrice = productSkuEntities.get(productSkuEntities.size() - 1).getSkuPrice();
+		priceMap.put("lowPrice", new BigDecimal(lowPrice));
+		priceMap.put("highPrice", new BigDecimal(highPrice));
+		return priceMap;
+	}
 
 	/**
 	 * 设置返回值中,前台分类对应的商品数量
@@ -288,7 +412,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		} else {
 			for (Object child : frontCategoryVO.getChildren()) {
 				FrontCategoryVO childResponse = (FrontCategoryVO) child;
-				buildResponseProductNum(childResponse, frontIdProductCountMap,frontIdBackIdMap);
+				buildResponseProductNum(childResponse, frontIdProductCountMap, frontIdBackIdMap);
 			}
 		}
 	}

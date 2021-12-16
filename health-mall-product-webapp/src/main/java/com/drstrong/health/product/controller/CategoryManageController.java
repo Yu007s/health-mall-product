@@ -30,7 +30,7 @@ import java.util.Objects;
 @RequestMapping("/product/category")
 @Slf4j
 @Api(tags = {"商品分类"}, description = "商品分类")
-public class CategoryController {
+public class CategoryManageController {
 	@Resource
 	FrontCategoryService frontCategoryService;
 
@@ -85,7 +85,4 @@ public class CategoryController {
 		frontCategoryService.deleteFrontCategoryById(categoryIdRequest.getCategoryId(), 999L);
 		return ResultVO.success();
 	}
-
-//	@ApiOperation("小程序-获取金刚区分类")
-//	@GetMapping("/api/get")
 }

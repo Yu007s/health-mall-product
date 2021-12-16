@@ -19,6 +19,7 @@ import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.*;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +55,50 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 
 	@Resource
 	BackCategoryService backCategoryService;
+
+	/**
+	 * 根据条件,分页查询商品基础信息
+	 *
+	 * @param querySpuRequest 查询入参
+	 * @return 商品基础信息
+	 * @author liuqiuyi
+	 * @date 2021/12/15 21:20
+	 */
+	@Override
+	public Page<ProductBasicsInfoEntity> pageQueryProductByParam(QuerySpuRequest querySpuRequest) {
+		Page<ProductBasicsInfoEntity> queryPage = new Page<>(querySpuRequest.getPageNo(), querySpuRequest.getPageSize());
+		return productBasicsInfoMapper.selectPage(queryPage, buildQuerySpuParam(querySpuRequest));
+	}
+
+	/**
+	 * 根据条件,查询商品基础信息
+	 *
+	 * @param querySpuRequest 查询条件
+	 * @return 商品基础信息集合
+	 * @author liuqiuyi
+	 * @date 2021/12/16 00:10
+	 */
+	@Override
+	public List<ProductBasicsInfoEntity> queryProductByParam(QuerySpuRequest querySpuRequest) {
+		return productBasicsInfoMapper.selectList(buildQuerySpuParam(querySpuRequest));
+	}
+
+	/**
+	 * 根据商品信息,组装 sku map
+	 *
+	 * @param basicsInfoEntityList 商品基本信息
+	 * @return map.key = 商品 id,map.value = sku 集合
+	 * @author liuqiuyi
+	 * @date 2021/12/16 00:30
+	 */
+	@Override
+	public Map<Long, List<ProductSkuEntity>> buildSkuMap(List<ProductBasicsInfoEntity> basicsInfoEntityList) {
+		if (CollectionUtils.isEmpty(basicsInfoEntityList)) {
+			return Maps.newHashMap();
+		}
+		Set<Long> productIdList = basicsInfoEntityList.stream().map(ProductBasicsInfoEntity::getId).collect(Collectors.toSet());
+		return productSkuService.queryByProductIdListToMap(productIdList);
+	}
 
 	/**
 	 * 根据商品 id 查询商品基础信息
@@ -152,15 +197,13 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	@Override
 	public PageVO<ProductSpuVO> pageQuerySpuByParam(QuerySpuRequest querySpuRequest) {
 		// 1.分页查询 spu 信息
-		Page<ProductBasicsInfoEntity> queryPage = new Page<>(querySpuRequest.getPageNo(), querySpuRequest.getPageSize());
-		Page<ProductBasicsInfoEntity> infoEntityPage = productBasicsInfoMapper.selectPage(queryPage, buildQuerySpuParam(querySpuRequest));
+		Page<ProductBasicsInfoEntity> infoEntityPage = pageQueryProductByParam(querySpuRequest);
 		if (Objects.isNull(infoEntityPage) || CollectionUtils.isEmpty(infoEntityPage.getRecords())) {
 			return PageVO.emptyPageVo(querySpuRequest.getPageNo(), querySpuRequest.getPageSize());
 		}
 		// 2.获取 productId 集合,查询 sku 信息
 		List<ProductBasicsInfoEntity> basicsInfoEntityList = infoEntityPage.getRecords();
-		Set<Long> productIdList = basicsInfoEntityList.stream().map(ProductBasicsInfoEntity::getId).collect(Collectors.toSet());
-		Map<Long, List<ProductSkuEntity>> productIdSkuListMap = productSkuService.queryByProductIdListToMap(productIdList);
+		Map<Long, List<ProductSkuEntity>> productIdSkuListMap = buildSkuMap(basicsInfoEntityList);
 		// 3.组装返回值
 		List<ProductSpuVO> spuVOList = Lists.newArrayListWithCapacity(basicsInfoEntityList.size());
 		for (ProductBasicsInfoEntity infoEntity : basicsInfoEntityList) {
@@ -178,27 +221,6 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			spuVOList.add(productSpuVO);
 		}
 		return PageVO.toPageVo(spuVOList, infoEntityPage.getTotal(), infoEntityPage.getSize(), infoEntityPage.getCurrent());
-	}
-
-	private LambdaQueryWrapper<ProductBasicsInfoEntity> buildQuerySpuParam(QuerySpuRequest querySpuRequest) {
-		LambdaQueryWrapper<ProductBasicsInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(ProductBasicsInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
-		if (Objects.nonNull(querySpuRequest.getSpuCode())) {
-			queryWrapper.eq(ProductBasicsInfoEntity::getSpuCode, querySpuRequest.getSpuCode());
-		}
-		if (Objects.nonNull(querySpuRequest.getProductName())) {
-			queryWrapper.like(ProductBasicsInfoEntity::getTitle, querySpuRequest.getProductName());
-		}
-		if (Objects.nonNull(querySpuRequest.getStoreId())) {
-			queryWrapper.eq(ProductBasicsInfoEntity::getSourceId, querySpuRequest.getStoreId());
-		}
-		if (Objects.nonNull(querySpuRequest.getCreateStart())) {
-			queryWrapper.gt(ProductBasicsInfoEntity::getCreatedAt, querySpuRequest.getCreateStart());
-		}
-		if (Objects.nonNull(querySpuRequest.getCreateEnd())) {
-			queryWrapper.lt(ProductBasicsInfoEntity::getCreatedAt, querySpuRequest.getCreateEnd());
-		}
-		return queryWrapper;
 	}
 
 	private ProductManageVO buildProductManageVO(ProductBasicsInfoEntity basicsInfoEntity, ProductExtendEntity extendEntity, BackCategoryEntity backCategoryEntity
@@ -300,9 +322,33 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	}
 
 	@Override
-	public Integer getCountBySPUCode(String spuCode){
+	public Integer getCountBySPUCode(String spuCode) {
 		LambdaQueryWrapper<ProductBasicsInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(ProductBasicsInfoEntity::getSpuCode,spuCode).eq(ProductBasicsInfoEntity::getDelFlag,0).eq(ProductBasicsInfoEntity::getState,1);
+		queryWrapper.eq(ProductBasicsInfoEntity::getSpuCode, spuCode).eq(ProductBasicsInfoEntity::getDelFlag, 0).eq(ProductBasicsInfoEntity::getState, 1);
 		return productBasicsInfoMapper.selectCount(queryWrapper);
+	}
+
+	private LambdaQueryWrapper<ProductBasicsInfoEntity> buildQuerySpuParam(QuerySpuRequest querySpuRequest) {
+		LambdaQueryWrapper<ProductBasicsInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(ProductBasicsInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+		if (Objects.nonNull(querySpuRequest.getSpuCode())) {
+			queryWrapper.eq(ProductBasicsInfoEntity::getSpuCode, querySpuRequest.getSpuCode());
+		}
+		if (Objects.nonNull(querySpuRequest.getProductName())) {
+			queryWrapper.like(ProductBasicsInfoEntity::getTitle, querySpuRequest.getProductName());
+		}
+		if (Objects.nonNull(querySpuRequest.getStoreId())) {
+			queryWrapper.eq(ProductBasicsInfoEntity::getSourceId, querySpuRequest.getStoreId());
+		}
+		if (Objects.nonNull(querySpuRequest.getCreateStart())) {
+			queryWrapper.gt(ProductBasicsInfoEntity::getCreatedAt, querySpuRequest.getCreateStart());
+		}
+		if (Objects.nonNull(querySpuRequest.getCreateEnd())) {
+			queryWrapper.lt(ProductBasicsInfoEntity::getCreatedAt, querySpuRequest.getCreateEnd());
+		}
+		if (!CollectionUtils.isEmpty(querySpuRequest.getBackCategoryIdList())) {
+			queryWrapper.in(ProductBasicsInfoEntity::getCategoryId, querySpuRequest.getBackCategoryIdList());
+		}
+		return queryWrapper;
 	}
 }

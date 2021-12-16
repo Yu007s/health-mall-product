@@ -27,6 +27,7 @@ public class BaseTree implements Serializable {
 	private Long id;
 
 	@ApiModelProperty(value = "父节点")
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private Long parentId;
 
 	@TableField(exist = false)

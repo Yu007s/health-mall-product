@@ -66,7 +66,7 @@ public class ProductSkuRevenueServiceImpl extends ServiceImpl<ProductSkuRevenueM
 	@Transactional(rollbackFor = Exception.class)
 	public void revenueAdd(AddRevenueRequest addRevenueRequest) {
 		// 1.校验 sku 是否存在
-		ProductSkuEntity productSkuEntity = productSkuService.queryBySkuIdOrCode(addRevenueRequest.getSkuId(), addRevenueRequest.getSkuCode());
+		ProductSkuEntity productSkuEntity = productSkuService.queryBySkuIdOrCode(addRevenueRequest.getSkuId(), addRevenueRequest.getSkuCode(), null);
 		if (Objects.isNull(productSkuEntity)) {
 			throw new BusinessException(ErrorEnums.PRODUCT_NOT_EXIST);
 		}
