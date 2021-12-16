@@ -17,6 +17,7 @@ import com.drstrong.health.product.service.IRedisService;
 import com.drstrong.health.redis.utils.RedisUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -41,6 +42,11 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
     @Resource
     IRedisService redisService;
     private static RedisUtils redisUtils;
+    @Value("${banner.default.photo-url}")
+    private String DEFAULT_PHOTO_URL;
+    @Value("${banner.default.link}")
+    private String DEFAULT_LINK;
+
     @Autowired
     public BannerServiceImpl(RedisUtils redisUtils) {
         BannerServiceImpl.redisUtils = redisUtils;
@@ -60,7 +66,7 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
         // 数量不足，展示占位图
         if (bannerResponses.size() < pageSize) {
             do {
-                BannerResponse banner = new BannerResponse("占位图", "占位图", 1, "");
+                BannerResponse banner = new BannerResponse(DEFAULT_PHOTO_URL, DEFAULT_LINK, 1, "");
                 bannerResponses.add(banner);
             } while (bannerResponses.size() < pageSize);
         }
