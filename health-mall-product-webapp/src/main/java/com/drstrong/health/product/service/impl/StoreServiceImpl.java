@@ -18,6 +18,7 @@ import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.service.StorePostageAreaService;
 import com.drstrong.health.product.service.StoreService;
+import com.drstrong.health.redis.utils.RedisUtils;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -45,6 +46,7 @@ public class StoreServiceImpl implements StoreService {
     private static final String STORE_UPDATE_ACTION = "update";
     private static final Integer STORE_NAME_MIN_LENGTH = 0;
     private static final Integer STORE_NAME_MAX_LENGTH = 20;
+    private static final String STORE_NAME_PREFIX = "mall:product:store:";
 
     @Resource
     private StoreMapper storeMapper;
@@ -52,6 +54,8 @@ public class StoreServiceImpl implements StoreService {
     private StorePostageAreaService storePostageAreaService;
     @Resource
     private StorePostageAreaMapper storePostageAreaMapper;
+    @Resource
+    private RedisUtils redisUtils;
 
     @Override
     public List<StoreInfoResponse> queryAll() {
@@ -75,6 +79,7 @@ public class StoreServiceImpl implements StoreService {
         storeSaveEntity.setCreatedBy(userId);
         storeSaveEntity.setChangedBy(userId);
         storeMapper.insert(storeSaveEntity);
+        redisUtils.set(STORE_NAME_PREFIX + storeSaveEntity.getId(),storeSaveEntity.getName());
     }
 
     @Override
@@ -89,6 +94,7 @@ public class StoreServiceImpl implements StoreService {
         storeUpdateEntity.setChangedAt(LocalDateTime.now());
         storeUpdateEntity.setChangedBy(userId);
         storeMapper.updateById(storeUpdateEntity);
+        redisUtils.set(STORE_NAME_PREFIX + storeAddOrUpdateRequest.getStoreId(),storeName);
     }
 
     @Override
