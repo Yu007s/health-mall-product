@@ -15,11 +15,8 @@ import java.util.List;
  */
 @Data
 @ApiModel("商品 spu 基础信息")
-public class SpuBaseInfoResponse implements Serializable {
+public class SpuBaseInfoVO implements Serializable {
 	private static final long serialVersionUID = -2458334369894407903L;
-
-	@ApiModelProperty("商品 id")
-	private String productId;
 
 	@ApiModelProperty("商品编码")
 	private String spuCode;
@@ -30,11 +27,14 @@ public class SpuBaseInfoResponse implements Serializable {
 	@ApiModelProperty("商品主图片集合")
 	private List<String> imageUrlList;
 
+	@ApiModelProperty("商品详情图片集合")
+	private List<String> detailUrlList;
+
 	@ApiModelProperty("店铺 id")
 	private Long storeId;
 
 	@ApiModelProperty("店铺名称")
-	private Long storeName;
+	private String storeName;
 
 	@ApiModelProperty("该商品的 sku 库存总和")
 	private Long inventoryNum;

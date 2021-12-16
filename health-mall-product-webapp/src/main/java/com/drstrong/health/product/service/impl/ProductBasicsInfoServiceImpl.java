@@ -11,10 +11,7 @@ import com.drstrong.health.product.model.enums.*;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.request.product.SaveProductRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.PackInfoResponse;
-import com.drstrong.health.product.model.response.product.ProductManageVO;
-import com.drstrong.health.product.model.response.product.ProductSpuVO;
-import com.drstrong.health.product.model.response.product.PropertyInfoResponse;
+import com.drstrong.health.product.model.response.product.*;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.*;
 import com.drstrong.health.product.util.BigDecimalUtil;
@@ -24,6 +21,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,6 +90,27 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	@Override
 	public List<ProductBasicsInfoEntity> queryProductByParam(QuerySpuRequest querySpuRequest) {
 		return productBasicsInfoMapper.selectList(buildQuerySpuParam(querySpuRequest));
+	}
+
+	/**
+	 * 根据 productId 或者 spuCode 查询商品基本信息
+	 *
+	 * @param productId 商品 id
+	 * @param spuCode   spu编码
+	 * @author liuqiuyi
+	 * @date 2021/12/16 20:15
+	 */
+	@Override
+	public ProductBasicsInfoEntity getByProductIdOrSpuCode(Long productId, String spuCode, UpOffEnum upOffEnum) {
+		if (Objects.isNull(productId) && StringUtils.isBlank(spuCode)) {
+			return null;
+		}
+		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
+		querySpuRequest.setProductId(productId);
+		querySpuRequest.setSpuCode(spuCode);
+		querySpuRequest.setUpOffEnum(upOffEnum);
+		List<ProductBasicsInfoEntity> basicsInfoEntityList = queryProductByParam(querySpuRequest);
+		return CollectionUtils.isEmpty(basicsInfoEntityList) ? null : basicsInfoEntityList.get(0);
 	}
 
 	/**
@@ -181,7 +200,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		Set<Long> attributeItemIdList = attributeEntityList.stream().map(ProductAttributeEntity::getAttributeItemId).collect(Collectors.toSet());
 		Map<Long, CategoryAttributeItemEntity> idEntityMap = categoryAttributeService.queryByIdListToMap(attributeItemIdList);
 		// 5.查询 sku 信息
-		List<ProductSkuEntity> skuEntityList = productSkuService.queryByProductId(productId);
+		List<ProductSkuEntity> skuEntityList = productSkuService.queryByProductId(productId, null);
 		// 6.组装返回值
 		return buildProductManageVO(basicsInfoEntity, extendEntity, backCategoryEntity, attributeEntityList, idEntityMap, skuEntityList);
 	}
@@ -221,6 +240,81 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			spuVOList.add(productSpuVO);
 		}
 		return PageVO.toPageVo(spuVOList, infoEntityPage.getTotal(), infoEntityPage.getSize(), infoEntityPage.getCurrent());
+	}
+
+	@Override
+	public Integer getCountBySPUCode(String spuCode) {
+		LambdaQueryWrapper<ProductBasicsInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(ProductBasicsInfoEntity::getSpuCode, spuCode).eq(ProductBasicsInfoEntity::getDelFlag, 0).eq(ProductBasicsInfoEntity::getState, 1);
+		return productBasicsInfoMapper.selectCount(queryWrapper);
+	}
+
+	/**
+	 * 生成商品或者药品编码,参照之前的方法
+	 *
+	 * @author liuqiuyi
+	 * @date 2021/12/16 14:13
+	 */
+	@Override
+	public String getNextProductNumber(ProductTypeEnum productTypeEnum) {
+		// 生成规则：药品编码M开头 + 建码日期六位：年后两位+月份+日期（190520）+ 5位顺序码    举例：M19052000001
+		StringBuilder number = new StringBuilder();
+		number.append(productTypeEnum.getMark());
+		number.append(DateUtil.formatDate(new Date(), "yyMMdd"));
+		long serialNumber = redisService.incr(RedisKeyUtils.getSerialNum());
+		number.append(String.format("%05d", serialNumber));
+		return number.toString();
+	}
+
+	/**
+	 * 小程序 - 根据 spuCode 获取商品详细信息
+	 *
+	 * @param spuCode spu编码
+	 * @return spu信息
+	 * @author liuqiuyi
+	 * @date 2021/12/16 19:55
+	 */
+	@Override
+	public ProductDetailVO getSpuInfo(String spuCode) {
+		if (StringUtils.isBlank(spuCode)) {
+			return new ProductDetailVO();
+		}
+		// 1.查询 spu 信息
+		ProductBasicsInfoEntity productEntity = getByProductIdOrSpuCode(null, spuCode, UpOffEnum.UP);
+		if (Objects.isNull(productEntity)) {
+			throw new BusinessException(ErrorEnums.PRODUCT_NOT_EXIST);
+		}
+		// 2.查询扩展信息
+		ProductExtendEntity extendEntity = productExtendService.queryByProductId(productEntity.getId());
+		// 3.查询 sku 信息
+		List<ProductSkuEntity> productSkuEntityList = productSkuService.queryByProductId(productEntity.getId(), UpOffEnum.UP);
+		if (CollectionUtils.isEmpty(productSkuEntityList)) {
+			throw new BusinessException(ErrorEnums.PRODUCT_NOT_EXIST);
+		}
+		productSkuEntityList.sort(Comparator.comparing(ProductSkuEntity::getSkuPrice));
+		// 3.查询库存信息
+		// TODO 调用库存的接口
+
+		// 4.组装返回值
+		return buildProductDetailVO(productEntity, extendEntity, productSkuEntityList);
+	}
+
+	private ProductDetailVO buildProductDetailVO(ProductBasicsInfoEntity productEntity, ProductExtendEntity extendEntity, List<ProductSkuEntity> productSkuEntityList) {
+		ProductDetailVO productDetailVO = new ProductDetailVO();
+		productDetailVO.setSpuCode(productEntity.getSpuCode());
+		productDetailVO.setProductTitle(productEntity.getTitle());
+		productDetailVO.setImageUrlList(Lists.newArrayList(extendEntity.getImageUrl().split(",")));
+		productDetailVO.setDetailUrlList(Lists.newArrayList(extendEntity.getDetailUrl().split(",")));
+		productDetailVO.setStoreId(productEntity.getSourceId());
+		productDetailVO.setStoreName(productEntity.getSourceName());
+//		productDetailVO.setInventoryNum();
+		ProductSkuEntity lowSku = productSkuEntityList.get(0);
+		ProductSkuEntity highSku = productSkuEntityList.get(0);
+		productDetailVO.setPriceStart(BigDecimalUtil.F2Y(lowSku.getSkuPrice().longValue()));
+		productDetailVO.setPriceEnd(BigDecimalUtil.F2Y(highSku.getSkuPrice().longValue()));
+		productDetailVO.setPackName(lowSku.getPackName());
+		productDetailVO.setPackValue(lowSku.getPackValue());
+		return productDetailVO;
 	}
 
 	private ProductManageVO buildProductManageVO(ProductBasicsInfoEntity basicsInfoEntity, ProductExtendEntity extendEntity, BackCategoryEntity backCategoryEntity
@@ -264,7 +358,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	}
 
 	private void saveOrUpdateSku(SaveProductRequest saveProductRequest, StoreEntity storeEntity, ProductBasicsInfoEntity infoEntity) {
-		Map<Long, ProductSkuEntity> skuIdEntityMap = productSkuService.queryByProductIdToMap(infoEntity.getId());
+		Map<Long, ProductSkuEntity> skuIdEntityMap = productSkuService.queryByProductIdToMap(infoEntity.getId(), null);
 
 		List<ProductSkuEntity> skuEntityList = Lists.newArrayListWithCapacity(saveProductRequest.getPackInfoList().size());
 		for (SaveProductRequest.PackInfoRequest packInfoRequest : saveProductRequest.getPackInfoList()) {
@@ -337,11 +431,8 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			infoEntity.setSpuCode(getNextProductNumber(ProductTypeEnum.PRODUCT));
 			infoEntity.setCreatedBy(saveProductRequest.getUserId());
 		}
-		infoEntity.setTitle(saveProductRequest.getTitle());
-		infoEntity.setBrandName(saveProductRequest.getBrandName());
-		infoEntity.setAliasName(saveProductRequest.getAliasName());
+		BeanUtils.copyProperties(saveProductRequest, infoEntity);
 		infoEntity.setMasterImageUrl(saveProductRequest.getImageUrlList().get(0));
-		infoEntity.setCategoryId(saveProductRequest.getCategoryId());
 		infoEntity.setSourceId(storeEntity.getId());
 		infoEntity.setSourceName(storeEntity.getName());
 		infoEntity.setChangedBy(saveProductRequest.getUserId());
@@ -350,37 +441,19 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		return infoEntity;
 	}
 
-	@Override
-	public Integer getCountBySPUCode(String spuCode) {
-		LambdaQueryWrapper<ProductBasicsInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(ProductBasicsInfoEntity::getSpuCode, spuCode).eq(ProductBasicsInfoEntity::getDelFlag, 0).eq(ProductBasicsInfoEntity::getState, 1);
-		return productBasicsInfoMapper.selectCount(queryWrapper);
-	}
-
-	/**
-	 * 生成商品或者药品编码,参照之前的方法
-	 *
-	 * @author liuqiuyi
-	 * @date 2021/12/16 14:13
-	 */
-	@Override
-	public String getNextProductNumber(ProductTypeEnum productTypeEnum) {
-		// 生成规则：药品编码M开头 + 建码日期六位：年后两位+月份+日期（190520）+ 5位顺序码    举例：M19052000001
-		StringBuilder number = new StringBuilder();
-		number.append(productTypeEnum.getMark());
-		number.append(DateUtil.formatDate(new Date(), "yyMMdd"));
-		long serialNumber = redisService.incr(RedisKeyUtils.getSerialNum());
-		number.append(String.format("%05d", serialNumber));
-		return number.toString();
-	}
-
 	private LambdaQueryWrapper<ProductBasicsInfoEntity> buildQuerySpuParam(QuerySpuRequest querySpuRequest) {
 		LambdaQueryWrapper<ProductBasicsInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(ProductBasicsInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
-		if (Objects.nonNull(querySpuRequest.getSpuCode())) {
+		if (Objects.nonNull(querySpuRequest.getUpOffEnum())) {
+			queryWrapper.eq(ProductBasicsInfoEntity::getState, querySpuRequest.getUpOffEnum().getCode());
+		}
+		if (StringUtils.isNotBlank(querySpuRequest.getSpuCode())) {
 			queryWrapper.eq(ProductBasicsInfoEntity::getSpuCode, querySpuRequest.getSpuCode());
 		}
-		if (Objects.nonNull(querySpuRequest.getProductName())) {
+		if (Objects.nonNull(querySpuRequest.getProductId())) {
+			queryWrapper.eq(ProductBasicsInfoEntity::getId, querySpuRequest.getProductId());
+		}
+		if (StringUtils.isNotBlank(querySpuRequest.getProductName())) {
 			queryWrapper.like(ProductBasicsInfoEntity::getTitle, querySpuRequest.getProductName());
 		}
 		if (Objects.nonNull(querySpuRequest.getStoreId())) {

@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel("商品详情信息")
-public class ProductDetailResponse extends SpuBaseInfoResponse implements Serializable {
+public class ProductDetailVO extends SpuBaseInfoVO implements Serializable {
 	private static final long serialVersionUID = -8217329668962591111L;
 
 	@ApiModelProperty("价格起始值")

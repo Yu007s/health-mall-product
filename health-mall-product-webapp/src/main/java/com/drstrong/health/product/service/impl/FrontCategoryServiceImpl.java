@@ -12,6 +12,7 @@ import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.LevelEnum;
+import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.category.AddOrUpdateFrontCategoryRequest;
 import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
 import com.drstrong.health.product.model.request.category.PageCategoryIdRequest;
@@ -372,7 +373,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		Set<Long> backIdList = relationByFrontCategoryIds.stream().map(CategoryRelationEntity::getBackCategoryId).collect(Collectors.toSet());
 		// 5.根据后台 id 集合,分页查询商品 spu 表
 		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
-		querySpuRequest.setState(1);
+		querySpuRequest.setUpOffEnum(UpOffEnum.UP);
 		querySpuRequest.setBackCategoryIdList(backIdList);
 		Page<ProductBasicsInfoEntity> productBasicsInfoEntityPage = productBasicsInfoService.pageQueryProductByParam(querySpuRequest);
 		Map<Long, List<ProductSkuEntity>> productIdSkusMap = productBasicsInfoService.buildSkuMap(productBasicsInfoEntityPage.getRecords());

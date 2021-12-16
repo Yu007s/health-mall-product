@@ -15,11 +15,8 @@ import java.math.BigDecimal;
  */
 @Data
 @ApiModel("sku 基础信息")
-public class SkuBaseInfoResponse implements Serializable {
+public class SkuBaseInfoVO implements Serializable {
 	private static final long serialVersionUID = -5089413355055401869L;
-
-	@ApiModelProperty("商品 id")
-	private Long productId;
 
 	@ApiModelProperty("商品编码")
 	private String skuCode;

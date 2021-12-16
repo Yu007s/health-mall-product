@@ -1,12 +1,14 @@
 package com.drstrong.health.product.controller;
 
-import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.ProductDetailResponse;
-import com.drstrong.health.product.model.response.product.ProductSearchResponse;
-import com.drstrong.health.product.model.response.product.SkuBaseInfoResponse;
-import com.drstrong.health.product.model.response.product.SpuBaseInfoResponse;
+import com.drstrong.health.product.model.response.product.ProductDetailVO;
+import com.drstrong.health.product.model.response.product.ProductSearchVO;
+import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
+import com.drstrong.health.product.model.response.product.SpuBaseInfoVO;
+import com.drstrong.health.product.model.response.result.ResultVO;
+import com.drstrong.health.product.service.ProductBasicsInfoService;
+import com.drstrong.health.product.service.ProductSkuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -29,17 +33,22 @@ import java.util.List;
 @Slf4j
 @Api(tags = {"商品 api"}, description = "商品 api")
 public class ProductApiController {
+	@Resource
+	ProductBasicsInfoService productBasicsInfoService;
+
+	@Resource
+	ProductSkuService productSkuService;
 
 	@ApiOperation("商品搜索-获取商品名称列表(分页)")
 	@GetMapping("/searchByName")
-	public ResultVO<PageVO<SpuBaseInfoResponse>> pageSearchByName(ProductSearchRequest productSearchRequest) {
+	public ResultVO<PageVO<SpuBaseInfoVO>> pageSearchByName(ProductSearchRequest productSearchRequest) {
 
 		return ResultVO.success();
 	}
 
 	@ApiOperation("商品搜索-获取搜索的商品列表(分页)")
 	@GetMapping("/search/detail")
-	public ResultVO<PageVO<ProductSearchResponse>> pageSearchDetail(ProductSearchRequest productSearchRequest) {
+	public ResultVO<PageVO<ProductSearchVO>> pageSearchDetail(ProductSearchRequest productSearchRequest) {
 
 		return ResultVO.success();
 	}
@@ -49,9 +58,9 @@ public class ProductApiController {
 			@ApiImplicitParam(name = "spuCode", value = "spu 编码", dataType = "string", paramType = "query", required = true)
 	})
 	@GetMapping("/spu/get")
-	public ResultVO<ProductDetailResponse> getSpu(String spuCode) {
-
-		return ResultVO.success();
+	public ResultVO<ProductDetailVO> getSpu(@NotBlank(message = "spuCode 不能为空") String spuCode) {
+		ProductDetailVO productDetailVO = productBasicsInfoService.getSpuInfo(spuCode);
+		return ResultVO.success(productDetailVO);
 	}
 
 	@ApiOperation("根据 spuCode 查询所有的 sku 信息")
@@ -59,8 +68,8 @@ public class ProductApiController {
 			@ApiImplicitParam(name = "spuCode", value = "spu 编码", dataType = "string", paramType = "query", required = true)
 	})
 	@GetMapping("/sku/listBySpuCode")
-	public ResultVO<List<SkuBaseInfoResponse>> listSkuBySpuCode(String spuCode) {
-
+	public ResultVO<List<SkuBaseInfoVO>> listSkuBySpuCode(@NotBlank(message = "spuCode 不能为空") String spuCode) {
+		List<SkuBaseInfoVO> skuBaseInfoVOList = productSkuService.listSkuBySpuCode(spuCode);
 		return ResultVO.success();
 	}
 }

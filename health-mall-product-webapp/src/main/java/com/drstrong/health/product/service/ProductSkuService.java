@@ -5,6 +5,7 @@ import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
+import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
 
 import java.util.Collection;
 import java.util.List;
@@ -44,7 +45,7 @@ public interface ProductSkuService {
 	 * @author liuqiuyi
 	 * @date 2021/12/13 21:13
 	 */
-	List<ProductSkuEntity> queryByProductId(Long productId);
+	List<ProductSkuEntity> queryByProductId(Long productId, UpOffEnum upOffEnum);
 
 	/**
 	 * 根据 商品id 查询 sku 集合,转成 skuMap
@@ -54,7 +55,7 @@ public interface ProductSkuService {
 	 * @author liuqiuyi
 	 * @date 2021/12/13 21:13
 	 */
-	Map<Long, ProductSkuEntity> queryByProductIdToMap(Long productId);
+	Map<Long, ProductSkuEntity> queryByProductIdToMap(Long productId, UpOffEnum upOffEnum);
 
 	/**
 	 * 根据 商品id 集合,查询 sku 集合
@@ -122,4 +123,14 @@ public interface ProductSkuService {
 	 * @date 2021/12/16 14:48
 	 */
 	String createNextSkuCode(String spuCode, Long productId);
+
+	/**
+	 * 小程序 - 根据 spuCode 查询 sku 集合
+	 *
+	 * @param spuCode spu编码
+	 * @return sku 集合
+	 * @author liuqiuyi
+	 * @date 2021/12/16 21:00
+	 */
+	List<SkuBaseInfoVO> listSkuBySpuCode(String spuCode);
 }

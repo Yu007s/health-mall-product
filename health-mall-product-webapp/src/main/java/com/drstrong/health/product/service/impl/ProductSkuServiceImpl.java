@@ -5,13 +5,18 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.ProductSkuMapper;
+import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
+import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
+import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.IRedisService;
+import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.util.RedisKeyUtils;
@@ -45,6 +50,9 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	@Resource
 	IRedisService redisService;
 
+	@Resource
+	ProductBasicsInfoService productBasicsInfoService;
+
 	/**
 	 * 批量保存 sku 信息
 	 *
@@ -75,12 +83,15 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	 * @date 2021/12/13 21:13
 	 */
 	@Override
-	public List<ProductSkuEntity> queryByProductId(Long productId) {
+	public List<ProductSkuEntity> queryByProductId(Long productId, UpOffEnum upOffEnum) {
 		if (Objects.isNull(productId)) {
 			return Lists.newArrayList();
 		}
 		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(ProductSkuEntity::getProductId, productId).eq(ProductSkuEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+		if (Objects.nonNull(upOffEnum)) {
+			queryWrapper.eq(ProductSkuEntity::getState, upOffEnum.getCode());
+		}
 		return productSkuMapper.selectList(queryWrapper);
 	}
 
@@ -93,8 +104,8 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	 * @date 2021/12/13 21:13
 	 */
 	@Override
-	public Map<Long, ProductSkuEntity> queryByProductIdToMap(Long productId) {
-		List<ProductSkuEntity> productSkuEntities = queryByProductId(productId);
+	public Map<Long, ProductSkuEntity> queryByProductIdToMap(Long productId, UpOffEnum upOffEnum) {
+		List<ProductSkuEntity> productSkuEntities = queryByProductId(productId, upOffEnum);
 		return productSkuEntities.stream().collect(toMap(ProductSkuEntity::getId, dto -> dto, (v1, v2) -> v1));
 	}
 
@@ -248,6 +259,43 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		}
 		long serialNumber = redisService.incr(RedisKeyUtils.getSkuNum(productId));
 		return spuCode + "-" + serialNumber;
+	}
+
+	/**
+	 * 小程序 - 根据 spuCode 查询 sku 集合
+	 *
+	 * @param spuCode spu编码
+	 * @return sku 集合
+	 * @author liuqiuyi
+	 * @date 2021/12/16 21:00
+	 */
+	@Override
+	public List<SkuBaseInfoVO> listSkuBySpuCode(String spuCode) {
+		if (StringUtils.isBlank(spuCode)) {
+			return Lists.newArrayList();
+		}
+		// 1.获取 spu 信息
+		ProductBasicsInfoEntity productEntity = productBasicsInfoService.getByProductIdOrSpuCode(null, spuCode, UpOffEnum.UP);
+		if (Objects.isNull(productEntity)) {
+			throw new BusinessException(ErrorEnums.PRODUCT_NOT_EXIST);
+		}
+		// 2.获取 sku 信息
+		List<ProductSkuEntity> productSkuEntityList = queryByProductId(productEntity.getId(), UpOffEnum.UP);
+		if (CollectionUtils.isEmpty(productSkuEntityList)) {
+			throw new BusinessException(ErrorEnums.PRODUCT_NOT_EXIST);
+		}
+		// 3.调用库存
+		// TODO 调用库存
+
+		// 4.组装返回值
+		List<SkuBaseInfoVO> skuBaseInfoVOList = Lists.newArrayListWithCapacity(productSkuEntityList.size());
+		for (ProductSkuEntity productSkuEntity : productSkuEntityList) {
+			SkuBaseInfoVO infoVO = new SkuBaseInfoVO();
+			BeanUtils.copyProperties(productSkuEntity, infoVO);
+			infoVO.setPrice(BigDecimalUtil.F2Y(productSkuEntity.getSkuPrice().longValue()));
+			skuBaseInfoVOList.add(infoVO);
+		}
+		return skuBaseInfoVOList;
 	}
 
 	private LambdaQueryWrapper<ProductSkuEntity> buildQuerySkuParam(QuerySkuRequest querySkuRequest) {

@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ApiModel("商品搜索结果返回值")
-public class ProductSearchResponse extends SpuBaseInfoResponse implements Serializable {
+public class ProductSearchVO extends SpuBaseInfoVO implements Serializable {
 	private static final long serialVersionUID = -4422986487802214588L;
 
 	@ApiModelProperty("icon 地址")

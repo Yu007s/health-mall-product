@@ -33,7 +33,7 @@ public enum ErrorEnums implements IBaseResult {
 	PARAM_IS_NOT_NULL("11000","参数不能为空"),
 	CATEGORY_NOT_EXIST("11100","分类不存在"),
 	SAVE_UPDATE_NOT_EXIST("11101","更新或者保存的数据不存在"),
-	PRODUCT_NOT_EXIST("11102","商品数据不存在"),
+	PRODUCT_NOT_EXIST("11102","商品数据不存在或已下架"),
 	CATEGORY_NAME_IS_EXIST("11103","同级分类中,分类名称已经存在"),
 	UPDATE_NOT_ALLOW("11104","已上架的商品不允许修改"),
 	STORE_NAME_LENGTH("17000","店铺名称长度不正确"),

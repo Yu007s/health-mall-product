@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
+import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.request.product.SaveProductRequest;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.product.ProductDetailVO;
 import com.drstrong.health.product.model.response.product.ProductManageVO;
 import com.drstrong.health.product.model.response.product.ProductSpuVO;
 
@@ -39,6 +41,17 @@ public interface ProductBasicsInfoService {
 	 * @date 2021/12/16 00:10
 	 */
 	List<ProductBasicsInfoEntity> queryProductByParam(QuerySpuRequest querySpuRequest);
+
+	/**
+	 * 根据 productId 或者 spuCode 查询商品基本信息
+	 *
+	 * @param productId 商品 id
+	 * @param spuCode   spu编码
+	 * @param upOffEnum 上下架状态
+	 * @author liuqiuyi
+	 * @date 2021/12/16 20:15
+	 */
+	ProductBasicsInfoEntity getByProductIdOrSpuCode(Long productId, String spuCode, UpOffEnum upOffEnum);
 
 	/**
 	 * 根据商品信息,组装 sku map
@@ -107,4 +120,14 @@ public interface ProductBasicsInfoService {
 	 * @date 2021/12/16 14:13
 	 */
 	String getNextProductNumber(ProductTypeEnum productTypeEnum);
+
+	/**
+	 * 小程序 - 根据 spuCode 获取商品详细信息
+	 *
+	 * @param spuCode spu编码
+	 * @return spu信息
+	 * @author liuqiuyi
+	 * @date 2021/12/16 19:55
+	 */
+	ProductDetailVO getSpuInfo(String spuCode);
 }
