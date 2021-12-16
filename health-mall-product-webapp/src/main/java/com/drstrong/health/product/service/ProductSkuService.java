@@ -90,4 +90,6 @@ public interface ProductSkuService {
 	 * @date 2021/12/16 09:59
 	 */
 	List<ProductSkuEntity> queryBySkuIdOrCode(Set<Long> skuIdList, Set<String> skuCodeList, UpOffEnum upOffEnum);
+
+	void updateState(List<Long> skuIdList,Integer state,Long userId);
 }

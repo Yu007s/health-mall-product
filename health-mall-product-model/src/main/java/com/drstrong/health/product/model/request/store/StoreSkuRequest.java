@@ -30,7 +30,7 @@ public class StoreSkuRequest extends PageRequest implements Serializable {
 	private String skuName;
 
 	@ApiModelProperty("三方 skuId")
-	private String threeSkuId;
+	private Long threeSkuId;
 
 	@ApiModelProperty("sku 状态")
 	private Integer skuState;

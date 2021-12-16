@@ -8,6 +8,7 @@ import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.entity.store.StorePostageAreaEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.enums.StorePostageEnum;
 import com.drstrong.health.product.model.enums.StoreStatusEnum;
 import com.drstrong.health.product.model.request.store.AreaPostage;
 import com.drstrong.health.product.model.request.store.StoreAddOrUpdateRequest;
@@ -119,6 +120,10 @@ public class StoreServiceImpl implements StoreService {
         return storePostage;
     }
 
+    @Override
+    public StoreEntity getByStoreId(Long storeId) {
+        return selectByStoreId(storeId);
+    }
 
 
     @Override
@@ -129,6 +134,7 @@ public class StoreServiceImpl implements StoreService {
         storeEntity.setFreePostage(storePostage.getFreePostage());
         storeEntity.setChangedAt(LocalDateTime.now());
         storeEntity.setChangedBy(userId);
+        storeEntity.setSetPostage(StorePostageEnum.HAS_SET.getCode());
         storeMapper.updateById(storeEntity);
         storePostageAreaService.deleteByStoreId(storeId,userId);
         List<AreaPostage> areaPostageList = storePostage.getAreaPostageList();
@@ -141,6 +147,21 @@ public class StoreServiceImpl implements StoreService {
             return storePostageAreaEntity;
         }).collect(Collectors.toList());
         storePostageAreaMapper.batchInsert(collect);
+    }
+
+    /**
+     * 根据店铺集合 获取已设置邮费的店铺
+     * @param storeIds
+     * @return
+     */
+    @Override
+    public List<StoreEntity> querySetPostageByStoreIds(List<Long> storeIds) {
+        LambdaQueryWrapper<StoreEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .eq(StoreEntity::getStoreStatus, StoreStatusEnum.ENABLE.getCode())
+                .eq(StoreEntity::getSetPostage,StorePostageEnum.HAS_SET)
+                .in(StoreEntity::getId,storeIds);
+        return storeMapper.selectList(queryWrapper);
     }
 
     private StoreEntity selectByStoreId(Long storeId) {

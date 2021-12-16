@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreSkuResponse;
 import com.drstrong.health.product.service.StoreService;
+import com.drstrong.health.product.service.StoreThreeRelevanceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,8 @@ public class StoreController {
 
 	@Resource
 	private StoreService storeService;
+	@Resource
+	private StoreThreeRelevanceService storeThreeRelevanceService;
 
 	@ApiOperation("获取所有的店铺信息")
 	@GetMapping("/query")
@@ -79,28 +82,31 @@ public class StoreController {
 	@ApiOperation("分页查询店铺的 sku 列表")
 	@GetMapping("/sku/page")
 	public ResultVO<PageVO<StoreSkuResponse>> pageSkuList(StoreSkuRequest storeSkuRequest) {
-
-		return ResultVO.success();
+		PageVO<StoreSkuResponse> pageVO = storeThreeRelevanceService.pageSkuList(storeSkuRequest);
+		return ResultVO.success(pageVO);
 	}
 
 	@ApiOperation("修改三方的进货单价")
 	@PostMapping("/purchasePrice/update")
 	public ResultVO<Object> updatePurchasePrice(@RequestBody UpdateThreeRequest updateThreeRequest) {
-
+		//TODO 获取当前操作人
+		storeThreeRelevanceService.updatePurchasePrice(updateThreeRequest,888L);
 		return ResultVO.success();
 	}
 
 	@ApiOperation("关联药店商品")
 	@PostMapping("/relevance/add")
-	public ResultVO<Object> relevanceAdd(@RequestBody UpdateThreeRequest updateThreeRequest) {
-
+	public ResultVO<Object> relevanceAdd(@RequestBody RelevanceThreeRequest relevanceThreeRequest) {
+		//TODO 获取当前操作人
+		storeThreeRelevanceService.relevanceAdd(relevanceThreeRequest,888L);
 		return ResultVO.success();
 	}
 
 	@ApiOperation("上架/下架 合作商品")
 	@PostMapping("/sku/updateState")
 	public ResultVO<Object> updateSkuState(@RequestBody UpdateSkuRequest updateSkuRequest) {
-
+		//TODO 获取当前操作人
+		storeThreeRelevanceService.updateSkuState(updateSkuRequest,888L);
 		return ResultVO.success();
 	}
 

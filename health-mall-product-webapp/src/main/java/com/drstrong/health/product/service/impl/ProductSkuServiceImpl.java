@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.dao.ProductSkuMapper;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -182,6 +184,18 @@ public class ProductSkuServiceImpl implements ProductSkuService {
 			queryWrapper.eq(ProductSkuEntity::getState, upOffEnum.getCode());
 		}
 		return productSkuMapper.selectList(queryWrapper);
+	}
+
+	@Override
+	public void updateState(List<Long> skuIdList, Integer state,Long userId) {
+		ProductSkuEntity productSkuEntity = new ProductSkuEntity();
+		LambdaUpdateWrapper<ProductSkuEntity> updateWrapper = new LambdaUpdateWrapper();
+		productSkuEntity.setState(state);
+		productSkuEntity.setChangedAt(LocalDateTime.now());
+		productSkuEntity.setChangedBy(userId);
+		updateWrapper.eq(ProductSkuEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode())
+				.in(ProductSkuEntity::getId,skuIdList);
+		productSkuMapper.update(productSkuEntity,updateWrapper);
 	}
 
 	private LambdaQueryWrapper<ProductSkuEntity> buildQuerySkuParam(QuerySkuRequest querySkuRequest) {

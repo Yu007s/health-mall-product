@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service;
 
+import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.request.store.StoreAddOrUpdateRequest;
 import com.drstrong.health.product.model.request.store.StoreIdRequest;
 import com.drstrong.health.product.model.request.store.StorePostage;
@@ -24,6 +25,10 @@ public interface StoreService {
     void disable(StoreIdRequest storeIdRequest, Long userId);
 
     StorePostage getPostage(Long storeId);
+    
+    StoreEntity getByStoreId(Long storeId);
 
     void updatePostage(StorePostage storePostage,Long userId);
+
+    List<StoreEntity> querySetPostageByStoreIds(List<Long> storeIds);
 }

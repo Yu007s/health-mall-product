@@ -38,6 +38,8 @@ public enum ErrorEnums implements IBaseResult {
 	STORE_NAME_LENGTH("17000","店铺名称长度不正确"),
 	STORE_NAME_REPEAT("17100","店铺名称已存在"),
 	STORE_NOT_EXIST("17110","店铺不存在"),
+	STORE_NOT_RELEVANCE("17111","商品需要关联sku"),
+	STORE_NOT_SETPOSTAGE("17211","sku商品未设置邮费，请设置邮费后再上架"),
 	;
 
 	private String code;
