@@ -32,3 +32,4 @@ banner:
   default:
     photo-url: "占位图"
     link: "占位链接"
+    name: "占位名称"

@@ -29,7 +29,7 @@
     </sql>
 
     <select id="getByLocation" resultType="com.drstrong.health.product.model.response.banner.BannerResponse">
-        SELECT photo_url,link_address,link_type,product_spu_sn
+        SELECT photo_url,link_address,link_type,product_spu_sn,banner_name
         FROM mall_product.mall_banner
         WHERE del_flag = 0
         AND   location = #{location}

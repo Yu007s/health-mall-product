@@ -46,6 +46,8 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
     private String DEFAULT_PHOTO_URL;
     @Value("${banner.default.link}")
     private String DEFAULT_LINK;
+    @Value("${banner.default.name}")
+    private String DEFAULT_NAME;
 
     @Autowired
     public BannerServiceImpl(RedisUtils redisUtils) {
@@ -66,7 +68,7 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
         // 数量不足，展示占位图
         if (bannerResponses.size() < pageSize) {
             do {
-                BannerResponse banner = new BannerResponse(DEFAULT_PHOTO_URL, DEFAULT_LINK, 1, "");
+                BannerResponse banner = new BannerResponse(DEFAULT_PHOTO_URL,DEFAULT_NAME, DEFAULT_LINK, 1, "");
                 bannerResponses.add(banner);
             } while (bannerResponses.size() < pageSize);
         }

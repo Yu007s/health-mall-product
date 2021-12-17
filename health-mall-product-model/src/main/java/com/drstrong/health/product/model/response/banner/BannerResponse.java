@@ -23,6 +23,9 @@ public class BannerResponse implements Serializable {
     @ApiModelProperty("图片url")
     private String photoUrl;
 
+    @ApiModelProperty("轮播图名称")
+    private String bannerName;
+
     @ApiModelProperty("链接地址")
     private String linkAddress;
 
