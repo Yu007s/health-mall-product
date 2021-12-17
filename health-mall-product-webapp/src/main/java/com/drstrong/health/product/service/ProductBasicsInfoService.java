@@ -43,6 +43,16 @@ public interface ProductBasicsInfoService {
 	List<ProductBasicsInfoEntity> queryProductByParam(QuerySpuRequest querySpuRequest);
 
 	/**
+	 * 根据条件,查询商品基础信息,转成 map 结构
+	 *
+	 * @param querySpuRequest 查询条件
+	 * @return 商品基础信息集合 map.key = 商品 id,value = 商品基础信息
+	 * @author liuqiuyi
+	 * @date 2021/12/16 00:10
+	 */
+	Map<Long, ProductBasicsInfoEntity> queryProductByParamToMap(QuerySpuRequest querySpuRequest);
+
+	/**
 	 * 根据 productId 或者 spuCode 查询商品基本信息
 	 *
 	 * @param productId 商品 id

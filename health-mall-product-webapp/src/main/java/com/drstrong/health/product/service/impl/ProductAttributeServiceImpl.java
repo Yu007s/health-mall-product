@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.ProductAttributeMapper;
 import com.drstrong.health.product.model.entity.product.ProductAttributeEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.response.product.ProductPropertyVO;
 import com.drstrong.health.product.service.ProductAttributeService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -84,5 +86,24 @@ public class ProductAttributeServiceImpl extends ServiceImpl<ProductAttributeMap
 		LambdaQueryWrapper<ProductAttributeEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(ProductAttributeEntity::getProductId, productId).eq(ProductAttributeEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
 		return productAttributeMapper.selectList(queryWrapper);
+	}
+
+	/**
+	 * 根据 spuCode 查询商品属性
+	 *
+	 * @param spuCode 商品编码
+	 * @return 属性集合
+	 * @author liuqiuyi
+	 * @date 2021/12/17 14:32
+	 */
+	@Override
+	public List<ProductPropertyVO> getPropertyByCode(String spuCode) {
+		if (StringUtils.isBlank(spuCode)) {
+			return Lists.newArrayList();
+		}
+
+
+
+		return null;
 	}
 }

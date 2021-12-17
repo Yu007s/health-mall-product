@@ -7,16 +7,19 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.ProductSkuMapper;
 import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
+import com.drstrong.health.product.model.entity.product.ProductSkuRevenueEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
+import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
 import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.IRedisService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
+import com.drstrong.health.product.service.ProductSkuRevenueService;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.util.RedisKeyUtils;
@@ -52,6 +55,9 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 
 	@Resource
 	ProductBasicsInfoService productBasicsInfoService;
+
+	@Resource
+	ProductSkuRevenueService productSkuRevenueService;
 
 	/**
 	 * 批量保存 sku 信息
@@ -154,14 +160,30 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	 */
 	@Override
 	public PageVO<ProductSkuVO> pageQuerySkuByParam(QuerySkuRequest querySkuRequest) {
+		// 1.分页查询 sku 表
 		Page<ProductSkuEntity> queryPage = new Page<>(querySkuRequest.getPageNo(), querySkuRequest.getPageSize());
 		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = buildQuerySkuParam(querySkuRequest);
 		Page<ProductSkuEntity> productSkuEntityPage = productSkuMapper.selectPage(queryPage, queryWrapper);
 		if (Objects.isNull(productSkuEntityPage) || CollectionUtils.isEmpty(productSkuEntityPage.getRecords())) {
-			return PageVO.emptyPageVo(querySkuRequest.getPageNo(), querySkuRequest.getPageSize());
+			return PageVO.newBuilder().pageNo(querySkuRequest.getPageNo()).pageSize(querySkuRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
 		}
-		List<ProductSkuVO> productSkuVOList = Lists.newArrayListWithCapacity(productSkuEntityPage.getRecords().size());
-		for (ProductSkuEntity record : productSkuEntityPage.getRecords()) {
+		// 2.获取 id 集合
+		List<ProductSkuEntity> skuEntityList = productSkuEntityPage.getRecords();
+		Set<Long> skuIdList = Sets.newHashSetWithExpectedSize(skuEntityList.size());
+		Set<Long> productIdList = Sets.newHashSetWithExpectedSize(skuEntityList.size());
+		skuEntityList.forEach(skuEntity -> {
+			skuIdList.add(skuEntity.getId());
+			productIdList.add(skuEntity.getProductId());
+		});
+		// 3.查询税收编码
+		Map<Long, ProductSkuRevenueEntity> skuIdRevenueEntityMap = productSkuRevenueService.listSkuRevenueToMap(skuIdList);
+		// 4.查询 spu 的主图信息
+		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
+		querySpuRequest.setProductIdList(productIdList);
+		Map<Long, ProductBasicsInfoEntity> productIdEntityMap = productBasicsInfoService.queryProductByParamToMap(querySpuRequest);
+		// 3.组装返回值
+		List<ProductSkuVO> productSkuVOList = Lists.newArrayListWithCapacity(skuEntityList.size());
+		for (ProductSkuEntity record : skuEntityList) {
 			ProductSkuVO productSkuVO = new ProductSkuVO();
 			BeanUtils.copyProperties(record, productSkuVO);
 			productSkuVO.setSkuId(record.getId());
@@ -169,11 +191,16 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			productSkuVO.setCreateTime(record.getCreatedAt());
 			productSkuVO.setUpdateTime(record.getChangedAt());
 			productSkuVO.setSkuState(record.getState());
+			productSkuVO.setSkuStateName(UpOffEnum.getValueByCode(record.getState()));
 			productSkuVO.setStoreId(record.getSourceId());
 			productSkuVO.setStoreName(record.getSourceName());
+			String masterImageUrl = productIdEntityMap.getOrDefault(productSkuVO.getProductId(), new ProductBasicsInfoEntity()).getMasterImageUrl();
+			productSkuVO.setMasterImageUrl(masterImageUrl);
+			String revenueCode = skuIdRevenueEntityMap.getOrDefault(productSkuVO.getSkuId(), new ProductSkuRevenueEntity()).getRevenueCode();
+			productSkuVO.setRevenueCode(revenueCode);
 			productSkuVOList.add(productSkuVO);
 		}
-		return PageVO.toPageVo(productSkuVOList, productSkuEntityPage.getTotal(), productSkuEntityPage.getSize(), productSkuEntityPage.getCurrent());
+		return PageVO.newBuilder().pageNo(querySkuRequest.getPageNo()).pageSize(querySkuRequest.getPageSize()).totalCount((int) productSkuEntityPage.getTotal()).result(productSkuVOList).build();
 	}
 
 	/**

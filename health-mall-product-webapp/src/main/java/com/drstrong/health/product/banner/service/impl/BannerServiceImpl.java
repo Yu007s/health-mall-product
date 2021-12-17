@@ -15,6 +15,7 @@ import com.drstrong.health.product.banner.service.BannerService;
 import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.drstrong.health.product.service.IRedisService;
 import com.drstrong.health.redis.utils.RedisUtils;
+import com.google.common.collect.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -145,9 +146,9 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
                     i.setMasterImageUrl(null);
                 }
             });
-            return PageVO.toPageVo(list,page.getTotal(),page.getCurrent(),page.getTotal());
+            return PageVO.newBuilder().pageNo(request.getPageNo()).pageSize(request.getPageSize()).totalCount((int) page.getTotal()).result(list).build();
         }else {
-            return PageVO.emptyPageVo(request.getPageNo(),request.getPageSize());
+            return PageVO.newBuilder().pageNo(request.getPageNo()).pageSize(request.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
         }
     }
 }

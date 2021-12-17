@@ -1,5 +1,9 @@
 package com.drstrong.health.product.model.enums;
 
+import jdk.nashorn.internal.ir.IfNode;
+
+import java.util.Objects;
+
 /**
  * 上下架的枚举
  *
@@ -17,6 +21,15 @@ public enum UpOffEnum {
 	private Integer code;
 
 	private String value;
+
+	public static String getValueByCode(Integer code){
+		for (UpOffEnum upOffEnum : UpOffEnum.values()) {
+			if (Objects.equals(upOffEnum.getCode(), code)) {
+				return upOffEnum.getValue();
+			}
+		}
+		return null;
+	}
 
 	UpOffEnum(Integer code, String value) {
 		this.code = code;

@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service;
 
 import com.drstrong.health.product.model.entity.product.ProductAttributeEntity;
+import com.drstrong.health.product.model.response.product.ProductPropertyVO;
 
 import java.util.List;
 
@@ -37,4 +38,14 @@ public interface ProductAttributeService {
 	 */
 	List<ProductAttributeEntity> queryByProductId(Long productId);
 
+
+	/**
+	 * 根据 spuCode 查询商品属性
+	 *
+	 * @param spuCode 商品编码
+	 * @return 属性集合
+	 * @author liuqiuyi
+	 * @date 2021/12/17 14:32
+	 */
+	List<ProductPropertyVO> getPropertyByCode(String spuCode);
 }

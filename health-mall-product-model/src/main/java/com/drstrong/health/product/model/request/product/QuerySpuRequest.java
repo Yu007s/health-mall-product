@@ -11,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,6 +28,9 @@ public class QuerySpuRequest extends PageRequest implements Serializable {
 
 	@ApiModelProperty(value = "商品 id", hidden = true)
 	private Long productId;
+
+	@ApiModelProperty(value = "商品 id集合", hidden = true)
+	private Set<Long> productIdList;
 
 	@ApiModelProperty("spu 编码")
 	private String spuCode;

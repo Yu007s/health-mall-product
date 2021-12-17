@@ -32,6 +32,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toMap;
+
 /**
  * 商品基础信息 service
  *
@@ -90,6 +92,23 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	@Override
 	public List<ProductBasicsInfoEntity> queryProductByParam(QuerySpuRequest querySpuRequest) {
 		return productBasicsInfoMapper.selectList(buildQuerySpuParam(querySpuRequest));
+	}
+
+	/**
+	 * 根据条件,查询商品基础信息,转成 map 结构
+	 *
+	 * @param querySpuRequest 查询条件
+	 * @return 商品基础信息集合 map.key = 商品 id,value = 商品基础信息
+	 * @author liuqiuyi
+	 * @date 2021/12/16 00:10
+	 */
+	@Override
+	public Map<Long, ProductBasicsInfoEntity> queryProductByParamToMap(QuerySpuRequest querySpuRequest) {
+		List<ProductBasicsInfoEntity> basicsInfoEntityList = queryProductByParam(querySpuRequest);
+		if (CollectionUtils.isEmpty(basicsInfoEntityList)) {
+			return Maps.newHashMap();
+		}
+		return basicsInfoEntityList.stream().collect(toMap(ProductBasicsInfoEntity::getId, dto -> dto, (v1, v2) -> v1));
 	}
 
 	/**
@@ -218,7 +237,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		// 1.分页查询 spu 信息
 		Page<ProductBasicsInfoEntity> infoEntityPage = pageQueryProductByParam(querySpuRequest);
 		if (Objects.isNull(infoEntityPage) || CollectionUtils.isEmpty(infoEntityPage.getRecords())) {
-			return PageVO.emptyPageVo(querySpuRequest.getPageNo(), querySpuRequest.getPageSize());
+			return PageVO.newBuilder().pageNo(querySpuRequest.getPageNo()).pageSize(querySpuRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
 		}
 		// 2.获取 productId 集合,查询 sku 信息
 		List<ProductBasicsInfoEntity> basicsInfoEntityList = infoEntityPage.getRecords();
@@ -239,7 +258,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			productSpuVO.setUpdateTime(infoEntity.getChangedAt());
 			spuVOList.add(productSpuVO);
 		}
-		return PageVO.toPageVo(spuVOList, infoEntityPage.getTotal(), infoEntityPage.getSize(), infoEntityPage.getCurrent());
+		return PageVO.newBuilder().pageNo(querySpuRequest.getPageNo()).pageSize(querySpuRequest.getPageSize()).totalCount((int) infoEntityPage.getTotal()).result(spuVOList).build();
 	}
 
 	@Override
@@ -452,6 +471,9 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		}
 		if (Objects.nonNull(querySpuRequest.getProductId())) {
 			queryWrapper.eq(ProductBasicsInfoEntity::getId, querySpuRequest.getProductId());
+		}
+		if (!CollectionUtils.isEmpty(querySpuRequest.getProductIdList())) {
+			queryWrapper.in(ProductBasicsInfoEntity::getId, querySpuRequest.getProductIdList());
 		}
 		if (StringUtils.isNotBlank(querySpuRequest.getProductName())) {
 			queryWrapper.like(ProductBasicsInfoEntity::getTitle, querySpuRequest.getProductName());

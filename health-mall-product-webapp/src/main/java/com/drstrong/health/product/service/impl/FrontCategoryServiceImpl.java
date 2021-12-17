@@ -21,13 +21,12 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.category.CategoryProductVO;
 import com.drstrong.health.product.model.response.category.FrontCategoryVO;
 import com.drstrong.health.product.model.response.category.HomeCategoryVO;
-import com.drstrong.health.product.model.response.product.ProductSpuVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.BackCategoryService;
 import com.drstrong.health.product.service.CategoryRelationService;
 import com.drstrong.health.product.service.FrontCategoryService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
-import com.drstrong.health.redis.utils.RedisUtils;
+import com.drstrong.health.product.util.BigDecimalUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -319,18 +318,8 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		} else {
 			queryWrapper.le(FrontCategoryEntity::getLevel, level);
 		}
-		List<FrontCategoryEntity> categoryEntityList = frontCategoryMapper.selectList(queryWrapper);
-		if (CollectionUtils.isEmpty(categoryEntityList)) {
-			return Lists.newArrayList();
-		}
 		// 封装返回值
-		List<HomeCategoryVO> homeCategoryVOList = Lists.newArrayListWithCapacity(categoryEntityList.size());
-		for (FrontCategoryEntity categoryEntity : categoryEntityList) {
-			HomeCategoryVO categoryVO = new HomeCategoryVO();
-			BeanUtils.copyProperties(categoryEntity, categoryVO);
-			categoryVO.setCategoryName(categoryEntity.getName());
-			homeCategoryVOList.add(categoryVO);
-		}
+		List<HomeCategoryVO> homeCategoryVOList = buildCategoryVOList(queryWrapper);
 		if (Objects.isNull(level) || Objects.equals(level, 1)) {
 			// 一级分类,进行返回值大小裁剪,并添加最后的全部分类
 			if (homeCategoryVOList.size() > FIRST_CATEGORY_SIZE) {
@@ -341,6 +330,39 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 			homeCategoryVOList = BaseTree.listToTree(homeCategoryVOList);
 		}
 		return homeCategoryVOList;
+	}
+
+	/**
+	 * 根据一级类 id 查询二级分类的商品信息
+	 *
+	 * @param oneLevelId 一级分类 id
+	 * @return 二级分类的信息
+	 * @author liuqiuyi
+	 * @date 2021/12/15 20:33
+	 */
+	@Override
+	public List<HomeCategoryVO> getLevelTwoById(Long oneLevelId) {
+		if (Objects.isNull(oneLevelId)) {
+			return Lists.newArrayList();
+		}
+		LambdaQueryWrapper<FrontCategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(FrontCategoryEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode()).eq(FrontCategoryEntity::getLevel, 2).eq(FrontCategoryEntity::getParentId, oneLevelId);
+		return buildCategoryVOList(queryWrapper);
+	}
+
+	private List<HomeCategoryVO> buildCategoryVOList(LambdaQueryWrapper<FrontCategoryEntity> queryWrapper) {
+		List<FrontCategoryEntity> categoryEntityList = frontCategoryMapper.selectList(queryWrapper);
+		if (CollectionUtils.isEmpty(categoryEntityList)) {
+			return Lists.newArrayList();
+		}
+		List<HomeCategoryVO> categoryVOList = Lists.newArrayListWithCapacity(categoryEntityList.size());
+		for (FrontCategoryEntity categoryEntity : categoryEntityList) {
+			HomeCategoryVO categoryVO = new HomeCategoryVO();
+			BeanUtils.copyProperties(categoryEntity, categoryVO);
+			categoryVO.setCategoryName(categoryEntity.getName());
+			categoryVOList.add(categoryVO);
+		}
+		return categoryVOList;
 	}
 
 	/**
@@ -367,7 +389,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		// 3.查询前后台关联关系
 		List<CategoryRelationEntity> relationByFrontCategoryIds = categoryRelationService.getRelationByFrontCategoryIds(frontCategoryIdList);
 		if (CollectionUtils.isEmpty(relationByFrontCategoryIds)) {
-			return PageVO.emptyPageVo(pageCategoryIdRequest.getPageNo(), pageCategoryIdRequest.getPageSize());
+			return PageVO.newBuilder().pageNo(pageCategoryIdRequest.getPageNo()).pageSize(pageCategoryIdRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
 		}
 		// 4.获取后台 id
 		Set<Long> backIdList = relationByFrontCategoryIds.stream().map(CategoryRelationEntity::getBackCategoryId).collect(Collectors.toSet());
@@ -381,17 +403,17 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		List<CategoryProductVO> productVOList = Lists.newArrayListWithCapacity(productBasicsInfoEntityPage.getRecords().size());
 		for (ProductBasicsInfoEntity record : productBasicsInfoEntityPage.getRecords()) {
 			CategoryProductVO categoryProductVO = new CategoryProductVO();
-			categoryProductVO.setProductId(record.getId());
+			categoryProductVO.setProductCode(record.getSpuCode());
 			categoryProductVO.setProductName(record.getTitle());
 			categoryProductVO.setMasterImageUrl(record.getMasterImageUrl());
 			Map<String, BigDecimal> priceSectionMap = getPriceSectionMap(productIdSkusMap.get(record.getId()));
-			categoryProductVO.setLowPrice(priceSectionMap.get("lowPrice"));
+			categoryProductVO.setLowPrice(BigDecimalUtil.F2Y(priceSectionMap.get("lowPrice").longValue()));
 			productVOList.add(categoryProductVO);
 		}
-		return PageVO.toPageVo(productVOList, productBasicsInfoEntityPage.getTotal(), pageCategoryIdRequest.getPageNo(), pageCategoryIdRequest.getPageSize());
+		return PageVO.newBuilder().pageNo(pageCategoryIdRequest.getPageNo()).pageSize(pageCategoryIdRequest.getPageSize()).totalCount((int) productBasicsInfoEntityPage.getTotal()).result(productVOList).build();
 	}
 
-	private Map<String, BigDecimal> getPriceSectionMap(List<ProductSkuEntity> productSkuEntities){
+	private Map<String, BigDecimal> getPriceSectionMap(List<ProductSkuEntity> productSkuEntities) {
 		Map<String, BigDecimal> priceMap = Maps.newHashMapWithExpectedSize(4);
 		if (CollectionUtils.isEmpty(productSkuEntities)) {
 			priceMap.put("lowPrice", new BigDecimal("0"));
