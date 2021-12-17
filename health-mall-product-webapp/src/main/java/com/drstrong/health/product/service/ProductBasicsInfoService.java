@@ -140,4 +140,15 @@ public interface ProductBasicsInfoService {
 	 * @date 2021/12/16 19:55
 	 */
 	ProductDetailVO getSpuInfo(String spuCode);
+
+	/**
+	 * 分页查询搜索的内容,只返回商品名称
+	 *
+	 * @param content 搜索条件
+	 * @param count   返回的个数
+	 * @return 搜索结果
+	 * @author liuqiuyi
+	 * @date 2021/12/17 15:49
+	 */
+	List<String> pageSearchByName(String content, Integer count);
 }

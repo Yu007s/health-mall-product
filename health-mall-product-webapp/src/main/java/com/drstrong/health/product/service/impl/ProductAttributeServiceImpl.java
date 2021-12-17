@@ -3,10 +3,19 @@ package com.drstrong.health.product.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.ProductAttributeMapper;
+import com.drstrong.health.product.model.entity.product.CategoryAttributeItemEntity;
 import com.drstrong.health.product.model.entity.product.ProductAttributeEntity;
+import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
+import com.drstrong.health.product.model.entity.product.ProductExtendEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.response.product.ProductPropertyVO;
+import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.service.CategoryAttributeService;
 import com.drstrong.health.product.service.ProductAttributeService;
+import com.drstrong.health.product.service.ProductBasicsInfoService;
+import com.drstrong.health.product.service.ProductExtendService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,8 +26,10 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 商品关联属性值 service
@@ -29,8 +40,21 @@ import java.util.Set;
 @Service
 @Slf4j
 public class ProductAttributeServiceImpl extends ServiceImpl<ProductAttributeMapper, ProductAttributeEntity> implements ProductAttributeService {
+	private static final String BRAND_NAME = "商品品牌";
+	private static final String APPROVAL_NUMBER = "批文编号";
+	private static final String VENDOR_NAME = "生产厂商";
+
 	@Resource
 	ProductAttributeMapper productAttributeMapper;
+
+	@Resource
+	ProductBasicsInfoService productBasicsInfoService;
+
+	@Resource
+	ProductExtendService productExtendService;
+
+	@Resource
+	CategoryAttributeService categoryAttributeService;
 
 	/**
 	 * 保存关联关系
@@ -101,9 +125,32 @@ public class ProductAttributeServiceImpl extends ServiceImpl<ProductAttributeMap
 		if (StringUtils.isBlank(spuCode)) {
 			return Lists.newArrayList();
 		}
+		// 1.校验 spuCode
+		ProductBasicsInfoEntity basicsInfoEntity = productBasicsInfoService.getByProductIdOrSpuCode(null, spuCode, UpOffEnum.UP);
+		if (Objects.isNull(basicsInfoEntity)) {
+			throw new BusinessException(ErrorEnums.PRODUCT_NOT_EXIST);
+		}
+		// 2.查询商品扩展信息
+		ProductExtendEntity extendEntity = productExtendService.queryByProductId(basicsInfoEntity.getId());
+		// 3.查询属性信息
+		List<ProductAttributeEntity> attributeEntityList = queryByProductId(basicsInfoEntity.getId());
+		Set<Long> attributeItemIdList = attributeEntityList.stream().map(ProductAttributeEntity::getAttributeItemId).collect(Collectors.toSet());
+		Map<Long, CategoryAttributeItemEntity> idEntityMap = categoryAttributeService.queryByIdListToMap(attributeItemIdList);
+		return buildProductPropertyVO(basicsInfoEntity, extendEntity, attributeEntityList, idEntityMap);
+	}
 
-
-
-		return null;
+	private List<ProductPropertyVO> buildProductPropertyVO(ProductBasicsInfoEntity basicsInfoEntity, ProductExtendEntity extendEntity,
+														   List<ProductAttributeEntity> attributeEntityList, Map<Long, CategoryAttributeItemEntity> idEntityMap) {
+		List<ProductPropertyVO> productPropertyVOList = Lists.newArrayListWithCapacity(attributeEntityList.size());
+		// 1.组装固定属性
+		productPropertyVOList.add(new ProductPropertyVO(BRAND_NAME, basicsInfoEntity.getBrandName()));
+		productPropertyVOList.add(new ProductPropertyVO(APPROVAL_NUMBER, extendEntity.getApprovalNumber()));
+		productPropertyVOList.add(new ProductPropertyVO(VENDOR_NAME, extendEntity.getVendorName()));
+		// 2.组装动态属性
+		for (ProductAttributeEntity attributeEntity : attributeEntityList) {
+			String attributeName = idEntityMap.getOrDefault(attributeEntity.getAttributeItemId(), new CategoryAttributeItemEntity()).getAttributeName();
+			productPropertyVOList.add(new ProductPropertyVO(attributeName, attributeEntity.getAttributeValue()));
+		}
+		return productPropertyVOList;
 	}
 }

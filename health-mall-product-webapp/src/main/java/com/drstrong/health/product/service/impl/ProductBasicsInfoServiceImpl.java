@@ -8,6 +8,7 @@ import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.entity.product.*;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.*;
+import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.request.product.SaveProductRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -316,6 +317,28 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 
 		// 4.组装返回值
 		return buildProductDetailVO(productEntity, extendEntity, productSkuEntityList);
+	}
+
+	/**
+	 * 分页查询搜索的内容,只返回商品名称
+	 *
+	 * @param content 搜索条件
+	 * @param count   返回的个数
+	 * @return 搜索结果
+	 * @author liuqiuyi
+	 * @date 2021/12/17 15:49
+	 */
+	@Override
+	public List<String> pageSearchByName(String content, Integer count) {
+		if (StringUtils.isBlank(content)) {
+			return Lists.newArrayList();
+		}
+		List<String> titleList = productBasicsInfoMapper.likeProductTitle(content, count);
+		// 如果商城的搜索结果为空,或者没有达到分页条数
+		if (CollectionUtils.isEmpty(titleList) || titleList.size() < count) {
+			// TODO 搜索老系统,获取结果 @坤鹏
+		}
+		return titleList;
 	}
 
 	private ProductDetailVO buildProductDetailVO(ProductBasicsInfoEntity productEntity, ProductExtendEntity extendEntity, List<ProductSkuEntity> productSkuEntityList) {

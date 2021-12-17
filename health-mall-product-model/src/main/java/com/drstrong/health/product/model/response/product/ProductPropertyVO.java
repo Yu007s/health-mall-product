@@ -2,7 +2,9 @@ package com.drstrong.health.product.model.response.product;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -14,6 +16,8 @@ import java.io.Serializable;
  */
 @Data
 @ApiModel("商品属性信息返回值")
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProductPropertyVO implements Serializable {
 	private static final long serialVersionUID = -8138427300059920122L;
 

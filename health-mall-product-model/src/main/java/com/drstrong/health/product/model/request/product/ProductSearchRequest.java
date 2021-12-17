@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
 /**
@@ -21,5 +22,6 @@ public class ProductSearchRequest extends PageRequest implements Serializable {
 	private static final long serialVersionUID = 586525841318457288L;
 
 	@ApiModelProperty("查询内容")
-	private String name;
+	@NotEmpty(message = "搜索内容不能为空")
+	private String content;
 }

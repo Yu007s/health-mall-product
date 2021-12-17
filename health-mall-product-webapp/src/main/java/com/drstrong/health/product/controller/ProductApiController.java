@@ -2,7 +2,10 @@ package com.drstrong.health.product.controller;
 
 import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.*;
+import com.drstrong.health.product.model.response.product.ProductDetailVO;
+import com.drstrong.health.product.model.response.product.ProductPropertyVO;
+import com.drstrong.health.product.model.response.product.ProductSearchVO;
+import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.service.ProductAttributeService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 商品 api controller
@@ -41,10 +45,17 @@ public class ProductApiController {
 	ProductAttributeService productAttributeService;
 
 	@ApiOperation("商品搜索-获取商品名称列表(分页)")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "content", value = "搜索内容", dataType = "string", paramType = "query", required = true),
+			@ApiImplicitParam(name = "count", value = "返回数据条数(不传默认为 10 条)", dataType = "int", paramType = "query")
+	})
 	@GetMapping("/searchByName")
-	public ResultVO<PageVO<SpuBaseInfoVO>> pageSearchByName(ProductSearchRequest productSearchRequest) {
-
-		return ResultVO.success();
+	public ResultVO<List<String>> pageSearchByName(String content, Integer count) {
+		if (Objects.isNull(count)) {
+			count = 10;
+		}
+		List<String> resultList = productBasicsInfoService.pageSearchByName(content, count);
+		return ResultVO.success(resultList);
 	}
 
 	@ApiOperation("商品搜索-获取搜索的商品列表(分页)")
