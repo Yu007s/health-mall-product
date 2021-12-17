@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -108,6 +110,12 @@ public class StoreController {
 		//TODO 获取当前操作人
 		storeThreeRelevanceService.updateSkuState(updateSkuRequest,888L);
 		return ResultVO.success();
+	}
+
+	@ApiOperation("商品维护列表导出")
+	@PostMapping("/sku/export")
+	public void updateSkuState(StoreSkuRequest storeSkuRequest, HttpServletRequest request, HttpServletResponse response) {
+		storeThreeRelevanceService.exportStoreSku(storeSkuRequest,request,response);
 	}
 
 

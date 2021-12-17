@@ -10,6 +10,7 @@ import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.entity.store.StoreThreeRelevanceEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.enums.ExcelMappingEnum;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.request.store.RelevanceThreeRequest;
 import com.drstrong.health.product.model.request.store.StoreSkuRequest;
@@ -22,13 +23,20 @@ import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.service.StoreService;
 import com.drstrong.health.product.service.StoreThreeRelevanceService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.easy.excel.ExcelContext;
+import org.easy.excel.util.ExcelDownLoadUtil;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +60,8 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
     private ProductSkuService productSkuService;
     @Resource
     private StoreService storeService;
+    @Autowired
+    private ExcelContext excelContext;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -116,6 +126,18 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
         }
         productSkuService.updateState(skuIdList,state,userId);
         //TODO 发送mq消息通知库存
+    }
+
+    @Override
+    public void exportStoreSku(StoreSkuRequest storeSkuRequest, HttpServletRequest request, HttpServletResponse response) {
+        PageVO<StoreSkuResponse> pageVO = this.pageSkuList(storeSkuRequest);
+        List<StoreSkuResponse> storeSkuResponses = pageVO.getList();
+        Workbook excel = excelContext.createExcel(ExcelMappingEnum.STORE_SKU_EXPORT.getMappingId(), storeSkuResponses);
+        try {
+            ExcelDownLoadUtil.downLoadExcel(excel,ExcelMappingEnum.STORE_SKU_EXPORT.getExcelName(),ExcelMappingEnum.STORE_SKU_EXPORT.getEmptyMessage(),request,response);
+        } catch (IOException e) {
+            throw new BusinessException(ErrorEnums.EXCEL_EXPORT_ERROR);
+        }
     }
 
     /**

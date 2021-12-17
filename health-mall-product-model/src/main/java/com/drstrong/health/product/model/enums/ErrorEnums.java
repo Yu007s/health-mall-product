@@ -21,6 +21,7 @@ import com.drstrong.health.product.model.response.result.IBaseResult;
  * 			16：用户
  * 			17:店铺
  * 			20：库存
+ * 			21:导入导出
  * </p>
  *
  * @author liuqiuyi
@@ -41,6 +42,8 @@ public enum ErrorEnums implements IBaseResult {
 	STORE_NOT_EXIST("17110","店铺不存在"),
 	STORE_NOT_RELEVANCE("17111","商品需要关联sku"),
 	STORE_NOT_SETPOSTAGE("17211","sku商品未设置邮费，请设置邮费后再上架"),
+	EXCEL_EXPORT_ERROR("21000","文档导出错误"),
+	EXCEL_IMPORT_ERROR("21100","文档导入错误"),
 	;
 
 	private String code;
