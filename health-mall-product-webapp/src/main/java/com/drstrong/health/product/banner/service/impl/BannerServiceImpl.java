@@ -15,6 +15,7 @@ import com.drstrong.health.product.banner.service.BannerService;
 import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.drstrong.health.product.service.IRedisService;
 import com.drstrong.health.redis.utils.RedisUtils;
+import com.google.common.collect.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,12 +43,7 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
     @Resource
     IRedisService redisService;
     private static RedisUtils redisUtils;
-    @Value("${banner.default.photo-url}")
-    private String DEFAULT_PHOTO_URL;
-    @Value("${banner.default.link}")
-    private String DEFAULT_LINK;
-    @Value("${banner.default.name}")
-    private String DEFAULT_NAME;
+
 
     @Autowired
     public BannerServiceImpl(RedisUtils redisUtils) {
@@ -65,14 +61,7 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
         if (bannerResponses.size() > pageSize) {
             bannerResponses.stream().limit(pageSize);
         }
-        // 数量不足，展示占位图
-        if (bannerResponses.size() < pageSize) {
-            do {
-                BannerResponse banner = new BannerResponse(DEFAULT_PHOTO_URL,DEFAULT_NAME, DEFAULT_LINK, 1, "");
-                bannerResponses.add(banner);
-            } while (bannerResponses.size() < pageSize);
-        }
-        return bannerResponses;
+        return bannerResponses.size() > 0 ? bannerResponses : new ArrayList<>();
     }
 
 
@@ -145,9 +134,9 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
                     i.setMasterImageUrl(null);
                 }
             });
-            return PageVO.toPageVo(list,page.getTotal(),page.getCurrent(),page.getTotal());
+            return PageVO.newBuilder().pageNo(request.getPageNo()).pageSize(request.getPageSize()).totalCount((int) page.getTotal()).result(list).build();
         }else {
-            return PageVO.emptyPageVo(request.getPageNo(),request.getPageSize());
+            return PageVO.newBuilder().pageNo(request.getPageNo()).pageSize(request.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
         }
     }
 }

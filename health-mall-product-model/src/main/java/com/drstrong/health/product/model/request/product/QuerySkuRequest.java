@@ -5,9 +5,10 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * 查询 sku 的入参
@@ -31,10 +32,12 @@ public class QuerySkuRequest extends PageRequest implements Serializable {
 	private String storeId;
 
 	@ApiModelProperty("开始时间")
-	private LocalDateTime createStart;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate createStart;
 
 	@ApiModelProperty("结束时间")
-	private LocalDateTime createEnd;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate createEnd;
 
 	@ApiModelProperty("价格开始值")
 	private Long priceStart;

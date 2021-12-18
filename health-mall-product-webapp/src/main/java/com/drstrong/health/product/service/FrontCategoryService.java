@@ -107,4 +107,15 @@ public interface FrontCategoryService {
 	 * @date 2021/12/15 20:33
 	 */
 	PageVO<CategoryProductVO> pageCategoryProduct(PageCategoryIdRequest pageCategoryIdRequest);
+
+
+	/**
+	 * 根据一级类 id 查询二级分类的商品信息
+	 *
+	 * @param oneLevelId 一级分类 id
+	 * @return 二级分类的信息
+	 * @author liuqiuyi
+	 * @date 2021/12/15 20:33
+	 */
+	List<HomeCategoryVO> getLevelTwoById(Long oneLevelId);
 }

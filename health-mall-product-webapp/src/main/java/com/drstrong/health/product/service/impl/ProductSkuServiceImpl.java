@@ -7,12 +7,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.ProductSkuMapper;
 import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
+import com.drstrong.health.product.model.entity.product.ProductSkuRevenueEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ExcelMappingEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.request.product.QuerySkuStockRequest;
+import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ProductSkuStockVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
@@ -20,6 +22,7 @@ import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.IRedisService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
+import com.drstrong.health.product.service.ProductSkuRevenueService;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.util.RedisKeyUtils;
@@ -43,6 +46,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -65,6 +69,9 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 
 	@Resource
 	ProductBasicsInfoService productBasicsInfoService;
+
+	@Resource
+	ProductSkuRevenueService productSkuRevenueService;
 
 	@Resource
 	PharmacyGoodsRemoteApi pharmacyGoodsRemoteApi;
@@ -172,14 +179,30 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	 */
 	@Override
 	public PageVO<ProductSkuVO> pageQuerySkuByParam(QuerySkuRequest querySkuRequest) {
+		// 1.分页查询 sku 表
 		Page<ProductSkuEntity> queryPage = new Page<>(querySkuRequest.getPageNo(), querySkuRequest.getPageSize());
 		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = buildQuerySkuParam(querySkuRequest);
 		Page<ProductSkuEntity> productSkuEntityPage = productSkuMapper.selectPage(queryPage, queryWrapper);
 		if (Objects.isNull(productSkuEntityPage) || CollectionUtils.isEmpty(productSkuEntityPage.getRecords())) {
-			return PageVO.emptyPageVo(querySkuRequest.getPageNo(), querySkuRequest.getPageSize());
+			return PageVO.newBuilder().pageNo(querySkuRequest.getPageNo()).pageSize(querySkuRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
 		}
-		List<ProductSkuVO> productSkuVOList = Lists.newArrayListWithCapacity(productSkuEntityPage.getRecords().size());
-		for (ProductSkuEntity record : productSkuEntityPage.getRecords()) {
+		// 2.获取 id 集合
+		List<ProductSkuEntity> skuEntityList = productSkuEntityPage.getRecords();
+		Set<Long> skuIdList = Sets.newHashSetWithExpectedSize(skuEntityList.size());
+		Set<Long> productIdList = Sets.newHashSetWithExpectedSize(skuEntityList.size());
+		skuEntityList.forEach(skuEntity -> {
+			skuIdList.add(skuEntity.getId());
+			productIdList.add(skuEntity.getProductId());
+		});
+		// 3.查询税收编码
+		Map<Long, ProductSkuRevenueEntity> skuIdRevenueEntityMap = productSkuRevenueService.listSkuRevenueToMap(skuIdList);
+		// 4.查询 spu 的主图信息
+		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
+		querySpuRequest.setProductIdList(productIdList);
+		Map<Long, ProductBasicsInfoEntity> productIdEntityMap = productBasicsInfoService.queryProductByParamToMap(querySpuRequest);
+		// 3.组装返回值
+		List<ProductSkuVO> productSkuVOList = Lists.newArrayListWithCapacity(skuEntityList.size());
+		for (ProductSkuEntity record : skuEntityList) {
 			ProductSkuVO productSkuVO = new ProductSkuVO();
 			BeanUtils.copyProperties(record, productSkuVO);
 			productSkuVO.setSkuId(record.getId());
@@ -187,11 +210,16 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			productSkuVO.setCreateTime(record.getCreatedAt());
 			productSkuVO.setUpdateTime(record.getChangedAt());
 			productSkuVO.setSkuState(record.getState());
+			productSkuVO.setSkuStateName(UpOffEnum.getValueByCode(record.getState()));
 			productSkuVO.setStoreId(record.getSourceId());
 			productSkuVO.setStoreName(record.getSourceName());
+			String masterImageUrl = productIdEntityMap.getOrDefault(productSkuVO.getProductId(), new ProductBasicsInfoEntity()).getMasterImageUrl();
+			productSkuVO.setMasterImageUrl(masterImageUrl);
+			String revenueCode = skuIdRevenueEntityMap.getOrDefault(productSkuVO.getSkuId(), new ProductSkuRevenueEntity()).getRevenueCode();
+			productSkuVO.setRevenueCode(revenueCode);
 			productSkuVOList.add(productSkuVO);
 		}
-		return PageVO.toPageVo(productSkuVOList, productSkuEntityPage.getTotal(), productSkuEntityPage.getSize(), productSkuEntityPage.getCurrent());
+		return PageVO.newBuilder().pageNo(querySkuRequest.getPageNo()).pageSize(querySkuRequest.getPageSize()).totalCount((int) productSkuEntityPage.getTotal()).result(productSkuVOList).build();
 	}
 
 	/**
@@ -209,7 +237,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		Page<ProductSkuEntity> productSkuEntityPage = productSkuMapper.selectPage(queryPage, queryWrapper);
 		List<ProductSkuEntity> records = productSkuEntityPage.getRecords();
 		if (Objects.isNull(productSkuEntityPage) || CollectionUtils.isEmpty(records)) {
-			return PageVO.emptyPageVo(querySkuStockRequest.getPageNo(), querySkuStockRequest.getPageSize());
+            return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
 		}
 		List<ProductSkuStockVO> productSkuStockVOS = Lists.newArrayListWithCapacity(records.size());
 		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(records.stream().map(ProductSkuEntity::getId).collect(Collectors.toList()));
@@ -222,7 +250,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
 			productSkuStockVOS.add(productSkuStockVO);
 		});
-		return PageVO.toPageVo(productSkuStockVOS, productSkuEntityPage.getTotal(), productSkuEntityPage.getSize(), productSkuEntityPage.getCurrent());
+        return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount((int) productSkuEntityPage.getTotal()).result(productSkuStockVOS).build();
 	}
 
 	/**
@@ -236,7 +264,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	@Override
 	public void exportSkuStock(QuerySkuStockRequest querySkuStockRequest, HttpServletRequest request, HttpServletResponse response) {
 		PageVO<ProductSkuStockVO> productSkuStockVOPageVO = this.pageQuerySkuStockByParam(querySkuStockRequest);
-		List<ProductSkuStockVO> productSkuStockVOS = productSkuStockVOPageVO.getList();
+		List<ProductSkuStockVO> productSkuStockVOS = productSkuStockVOPageVO.getResult();
 		Workbook excel = excelContext.createExcel(ExcelMappingEnum.SKU_STOCK_EXPORT.getMappingId(), productSkuStockVOS);
 		try {
 			ExcelDownLoadUtil.downLoadExcel(excel,ExcelMappingEnum.SKU_STOCK_EXPORT.getExcelName(),ExcelMappingEnum.SKU_STOCK_EXPORT.getEmptyMessage(),request,response);
@@ -365,6 +393,28 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			skuBaseInfoVOList.add(infoVO);
 		}
 		return skuBaseInfoVOList;
+	}
+
+	/**
+	 * 获取 sku 的最低价格和最高价格
+	 *
+	 * @author liuqiuyi
+	 * @date 2021/12/18 14:50
+	 */
+	@Override
+	public Map<String, BigDecimal> getPriceSectionMap(List<ProductSkuEntity> productSkuEntities) {
+		Map<String, BigDecimal> priceMap = Maps.newHashMapWithExpectedSize(4);
+		if (CollectionUtils.isEmpty(productSkuEntities)) {
+			priceMap.put("lowPrice", new BigDecimal("0"));
+			priceMap.put("highPrice", new BigDecimal("0"));
+			return priceMap;
+		}
+		productSkuEntities.sort(Comparator.comparing(ProductSkuEntity::getSkuPrice));
+		Integer lowPrice = productSkuEntities.get(0).getSkuPrice();
+		Integer highPrice = productSkuEntities.get(productSkuEntities.size() - 1).getSkuPrice();
+		priceMap.put("lowPrice", BigDecimalUtil.F2Y(lowPrice.longValue()));
+		priceMap.put("highPrice", BigDecimalUtil.F2Y(highPrice.longValue()));
+		return priceMap;
 	}
 
 	private LambdaQueryWrapper<ProductSkuEntity> buildQuerySkuParam(QuerySkuRequest querySkuRequest) {

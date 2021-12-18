@@ -28,8 +28,20 @@ public class ProductSkuVO implements Serializable {
 	@ApiModelProperty("商品 sku 编码")
 	private String skuCode;
 
+	@ApiModelProperty("商品主图")
+	private String masterImageUrl;
+
 	@ApiModelProperty("商品 sku 名称")
 	private String skuName;
+
+	@ApiModelProperty("上架状态(0-未上架,1-已上架)")
+	private Integer skuState;
+
+	@ApiModelProperty("上架状态名称(0-未上架,1-已上架)")
+	private String skuStateName;
+
+	@ApiModelProperty("税收编码")
+	private String revenueCode;
 
 	@ApiModelProperty("规格名称")
 	private String packName;
@@ -51,7 +63,4 @@ public class ProductSkuVO implements Serializable {
 
 	@ApiModelProperty("店铺名称")
 	private String storeName;
-
-	@ApiModelProperty("sku状态")
-	private Integer skuState;
 }

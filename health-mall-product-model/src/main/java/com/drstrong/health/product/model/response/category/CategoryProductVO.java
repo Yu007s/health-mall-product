@@ -18,8 +18,8 @@ import java.math.BigDecimal;
 public class CategoryProductVO implements Serializable {
 	private static final long serialVersionUID = 8259032647230107186L;
 
-	@ApiModelProperty("商品 id")
-	private Long productId;
+	@ApiModelProperty("商品编码")
+	private String productCode;
 
 	@ApiModelProperty("商品名称")
 	private String productName;
@@ -29,4 +29,7 @@ public class CategoryProductVO implements Serializable {
 
 	@ApiModelProperty("最低价格")
 	private BigDecimal lowPrice;
+
+	@ApiModelProperty("是否有库存")
+	private Boolean hasInventory;
 }

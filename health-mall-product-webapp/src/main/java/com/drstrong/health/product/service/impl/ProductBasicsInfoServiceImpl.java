@@ -8,6 +8,7 @@ import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.entity.product.*;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.*;
+import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.request.product.SaveProductRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -28,9 +29,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * 商品基础信息 service
@@ -90,6 +94,23 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	@Override
 	public List<ProductBasicsInfoEntity> queryProductByParam(QuerySpuRequest querySpuRequest) {
 		return productBasicsInfoMapper.selectList(buildQuerySpuParam(querySpuRequest));
+	}
+
+	/**
+	 * 根据条件,查询商品基础信息,转成 map 结构
+	 *
+	 * @param querySpuRequest 查询条件
+	 * @return 商品基础信息集合 map.key = 商品 id,value = 商品基础信息
+	 * @author liuqiuyi
+	 * @date 2021/12/16 00:10
+	 */
+	@Override
+	public Map<Long, ProductBasicsInfoEntity> queryProductByParamToMap(QuerySpuRequest querySpuRequest) {
+		List<ProductBasicsInfoEntity> basicsInfoEntityList = queryProductByParam(querySpuRequest);
+		if (CollectionUtils.isEmpty(basicsInfoEntityList)) {
+			return Maps.newHashMap();
+		}
+		return basicsInfoEntityList.stream().collect(toMap(ProductBasicsInfoEntity::getId, dto -> dto, (v1, v2) -> v1));
 	}
 
 	/**
@@ -218,7 +239,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		// 1.分页查询 spu 信息
 		Page<ProductBasicsInfoEntity> infoEntityPage = pageQueryProductByParam(querySpuRequest);
 		if (Objects.isNull(infoEntityPage) || CollectionUtils.isEmpty(infoEntityPage.getRecords())) {
-			return PageVO.emptyPageVo(querySpuRequest.getPageNo(), querySpuRequest.getPageSize());
+			return PageVO.newBuilder().pageNo(querySpuRequest.getPageNo()).pageSize(querySpuRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
 		}
 		// 2.获取 productId 集合,查询 sku 信息
 		List<ProductBasicsInfoEntity> basicsInfoEntityList = infoEntityPage.getRecords();
@@ -239,7 +260,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			productSpuVO.setUpdateTime(infoEntity.getChangedAt());
 			spuVOList.add(productSpuVO);
 		}
-		return PageVO.toPageVo(spuVOList, infoEntityPage.getTotal(), infoEntityPage.getSize(), infoEntityPage.getCurrent());
+		return PageVO.newBuilder().pageNo(querySpuRequest.getPageNo()).pageSize(querySpuRequest.getPageSize()).totalCount((int) infoEntityPage.getTotal()).result(spuVOList).build();
 	}
 
 	@Override
@@ -297,6 +318,68 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 
 		// 4.组装返回值
 		return buildProductDetailVO(productEntity, extendEntity, productSkuEntityList);
+	}
+
+	/**
+	 * 分页查询搜索的内容,只返回商品名称
+	 *
+	 * @param content 搜索条件
+	 * @param count   返回的个数
+	 * @return 搜索结果
+	 * @author liuqiuyi
+	 * @date 2021/12/17 15:49
+	 */
+	@Override
+	public List<String> pageSearchByName(String content, Integer count) {
+		if (StringUtils.isBlank(content)) {
+			return Lists.newArrayList();
+		}
+		List<String> titleList = productBasicsInfoMapper.likeProductTitle(content, count);
+		// 如果商城的搜索结果为空,或者没有达到分页条数
+		if (CollectionUtils.isEmpty(titleList) || titleList.size() < count) {
+			// TODO 搜索老系统,获取结果 @坤鹏
+		}
+		return titleList;
+	}
+
+	/**
+	 * 分页查询搜索结果
+	 *
+	 * @param productSearchRequest 搜索条件
+	 * @return 搜索结果
+	 * @author liuqiuyi
+	 * @date 2021/12/18 14:05
+	 */
+	@Override
+	public PageVO<ProductSearchDetailVO> pageSearchDetail(ProductSearchRequest productSearchRequest) {
+		if (StringUtils.isBlank(productSearchRequest.getContent())) {
+			return PageVO.newBuilder().pageNo(productSearchRequest.getPageNo()).pageSize(productSearchRequest.getPageSize()).totalCount(0).result(new ArrayList<>()).build();
+		}
+		// 1.模糊查询商品信息
+		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
+		querySpuRequest.setProductName(productSearchRequest.getContent());
+		querySpuRequest.setPageNo(productSearchRequest.getPageNo());
+		querySpuRequest.setPageSize(productSearchRequest.getPageSize());
+		querySpuRequest.setUpOffEnum(UpOffEnum.UP);
+		Page<ProductBasicsInfoEntity> infoEntityPage = pageQueryProductByParam(querySpuRequest);
+		if (Objects.isNull(infoEntityPage) || CollectionUtils.isEmpty(infoEntityPage.getRecords())) {
+			return PageVO.newBuilder().pageNo(productSearchRequest.getPageNo()).pageSize(productSearchRequest.getPageSize()).totalCount(0).result(new ArrayList<>()).build();
+		}
+		// 2.查询商品 sku 信息
+		Map<Long, List<ProductSkuEntity>> productIdSkusMap = buildSkuMap(infoEntityPage.getRecords());
+		// TODO 判断库存是否充足
+		// 3.组装返回值信息
+		List<ProductSearchDetailVO> detailVOList = Lists.newArrayListWithCapacity(infoEntityPage.getRecords().size());
+		for (ProductBasicsInfoEntity infoEntity : infoEntityPage.getRecords()) {
+			ProductSearchDetailVO detailVO = new ProductSearchDetailVO();
+			detailVO.setSpuCode(infoEntity.getSpuCode());
+			detailVO.setMasterImageUrl(infoEntity.getMasterImageUrl());
+			detailVO.setProductName(infoEntity.getTitle());
+			Map<String, BigDecimal> priceSectionMap = productSkuService.getPriceSectionMap(productIdSkusMap.getOrDefault(infoEntity.getId(), Lists.newArrayList()));
+			detailVO.setLowPrice(priceSectionMap.get("lowPrice"));
+			detailVOList.add(detailVO);
+		}
+		return PageVO.newBuilder().pageNo(productSearchRequest.getPageNo()).pageSize(productSearchRequest.getPageSize()).totalCount((int) infoEntityPage.getTotal()).result(detailVOList).build();
 	}
 
 	private ProductDetailVO buildProductDetailVO(ProductBasicsInfoEntity productEntity, ProductExtendEntity extendEntity, List<ProductSkuEntity> productSkuEntityList) {
@@ -452,6 +535,9 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		}
 		if (Objects.nonNull(querySpuRequest.getProductId())) {
 			queryWrapper.eq(ProductBasicsInfoEntity::getId, querySpuRequest.getProductId());
+		}
+		if (!CollectionUtils.isEmpty(querySpuRequest.getProductIdList())) {
+			queryWrapper.in(ProductBasicsInfoEntity::getId, querySpuRequest.getProductIdList());
 		}
 		if (StringUtils.isNotBlank(querySpuRequest.getProductName())) {
 			queryWrapper.like(ProductBasicsInfoEntity::getTitle, querySpuRequest.getProductName());

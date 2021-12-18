@@ -5,12 +5,11 @@ import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
+import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.request.product.SaveProductRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.ProductDetailVO;
-import com.drstrong.health.product.model.response.product.ProductManageVO;
-import com.drstrong.health.product.model.response.product.ProductSpuVO;
+import com.drstrong.health.product.model.response.product.*;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +40,16 @@ public interface ProductBasicsInfoService {
 	 * @date 2021/12/16 00:10
 	 */
 	List<ProductBasicsInfoEntity> queryProductByParam(QuerySpuRequest querySpuRequest);
+
+	/**
+	 * 根据条件,查询商品基础信息,转成 map 结构
+	 *
+	 * @param querySpuRequest 查询条件
+	 * @return 商品基础信息集合 map.key = 商品 id,value = 商品基础信息
+	 * @author liuqiuyi
+	 * @date 2021/12/16 00:10
+	 */
+	Map<Long, ProductBasicsInfoEntity> queryProductByParamToMap(QuerySpuRequest querySpuRequest);
 
 	/**
 	 * 根据 productId 或者 spuCode 查询商品基本信息
@@ -130,4 +139,25 @@ public interface ProductBasicsInfoService {
 	 * @date 2021/12/16 19:55
 	 */
 	ProductDetailVO getSpuInfo(String spuCode);
+
+	/**
+	 * 分页查询搜索的内容,只返回商品名称
+	 *
+	 * @param content 搜索条件
+	 * @param count   返回的个数
+	 * @return 搜索结果
+	 * @author liuqiuyi
+	 * @date 2021/12/17 15:49
+	 */
+	List<String> pageSearchByName(String content, Integer count);
+
+	/**
+	 * 分页查询搜索结果
+	 *
+	 * @param productSearchRequest 搜索条件
+	 * @return 搜索结果
+	 * @author liuqiuyi
+	 * @date 2021/12/18 14:05
+	 */
+	PageVO<ProductSearchDetailVO> pageSearchDetail(ProductSearchRequest productSearchRequest);
 }

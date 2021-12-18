@@ -22,6 +22,7 @@ import com.drstrong.health.product.model.response.store.StoreSkuResponse;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.service.StoreService;
 import com.drstrong.health.product.service.StoreThreeRelevanceService;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.easy.excel.ExcelContext;
@@ -100,9 +101,9 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
         }
         List<StoreSkuResponse> storeSkuResponses =  storeThreeRelevanceMapper.pageSkuList(page,queryWrapper);
         if(CollectionUtils.isEmpty(storeSkuResponses)){
-            return PageVO.emptyPageVo(storeSkuRequest.getPageNo(),storeSkuRequest.getPageSize());
+            return PageVO.newBuilder().pageNo(storeSkuRequest.getPageNo()).pageSize(storeSkuRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
         }
-        return PageVO.toPageVo(storeSkuResponses,page.getTotal(),storeSkuRequest.getPageNo(),storeSkuRequest.getPageSize());
+        return PageVO.newBuilder().pageNo(storeSkuRequest.getPageNo()).pageSize(storeSkuRequest.getPageSize()).totalCount((int) page.getTotal()).result(storeSkuResponses).build();
     }
 
     @Override
@@ -131,7 +132,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
     @Override
     public void exportStoreSku(StoreSkuRequest storeSkuRequest, HttpServletRequest request, HttpServletResponse response) {
         PageVO<StoreSkuResponse> pageVO = this.pageSkuList(storeSkuRequest);
-        List<StoreSkuResponse> storeSkuResponses = pageVO.getList();
+        List<StoreSkuResponse> storeSkuResponses = pageVO.getResult();
         Workbook excel = excelContext.createExcel(ExcelMappingEnum.STORE_SKU_EXPORT.getMappingId(), storeSkuResponses);
         try {
             ExcelDownLoadUtil.downLoadExcel(excel,ExcelMappingEnum.STORE_SKU_EXPORT.getExcelName(),ExcelMappingEnum.STORE_SKU_EXPORT.getEmptyMessage(),request,response);
