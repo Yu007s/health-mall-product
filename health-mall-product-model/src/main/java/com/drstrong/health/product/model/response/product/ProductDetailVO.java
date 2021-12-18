@@ -21,10 +21,10 @@ public class ProductDetailVO extends SpuBaseInfoVO implements Serializable {
 	private static final long serialVersionUID = -8217329668962591111L;
 
 	@ApiModelProperty("价格起始值")
-	private BigDecimal priceStart;
+	private BigDecimal lowPrice;
 
 	@ApiModelProperty("价格结束值")
-	private BigDecimal priceEnd;
+	private BigDecimal highPrice;
 
 	@ApiModelProperty("规格名称")
 	private String packName;

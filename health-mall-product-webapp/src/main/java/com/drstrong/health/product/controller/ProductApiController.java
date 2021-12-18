@@ -50,17 +50,17 @@ public class ProductApiController {
 			@ApiImplicitParam(name = "count", value = "返回数据条数(不传默认为 10 条)", dataType = "int", paramType = "query")
 	})
 	@GetMapping("/searchByName")
-	public ResultVO<List<String>> pageSearchByName(@NotBlank(message = "搜索内容不能为空") String content, Integer count) {
+	public ResultVO<SearchNameResultVO> pageSearchByName(@NotBlank(message = "搜索内容不能为空") String content, Integer count) {
 		if (Objects.isNull(count)) {
 			count = 10;
 		}
 		List<String> resultList = productBasicsInfoService.pageSearchByName(content, count);
-		return ResultVO.success(resultList);
+		return ResultVO.success(new SearchNameResultVO(resultList));
 	}
 
 	@ApiOperation("商品搜索-获取搜索的商品列表(分页)")
 	@GetMapping("/search/detail")
-	public ResultVO<PageVO<ProductSearchDetailVO>> pageSearchDetail(@Valid ProductSearchRequest productSearchRequest) {
+	public ResultVO<PageVO<ProductSearchDetailVO>> pageSearchDetail(ProductSearchRequest productSearchRequest) {
 		PageVO<ProductSearchDetailVO> resultList = productBasicsInfoService.pageSearchDetail(productSearchRequest);
 		return ResultVO.success(resultList);
 	}

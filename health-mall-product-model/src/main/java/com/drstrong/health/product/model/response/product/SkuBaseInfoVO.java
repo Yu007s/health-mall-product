@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 public class SkuBaseInfoVO implements Serializable {
 	private static final long serialVersionUID = -5089413355055401869L;
 
-	@ApiModelProperty("商品编码")
+	@ApiModelProperty("sku编码")
 	private String skuCode;
 
 	@ApiModelProperty("规格名称")

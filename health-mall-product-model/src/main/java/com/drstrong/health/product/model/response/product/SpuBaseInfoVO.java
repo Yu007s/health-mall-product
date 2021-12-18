@@ -22,7 +22,7 @@ public class SpuBaseInfoVO implements Serializable {
 	private String spuCode;
 
 	@ApiModelProperty("商品标题")
-	private String productTitle;
+	private String productName;
 
 	@ApiModelProperty("商品主图片集合")
 	private List<String> imageUrlList;

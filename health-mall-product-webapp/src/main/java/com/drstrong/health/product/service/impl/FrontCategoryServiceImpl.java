@@ -403,7 +403,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		List<CategoryProductVO> productVOList = Lists.newArrayListWithCapacity(productBasicsInfoEntityPage.getRecords().size());
 		for (ProductBasicsInfoEntity record : productBasicsInfoEntityPage.getRecords()) {
 			CategoryProductVO categoryProductVO = new CategoryProductVO();
-			categoryProductVO.setProductCode(record.getSpuCode());
+			categoryProductVO.setSpuCode(record.getSpuCode());
 			categoryProductVO.setProductName(record.getTitle());
 			categoryProductVO.setMasterImageUrl(record.getMasterImageUrl());
 			Map<String, BigDecimal> priceSectionMap = productSkuService.getPriceSectionMap(productIdSkusMap.get(record.getId()));

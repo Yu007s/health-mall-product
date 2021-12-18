@@ -178,7 +178,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void saveOrUpdateProduct(SaveProductRequest saveProductRequest) {
+	public Long saveOrUpdateProduct(SaveProductRequest saveProductRequest) {
 		// 1.校验店铺 id 是否存在
 		StoreEntity storeEntity = storeService.getByStoreId(saveProductRequest.getStoreId());
 		if (Objects.isNull(storeEntity)) {
@@ -192,6 +192,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		saveAttribute(saveProductRequest, infoEntity.getId());
 		// 5.保存或更新 sku 信息
 		saveOrUpdateSku(saveProductRequest, storeEntity, infoEntity);
+		return infoEntity.getId();
 	}
 
 	/**
@@ -352,12 +353,11 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	 */
 	@Override
 	public PageVO<ProductSearchDetailVO> pageSearchDetail(ProductSearchRequest productSearchRequest) {
-		if (StringUtils.isBlank(productSearchRequest.getContent())) {
-			return PageVO.newBuilder().pageNo(productSearchRequest.getPageNo()).pageSize(productSearchRequest.getPageSize()).totalCount(0).result(new ArrayList<>()).build();
-		}
 		// 1.模糊查询商品信息
 		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
-		querySpuRequest.setProductName(productSearchRequest.getContent());
+		if (StringUtils.isNotBlank(productSearchRequest.getContent())) {
+			querySpuRequest.setProductName(productSearchRequest.getContent());
+		}
 		querySpuRequest.setPageNo(productSearchRequest.getPageNo());
 		querySpuRequest.setPageSize(productSearchRequest.getPageSize());
 		querySpuRequest.setUpOffEnum(UpOffEnum.UP);
@@ -385,7 +385,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	private ProductDetailVO buildProductDetailVO(ProductBasicsInfoEntity productEntity, ProductExtendEntity extendEntity, List<ProductSkuEntity> productSkuEntityList) {
 		ProductDetailVO productDetailVO = new ProductDetailVO();
 		productDetailVO.setSpuCode(productEntity.getSpuCode());
-		productDetailVO.setProductTitle(productEntity.getTitle());
+		productDetailVO.setProductName(productEntity.getTitle());
 		productDetailVO.setImageUrlList(Lists.newArrayList(extendEntity.getImageUrl().split(",")));
 		productDetailVO.setDetailUrlList(Lists.newArrayList(extendEntity.getDetailUrl().split(",")));
 		productDetailVO.setStoreId(productEntity.getSourceId());
@@ -393,8 +393,8 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 //		productDetailVO.setInventoryNum();
 		ProductSkuEntity lowSku = productSkuEntityList.get(0);
 		ProductSkuEntity highSku = productSkuEntityList.get(0);
-		productDetailVO.setPriceStart(BigDecimalUtil.F2Y(lowSku.getSkuPrice().longValue()));
-		productDetailVO.setPriceEnd(BigDecimalUtil.F2Y(highSku.getSkuPrice().longValue()));
+		productDetailVO.setLowPrice(BigDecimalUtil.F2Y(lowSku.getSkuPrice().longValue()));
+		productDetailVO.setHighPrice(BigDecimalUtil.F2Y(highSku.getSkuPrice().longValue()));
 		productDetailVO.setPackName(lowSku.getPackName());
 		productDetailVO.setPackValue(lowSku.getPackValue());
 		return productDetailVO;

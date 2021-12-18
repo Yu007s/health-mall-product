@@ -8,10 +8,7 @@ import com.drstrong.health.product.service.CategoryAttributeService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductSkuRevenueService;
 import com.drstrong.health.product.service.ProductSkuService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -57,13 +54,13 @@ public class ProductManageController {
 		return ResultVO.success(categoryAttributeServiceItems);
 	}
 
-	@ApiOperation("商品上传")
+	@ApiOperation(value = "商品上传或更新", notes = "如果 productId 为空,新增商品,如果不为空,更新商品")
 	@PostMapping("/saveOrUpdate")
-	public ResultVO<Object> saveProperty(@RequestBody @Valid SaveProductRequest saveProductRequest) {
+	public ResultVO<ProductSaveResultVO> saveOrUpdateProduct(@RequestBody @Valid SaveProductRequest saveProductRequest) {
 		// TODO
 		saveProductRequest.setUserId(999L);
-		productBasicsInfoService.saveOrUpdateProduct(saveProductRequest);
-		return ResultVO.success();
+		Long productId = productBasicsInfoService.saveOrUpdateProduct(saveProductRequest);
+		return ResultVO.success(new ProductSaveResultVO(productId));
 	}
 
 	@ApiOperation("根据商品 id 查看商品信息")

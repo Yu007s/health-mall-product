@@ -89,7 +89,7 @@ public interface ProductBasicsInfoService {
 	 * @author liuqiuyi
 	 * @date 2021/12/13 15:48
 	 */
-	void saveOrUpdateProduct(SaveProductRequest saveProductRequest);
+	Long saveOrUpdateProduct(SaveProductRequest saveProductRequest);
 
 	/**
 	 * 根据商品 id,查询管理端商品信息
