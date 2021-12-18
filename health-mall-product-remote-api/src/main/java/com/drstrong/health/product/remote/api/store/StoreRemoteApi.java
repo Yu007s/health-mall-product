@@ -18,7 +18,7 @@ import java.util.Set;
  * @since TODO
  */
 @Api(tags = "店铺相关API")
-@FeignClient(value = "health-mall-product",path = "/store/api")
+@FeignClient(value = "health-mall-product-store",path = "/store/api")
 public interface StoreRemoteApi {
 
     @ApiOperation("批量获取店铺地区邮费")

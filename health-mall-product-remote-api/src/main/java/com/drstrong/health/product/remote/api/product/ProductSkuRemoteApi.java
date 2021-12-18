@@ -16,7 +16,7 @@ import java.util.List;
  * @date 2021/12/14 17:22
  */
 @Api(tags = "商品sku相关API")
-@FeignClient(value = "health-mall-product",path = "/product/api")
+@FeignClient(value = "health-mall-product-sku",path = "/product/api")
 public interface ProductSkuRemoteApi {
 	/**
 	 * 根据 skuId 集合,获取 sku 信息

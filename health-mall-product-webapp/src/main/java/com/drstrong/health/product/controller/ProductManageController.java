@@ -91,7 +91,7 @@ public class ProductManageController {
 	}
 
 	@ApiOperation("分页查询 sku库存 信息")
-	@GetMapping("/pageSku")
+	@GetMapping("/pageSkuStock")
 	public ResultVO<PageVO<ProductSkuStockVO>> pageSku(QuerySkuStockRequest querySkuStockRequest) {
 		PageVO<ProductSkuStockVO> resultPageVO = productSkuService.pageQuerySkuStockByParam(querySkuStockRequest);
 		return ResultVO.success(resultPageVO);
