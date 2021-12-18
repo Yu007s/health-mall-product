@@ -11,6 +11,7 @@ public enum ExcelMappingEnum {
 	 *
 	 */
 	STORE_SKU_EXPORT("storeSkuExport", "店铺商品导出明细","没有可导出的店铺商品"),
+	SKU_STOCK_EXPORT("skuStockExport", "商品库存导出明细","没有可导出的商品库存"),
 	;
 
 	private String mappingId;

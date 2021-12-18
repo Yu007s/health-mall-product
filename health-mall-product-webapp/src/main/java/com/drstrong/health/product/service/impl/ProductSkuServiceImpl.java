@@ -9,9 +9,12 @@ import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.enums.ExcelMappingEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
+import com.drstrong.health.product.model.request.product.QuerySkuStockRequest;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.product.ProductSkuStockVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
 import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
@@ -20,19 +23,29 @@ import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.util.RedisKeyUtils;
+import com.drstrong.health.ware.model.vo.SkuStockNumVO;
+import com.drstrong.health.ware.remote.api.PharmacyGoodsRemoteApi;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.easy.excel.ExcelContext;
+import org.easy.excel.util.ExcelDownLoadUtil;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
@@ -53,6 +66,11 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	@Resource
 	ProductBasicsInfoService productBasicsInfoService;
 
+	@Resource
+	PharmacyGoodsRemoteApi pharmacyGoodsRemoteApi;
+
+	@Autowired
+	private ExcelContext excelContext;
 	/**
 	 * 批量保存 sku 信息
 	 *
@@ -174,6 +192,57 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			productSkuVOList.add(productSkuVO);
 		}
 		return PageVO.toPageVo(productSkuVOList, productSkuEntityPage.getTotal(), productSkuEntityPage.getSize(), productSkuEntityPage.getCurrent());
+	}
+
+	/**
+	 * 根据条件分页查询 sku库存 信息
+	 *
+	 * @param querySkuStockRequest 查询参数
+	 * @return sku 库存信息
+	 * @author lsx
+	 * @date 2021/12/17 14:04
+	 */
+	@Override
+	public PageVO<ProductSkuStockVO> pageQuerySkuStockByParam(QuerySkuStockRequest querySkuStockRequest) {
+		Page<ProductSkuEntity> queryPage = new Page<>(querySkuStockRequest.getPageNo(), querySkuStockRequest.getPageSize());
+		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = buildQuerySkuStockParam(querySkuStockRequest);
+		Page<ProductSkuEntity> productSkuEntityPage = productSkuMapper.selectPage(queryPage, queryWrapper);
+		List<ProductSkuEntity> records = productSkuEntityPage.getRecords();
+		if (Objects.isNull(productSkuEntityPage) || CollectionUtils.isEmpty(records)) {
+			return PageVO.emptyPageVo(querySkuStockRequest.getPageNo(), querySkuStockRequest.getPageSize());
+		}
+		List<ProductSkuStockVO> productSkuStockVOS = Lists.newArrayListWithCapacity(records.size());
+		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(records.stream().map(ProductSkuEntity::getId).collect(Collectors.toList()));
+		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
+		records.forEach(r -> {
+			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
+			BeanUtils.copyProperties(r,productSkuStockVO);
+			productSkuStockVO.setSkuId(r.getId());
+			productSkuStockVO.setStoreName(r.getSourceName());
+			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
+			productSkuStockVOS.add(productSkuStockVO);
+		});
+		return PageVO.toPageVo(productSkuStockVOS, productSkuEntityPage.getTotal(), productSkuEntityPage.getSize(), productSkuEntityPage.getCurrent());
+	}
+
+	/**
+	 * 根据条件分页导出 sku库存 信息
+	 *
+	 * @param querySkuStockRequest 查询参数
+	 * @return sku 库存信息
+	 * @author lsx
+	 * @date 2021/12/17 14:04
+	 */
+	@Override
+	public void exportSkuStock(QuerySkuStockRequest querySkuStockRequest, HttpServletRequest request, HttpServletResponse response) {
+		PageVO<ProductSkuStockVO> productSkuStockVOPageVO = this.pageQuerySkuStockByParam(querySkuStockRequest);
+		List<ProductSkuStockVO> productSkuStockVOS = productSkuStockVOPageVO.getList();
+		Workbook excel = excelContext.createExcel(ExcelMappingEnum.SKU_STOCK_EXPORT.getMappingId(), productSkuStockVOS);
+		try {
+			ExcelDownLoadUtil.downLoadExcel(excel,ExcelMappingEnum.SKU_STOCK_EXPORT.getExcelName(),ExcelMappingEnum.SKU_STOCK_EXPORT.getEmptyMessage(),request,response);
+		} catch (IOException e) {
+			throw new BusinessException(ErrorEnums.EXCEL_EXPORT_ERROR);
+		}
 	}
 
 	/**
@@ -321,6 +390,24 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		}
 		if (Objects.nonNull(querySkuRequest.getPriceEnd())) {
 			queryWrapper.le(ProductSkuEntity::getSkuPrice, querySkuRequest.getPriceEnd());
+		}
+		return queryWrapper;
+	}
+
+	private LambdaQueryWrapper<ProductSkuEntity> buildQuerySkuStockParam(QuerySkuStockRequest querySkuStockRequest) {
+		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(ProductSkuEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+		if (Objects.nonNull(querySkuStockRequest.getSkuCode())) {
+			queryWrapper.eq(ProductSkuEntity::getSkuCode, querySkuStockRequest.getSkuCode());
+		}
+		if (Objects.nonNull(querySkuStockRequest.getSkuName())) {
+			queryWrapper.like(ProductSkuEntity::getSkuName, querySkuStockRequest.getSkuName());
+		}
+		if (Objects.nonNull(querySkuStockRequest.getStoreId())) {
+			queryWrapper.eq(ProductSkuEntity::getSourceId, querySkuStockRequest.getStoreId());
+		}
+		if(Objects.nonNull(querySkuStockRequest.getCommAttribute())){
+			queryWrapper.eq(ProductSkuEntity::getCommAttribute, querySkuStockRequest.getCommAttribute());
 		}
 		return queryWrapper;
 	}

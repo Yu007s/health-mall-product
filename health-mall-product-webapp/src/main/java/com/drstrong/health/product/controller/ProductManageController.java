@@ -1,14 +1,8 @@
 package com.drstrong.health.product.controller;
 
-import com.drstrong.health.product.model.request.product.AddRevenueRequest;
-import com.drstrong.health.product.model.request.product.QuerySkuRequest;
-import com.drstrong.health.product.model.request.product.QuerySpuRequest;
-import com.drstrong.health.product.model.request.product.SaveProductRequest;
+import com.drstrong.health.product.model.request.product.*;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.CategoryAttributeItemVO;
-import com.drstrong.health.product.model.response.product.ProductManageVO;
-import com.drstrong.health.product.model.response.product.ProductSkuVO;
-import com.drstrong.health.product.model.response.product.ProductSpuVO;
+import com.drstrong.health.product.model.response.product.*;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.service.CategoryAttributeService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
@@ -23,8 +17,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -93,6 +88,19 @@ public class ProductManageController {
 	public ResultVO<PageVO<ProductSkuVO>> pageSku(QuerySkuRequest querySkuRequest) {
 		PageVO<ProductSkuVO> resultPageVO = productSkuService.pageQuerySkuByParam(querySkuRequest);
 		return ResultVO.success(resultPageVO);
+	}
+
+	@ApiOperation("分页查询 sku库存 信息")
+	@GetMapping("/pageSku")
+	public ResultVO<PageVO<ProductSkuStockVO>> pageSku(QuerySkuStockRequest querySkuStockRequest) {
+		PageVO<ProductSkuStockVO> resultPageVO = productSkuService.pageQuerySkuStockByParam(querySkuStockRequest);
+		return ResultVO.success(resultPageVO);
+	}
+
+	@ApiOperation("导出 sku库存 信息")
+	@GetMapping("/skuStock/export")
+	public void exportSkuStock(QuerySkuStockRequest querySkuStockRequest, HttpServletRequest request, HttpServletResponse response) {
+		productSkuService.exportSkuStock(querySkuStockRequest,request,response);
 	}
 
 	@ApiOperation("保存税收编码")

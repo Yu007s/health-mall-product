@@ -3,10 +3,14 @@ package com.drstrong.health.product.service;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
+import com.drstrong.health.product.model.request.product.QuerySkuStockRequest;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.product.ProductSkuStockVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
 import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -133,4 +137,8 @@ public interface ProductSkuService {
 	 * @date 2021/12/16 21:00
 	 */
 	List<SkuBaseInfoVO> listSkuBySpuCode(String spuCode);
+
+	PageVO<ProductSkuStockVO> pageQuerySkuStockByParam(QuerySkuStockRequest querySkuStockRequest);
+
+	void exportSkuStock(QuerySkuStockRequest querySkuStockRequest, HttpServletRequest request, HttpServletResponse response);
 }

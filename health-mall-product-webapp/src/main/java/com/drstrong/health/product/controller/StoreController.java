@@ -114,7 +114,7 @@ public class StoreController {
 
 	@ApiOperation("商品维护列表导出")
 	@PostMapping("/sku/export")
-	public void updateSkuState(StoreSkuRequest storeSkuRequest, HttpServletRequest request, HttpServletResponse response) {
+	public void exportSku(StoreSkuRequest storeSkuRequest, HttpServletRequest request, HttpServletResponse response) {
 		storeThreeRelevanceService.exportStoreSku(storeSkuRequest,request,response);
 	}
 
