@@ -60,7 +60,7 @@ public class CategoryApiController {
 
 	@ApiOperation("小程序 - 根据分类 id 获取商品列表(分页)")
 	@GetMapping("/page/queryById")
-	public ResultVO<PageVO<CategoryProductVO>> pageCategoryProduct(PageCategoryIdRequest pageCategoryIdRequest) {
+	public ResultVO<PageVO<CategoryProductVO>> pageCategoryProduct(@Valid PageCategoryIdRequest pageCategoryIdRequest) {
 		PageVO<CategoryProductVO> categoryPageVO = frontCategoryService.pageCategoryProduct(pageCategoryIdRequest);
 		return ResultVO.success(categoryPageVO);
 	}

@@ -2,10 +2,7 @@ package com.drstrong.health.product.controller;
 
 import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.ProductDetailVO;
-import com.drstrong.health.product.model.response.product.ProductPropertyVO;
-import com.drstrong.health.product.model.response.product.ProductSearchVO;
-import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
+import com.drstrong.health.product.model.response.product.*;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.service.ProductAttributeService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
@@ -15,11 +12,13 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Objects;
@@ -30,10 +29,11 @@ import java.util.Objects;
  * @author liuqiuyi
  * @date 2021/12/6 20:36
  */
+@Validated
 @RestController
 @RequestMapping("/product")
 @Slf4j
-@Api(tags = {"商品 api"}, description = "商品 api")
+@Api(tags = {"小程序-商品 api"}, description = "小程序-商品 api")
 public class ProductApiController {
 	@Resource
 	ProductBasicsInfoService productBasicsInfoService;
@@ -44,13 +44,13 @@ public class ProductApiController {
 	@Resource
 	ProductAttributeService productAttributeService;
 
-	@ApiOperation("商品搜索-获取商品名称列表(分页)")
+	@ApiOperation("商品搜索-获取商品名称列表")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "content", value = "搜索内容", dataType = "string", paramType = "query", required = true),
 			@ApiImplicitParam(name = "count", value = "返回数据条数(不传默认为 10 条)", dataType = "int", paramType = "query")
 	})
 	@GetMapping("/searchByName")
-	public ResultVO<List<String>> pageSearchByName(String content, Integer count) {
+	public ResultVO<List<String>> pageSearchByName(@NotBlank(message = "搜索内容不能为空") String content, Integer count) {
 		if (Objects.isNull(count)) {
 			count = 10;
 		}
@@ -60,9 +60,9 @@ public class ProductApiController {
 
 	@ApiOperation("商品搜索-获取搜索的商品列表(分页)")
 	@GetMapping("/search/detail")
-	public ResultVO<PageVO<ProductSearchVO>> pageSearchDetail(ProductSearchRequest productSearchRequest) {
-
-		return ResultVO.success();
+	public ResultVO<PageVO<ProductSearchDetailVO>> pageSearchDetail(@Valid ProductSearchRequest productSearchRequest) {
+		PageVO<ProductSearchDetailVO> resultList = productBasicsInfoService.pageSearchDetail(productSearchRequest);
+		return ResultVO.success(resultList);
 	}
 
 	@ApiOperation("根据 spuCode 查询 spu 信息")

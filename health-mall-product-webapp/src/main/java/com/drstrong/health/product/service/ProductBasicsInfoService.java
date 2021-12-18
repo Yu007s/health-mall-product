@@ -5,12 +5,11 @@ import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
+import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.request.product.SaveProductRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.ProductDetailVO;
-import com.drstrong.health.product.model.response.product.ProductManageVO;
-import com.drstrong.health.product.model.response.product.ProductSpuVO;
+import com.drstrong.health.product.model.response.product.*;
 
 import java.util.List;
 import java.util.Map;
@@ -151,4 +150,14 @@ public interface ProductBasicsInfoService {
 	 * @date 2021/12/17 15:49
 	 */
 	List<String> pageSearchByName(String content, Integer count);
+
+	/**
+	 * 分页查询搜索结果
+	 *
+	 * @param productSearchRequest 搜索条件
+	 * @return 搜索结果
+	 * @author liuqiuyi
+	 * @date 2021/12/18 14:05
+	 */
+	PageVO<ProductSearchDetailVO> pageSearchDetail(ProductSearchRequest productSearchRequest);
 }

@@ -22,10 +22,7 @@ import com.drstrong.health.product.model.response.category.CategoryProductVO;
 import com.drstrong.health.product.model.response.category.FrontCategoryVO;
 import com.drstrong.health.product.model.response.category.HomeCategoryVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
-import com.drstrong.health.product.service.BackCategoryService;
-import com.drstrong.health.product.service.CategoryRelationService;
-import com.drstrong.health.product.service.FrontCategoryService;
-import com.drstrong.health.product.service.ProductBasicsInfoService;
+import com.drstrong.health.product.service.*;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -75,6 +72,9 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 
 	@Resource
 	ProductBasicsInfoService productBasicsInfoService;
+
+	@Resource
+	ProductSkuService productSkuService;
 
 	/**
 	 * 查询所有的前台分类,并组装树形结构
@@ -406,26 +406,11 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 			categoryProductVO.setProductCode(record.getSpuCode());
 			categoryProductVO.setProductName(record.getTitle());
 			categoryProductVO.setMasterImageUrl(record.getMasterImageUrl());
-			Map<String, BigDecimal> priceSectionMap = getPriceSectionMap(productIdSkusMap.get(record.getId()));
-			categoryProductVO.setLowPrice(BigDecimalUtil.F2Y(priceSectionMap.get("lowPrice").longValue()));
+			Map<String, BigDecimal> priceSectionMap = productSkuService.getPriceSectionMap(productIdSkusMap.get(record.getId()));
+			categoryProductVO.setLowPrice(priceSectionMap.get("lowPrice"));
 			productVOList.add(categoryProductVO);
 		}
 		return PageVO.newBuilder().pageNo(pageCategoryIdRequest.getPageNo()).pageSize(pageCategoryIdRequest.getPageSize()).totalCount((int) productBasicsInfoEntityPage.getTotal()).result(productVOList).build();
-	}
-
-	private Map<String, BigDecimal> getPriceSectionMap(List<ProductSkuEntity> productSkuEntities) {
-		Map<String, BigDecimal> priceMap = Maps.newHashMapWithExpectedSize(4);
-		if (CollectionUtils.isEmpty(productSkuEntities)) {
-			priceMap.put("lowPrice", new BigDecimal("0"));
-			priceMap.put("highPrice", new BigDecimal("0"));
-			return priceMap;
-		}
-		productSkuEntities.sort(Comparator.comparing(ProductSkuEntity::getSkuPrice));
-		Integer lowPrice = productSkuEntities.get(0).getSkuPrice();
-		Integer highPrice = productSkuEntities.get(productSkuEntities.size() - 1).getSkuPrice();
-		priceMap.put("lowPrice", new BigDecimal(lowPrice));
-		priceMap.put("highPrice", new BigDecimal(highPrice));
-		return priceMap;
 	}
 
 	/**

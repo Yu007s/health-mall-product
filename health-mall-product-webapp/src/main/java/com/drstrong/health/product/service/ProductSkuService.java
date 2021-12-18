@@ -7,6 +7,7 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
 import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -133,4 +134,12 @@ public interface ProductSkuService {
 	 * @date 2021/12/16 21:00
 	 */
 	List<SkuBaseInfoVO> listSkuBySpuCode(String spuCode);
+
+	/**
+	 * 获取 sku 的最低价格和最高价格
+	 *
+	 * @author liuqiuyi
+	 * @date 2021/12/18 14:50
+	 */
+	Map<String, BigDecimal> getPriceSectionMap(List<ProductSkuEntity> productSkuEntities);
 }

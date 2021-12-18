@@ -29,4 +29,7 @@ public class CategoryProductVO implements Serializable {
 
 	@ApiModelProperty("最低价格")
 	private BigDecimal lowPrice;
+
+	@ApiModelProperty("是否有库存")
+	private Boolean hasInventory;
 }

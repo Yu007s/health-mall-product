@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -323,6 +324,28 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			skuBaseInfoVOList.add(infoVO);
 		}
 		return skuBaseInfoVOList;
+	}
+
+	/**
+	 * 获取 sku 的最低价格和最高价格
+	 *
+	 * @author liuqiuyi
+	 * @date 2021/12/18 14:50
+	 */
+	@Override
+	public Map<String, BigDecimal> getPriceSectionMap(List<ProductSkuEntity> productSkuEntities) {
+		Map<String, BigDecimal> priceMap = Maps.newHashMapWithExpectedSize(4);
+		if (CollectionUtils.isEmpty(productSkuEntities)) {
+			priceMap.put("lowPrice", new BigDecimal("0"));
+			priceMap.put("highPrice", new BigDecimal("0"));
+			return priceMap;
+		}
+		productSkuEntities.sort(Comparator.comparing(ProductSkuEntity::getSkuPrice));
+		Integer lowPrice = productSkuEntities.get(0).getSkuPrice();
+		Integer highPrice = productSkuEntities.get(productSkuEntities.size() - 1).getSkuPrice();
+		priceMap.put("lowPrice", BigDecimalUtil.F2Y(lowPrice.longValue()));
+		priceMap.put("highPrice", BigDecimalUtil.F2Y(highPrice.longValue()));
+		return priceMap;
 	}
 
 	private LambdaQueryWrapper<ProductSkuEntity> buildQuerySkuParam(QuerySkuRequest querySkuRequest) {

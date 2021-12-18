@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -339,6 +340,46 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			// TODO 搜索老系统,获取结果 @坤鹏
 		}
 		return titleList;
+	}
+
+	/**
+	 * 分页查询搜索结果
+	 *
+	 * @param productSearchRequest 搜索条件
+	 * @return 搜索结果
+	 * @author liuqiuyi
+	 * @date 2021/12/18 14:05
+	 */
+	@Override
+	public PageVO<ProductSearchDetailVO> pageSearchDetail(ProductSearchRequest productSearchRequest) {
+		if (StringUtils.isBlank(productSearchRequest.getContent())) {
+			return PageVO.newBuilder().pageNo(productSearchRequest.getPageNo()).pageSize(productSearchRequest.getPageSize()).totalCount(0).result(new ArrayList<>()).build();
+		}
+		// 1.模糊查询商品信息
+		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
+		querySpuRequest.setProductName(productSearchRequest.getContent());
+		querySpuRequest.setPageNo(productSearchRequest.getPageNo());
+		querySpuRequest.setPageSize(productSearchRequest.getPageSize());
+		querySpuRequest.setUpOffEnum(UpOffEnum.UP);
+		Page<ProductBasicsInfoEntity> infoEntityPage = pageQueryProductByParam(querySpuRequest);
+		if (Objects.isNull(infoEntityPage) || CollectionUtils.isEmpty(infoEntityPage.getRecords())) {
+			return PageVO.newBuilder().pageNo(productSearchRequest.getPageNo()).pageSize(productSearchRequest.getPageSize()).totalCount(0).result(new ArrayList<>()).build();
+		}
+		// 2.查询商品 sku 信息
+		Map<Long, List<ProductSkuEntity>> productIdSkusMap = buildSkuMap(infoEntityPage.getRecords());
+		// TODO 判断库存是否充足
+		// 3.组装返回值信息
+		List<ProductSearchDetailVO> detailVOList = Lists.newArrayListWithCapacity(infoEntityPage.getRecords().size());
+		for (ProductBasicsInfoEntity infoEntity : infoEntityPage.getRecords()) {
+			ProductSearchDetailVO detailVO = new ProductSearchDetailVO();
+			detailVO.setSpuCode(infoEntity.getSpuCode());
+			detailVO.setMasterImageUrl(infoEntity.getMasterImageUrl());
+			detailVO.setProductName(infoEntity.getTitle());
+			Map<String, BigDecimal> priceSectionMap = productSkuService.getPriceSectionMap(productIdSkusMap.getOrDefault(infoEntity.getId(), Lists.newArrayList()));
+			detailVO.setLowPrice(priceSectionMap.get("lowPrice"));
+			detailVOList.add(detailVO);
+		}
+		return PageVO.newBuilder().pageNo(productSearchRequest.getPageNo()).pageSize(productSearchRequest.getPageSize()).totalCount((int) infoEntityPage.getTotal()).result(detailVOList).build();
 	}
 
 	private ProductDetailVO buildProductDetailVO(ProductBasicsInfoEntity productEntity, ProductExtendEntity extendEntity, List<ProductSkuEntity> productSkuEntityList) {
