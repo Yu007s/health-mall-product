@@ -5,8 +5,10 @@ import com.drstrong.health.product.model.request.store.StoreAddOrUpdateRequest;
 import com.drstrong.health.product.model.request.store.StoreIdRequest;
 import com.drstrong.health.product.model.request.store.StorePostage;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
+import com.drstrong.health.product.remote.model.StorePostageDTO;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author lsx
@@ -31,4 +33,6 @@ public interface StoreService {
     void updatePostage(StorePostage storePostage,String userId);
 
     List<StoreEntity> querySetPostageByStoreIds(List<Long> storeIds);
+
+    List<StorePostageDTO> getStorePostageByIds(Set<Long> storeIds, String areaName);
 }

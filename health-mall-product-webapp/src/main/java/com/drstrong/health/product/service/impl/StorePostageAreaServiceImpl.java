@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author lsx
@@ -34,6 +35,15 @@ public class StorePostageAreaServiceImpl implements StorePostageAreaService {
         LambdaQueryWrapper<StorePostageAreaEntity> storePostageAreaEntityWrapper = new LambdaQueryWrapper<>();
         storePostageAreaEntityWrapper.eq(StorePostageAreaEntity::getStoreId,storeId)
                 .eq(StorePostageAreaEntity::getDelFlag, DelFlagEnum.UN_DELETED);
+        return storePostageAreaMapper.selectList(storePostageAreaEntityWrapper);
+    }
+
+    @Override
+    public List<StorePostageAreaEntity> queryByStoreIdsAndAreaName(Set<Long> storeIds, String areaName) {
+        LambdaQueryWrapper<StorePostageAreaEntity> storePostageAreaEntityWrapper = new LambdaQueryWrapper<>();
+        storePostageAreaEntityWrapper.in(StorePostageAreaEntity::getStoreId,storeIds)
+                .eq(StorePostageAreaEntity::getDelFlag, DelFlagEnum.UN_DELETED)
+                .eq(StorePostageAreaEntity::getAreaName,areaName);
         return storePostageAreaMapper.selectList(storePostageAreaEntityWrapper);
     }
 

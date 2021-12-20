@@ -103,7 +103,6 @@ public class StoreClient implements StoreRemoteApi {
 
 	@Override
 	public List<StorePostageDTO> getStorePostageByIds(Set<Long> storeIds, String areaName) {
-		//TODO
-		return null;
+		return storeService.getStorePostageByIds(storeIds,areaName);
 	}
 }

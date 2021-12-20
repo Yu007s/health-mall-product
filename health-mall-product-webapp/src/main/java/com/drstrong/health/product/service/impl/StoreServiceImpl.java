@@ -16,6 +16,7 @@ import com.drstrong.health.product.model.request.store.StoreIdRequest;
 import com.drstrong.health.product.model.request.store.StorePostage;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
+import com.drstrong.health.product.remote.model.StorePostageDTO;
 import com.drstrong.health.product.service.StorePostageAreaService;
 import com.drstrong.health.product.service.StoreService;
 import com.drstrong.health.redis.utils.RedisUtils;
@@ -26,10 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -170,12 +170,35 @@ public class StoreServiceImpl implements StoreService {
         return storeMapper.selectList(queryWrapper);
     }
 
+    @Override
+    public List<StorePostageDTO> getStorePostageByIds(Set<Long> storeIds, String areaName) {
+        List<StoreEntity> storeEntities = selectByStoreIds(storeIds);
+        List<StorePostageAreaEntity> storePostageAreaEntities = storePostageAreaService.queryByStoreIdsAndAreaName(storeIds, areaName);
+        Map<Long, BigDecimal> map = storePostageAreaEntities.stream().collect(Collectors.toMap(StorePostageAreaEntity::getStoreId, StorePostageAreaEntity::getPostage));
+        return storeEntities.stream().map(s -> {
+            StorePostageDTO storePostageDTO = new StorePostageDTO();
+            storePostageDTO.setStoreId(s.getId());
+            storePostageDTO.setStoreName(s.getName());
+            storePostageDTO.setFreePostage(s.getFreePostage());
+            storePostageDTO.setPostage(map.getOrDefault(s.getId(),BigDecimal.valueOf(0)));
+            return storePostageDTO;
+        }).collect(Collectors.toList());
+    }
+
     private StoreEntity selectByStoreId(Long storeId) {
         LambdaQueryWrapper<StoreEntity> storeWrapper = new LambdaQueryWrapper<>();
         storeWrapper.eq(StoreEntity::getId, storeId)
                 .eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(StoreEntity::getStoreStatus, StoreStatusEnum.ENABLE.getCode());
         return storeMapper.selectOne(storeWrapper);
+    }
+
+    private List<StoreEntity> selectByStoreIds(Set<Long> storeIds) {
+        LambdaQueryWrapper<StoreEntity> storeWrapper = new LambdaQueryWrapper<>();
+        storeWrapper.in(StoreEntity::getId, storeIds)
+                .eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .eq(StoreEntity::getStoreStatus, StoreStatusEnum.ENABLE.getCode());
+        return storeMapper.selectList(storeWrapper);
     }
 
     private StoreEntity checkStoreIdExist(Long storeId) {
