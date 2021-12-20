@@ -76,7 +76,7 @@ public class ProductManageController implements ProductManageFacade {
 	}
 
 	@Override
-	public ResultVO<PageVO<ProductSkuStockVO>> pageSku(QuerySkuStockRequest querySkuStockRequest) {
+	public ResultVO<PageVO<ProductSkuStockVO>> pageSkuStore(QuerySkuStockRequest querySkuStockRequest) {
 		PageVO<ProductSkuStockVO> resultPageVO = productSkuService.pageQuerySkuStockByParam(querySkuStockRequest);
 		return ResultVO.success(resultPageVO);
 	}
