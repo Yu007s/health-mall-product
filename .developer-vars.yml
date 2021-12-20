@@ -8,7 +8,7 @@ variables:
   # jvm args, developer define
   JVM_OPTS_DEV169: '-Xmx512m -Xms512m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.20.169:8848'
   JVM_OPTS_TESTING1: '-Xmx512m -Xms512m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.21.3:8848'
-  JVM_OPTS_TESTING2: '-Xmx512m -Xms512m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.21.3:8848'
+  JVM_OPTS_TESTING2: '-Xmx512m -Xms512m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.21.202:8848'
   JVM_OPTS_TESTING3: '-Xmx512m -Xms512m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.21.3:8848'
   JVM_OPTS_PRE: '-Xmx1024m -Xms1024m -Xss512k -Dspring.cloud.nacos.config.namespace=uat-207 -Dspring.cloud.nacos.config.server-addr=127.0.0.1:8848'
   JVM_OPTS_PROD: '-Xmx1024m -Xms1024m -Xss512k -Dspring.cloud.nacos.config.namespace=smart-campus-jiashan-prd -Dspring.cloud.nacos.config.server-addr=127.0.0.1:8848'
