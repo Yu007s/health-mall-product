@@ -36,7 +36,7 @@ public interface ProductManageFacade {
 	@GetMapping("/property/getById")
 	ResultVO<List<CategoryAttributeItemVO>> getProperty(@Valid @NotNull(message = "categoryId 不能为空") @RequestParam("categoryId") Long categoryId);
 
-	@ApiOperation(value = "商品上传或更新", notes = "如果 productId 为空,新增商品,如果不为空,更新商品")
+	@ApiOperation(value = "商品上传或更新", notes = "如果 productId 为空,新增商品,如果不为空,更新商品" )
 	@PostMapping("/saveOrUpdate")
 	ResultVO<ProductSaveResultVO> saveOrUpdateProduct(@RequestBody @Valid SaveProductRequest saveProductRequest);
 
