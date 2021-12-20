@@ -23,7 +23,7 @@ import java.util.Set;
  * @createTime 2021/12/15 15:54
  * @since TODO
  */
-@FeignClient(value = "health-mall-product-store")
+@FeignClient(value = "health-mall-product")
 public interface StoreRemoteApi {
 
     ResultVO<List<StoreInfoResponse>> queryAllStore();
