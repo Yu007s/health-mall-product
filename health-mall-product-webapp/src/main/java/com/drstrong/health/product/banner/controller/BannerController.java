@@ -73,7 +73,7 @@ public class BannerController {
 
     @ApiOperation("查询轮播图列表")
     @GetMapping("/queryList")
-    public ResultVO<PageVO<BannerListResponse>> queryList(@Validated @RequestBody BannerListRequest request){
+    public ResultVO<PageVO<BannerListResponse>> queryList(@Validated BannerListRequest request){
        return ResultVO.success(bannerService.queryList(request));
     }
 }

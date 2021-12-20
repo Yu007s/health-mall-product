@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -17,14 +18,21 @@ import java.io.Serializable;
  * @program health-mall-product
  */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @ApiModel("获取轮播图列表-请求")
-public class BannerListRequest extends PageRequest implements Serializable {
-
+public class BannerListRequest  implements Serializable {
+    private static final long serialVersionUID = -7809728480774839927L;
     @Size(max = 20)
     @ApiModelProperty("轮播图名称")
     private String bannerName;
+
     @ApiModelProperty("上架状态，0:待上架，1:已上架 2:已过期")
     private Integer showStatus;
+
+    @Min(1)
+    @ApiModelProperty("查询的页码")
+    private Integer pageNo = 1;
+
+    @Min(1)
+    @ApiModelProperty("查询的条数")
+    private Integer pageSize = 10;
 }
