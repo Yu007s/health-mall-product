@@ -14,5 +14,5 @@ public interface StorePostageAreaService {
 
    List<StorePostageAreaEntity> queryByStoreId(Long storeId);
    
-   void deleteByStoreId(Long storeId,Long userId);
+   void deleteByStoreId(Long storeId,String userId);
 }

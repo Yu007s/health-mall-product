@@ -1,6 +1,5 @@
 package com.drstrong.health.product;
 
-import cn.strong.mybatis.config.StrongMybatisPlusExtendConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -12,9 +11,9 @@ import org.springframework.context.annotation.ComponentScan;
  * @since 2021/6/8 15:39.
  */
 @SpringBootApplication
-@EnableFeignClients
+@EnableFeignClients(basePackages = {"com.drstrong.health.ware.remote"})
 @EnableDiscoveryClient
-@ComponentScan({"com.drstrong.health.product","com.drstrong.health.redis"})
+@ComponentScan({"com.drstrong.health.product", "com.drstrong.health.redis"})
 public class ProductSpringBootApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ProductSpringBootApplication.class, args);

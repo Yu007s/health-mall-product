@@ -76,7 +76,7 @@ public interface FrontCategoryService {
 	 * @author liuqiuyi
 	 * @date 2021/12/13 11:05
 	 */
-	void updateStateFront(Long categoryId, Long userId);
+	void updateStateFront(Long categoryId, String userId);
 
 	/**
 	 * 逻辑删除前台分类状态
@@ -86,7 +86,7 @@ public interface FrontCategoryService {
 	 * @author liuqiuyi
 	 * @date 2021/12/13 11:05
 	 */
-	void deleteFrontCategoryById(Long categoryId, Long userId);
+	void deleteFrontCategoryById(Long categoryId, String userId);
 
 	/**
 	 * 获取首页的分类信息

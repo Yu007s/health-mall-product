@@ -66,7 +66,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updatePurchasePrice(UpdateThreeRequest updateThreeRequest, Long userId) {
+    public void updatePurchasePrice(UpdateThreeRequest updateThreeRequest, String userId) {
         StoreThreeRelevanceEntity storeThreeRelevanceEntity = new StoreThreeRelevanceEntity();
         storeThreeRelevanceEntity.setThreePurchasePrice(updateThreeRequest.getPurchasePrice());
         storeThreeRelevanceEntity.setChangedBy(userId);
@@ -108,7 +108,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void relevanceAdd(RelevanceThreeRequest relevanceThreeRequest, Long userId) {
+    public void relevanceAdd(RelevanceThreeRequest relevanceThreeRequest, String userId) {
         StoreThreeRelevanceEntity storeThreeRelevanceEntity = queryBySkuId(relevanceThreeRequest.getSkuId());
         if(Objects.isNull(storeThreeRelevanceEntity)){
            buildAndSave(relevanceThreeRequest,userId);
@@ -118,7 +118,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
     }
 
     @Override
-    public void updateSkuState(UpdateSkuRequest updateSkuRequest, Long userId) {
+    public void updateSkuState(UpdateSkuRequest updateSkuRequest, String userId) {
         List<Long> skuIdList = updateSkuRequest.getSkuIdList();
         Integer state = updateSkuRequest.getState();
         if(ProductStateEnum.HAS_PUT.getCode().equals(state)){
@@ -168,7 +168,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
         }
     }
 
-    private void buildAndUpdate(Long id, RelevanceThreeRequest relevanceThreeRequest,Long userId) {
+    private void buildAndUpdate(Long id, RelevanceThreeRequest relevanceThreeRequest,String userId) {
         StoreThreeRelevanceEntity storeThreeRelevanceEntity = new StoreThreeRelevanceEntity();
         BeanUtils.copyProperties(relevanceThreeRequest,storeThreeRelevanceEntity);
         storeThreeRelevanceEntity.setId(id);
@@ -177,7 +177,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
         storeThreeRelevanceMapper.updateById(storeThreeRelevanceEntity);
     }
 
-    private void buildAndSave(RelevanceThreeRequest relevanceThreeRequest,Long userId) {
+    private void buildAndSave(RelevanceThreeRequest relevanceThreeRequest,String userId) {
         StoreThreeRelevanceEntity storeThreeRelevanceEntity = new StoreThreeRelevanceEntity();
         BeanUtils.copyProperties(relevanceThreeRequest,storeThreeRelevanceEntity);
         storeThreeRelevanceEntity.setCreatedBy(userId);

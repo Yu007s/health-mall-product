@@ -19,13 +19,13 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface StoreThreeRelevanceService {
 
-    void updatePurchasePrice(UpdateThreeRequest updateThreeRequest,Long userId);
+    void updatePurchasePrice(UpdateThreeRequest updateThreeRequest,String userId);
 
     PageVO<StoreSkuResponse> pageSkuList(StoreSkuRequest storeSkuRequest);
 
-    void relevanceAdd(RelevanceThreeRequest relevanceThreeRequest, Long userId);
+    void relevanceAdd(RelevanceThreeRequest relevanceThreeRequest, String userId);
 
-    void updateSkuState(UpdateSkuRequest updateSkuRequest, Long userId);
+    void updateSkuState(UpdateSkuRequest updateSkuRequest, String userId);
 
     void exportStoreSku(StoreSkuRequest storeSkuRequest, HttpServletRequest request, HttpServletResponse response);
 }

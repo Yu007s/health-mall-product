@@ -18,17 +18,17 @@ public interface StoreService {
 
     List<StoreInfoResponse> queryAll();
 
-    void add(StoreAddOrUpdateRequest storeAddOrUpdateRequest,Long userId);
+    void add(StoreAddOrUpdateRequest storeAddOrUpdateRequest,String userId);
 
-    void update(StoreAddOrUpdateRequest storeAddOrUpdateRequest,Long userId);
+    void update(StoreAddOrUpdateRequest storeAddOrUpdateRequest,String userId);
 
-    void disable(StoreIdRequest storeIdRequest, Long userId);
+    void disable(StoreIdRequest storeIdRequest, String userId);
 
     StorePostage getPostage(Long storeId);
     
     StoreEntity getByStoreId(Long storeId);
 
-    void updatePostage(StorePostage storePostage,Long userId);
+    void updatePostage(StorePostage storePostage,String userId);
 
     List<StoreEntity> querySetPostageByStoreIds(List<Long> storeIds);
 }

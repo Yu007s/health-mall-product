@@ -71,7 +71,7 @@ public interface CategoryRelationService {
 	 * @author liuqiuyi
 	 * @date 2021/12/13 11:10
 	 */
-	void deletedByFrontCategoryId(Long frontCategoryId, Long userId);
+	void deletedByFrontCategoryId(Long frontCategoryId, String userId);
 
 	/**
 	 * 根据前台分类 id,更新关联信息的状态
@@ -82,5 +82,5 @@ public interface CategoryRelationService {
 	 * @author liuqiuyi
 	 * @date 2021/12/13 11:20
 	 */
-	void updateStateByFrontCategoryId(Long frontCategoryId, Integer state, Long userId);
+	void updateStateByFrontCategoryId(Long frontCategoryId, Integer state, String userId);
 }

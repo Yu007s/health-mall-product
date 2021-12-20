@@ -254,7 +254,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void updateStateFront(Long categoryId, Long userId) {
+	public void updateStateFront(Long categoryId, String userId) {
 		if (Objects.isNull(categoryId) || Objects.isNull(userId)) {
 			log.error("com.drstrong.health.product.service.impl.FrontCategoryServiceImpl#updateStateFront() param is null");
 			return;
@@ -285,7 +285,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void deleteFrontCategoryById(Long categoryId, Long userId) {
+	public void deleteFrontCategoryById(Long categoryId, String userId) {
 		if (Objects.isNull(categoryId) || Objects.isNull(userId)) {
 			log.error("com.drstrong.health.product.service.impl.FrontCategoryServiceImpl#updateStateFront() param is null");
 			return;

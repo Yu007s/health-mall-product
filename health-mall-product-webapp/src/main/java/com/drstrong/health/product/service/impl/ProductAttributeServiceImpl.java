@@ -80,7 +80,7 @@ public class ProductAttributeServiceImpl extends ServiceImpl<ProductAttributeMap
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void deletedByProductId(Long productId, Long userId) {
+	public void deletedByProductId(Long productId, String userId) {
 		if (Objects.isNull(productId) || Objects.isNull(userId)) {
 			return;
 		}

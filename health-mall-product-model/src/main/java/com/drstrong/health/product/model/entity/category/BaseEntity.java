@@ -23,7 +23,7 @@ public class BaseEntity implements Serializable {
 	/**
 	 * 创建人
 	 */
-	private Long createdBy;
+	private String createdBy;
 
 	/**
 	 * 修改时间
@@ -33,7 +33,7 @@ public class BaseEntity implements Serializable {
 	/**
 	 * 修改人
 	 */
-	private Long changedBy;
+	private String changedBy;
 
 	/**
 	 * 是否删除 0：正常 1：删除

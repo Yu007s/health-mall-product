@@ -56,7 +56,7 @@ public class CategoryManageController {
 	@ApiOperation("添加前台分类")
 	@PostMapping("/front/add")
 	public ResultVO<Object> addFront(@RequestBody @Valid AddOrUpdateFrontCategoryRequest addOrUpdateFrontCategoryRequest) {
-		addOrUpdateFrontCategoryRequest.setUserId(999L);
+		addOrUpdateFrontCategoryRequest.setUserId("999");
 		frontCategoryService.add(addOrUpdateFrontCategoryRequest);
 		return ResultVO.success();
 	}
@@ -67,7 +67,7 @@ public class CategoryManageController {
 		if (Objects.isNull(updateFrontCategoryRequest.getCategoryId())) {
 			throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
 		}
-		updateFrontCategoryRequest.setUserId(999L);
+		updateFrontCategoryRequest.setUserId("999");
 		frontCategoryService.update(updateFrontCategoryRequest);
 		return ResultVO.success();
 	}
@@ -75,14 +75,14 @@ public class CategoryManageController {
 	@ApiOperation("更新分类状态")
 	@PostMapping("/front/updateState")
 	public ResultVO<Object> updateStateFront(@RequestBody @Valid CategoryIdRequest categoryIdRequest) {
-		frontCategoryService.updateStateFront(categoryIdRequest.getCategoryId(), 999L);
+		frontCategoryService.updateStateFront(categoryIdRequest.getCategoryId(), "999");
 		return ResultVO.success();
 	}
 
 	@ApiOperation("删除分类信息")
 	@PostMapping("/front/delete")
 	public ResultVO<Object> deleteFront(@RequestBody @Valid CategoryIdRequest categoryIdRequest) {
-		frontCategoryService.deleteFrontCategoryById(categoryIdRequest.getCategoryId(), 999L);
+		frontCategoryService.deleteFrontCategoryById(categoryIdRequest.getCategoryId(), "999");
 		return ResultVO.success();
 	}
 }

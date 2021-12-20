@@ -47,7 +47,7 @@ public class CategoryRelationEntity extends BaseEntity implements Serializable {
 	 */
 	private Integer version;
 
-	public static CategoryRelationEntity buildUpdateEntity(Long userId) {
+	public static CategoryRelationEntity buildUpdateEntity(String userId) {
 		CategoryRelationEntity entity = new CategoryRelationEntity();
 		entity.setChangedAt(LocalDateTime.now());
 		entity.setChangedBy(userId);

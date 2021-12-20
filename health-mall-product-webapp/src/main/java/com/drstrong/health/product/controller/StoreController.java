@@ -46,7 +46,7 @@ public class StoreController {
 	@PostMapping("/add")
 	public ResultVO<Object> add(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest) {
 		//TODO 获取当前操作人
-		storeService.add(storeAddOrUpdateRequest,888L);
+		storeService.add(storeAddOrUpdateRequest,"888");
 		return ResultVO.success();
 	}
 
@@ -54,7 +54,7 @@ public class StoreController {
 	@PostMapping("/update")
 	public ResultVO<Object> update(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest) {
 		//TODO 获取当前操作人
-		storeService.update(storeAddOrUpdateRequest,888L);
+		storeService.update(storeAddOrUpdateRequest,"888");
 		return ResultVO.success();
 	}
 
@@ -62,7 +62,7 @@ public class StoreController {
 	@PostMapping("/updateState")
 	public ResultVO<Object> updateState(@RequestBody @Valid StoreIdRequest storeIdRequest) {
 		//TODO 获取当前操作人
-		storeService.disable(storeIdRequest,888L);
+		storeService.disable(storeIdRequest,"888");
 		return ResultVO.success();
 	}
 
@@ -77,7 +77,7 @@ public class StoreController {
 	@PostMapping("/postage/update")
 	public ResultVO<Object> updatePostage(@RequestBody StorePostage storePostage) {
 		//TODO 获取当前操作人
-		storeService.updatePostage(storePostage,888L);
+		storeService.updatePostage(storePostage,"888");
 		return ResultVO.success();
 	}
 
@@ -92,7 +92,7 @@ public class StoreController {
 	@PostMapping("/purchasePrice/update")
 	public ResultVO<Object> updatePurchasePrice(@RequestBody UpdateThreeRequest updateThreeRequest) {
 		//TODO 获取当前操作人
-		storeThreeRelevanceService.updatePurchasePrice(updateThreeRequest,888L);
+		storeThreeRelevanceService.updatePurchasePrice(updateThreeRequest,"888");
 		return ResultVO.success();
 	}
 
@@ -100,7 +100,7 @@ public class StoreController {
 	@PostMapping("/relevance/add")
 	public ResultVO<Object> relevanceAdd(@RequestBody RelevanceThreeRequest relevanceThreeRequest) {
 		//TODO 获取当前操作人
-		storeThreeRelevanceService.relevanceAdd(relevanceThreeRequest,888L);
+		storeThreeRelevanceService.relevanceAdd(relevanceThreeRequest,"888");
 		return ResultVO.success();
 	}
 
@@ -108,7 +108,7 @@ public class StoreController {
 	@PostMapping("/sku/updateState")
 	public ResultVO<Object> updateSkuState(@RequestBody UpdateSkuRequest updateSkuRequest) {
 		//TODO 获取当前操作人
-		storeThreeRelevanceService.updateSkuState(updateSkuRequest,888L);
+		storeThreeRelevanceService.updateSkuState(updateSkuRequest,"888");
 		return ResultVO.success();
 	}
 

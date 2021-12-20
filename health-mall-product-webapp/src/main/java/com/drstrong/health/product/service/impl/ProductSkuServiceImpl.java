@@ -330,7 +330,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	}
 
 	@Override
-	public void updateState(List<Long> skuIdList, Integer state, Long userId) {
+	public void updateState(List<Long> skuIdList, Integer state, String userId) {
 		ProductSkuEntity productSkuEntity = new ProductSkuEntity();
 		LambdaUpdateWrapper<ProductSkuEntity> updateWrapper = new LambdaUpdateWrapper();
 		productSkuEntity.setState(state);

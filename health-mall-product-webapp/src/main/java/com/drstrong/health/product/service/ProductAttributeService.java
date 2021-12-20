@@ -26,7 +26,7 @@ public interface ProductAttributeService {
 	 * @author liuqiuyi
 	 * @date 2021/12/13 19:42
 	 */
-	void deletedByProductId(Long productId, Long userId);
+	void deletedByProductId(Long productId, String userId);
 
 	/**
 	 * 根据 商品 id 查询关联的属性信息

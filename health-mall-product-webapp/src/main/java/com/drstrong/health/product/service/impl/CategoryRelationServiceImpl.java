@@ -135,7 +135,7 @@ public class CategoryRelationServiceImpl implements CategoryRelationService {
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void deletedByFrontCategoryId(Long frontCategoryId, Long userId) {
+	public void deletedByFrontCategoryId(Long frontCategoryId, String userId) {
 		if (Objects.isNull(frontCategoryId) || Objects.isNull(userId)) {
 			return;
 		}
@@ -155,7 +155,7 @@ public class CategoryRelationServiceImpl implements CategoryRelationService {
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void updateStateByFrontCategoryId(Long frontCategoryId, Integer state, Long userId) {
+	public void updateStateByFrontCategoryId(Long frontCategoryId, Integer state, String userId) {
 		if (Objects.isNull(frontCategoryId) || Objects.isNull(state) || Objects.isNull(userId)) {
 			return;
 		}

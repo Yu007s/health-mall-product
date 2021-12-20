@@ -116,7 +116,7 @@ public interface ProductSkuService {
 	 */
 	List<ProductSkuEntity> queryBySkuIdOrCode(Set<Long> skuIdList, Set<String> skuCodeList, UpOffEnum upOffEnum);
 
-	void updateState(List<Long> skuIdList, Integer state, Long userId);
+	void updateState(List<Long> skuIdList, Integer state, String userId);
 
 	/**
 	 * 获取下一个 sku 编码,参照之前的逻辑

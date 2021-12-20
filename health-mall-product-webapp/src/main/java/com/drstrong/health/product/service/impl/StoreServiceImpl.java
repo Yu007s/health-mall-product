@@ -67,7 +67,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(StoreAddOrUpdateRequest storeAddOrUpdateRequest,Long userId) {
+    public void add(StoreAddOrUpdateRequest storeAddOrUpdateRequest,String userId) {
         String storeName = storeAddOrUpdateRequest.getName();
         checkStoreName(storeName);
         checkStoreNameRepeat(storeAddOrUpdateRequest,STORE_ADD_ACTION);
@@ -83,7 +83,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public void update(StoreAddOrUpdateRequest storeAddOrUpdateRequest,Long userId) {
+    public void update(StoreAddOrUpdateRequest storeAddOrUpdateRequest,String userId) {
         String storeName = storeAddOrUpdateRequest.getName();
         checkStoreName(storeName);
         checkStoreNameRepeat(storeAddOrUpdateRequest,STORE_UPDATE_ACTION);
@@ -98,7 +98,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public void disable(StoreIdRequest storeIdRequest, Long userId) {
+    public void disable(StoreIdRequest storeIdRequest, String userId) {
         StoreEntity disEntity = new StoreEntity();
         disEntity.setId(storeIdRequest.getStoreId());
         disEntity.setChangedBy(userId);
@@ -134,7 +134,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updatePostage(StorePostage storePostage,Long userId) {
+    public void updatePostage(StorePostage storePostage,String userId) {
         Long storeId = storePostage.getStoreId();
         StoreEntity storeEntity = checkStoreIdExist(storeId);
         storeEntity.setFreePostage(storePostage.getFreePostage());

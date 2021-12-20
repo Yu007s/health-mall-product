@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -73,7 +74,8 @@ public class SaveProductRequest implements Serializable {
 	private List<String> detailUrlList;
 
 	@ApiModelProperty(value = "操作人 id", hidden = true)
-	private Long userId;
+	@NotBlank(message = "userId 不能为空")
+	private String userId;
 
 	@Data
 	@ApiModel("商品属性的入参")

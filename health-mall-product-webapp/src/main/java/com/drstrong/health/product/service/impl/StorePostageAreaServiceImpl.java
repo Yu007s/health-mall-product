@@ -38,7 +38,7 @@ public class StorePostageAreaServiceImpl implements StorePostageAreaService {
     }
 
     @Override
-    public void deleteByStoreId(Long storeId,Long userId) {
+    public void deleteByStoreId(Long storeId,String userId) {
         StorePostageAreaEntity deleteEntity = new StorePostageAreaEntity();
         deleteEntity.setChangedAt(LocalDateTime.now());
         deleteEntity.setChangedBy(userId);
