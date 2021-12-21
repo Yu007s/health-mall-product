@@ -19,7 +19,7 @@ spring:
     database: 7
   cloud:
     inetutils:
-      preferredNetworks: [ '192.168' ]
+      preferredNetworks: [ '10.42' ]
     nacos:
       config:
         server-addr: 192.168.21.202:8848 #nacos注册中心地址
