@@ -3,11 +3,10 @@ package com.drstrong.health.product.model.entity.store;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.drstrong.health.product.model.entity.category.BaseEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author lsx
@@ -15,10 +14,9 @@ import java.io.Serializable;
  * @desc 地区
  * @createTime 2021/12/13 10:37
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("product_city")
-public class AreaEntity extends BaseEntity implements Serializable {
+public class AreaEntity implements Serializable {
 
     private static final long serialVersionUID = 2286983794183915722L;
     /**
@@ -71,5 +69,25 @@ public class AreaEntity extends BaseEntity implements Serializable {
      * 是否热门城市 0：否 1：是 用于代发货项目
      */
     private Integer hot;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createdAt;
+
+    /**
+     * 创建人
+     */
+    private String createdBy;
+
+    /**
+     * 修改时间
+     */
+    private LocalDateTime changedAt;
+
+    /**
+     * 修改人
+     */
+    private String changedBy;
     
 }
