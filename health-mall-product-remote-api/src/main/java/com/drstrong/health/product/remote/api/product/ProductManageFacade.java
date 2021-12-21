@@ -57,7 +57,7 @@ public interface ProductManageFacade {
 
 	@ApiOperation("分页查询 sku库存 信息")
 	@PostMapping("/pageSkuStock")
-	ResultVO<PageVO<ProductSkuStockVO>> pageSkuStore(@RequestBody QuerySkuStockRequest querySkuStockRequest);
+	ResultVO<PageVO<ProductSkuStockVO>> pageSkuStock(@RequestBody QuerySkuStockRequest querySkuStockRequest);
 
 	@ApiOperation("导出 sku库存 信息")
 	@PostMapping("/skuStock/export")
