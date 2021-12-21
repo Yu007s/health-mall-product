@@ -11,12 +11,12 @@ import com.drstrong.health.product.service.StoreService;
 import com.drstrong.health.product.service.StoreThreeRelevanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
@@ -27,6 +27,7 @@ import java.util.Set;
  * @date 2021/12/7 09:51
  */
 @RestController
+@RequestMapping("/product/store")
 @Slf4j
 public class StoreClient implements StoreRemoteApi {
 
@@ -48,13 +49,13 @@ public class StoreClient implements StoreRemoteApi {
 	}
 
 	@Override
-	public ResultVO<Object> update(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest,String userId) {
+	public ResultVO<Object> update(StoreAddOrUpdateRequest storeAddOrUpdateRequest,String userId) {
 		storeService.update(storeAddOrUpdateRequest,userId);
 		return ResultVO.success();
 	}
 
 	@Override
-	public ResultVO<Object> updateState(@RequestBody @Valid StoreIdRequest storeIdRequest,String userId) {
+	public ResultVO<Object> updateState(StoreIdRequest storeIdRequest,String userId) {
 		storeService.disable(storeIdRequest,userId);
 		return ResultVO.success();
 	}
@@ -66,7 +67,7 @@ public class StoreClient implements StoreRemoteApi {
 	}
 
 	@Override
-	public ResultVO<Object> updatePostage(@RequestBody StorePostage storePostage,String userId) {
+	public ResultVO<Object> updatePostage(StorePostage storePostage,String userId) {
 		storeService.updatePostage(storePostage,userId);
 		return ResultVO.success();
 	}
@@ -78,19 +79,19 @@ public class StoreClient implements StoreRemoteApi {
 	}
 
 	@Override
-	public ResultVO<Object> updatePurchasePrice(@RequestBody UpdateThreeRequest updateThreeRequest,String userId) {
+	public ResultVO<Object> updatePurchasePrice(UpdateThreeRequest updateThreeRequest,String userId) {
 		storeThreeRelevanceService.updatePurchasePrice(updateThreeRequest,userId);
 		return ResultVO.success();
 	}
 
 	@Override
-	public ResultVO<Object> relevanceAdd(@RequestBody RelevanceThreeRequest relevanceThreeRequest,String userId) {
+	public ResultVO<Object> relevanceAdd(RelevanceThreeRequest relevanceThreeRequest,String userId) {
 		storeThreeRelevanceService.relevanceAdd(relevanceThreeRequest,userId);
 		return ResultVO.success();
 	}
 
 	@Override
-	public ResultVO<Object> updateSkuState(@RequestBody UpdateSkuRequest updateSkuRequest,String userId) {
+	public ResultVO<Object> updateSkuState(UpdateSkuRequest updateSkuRequest,String userId) {
 		storeThreeRelevanceService.updateSkuState(updateSkuRequest,userId);
 		return ResultVO.success();
 	}
