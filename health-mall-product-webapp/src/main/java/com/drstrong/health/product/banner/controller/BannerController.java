@@ -65,7 +65,7 @@ public class BannerController {
         if (request.getEndTime().compareTo(request.getStartTime()) == -1){
             return ResultVO.failed("开始时间不得大于结束时间");
         }
-        if (StringUtils.isNotBlank(request.getProductSpuSn()) && productBasicsInfoService.getCountBySPUCode(request.getProductSpuSn()) <1  ){
+        if (request.getLinkType()== 2 && StringUtils.isNotBlank(request.getProductSpuSn()) && productBasicsInfoService.getCountBySPUCode(request.getProductSpuSn()) <1  ){
             return ResultVO.failed("SPU不存在，或已下架");
         }
         return bannerService.addOrUpdate(request) ? ResultVO.success() : ResultVO.failed("");

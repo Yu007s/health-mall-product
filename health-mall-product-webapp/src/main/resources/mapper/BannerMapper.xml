@@ -73,5 +73,6 @@
         <if test="showStatus != null">
             AND show_status = #{showStatus}
         </if>
+        ORDER BY sort
     </select>
 </mapper>
