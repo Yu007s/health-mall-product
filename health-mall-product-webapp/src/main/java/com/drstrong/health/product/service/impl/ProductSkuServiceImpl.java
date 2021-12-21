@@ -240,7 +240,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
             return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
 		}
 		List<ProductSkuStockVO> productSkuStockVOS = Lists.newArrayListWithCapacity(records.size());
-		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(records.stream().map(ProductSkuEntity::getId).collect(Collectors.toList()));
+		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(records.stream().map(ProductSkuEntity::getId).collect(Collectors.toList())).getData().getSkuStockNumList();
 		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
 		records.forEach(r -> {
 			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
