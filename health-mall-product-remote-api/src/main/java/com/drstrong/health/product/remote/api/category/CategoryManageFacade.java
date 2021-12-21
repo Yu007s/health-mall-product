@@ -9,10 +9,8 @@ import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -27,12 +25,12 @@ import java.util.List;
 @FeignClient(value = "health-mall-product", path = "/product/category")
 public interface CategoryManageFacade {
 	@ApiOperation(value = "获取所有前台分类", notes = "前台分类较少,前后端讨论后决定不进行分页查询")
-	@GetMapping("/front/query")
-	ResultVO<List<FrontCategoryVO>> frontQuery(@RequestParam("categoryQueryRequest") CategoryQueryRequest categoryQueryRequest);
+	@PostMapping("/front/query")
+	ResultVO<List<FrontCategoryVO>> frontQuery(@RequestBody CategoryQueryRequest categoryQueryRequest);
 
 	@ApiOperation(value = "获取所有后台分类", notes = "后台分类较少,前后端讨论后决定不进行分页查询")
-	@GetMapping("/back/query")
-	ResultVO<List<BackCategoryVO>> backQuery(@RequestParam("categoryQueryRequest") CategoryQueryRequest categoryQueryRequest);
+	@PostMapping("/back/query")
+	ResultVO<List<BackCategoryVO>> backQuery(@RequestBody CategoryQueryRequest categoryQueryRequest);
 
 	@ApiOperation("添加前台分类")
 	@PostMapping("/front/add")

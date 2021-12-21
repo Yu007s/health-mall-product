@@ -36,7 +36,7 @@ public interface ProductManageFacade {
 	@GetMapping("/property/getById")
 	ResultVO<List<CategoryAttributeItemVO>> getProperty(@Valid @NotNull(message = "categoryId 不能为空") @RequestParam("categoryId") Long categoryId);
 
-	@ApiOperation(value = "商品上传或更新", notes = "如果 productId 为空,新增商品,如果不为空,更新商品" )
+	@ApiOperation(value = "商品上传或更新", notes = "如果 productId 为空,新增商品,如果不为空,更新商品")
 	@PostMapping("/saveOrUpdate")
 	ResultVO<ProductSaveResultVO> saveOrUpdateProduct(@RequestBody @Valid SaveProductRequest saveProductRequest);
 
@@ -48,20 +48,20 @@ public interface ProductManageFacade {
 	ResultVO<ProductManageVO> getByProductId(@NotNull(message = "productId 不能为空") @RequestParam("productId") Long productId);
 
 	@ApiOperation("分页查询 spu 信息")
-	@GetMapping("/pageSpu")
-	ResultVO<PageVO<ProductSpuVO>> pageSpu(@RequestParam("querySpuRequest") QuerySpuRequest querySpuRequest);
+	@PostMapping("/pageSpu")
+	ResultVO<PageVO<ProductSpuVO>> pageSpu(@RequestBody QuerySpuRequest querySpuRequest);
 
 	@ApiOperation("分页查询 sku 信息")
-	@GetMapping("/pageSku")
-	ResultVO<PageVO<ProductSkuVO>> pageSku(@RequestParam("querySkuRequest") QuerySkuRequest querySkuRequest);
+	@PostMapping("/pageSku")
+	ResultVO<PageVO<ProductSkuVO>> pageSku(@RequestBody QuerySkuRequest querySkuRequest);
 
 	@ApiOperation("分页查询 sku库存 信息")
-	@GetMapping("/pageSkuStock")
-	ResultVO<PageVO<ProductSkuStockVO>> pageSkuStore(@RequestParam("querySkuStockRequest") QuerySkuStockRequest querySkuStockRequest);
+	@PostMapping("/pageSkuStock")
+	ResultVO<PageVO<ProductSkuStockVO>> pageSkuStore(@RequestBody QuerySkuStockRequest querySkuStockRequest);
 
 	@ApiOperation("导出 sku库存 信息")
-	@GetMapping("/skuStock/export")
-	void exportSkuStock(@RequestParam("querySkuStockRequest") QuerySkuStockRequest querySkuStockRequest, @RequestParam("request") HttpServletRequest request, @RequestParam("response") HttpServletResponse response);
+	@PostMapping("/skuStock/export")
+	void exportSkuStock(@RequestBody QuerySkuStockRequest querySkuStockRequest, @RequestParam("request") HttpServletRequest request, @RequestParam("response") HttpServletResponse response);
 
 	@ApiOperation("保存税收编码")
 	@PostMapping("/revenue/add")
