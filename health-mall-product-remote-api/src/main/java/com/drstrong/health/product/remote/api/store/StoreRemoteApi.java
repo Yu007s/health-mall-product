@@ -8,10 +8,7 @@ import com.drstrong.health.product.model.response.store.StoreSkuResponse;
 import com.drstrong.health.product.remote.model.StorePostageDTO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -71,7 +68,7 @@ public interface StoreRemoteApi {
 
     @ApiOperation("商品维护列表导出")
     @PostMapping("/sku/export")
-    void exportSku(@RequestBody StoreSkuRequest storeSkuRequest, HttpServletRequest request, HttpServletResponse response);
+    void exportSku(@RequestBody StoreSkuRequest storeSkuRequest, @RequestParam("request") HttpServletRequest request, @RequestParam("response") HttpServletResponse response);
 
     @ApiOperation("批量获取店铺地区邮费")
     @GetMapping("getStorePostageByIds")
