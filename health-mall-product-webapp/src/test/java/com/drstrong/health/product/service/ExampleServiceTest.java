@@ -11,7 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 public class ExampleServiceTest extends SpringBootTests {
 
 
-    @DisplayName("测试样例")
+    @DisplayName("测试样例2")
     public void test1() {
         System.out.println("test for health-mall-product");
     }
