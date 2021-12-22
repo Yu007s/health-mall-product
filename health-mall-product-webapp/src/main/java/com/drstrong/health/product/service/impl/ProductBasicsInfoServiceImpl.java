@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.impl;
 
+import cn.strong.common.base.Result;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,6 +19,9 @@ import com.drstrong.health.product.service.*;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.util.DateUtil;
 import com.drstrong.health.product.util.RedisKeyUtils;
+import com.drstrong.health.ware.model.vo.SkuStockNumListVO;
+import com.drstrong.health.ware.model.vo.SkuStockNumVO;
+import com.drstrong.health.ware.remote.api.PharmacyGoodsRemoteApi;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -68,6 +72,9 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 
 	@Resource
 	StoreService storeService;
+
+	@Resource
+	PharmacyGoodsRemoteApi pharmacyGoodsRemoteApi;
 
 	/**
 	 * 根据条件,分页查询商品基础信息
@@ -315,10 +322,16 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		}
 		productSkuEntityList.sort(Comparator.comparing(ProductSkuEntity::getSkuPrice));
 		// 3.查询库存信息
-		// TODO 调用库存的接口
+		List<Long> skuIdList = productSkuEntityList.stream().map(ProductSkuEntity::getId).collect(Collectors.toList());
+//		Result<SkuStockNumListVO> skuStockNum = pharmacyGoodsRemoteApi.getSkuStockNum(skuIdList);
+		Result<SkuStockNumListVO> skuStockNum = null;
 
-		// 4.组装返回值
-		return buildProductDetailVO(productEntity, extendEntity, productSkuEntityList);
+
+		Result<SkuStockNumListVO> skuStockNum2 = pharmacyGoodsRemoteApi.getSkuStockNum(skuIdList);
+		// 4.调用商品购物车接口,设置用户购物车是否有商品
+		// TODO 购物车
+		// 5.组装返回值
+		return buildProductDetailVO(productEntity, extendEntity, productSkuEntityList, skuStockNum.getData().getSkuStockNumList());
 	}
 
 	/**
@@ -367,8 +380,11 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		}
 		// 2.查询商品 sku 信息
 		Map<Long, List<ProductSkuEntity>> productIdSkusMap = buildSkuMap(infoEntityPage.getRecords());
-		// TODO 判断库存是否充足
-		// 3.组装返回值信息
+		// 3.判断库存是否充足
+		Map<Long, Integer> spuStockNumMap = getSpuStockNum(productIdSkusMap);
+		// 4.如果搜索结果不足,需要调用老的系统,获取商品信息
+		// TODO 调用老系统,获取商品信息  @坤鹏
+		// 5.组装返回值信息
 		List<ProductSearchDetailVO> detailVOList = Lists.newArrayListWithCapacity(infoEntityPage.getRecords().size());
 		for (ProductBasicsInfoEntity infoEntity : infoEntityPage.getRecords()) {
 			ProductSearchDetailVO detailVO = new ProductSearchDetailVO();
@@ -377,12 +393,48 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			detailVO.setProductName(infoEntity.getTitle());
 			Map<String, BigDecimal> priceSectionMap = productSkuService.getPriceSectionMap(productIdSkusMap.getOrDefault(infoEntity.getId(), Lists.newArrayList()));
 			detailVO.setLowPrice(priceSectionMap.get("lowPrice"));
+			detailVO.setHasInventory(spuStockNumMap.get(infoEntity.getId()) > 0);
 			detailVOList.add(detailVO);
 		}
 		return PageVO.newBuilder().pageNo(productSearchRequest.getPageNo()).pageSize(productSearchRequest.getPageSize()).totalCount((int) infoEntityPage.getTotal()).result(detailVOList).build();
 	}
 
-	private ProductDetailVO buildProductDetailVO(ProductBasicsInfoEntity productEntity, ProductExtendEntity extendEntity, List<ProductSkuEntity> productSkuEntityList) {
+	/**
+	 * 校验 spu 是否有库存
+	 * <p> 查询的是 spu 下所有 sku 的库存 </>
+	 *
+	 * @return Map.key = spuId, map.value = sku 的库存总数
+	 * @author liuqiuyi
+	 * @date 2021/12/21 15:06
+	 */
+	public Map<Long, Integer> getSpuStockNum(Map<Long, List<ProductSkuEntity>> productIdSkusMap) {
+		if (CollectionUtils.isEmpty(productIdSkusMap)) {
+			return Maps.newHashMap();
+		}
+		// 1.获取 skuId,查询库存信息
+		List<Long> skuIdList = productIdSkusMap.values().stream().flatMap(Collection::stream).map(ProductSkuEntity::getId).collect(Collectors.toList());
+		List<SkuStockNumVO> skuStockNums = pharmacyGoodsRemoteApi.getSkuStockNum(skuIdList).getData().getSkuStockNumList();
+		Map<Long, Integer> skuIdStockNumMap = Maps.newHashMapWithExpectedSize(skuIdList.size());
+		if (!CollectionUtils.isEmpty(skuStockNums)) {
+			skuIdStockNumMap = skuStockNums.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum, (v1, v2) -> v1));
+		}
+		// 2.组装返回值
+		Map<Long, Integer> spuIdStockNumMap = Maps.newHashMapWithExpectedSize(productIdSkusMap.size());
+		for (Map.Entry<Long, List<ProductSkuEntity>> spuIdSkuEntityListEntry : productIdSkusMap.entrySet()) {
+			Integer stockNum = 0;
+			for (ProductSkuEntity productSkuEntity : spuIdSkuEntityListEntry.getValue()) {
+				stockNum += skuIdStockNumMap.getOrDefault(productSkuEntity.getId(), 0);
+			}
+			spuIdStockNumMap.put(spuIdSkuEntityListEntry.getKey(), stockNum);
+		}
+		return spuIdStockNumMap;
+	}
+
+	private ProductDetailVO buildProductDetailVO(ProductBasicsInfoEntity productEntity, ProductExtendEntity extendEntity, List<ProductSkuEntity> productSkuEntityList, List<SkuStockNumVO> skuStockNumList) {
+		long inventoryNum = 0L;
+		if (!CollectionUtils.isEmpty(skuStockNumList)) {
+			inventoryNum = skuStockNumList.stream().map(SkuStockNumVO::getStockNum).count();
+		}
 		ProductDetailVO productDetailVO = new ProductDetailVO();
 		productDetailVO.setSpuCode(productEntity.getSpuCode());
 		productDetailVO.setProductName(productEntity.getTitle());
@@ -390,13 +442,14 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		productDetailVO.setDetailUrlList(Lists.newArrayList(extendEntity.getDetailUrl().split(",")));
 		productDetailVO.setStoreId(productEntity.getSourceId());
 		productDetailVO.setStoreName(productEntity.getSourceName());
-//		productDetailVO.setInventoryNum();
+		productDetailVO.setInventoryNum(inventoryNum);
 		ProductSkuEntity lowSku = productSkuEntityList.get(0);
-		ProductSkuEntity highSku = productSkuEntityList.get(0);
+		ProductSkuEntity highSku = productSkuEntityList.get(productSkuEntityList.size() - 1);
 		productDetailVO.setLowPrice(BigDecimalUtil.F2Y(lowSku.getSkuPrice().longValue()));
 		productDetailVO.setHighPrice(BigDecimalUtil.F2Y(highSku.getSkuPrice().longValue()));
 		productDetailVO.setPackName(lowSku.getPackName());
 		productDetailVO.setPackValue(lowSku.getPackValue());
+//		productDetailVO.setHasUnpaidFlag();
 		return productDetailVO;
 	}
 

@@ -42,6 +42,5 @@ public class AddOrUpdateFrontCategoryRequest implements Serializable {
 	private Set<Long> backCategoryIdList;
 
 	@ApiModelProperty(value = "操作人 id", hidden = true)
-	@NotBlank(message = "userId 不能为空")
 	private String userId;
 }
