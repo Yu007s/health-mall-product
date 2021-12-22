@@ -6,7 +6,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * @author lsx
@@ -26,9 +25,6 @@ public class RelevanceThreeRequest implements Serializable {
     @ApiModelProperty("三方 storeId")
     @NotNull
     private Long storeId;
-    @NotNull
-    @ApiModelProperty("进货单价")
-    private BigDecimal threePurchasePrice;
     @NotNull
     @ApiModelProperty("商城的 skuId")
     private Long skuId;
