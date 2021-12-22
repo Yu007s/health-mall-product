@@ -77,8 +77,11 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
             this.bannerDao.updateFollowUp(banner.getSort());
         }
         if (banner.getId() == null) {
+            banner.setCreatedBy(request.getUserId()!=null?request.getUserId():0);
+            banner.setChangedBy(request.getUserId()!=null?request.getUserId():0);
             this.save(banner);
         } else {
+            banner.setChangedBy(request.getUserId()!=null?request.getUserId():0);
             this.updateById(banner);
         }
         // 如果 该轮播图上架 清空缓存

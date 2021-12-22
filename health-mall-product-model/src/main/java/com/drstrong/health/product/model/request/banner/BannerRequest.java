@@ -61,5 +61,6 @@ public class BannerRequest {
     @ApiModelProperty("结束时间")
     private Date endTime;
 
-
+    @ApiModelProperty(value = "操作人 id", hidden = true)
+    private Long userId;
 }

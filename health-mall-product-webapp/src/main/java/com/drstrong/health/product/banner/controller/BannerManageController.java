@@ -36,6 +36,7 @@ public class BannerManageController implements BannerManageFacade {
 
     @Override
     public ResultVO addOrUpdate(@RequestBody @Validated BannerRequest request){
+        log.info("添加/修改轮播题------BannerRequest:{}",request);
         if (request.getLinkType() ==  1 && StringUtils.isEmpty(request.getLinkAddress())){
             return ResultVO.failed("跳转链接不得为空");
         }

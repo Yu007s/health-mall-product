@@ -2,6 +2,7 @@ package com.drstrong.health.product.model.entity.banner;
 
 import cn.strong.mybatis.model.MyBatisPlusBaseModel;
 import com.baomidou.mybatisplus.annotation.*;
+import com.drstrong.health.product.model.entity.category.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -21,7 +22,7 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 @TableName("mall_banner")
-public class Banner implements Serializable {
+public class Banner   implements Serializable  {
 
     private static final long serialVersionUID=1L;
 
@@ -81,33 +82,29 @@ public class Banner implements Serializable {
      */
     private Integer showStatus;
 
-
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 
     /**
      * 创建人
      */
-    private String createdBy;
+    private Long createdBy;
 
     /**
      * 修改时间
      */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime changedAt;
 
     /**
      * 修改人
      */
-    private String changedBy;
+    private Long changedBy;
 
     /**
      * 是否删除 0：正常 1：删除
      */
-    @TableLogic
-    private Boolean delFlag;
+    private Integer delFlag;
 
 }
