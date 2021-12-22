@@ -11,11 +11,11 @@ import org.springframework.context.annotation.ComponentScan;
  * @since 2021/6/8 15:39.
  */
 @SpringBootApplication
-@EnableFeignClients(basePackages = {"com.drstrong.health.ware.remote"})
+@EnableFeignClients(basePackages = {"com.drstrong.health.ware.remote", "com.drstrong.health.product.remote.cms"})
 @EnableDiscoveryClient
 @ComponentScan({"com.drstrong.health.product", "com.drstrong.health.redis"})
 public class ProductSpringBootApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(ProductSpringBootApplication.class, args );
+		SpringApplication.run(ProductSpringBootApplication.class, args);
 	}
 }

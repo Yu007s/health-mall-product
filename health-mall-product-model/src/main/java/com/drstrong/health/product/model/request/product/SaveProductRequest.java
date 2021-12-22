@@ -74,7 +74,6 @@ public class SaveProductRequest implements Serializable {
 	private List<String> detailUrlList;
 
 	@ApiModelProperty(value = "操作人 id", hidden = true)
-	@NotBlank(message = "userId 不能为空")
 	private String userId;
 
 	@Data

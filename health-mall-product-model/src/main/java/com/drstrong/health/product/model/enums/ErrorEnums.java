@@ -31,6 +31,7 @@ public enum ErrorEnums implements IBaseResult {
 	/**
 	 *
 	 */
+	QUERY_SIZE_TOO_BIG("100001", "查询参数过大"),
 	PARAM_IS_NOT_NULL("11000","参数不能为空"),
 	CATEGORY_NOT_EXIST("11100","分类不存在"),
 	SAVE_UPDATE_NOT_EXIST("11101","更新或者保存的数据不存在"),
