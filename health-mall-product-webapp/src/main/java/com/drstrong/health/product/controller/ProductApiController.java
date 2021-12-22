@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Objects;
@@ -95,5 +94,12 @@ public class ProductApiController {
 		return ResultVO.success(productPropertyVOList);
 	}
 
+	@ApiOperation("热门推荐商品分页展示")
+	@GetMapping("/search/recommend")
+	public ResultVO<PageVO<ProductSearchDetailVO>> pageSearchRecommend(ProductSearchRequest productSearchRequest) {
+		//TODO
+		PageVO<ProductSearchDetailVO> resultList = productBasicsInfoService.pageSearchDetail(productSearchRequest);
+		return ResultVO.success(resultList);
+	}
 
 }

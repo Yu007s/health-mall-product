@@ -263,14 +263,41 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	 */
 	@Override
 	public void exportSkuStock(QuerySkuStockRequest querySkuStockRequest, HttpServletRequest request, HttpServletResponse response) {
-		PageVO<ProductSkuStockVO> productSkuStockVOPageVO = this.pageQuerySkuStockByParam(querySkuStockRequest);
-		List<ProductSkuStockVO> productSkuStockVOS = productSkuStockVOPageVO.getResult();
+		List<ProductSkuStockVO> productSkuStockVOS = this.querySkuStockByParam(querySkuStockRequest);
 		Workbook excel = excelContext.createExcel(ExcelMappingEnum.SKU_STOCK_EXPORT.getMappingId(), productSkuStockVOS);
 		try {
 			ExcelDownLoadUtil.downLoadExcel(excel,ExcelMappingEnum.SKU_STOCK_EXPORT.getExcelName(),ExcelMappingEnum.SKU_STOCK_EXPORT.getEmptyMessage(),request,response);
 		} catch (IOException e) {
 			throw new BusinessException(ErrorEnums.EXCEL_EXPORT_ERROR);
 		}
+	}
+
+	/**
+	 * 根据条件查询 并导出sku库存 信息
+	 *
+	 * @param querySkuStockRequest 查询参数
+	 * @return sku 库存信息
+	 * @author lsx
+	 * @date 2021/12/17 14:04
+	 */
+	private List<ProductSkuStockVO> querySkuStockByParam(QuerySkuStockRequest querySkuStockRequest) {
+		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = buildQuerySkuStockParam(querySkuStockRequest);
+		List<ProductSkuEntity> productSkuEntities = productSkuMapper.selectList(queryWrapper);
+		if (CollectionUtils.isEmpty(productSkuEntities)) {
+			return Lists.newArrayList();
+		}
+		List<ProductSkuStockVO> productSkuStockVOS = Lists.newArrayListWithCapacity(productSkuEntities.size());
+		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(productSkuEntities.stream().map(ProductSkuEntity::getId).collect(Collectors.toList())).getData().getSkuStockNumList();
+		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
+		productSkuEntities.forEach(r -> {
+			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
+			BeanUtils.copyProperties(r,productSkuStockVO);
+			productSkuStockVO.setSkuId(r.getId());
+			productSkuStockVO.setStoreName(r.getSourceName());
+			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
+			productSkuStockVOS.add(productSkuStockVO);
+		});
+		return productSkuStockVOS;
 	}
 
 	/**

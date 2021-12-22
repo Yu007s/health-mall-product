@@ -45,4 +45,10 @@ public class StoreThreeRelevanceEntity extends BaseEntity implements Serializabl
      * 三方药店商品进货价
      */
     private BigDecimal threePurchasePrice;
+
+
+    /**
+     * 乐观锁
+     */
+    private Integer version;
 }
