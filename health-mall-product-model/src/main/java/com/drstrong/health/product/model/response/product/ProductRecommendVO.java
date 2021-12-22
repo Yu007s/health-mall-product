@@ -19,11 +19,11 @@ import java.math.BigDecimal;
 public class ProductRecommendVO implements Serializable {
     private static final long serialVersionUID = 403157353536984487L;
 
-    @ApiModelProperty("商品 id")
-    private Long productId;
-
     @ApiModelProperty("商品标题")
-    private String title;
+    private String productName;
+
+    @ApiModelProperty("spu 编码")
+    private String spuCode;
 
     @ApiModelProperty("主图地址")
     private String masterImageUrl;
