@@ -2,6 +2,8 @@ package com.drstrong.health.product.service;
 
 import com.drstrong.health.product.model.entity.product.ProductExtendEntity;
 
+import java.util.List;
+
 /**
  * 商品扩展信息
  *
@@ -29,4 +31,6 @@ public interface ProductExtendService {
 	 * @date 2021/12/13 17:43
 	 */
 	ProductExtendEntity queryByProductId(Long productId);
+
+	List<ProductExtendEntity> queryListByProductIds(List<Long> productIds);
 }

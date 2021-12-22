@@ -9,8 +9,11 @@ import com.drstrong.health.product.service.ProductExtendService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -47,5 +50,15 @@ public class ProductExtendServiceImpl extends ServiceImpl<ProductExtendMapper, P
 		LambdaQueryWrapper<ProductExtendEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(ProductExtendEntity::getProductId, productId).eq(ProductExtendEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
 		return productExtendMapper.selectOne(queryWrapper);
+	}
+
+	@Override
+	public List<ProductExtendEntity> queryListByProductIds(List<Long> productIds) {
+		if (CollectionUtils.isEmpty(productIds)) {
+			return Collections.emptyList();
+		}
+		LambdaQueryWrapper<ProductExtendEntity> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.in(ProductExtendEntity::getProductId, productIds).eq(ProductExtendEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+		return productExtendMapper.selectList(queryWrapper);
 	}
 }

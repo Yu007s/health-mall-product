@@ -9,6 +9,7 @@ import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.entity.product.*;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.*;
+import com.drstrong.health.product.model.request.PageRequest;
 import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.request.product.SaveProductRequest;
@@ -397,6 +398,40 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			detailVOList.add(detailVO);
 		}
 		return PageVO.newBuilder().pageNo(productSearchRequest.getPageNo()).pageSize(productSearchRequest.getPageSize()).totalCount((int) infoEntityPage.getTotal()).result(detailVOList).build();
+	}
+
+	@Override
+	public PageVO<ProductRecommendVO> pageSearchRecommend(PageRequest pageRequest) {
+		Page<ProductBasicsInfoEntity> page = new Page<>(pageRequest.getPageNo(),pageRequest.getPageSize());
+		LambdaQueryWrapper<ProductBasicsInfoEntity> basicsInfoWrapper = new LambdaQueryWrapper<>();
+		basicsInfoWrapper.eq(ProductBasicsInfoEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode())
+				.eq(ProductBasicsInfoEntity::getState,UpOffEnum.UP.getCode())
+				.orderByAsc(ProductBasicsInfoEntity::getSort);
+		Page<ProductBasicsInfoEntity> resultPage = productBasicsInfoMapper.selectPage(page, basicsInfoWrapper);
+		List<ProductBasicsInfoEntity> records = resultPage.getRecords();
+		List<ProductRecommendVO> recommendVOS = Lists.newArrayListWithCapacity(records.size());
+		List<Long> productIds = records.stream().map(ProductBasicsInfoEntity::getId).collect(Collectors.toList());
+		Map<Long, String> proDesMap = productExtendService.queryListByProductIds(productIds).stream().collect(toMap(ProductExtendEntity::getProductId, ProductExtendEntity::getDescription));
+		Map<Long, List<ProductSkuEntity>> spuSkuMap = productSkuService.queryByProductIdListToMap(productIds.stream().collect(Collectors.toSet()));
+		Map<Long,BigDecimal> spuLowPriceMap = getSpuLowPriceMap(spuSkuMap);
+		records.forEach(r -> {
+			ProductRecommendVO recommendVO = new ProductRecommendVO();
+			recommendVO.setProductId(r.getId());
+			recommendVO.setTitle(r.getTitle());
+			recommendVO.setMasterImageUrl(r.getMasterImageUrl());
+			recommendVO.setDescription(proDesMap.get(r.getId()));
+			recommendVO.setLowPrice(spuLowPriceMap.getOrDefault(r.getId(),BigDecimal.ZERO));
+		});
+		return null;
+	}
+
+	private Map<Long, BigDecimal> getSpuLowPriceMap(Map<Long, List<ProductSkuEntity>> spuSkuMap) {
+		Map<Long,BigDecimal> spuLowPriceMap = new HashMap<>();
+		spuSkuMap.forEach((k,v) -> {
+			Integer lowPrice = v.stream().min(Comparator.comparing(ProductSkuEntity::getSkuPrice)).get().getSkuPrice();
+			spuLowPriceMap.put(k,BigDecimalUtil.F2Y(lowPrice.longValue()));
+		});
+		return spuLowPriceMap;
 	}
 
 	/**
