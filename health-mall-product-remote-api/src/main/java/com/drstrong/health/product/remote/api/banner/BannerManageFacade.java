@@ -32,6 +32,6 @@ public interface BannerManageFacade {
     public ResultVO addOrUpdate(@RequestBody @Validated BannerRequest request);
 
     @ApiOperation("查询轮播图列表")
-    @PostMapping("/queryList")
+    @GetMapping("/queryList")
     public ResultVO<PageVO<BannerListResponse>> queryList(@Validated BannerListRequest request);
 }
