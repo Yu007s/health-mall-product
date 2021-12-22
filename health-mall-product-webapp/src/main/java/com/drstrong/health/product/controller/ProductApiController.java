@@ -1,5 +1,6 @@
 package com.drstrong.health.product.controller;
 
+import com.drstrong.health.product.model.request.PageRequest;
 import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.*;
@@ -96,9 +97,8 @@ public class ProductApiController {
 
 	@ApiOperation("热门推荐商品分页展示")
 	@GetMapping("/search/recommend")
-	public ResultVO<PageVO<ProductSearchDetailVO>> pageSearchRecommend(ProductSearchRequest productSearchRequest) {
-		//TODO
-		PageVO<ProductSearchDetailVO> resultList = productBasicsInfoService.pageSearchDetail(productSearchRequest);
+	public ResultVO<PageVO<ProductRecommendVO>> pageSearchRecommend(PageRequest pageRequest) {
+		PageVO<ProductRecommendVO> resultList = productBasicsInfoService.pageSearchRecommend(pageRequest);
 		return ResultVO.success(resultList);
 	}
 
