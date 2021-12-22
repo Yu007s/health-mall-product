@@ -19,10 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 /**
- * @description: 轮播图管理的 api 接口,目前主要提供给 cms 调用
- * @Author: JiaoYuSheng
- * @Date: 2021-12-22 15:45
- * @program health-mall-product
+ * 轮播图管理的 api 接口,目前主要提供给 cms 调用
+ * @author JiaoYuSheng
+ * @date 2021/12/22 17:33
  */
 @Api("健康商城-轮播图管理远程接口")
 @FeignClient(value = "health-mall-product", path = "/product/banner")
