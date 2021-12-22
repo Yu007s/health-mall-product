@@ -1,5 +1,6 @@
 package com.drstrong.health.product.controller;
 
+import com.drstrong.health.product.model.enums.SourceEnum;
 import com.drstrong.health.product.model.request.PageRequest;
 import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 商品 api controller
@@ -51,9 +51,6 @@ public class ProductApiController {
 	})
 	@GetMapping("/searchByName")
 	public ResultVO<SearchNameResultVO> pageSearchByName(@NotBlank(message = "搜索内容不能为空") String content, Integer count) {
-		if (Objects.isNull(count)) {
-			count = 10;
-		}
 		List<String> resultList = productBasicsInfoService.pageSearchByName(content, count);
 		return ResultVO.success(new SearchNameResultVO(resultList));
 	}

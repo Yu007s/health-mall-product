@@ -18,26 +18,29 @@ import java.math.BigDecimal;
 public class ProductSkuInfoDTO implements Serializable {
 	private static final long serialVersionUID = 814358534732690036L;
 
+	@ApiModelProperty("商品id")
+	private Long productId;
+
+	@ApiModelProperty("商品编码")
+	private String spuCode;
+
+	@ApiModelProperty("商品主图")
+	private String masterImageUrl;
+
 	@ApiModelProperty("商品skuId")
 	private Long skuId;
 
-	@ApiModelProperty("商品id")
-	private String productId;
+	@ApiModelProperty("商品sku编码")
+	private String skuCode;
 
 	@ApiModelProperty("商品标题")
 	private String productName;
 
-	@ApiModelProperty("规格")
-	private String packSpecification;
+	@ApiModelProperty("商品规格值")
+	private String packValue;
 
-	@ApiModelProperty("商品价格")
-	private BigDecimal productAmount;
-
-	@ApiModelProperty("数量")
-	private Integer quantity;
-
-	@ApiModelProperty("商品主图")
-	private String productIcon;
+	@ApiModelProperty("商品sku价格")
+	private BigDecimal price;
 
 	@ApiModelProperty(value = "店铺id")
 	private Long storeId;
@@ -45,6 +48,18 @@ public class ProductSkuInfoDTO implements Serializable {
 	@ApiModelProperty(value = "店铺名称")
 	private String storeName;
 
-	@ApiModelProperty("商品上下架状态 0-未上架,1-已上架")
+	@ApiModelProperty("商品 sku 上下架状态 0-未上架,1-已上架")
 	private Integer upOffStatus;
+
+	@ApiModelProperty("库存数量")
+	private Integer stockNum;
+
+	@ApiModelProperty("商品属性")
+	private Integer commAttribute;
+
+	@ApiModelProperty("商品属性值")
+	private String commAttributeName;
+
+	@ApiModelProperty("商品属性icon")
+	private String commAttributeIcon;
 }
