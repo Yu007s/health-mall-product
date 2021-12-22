@@ -421,8 +421,9 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			recommendVO.setMasterImageUrl(r.getMasterImageUrl());
 			recommendVO.setDescription(proDesMap.get(r.getId()));
 			recommendVO.setLowPrice(spuLowPriceMap.getOrDefault(r.getId(),BigDecimal.ZERO));
+			recommendVOS.add(recommendVO);
 		});
-		return null;
+		return PageVO.newBuilder().pageNo(pageRequest.getPageNo()).pageSize(pageRequest.getPageSize()).totalCount((int) resultPage.getTotal()).result(recommendVOS).build();
 	}
 
 	private Map<Long, BigDecimal> getSpuLowPriceMap(Map<Long, List<ProductSkuEntity>> spuSkuMap) {
