@@ -10,13 +10,10 @@ import com.drstrong.health.product.remote.model.StorePostageDTO;
 import com.drstrong.health.product.service.StoreService;
 import com.drstrong.health.product.service.StoreThreeRelevanceService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Set;
 
@@ -97,8 +94,9 @@ public class StoreClient implements StoreRemoteApi {
 	}
 
 	@Override
-	public void exportSku(StoreSkuRequest storeSkuRequest, HttpServletRequest request, HttpServletResponse response) {
-		storeThreeRelevanceService.exportStoreSku(storeSkuRequest,request,response);
+	public ResultVO<List<StoreSkuResponse>> searchSkuList(StoreSkuRequest storeSkuRequest) {
+		List<StoreSkuResponse> storeSkuResponses = storeThreeRelevanceService.searchSkuList(storeSkuRequest);
+		return ResultVO.success(storeSkuResponses);
 	}
 
 

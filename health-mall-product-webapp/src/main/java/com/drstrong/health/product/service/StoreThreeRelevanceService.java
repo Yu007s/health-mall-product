@@ -7,8 +7,7 @@ import com.drstrong.health.product.model.request.store.UpdateThreeRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.store.StoreSkuResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author lsx
@@ -27,5 +26,5 @@ public interface StoreThreeRelevanceService {
 
     void updateSkuState(UpdateSkuRequest updateSkuRequest, String userId);
 
-    void exportStoreSku(StoreSkuRequest storeSkuRequest, HttpServletRequest request, HttpServletResponse response);
+    List<StoreSkuResponse> searchSkuList(StoreSkuRequest storeSkuRequest);
 }

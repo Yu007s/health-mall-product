@@ -8,10 +8,11 @@ import com.drstrong.health.product.model.response.store.StoreSkuResponse;
 import com.drstrong.health.product.remote.model.StorePostageDTO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
@@ -66,12 +67,11 @@ public interface StoreRemoteApi {
     @PostMapping("/sku/updateState")
     ResultVO<Object> updateSkuState(@RequestBody UpdateSkuRequest updateSkuRequest,@RequestParam("userId")String userId);
 
-    @ApiOperation("商品维护列表导出")
-    @PostMapping("/sku/export")
-    void exportSku(@RequestBody StoreSkuRequest storeSkuRequest, @RequestParam("request") HttpServletRequest request, @RequestParam("response") HttpServletResponse response);
+    @ApiOperation("不分页查询店铺的 sku 列表")
+    @PostMapping("/sku/search")
+    ResultVO<List<StoreSkuResponse>> searchSkuList(@RequestBody StoreSkuRequest storeSkuRequest);
 
     @ApiOperation("批量获取店铺地区邮费")
     @GetMapping("getStorePostageByIds")
     List<StorePostageDTO> getStorePostageByIds(@RequestParam("storeIds") Set<Long> storeIds,@RequestParam("areaName") String areaName);
 }
-                                      

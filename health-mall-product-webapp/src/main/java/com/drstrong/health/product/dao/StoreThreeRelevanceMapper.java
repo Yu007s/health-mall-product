@@ -24,4 +24,8 @@ public interface StoreThreeRelevanceMapper extends BaseMapper<StoreThreeRelevanc
     @Select("SELECT p.id as skuId,p.sku_code,p.sku_name,p.sku_price as price,p.state as skuState,t.three_purchase_price as intoPrice,t.three_sku_id FROM `pms_product_sku` p LEFT JOIN product_three_store_relevance t ON p.id = t.sku_id "
     + "${ew.customSqlSegment}" + "ORDER BY p.created_at DESC")
     List<StoreSkuResponse> pageSkuList(Page<StoreSkuResponse> page, @Param(Constants.WRAPPER) QueryWrapper<StoreSkuResponse> queryWrapper);
+
+    @Select("SELECT p.id as skuId,p.sku_code,p.sku_name,p.sku_price as price,p.state as skuState,t.three_purchase_price as intoPrice,t.three_sku_id FROM `pms_product_sku` p LEFT JOIN product_three_store_relevance t ON p.id = t.sku_id "
+            + "${ew.customSqlSegment}" + "ORDER BY p.created_at DESC")
+    List<StoreSkuResponse> searchSkuList(@Param(Constants.WRAPPER) QueryWrapper<StoreSkuResponse> queryWrapper);
 }
