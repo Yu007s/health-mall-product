@@ -40,9 +40,6 @@ public class BannerController {
     @Resource
     BannerService bannerService;
 
-    @Resource
-    ProductBasicsInfoService productBasicsInfoService;
-
     @ApiOperation("获取轮播图")
     @GetMapping("/get")
     @ApiImplicitParams({
@@ -53,28 +50,5 @@ public class BannerController {
         return ResultVO.success(bannerService.get(location,pageSize));
     }
 
-    @ApiOperation("添加轮播图")
-    @PostMapping("/addOrUpdate")
-    public ResultVO addOrUpdate(@RequestBody @Validated BannerRequest request){
-        if (request.getLinkType() ==  1 && StringUtils.isEmpty(request.getLinkAddress())){
-           return ResultVO.failed("跳转链接不得为空");
-        }
-        if (request.getLinkType() ==  2 && StringUtils.isEmpty(request.getProductSpuSn())){
-            return ResultVO.failed("SPU 编码不得为空");
-        }
-        if (request.getEndTime().compareTo(request.getStartTime()) == -1){
-            return ResultVO.failed("开始时间不得大于结束时间");
-        }
-        if (request.getLinkType()== 2 && StringUtils.isNotBlank(request.getProductSpuSn()) && productBasicsInfoService.getCountBySPUCode(request.getProductSpuSn()) <1  ){
-            return ResultVO.failed("SPU不存在，或已下架");
-        }
-        return bannerService.addOrUpdate(request) ? ResultVO.success() : ResultVO.failed("");
-    }
-
-    @ApiOperation("查询轮播图列表")
-    @GetMapping("/queryList")
-    public ResultVO<PageVO<BannerListResponse>> queryList(@Validated BannerListRequest request){
-       return ResultVO.success(bannerService.queryList(request));
-    }
 }
 
