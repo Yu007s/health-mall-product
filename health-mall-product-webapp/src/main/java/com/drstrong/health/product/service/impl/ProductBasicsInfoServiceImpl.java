@@ -416,8 +416,8 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		Map<Long,BigDecimal> spuLowPriceMap = getSpuLowPriceMap(spuSkuMap);
 		records.forEach(r -> {
 			ProductRecommendVO recommendVO = new ProductRecommendVO();
-			recommendVO.setProductId(r.getId());
-			recommendVO.setTitle(r.getTitle());
+			recommendVO.setSpuCode(r.getSpuCode());
+			recommendVO.setProductName(r.getTitle());
 			recommendVO.setMasterImageUrl(r.getMasterImageUrl());
 			recommendVO.setDescription(proDesMap.get(r.getId()));
 			recommendVO.setLowPrice(spuLowPriceMap.getOrDefault(r.getId(),BigDecimal.ZERO));
