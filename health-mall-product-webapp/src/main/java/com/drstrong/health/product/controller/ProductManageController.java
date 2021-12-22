@@ -9,14 +9,14 @@ import com.drstrong.health.product.service.CategoryAttributeService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductSkuRevenueService;
 import com.drstrong.health.product.service.ProductSkuService;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -82,8 +82,9 @@ public class ProductManageController implements ProductManageFacade {
 	}
 
 	@Override
-	public void exportSkuStock(QuerySkuStockRequest querySkuStockRequest, HttpServletRequest request, HttpServletResponse response) {
-		productSkuService.exportSkuStock(querySkuStockRequest,request,response);
+	public ResultVO<List<ProductSkuStockVO>> searchSkuStock(QuerySkuStockRequest querySkuStockRequest) {
+		List<ProductSkuStockVO> productSkuStockVOS = productSkuService.searchSkuStock(querySkuStockRequest);
+		return ResultVO.success(productSkuStockVOS);
 	}
 
 	@Override

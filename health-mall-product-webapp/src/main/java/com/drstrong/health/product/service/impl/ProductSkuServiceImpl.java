@@ -10,7 +10,6 @@ import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuRevenueEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
-import com.drstrong.health.product.model.enums.ExcelMappingEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.request.product.QuerySkuStockRequest;
@@ -33,9 +32,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.easy.excel.ExcelContext;
-import org.easy.excel.util.ExcelDownLoadUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,9 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -240,21 +234,21 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
             return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
 		}
 		List<ProductSkuStockVO> productSkuStockVOS = Lists.newArrayListWithCapacity(records.size());
-		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(records.stream().map(ProductSkuEntity::getId).collect(Collectors.toList())).getData().getSkuStockNumList();
-		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
+//		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(records.stream().map(ProductSkuEntity::getId).collect(Collectors.toList())).getData().getSkuStockNumList();
+//		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
 		records.forEach(r -> {
 			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
 			BeanUtils.copyProperties(r,productSkuStockVO);
 			productSkuStockVO.setSkuId(r.getId());
 			productSkuStockVO.setStoreName(r.getSourceName());
-			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
+//			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
 			productSkuStockVOS.add(productSkuStockVO);
 		});
         return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount((int) productSkuEntityPage.getTotal()).result(productSkuStockVOS).build();
 	}
 
 	/**
-	 * 根据条件分页导出 sku库存 信息
+	 * 根据条件不分页查询 sku库存 信息
 	 *
 	 * @param querySkuStockRequest 查询参数
 	 * @return sku 库存信息
@@ -262,25 +256,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	 * @date 2021/12/17 14:04
 	 */
 	@Override
-	public void exportSkuStock(QuerySkuStockRequest querySkuStockRequest, HttpServletRequest request, HttpServletResponse response) {
-		List<ProductSkuStockVO> productSkuStockVOS = this.querySkuStockByParam(querySkuStockRequest);
-		Workbook excel = excelContext.createExcel(ExcelMappingEnum.SKU_STOCK_EXPORT.getMappingId(), productSkuStockVOS);
-		try {
-			ExcelDownLoadUtil.downLoadExcel(excel,ExcelMappingEnum.SKU_STOCK_EXPORT.getExcelName(),ExcelMappingEnum.SKU_STOCK_EXPORT.getEmptyMessage(),request,response);
-		} catch (IOException e) {
-			throw new BusinessException(ErrorEnums.EXCEL_EXPORT_ERROR);
-		}
-	}
-
-	/**
-	 * 根据条件查询 并导出sku库存 信息
-	 *
-	 * @param querySkuStockRequest 查询参数
-	 * @return sku 库存信息
-	 * @author lsx
-	 * @date 2021/12/17 14:04
-	 */
-	private List<ProductSkuStockVO> querySkuStockByParam(QuerySkuStockRequest querySkuStockRequest) {
+	public List<ProductSkuStockVO> searchSkuStock(QuerySkuStockRequest querySkuStockRequest) {
 		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = buildQuerySkuStockParam(querySkuStockRequest);
 		List<ProductSkuEntity> productSkuEntities = productSkuMapper.selectList(queryWrapper);
 		if (CollectionUtils.isEmpty(productSkuEntities)) {
@@ -409,14 +385,19 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			throw new BusinessException(ErrorEnums.PRODUCT_NOT_EXIST);
 		}
 		// 3.调用库存
-		// TODO 调用库存
-
+		List<Long> skuIdList = productSkuEntityList.stream().map(ProductSkuEntity::getId).collect(Collectors.toList());
+		List<SkuStockNumVO> skuStockNum = pharmacyGoodsRemoteApi.getSkuStockNum(skuIdList).getData().getSkuStockNumList();
+		Map<Long, Integer> skuIdStockNumMap = Maps.newHashMapWithExpectedSize(skuIdList.size());
+		if (!CollectionUtils.isEmpty(skuStockNum)) {
+			skuIdStockNumMap = skuStockNum.stream().collect(Collectors.toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum, (v1, v2) -> v1));
+		}
 		// 4.组装返回值
 		List<SkuBaseInfoVO> skuBaseInfoVOList = Lists.newArrayListWithCapacity(productSkuEntityList.size());
 		for (ProductSkuEntity productSkuEntity : productSkuEntityList) {
 			SkuBaseInfoVO infoVO = new SkuBaseInfoVO();
 			BeanUtils.copyProperties(productSkuEntity, infoVO);
 			infoVO.setPrice(BigDecimalUtil.F2Y(productSkuEntity.getSkuPrice().longValue()));
+			infoVO.setInventoryNum(skuIdStockNumMap.getOrDefault(productSkuEntity.getId(), 0).longValue());
 			skuBaseInfoVOList.add(infoVO);
 		}
 		return skuBaseInfoVOList;

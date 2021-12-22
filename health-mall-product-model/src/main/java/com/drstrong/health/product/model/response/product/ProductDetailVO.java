@@ -31,4 +31,7 @@ public class ProductDetailVO extends SpuBaseInfoVO implements Serializable {
 
 	@ApiModelProperty("规格值")
 	private String packValue;
+
+	@ApiModelProperty("购物车中是否有未付款商品")
+	private Boolean hasUnpaidFlag;
 }

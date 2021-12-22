@@ -10,7 +10,6 @@ import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.entity.store.StoreThreeRelevanceEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
-import com.drstrong.health.product.model.enums.ExcelMappingEnum;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.request.store.RelevanceThreeRequest;
 import com.drstrong.health.product.model.request.store.StoreSkuRequest;
@@ -24,9 +23,7 @@ import com.drstrong.health.product.service.StoreService;
 import com.drstrong.health.product.service.StoreThreeRelevanceService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.easy.excel.ExcelContext;
-import org.easy.excel.util.ExcelDownLoadUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,9 +32,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -130,15 +124,27 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
     }
 
     @Override
-    public void exportStoreSku(StoreSkuRequest storeSkuRequest, HttpServletRequest request, HttpServletResponse response) {
-        PageVO<StoreSkuResponse> pageVO = this.pageSkuList(storeSkuRequest);
-        List<StoreSkuResponse> storeSkuResponses = pageVO.getResult();
-        Workbook excel = excelContext.createExcel(ExcelMappingEnum.STORE_SKU_EXPORT.getMappingId(), storeSkuResponses);
-        try {
-            ExcelDownLoadUtil.downLoadExcel(excel,ExcelMappingEnum.STORE_SKU_EXPORT.getExcelName(),ExcelMappingEnum.STORE_SKU_EXPORT.getEmptyMessage(),request,response);
-        } catch (IOException e) {
-            throw new BusinessException(ErrorEnums.EXCEL_EXPORT_ERROR);
+    public List<StoreSkuResponse> searchSkuList(StoreSkuRequest storeSkuRequest) {
+        Long storeId = storeSkuRequest.getStoreId();
+        if(Objects.isNull(storeId)){
+            throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
         }
+        QueryWrapper<StoreSkuResponse> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("p.del_flag", DelFlagEnum.UN_DELETED.getCode());
+        queryWrapper.eq("p.source_id", storeId);
+        if(StringUtils.hasLength(storeSkuRequest.getSkuCode())){
+            queryWrapper.eq("p.sku_code",storeSkuRequest.getSkuCode());
+        }
+        if(StringUtils.hasLength(storeSkuRequest.getSkuName())){
+            queryWrapper.like(" p.sku_name",storeSkuRequest.getSkuName());
+        }
+        if(Objects.nonNull(storeSkuRequest.getSkuState())){
+            queryWrapper.eq("p.state",storeSkuRequest.getSkuState());
+        }
+        if(Objects.nonNull(storeSkuRequest.getThreeSkuId())){
+            queryWrapper.eq("t.three_sku_id",storeSkuRequest.getThreeSkuId());
+        }
+        return storeThreeRelevanceMapper.searchSkuList(queryWrapper);
     }
 
     /**

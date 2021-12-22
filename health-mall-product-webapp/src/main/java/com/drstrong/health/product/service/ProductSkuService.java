@@ -9,8 +9,6 @@ import com.drstrong.health.product.model.response.product.ProductSkuStockVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
 import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
@@ -149,5 +147,5 @@ public interface ProductSkuService {
 
 	PageVO<ProductSkuStockVO> pageQuerySkuStockByParam(QuerySkuStockRequest querySkuStockRequest);
 
-	void exportSkuStock(QuerySkuStockRequest querySkuStockRequest, HttpServletRequest request, HttpServletResponse response);
+	List<ProductSkuStockVO> searchSkuStock(QuerySkuStockRequest querySkuStockRequest);
 }

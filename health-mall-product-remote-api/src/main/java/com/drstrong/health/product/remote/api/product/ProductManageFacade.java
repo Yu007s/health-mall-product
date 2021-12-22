@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -59,9 +57,9 @@ public interface ProductManageFacade {
 	@PostMapping("/pageSkuStock")
 	ResultVO<PageVO<ProductSkuStockVO>> pageSkuStock(@RequestBody QuerySkuStockRequest querySkuStockRequest);
 
-	@ApiOperation("导出 sku库存 信息")
-	@PostMapping("/skuStock/export")
-	void exportSkuStock(@RequestBody QuerySkuStockRequest querySkuStockRequest, @RequestParam("request") HttpServletRequest request, @RequestParam("response") HttpServletResponse response);
+	@ApiOperation("不分页查询 sku库存 信息")
+	@PostMapping("/searchSkuStock")
+	ResultVO<List<ProductSkuStockVO>> searchSkuStock(@RequestBody QuerySkuStockRequest querySkuStockRequest);
 
 	@ApiOperation("保存税收编码")
 	@PostMapping("/revenue/add")
