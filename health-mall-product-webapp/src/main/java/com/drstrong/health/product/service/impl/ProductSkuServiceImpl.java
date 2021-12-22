@@ -240,14 +240,14 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
             return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
 		}
 		List<ProductSkuStockVO> productSkuStockVOS = Lists.newArrayListWithCapacity(records.size());
-		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(records.stream().map(ProductSkuEntity::getId).collect(Collectors.toList())).getData().getSkuStockNumList();
-		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
+//		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(records.stream().map(ProductSkuEntity::getId).collect(Collectors.toList())).getData().getSkuStockNumList();
+//		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
 		records.forEach(r -> {
 			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
 			BeanUtils.copyProperties(r,productSkuStockVO);
 			productSkuStockVO.setSkuId(r.getId());
 			productSkuStockVO.setStoreName(r.getSourceName());
-			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
+//			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
 			productSkuStockVOS.add(productSkuStockVO);
 		});
         return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount((int) productSkuEntityPage.getTotal()).result(productSkuStockVOS).build();
@@ -409,14 +409,19 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			throw new BusinessException(ErrorEnums.PRODUCT_NOT_EXIST);
 		}
 		// 3.调用库存
-		// TODO 调用库存
-
+		List<Long> skuIdList = productSkuEntityList.stream().map(ProductSkuEntity::getId).collect(Collectors.toList());
+		List<SkuStockNumVO> skuStockNum = pharmacyGoodsRemoteApi.getSkuStockNum(skuIdList).getData().getSkuStockNumList();
+		Map<Long, Integer> skuIdStockNumMap = Maps.newHashMapWithExpectedSize(skuIdList.size());
+		if (!CollectionUtils.isEmpty(skuStockNum)) {
+			skuIdStockNumMap = skuStockNum.stream().collect(Collectors.toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum, (v1, v2) -> v1));
+		}
 		// 4.组装返回值
 		List<SkuBaseInfoVO> skuBaseInfoVOList = Lists.newArrayListWithCapacity(productSkuEntityList.size());
 		for (ProductSkuEntity productSkuEntity : productSkuEntityList) {
 			SkuBaseInfoVO infoVO = new SkuBaseInfoVO();
 			BeanUtils.copyProperties(productSkuEntity, infoVO);
 			infoVO.setPrice(BigDecimalUtil.F2Y(productSkuEntity.getSkuPrice().longValue()));
+			infoVO.setInventoryNum(skuIdStockNumMap.getOrDefault(productSkuEntity.getId(), 0).longValue());
 			skuBaseInfoVOList.add(infoVO);
 		}
 		return skuBaseInfoVOList;
