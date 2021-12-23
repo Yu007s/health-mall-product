@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.drstrong.health.product.model.constans.banner.CommonConstants;
 import com.drstrong.health.product.model.dto.CommAttributeDTO;
 import com.drstrong.health.product.model.response.cms.DictVO;
-import com.drstrong.health.product.remote.api.product.ICMSFeignClient;
 import com.drstrong.health.product.remote.model.DictResponse;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
