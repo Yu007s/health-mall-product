@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.ProductSkuMapper;
+import com.drstrong.health.product.model.dto.CommAttributeDTO;
 import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuRevenueEntity;
@@ -19,6 +20,7 @@ import com.drstrong.health.product.model.response.product.ProductSkuStockVO;
 import com.drstrong.health.product.model.response.product.ProductSkuVO;
 import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.remote.cms.CmsRemoteProService;
 import com.drstrong.health.product.service.IRedisService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductSkuRevenueService;
@@ -32,9 +34,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.easy.excel.ExcelContext;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -70,8 +70,9 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	@Resource
 	PharmacyGoodsRemoteApi pharmacyGoodsRemoteApi;
 
-	@Autowired
-	private ExcelContext excelContext;
+	@Resource
+	CmsRemoteProService cmsRemoteProService;
+
 	/**
 	 * 批量保存 sku 信息
 	 *
@@ -235,6 +236,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		}
 		List<ProductSkuStockVO> productSkuStockVOS = Lists.newArrayListWithCapacity(records.size());
 		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(records.stream().map(ProductSkuEntity::getId).collect(Collectors.toList())).getData().getSkuStockNumList();
+		Map<Integer, CommAttributeDTO> commAttributeMap = cmsRemoteProService.getCommAttributeByIdListToMap();
 		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
 		records.forEach(r -> {
 			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
@@ -242,6 +244,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			productSkuStockVO.setSkuId(r.getId());
 			productSkuStockVO.setStoreName(r.getSourceName());
 			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
+			productSkuStockVO.setCommAttributeName(commAttributeMap.get(r.getCommAttribute()).getCommAttributeName());
 			productSkuStockVOS.add(productSkuStockVO);
 		});
         return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount((int) productSkuEntityPage.getTotal()).result(productSkuStockVOS).build();
@@ -264,6 +267,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		}
 		List<ProductSkuStockVO> productSkuStockVOS = Lists.newArrayListWithCapacity(productSkuEntities.size());
 		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(productSkuEntities.stream().map(ProductSkuEntity::getId).collect(Collectors.toList())).getData().getSkuStockNumList();
+		Map<Integer, CommAttributeDTO> commAttributeMap = cmsRemoteProService.getCommAttributeByIdListToMap();
 		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
 		productSkuEntities.forEach(r -> {
 			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
@@ -271,6 +275,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			productSkuStockVO.setSkuId(r.getId());
 			productSkuStockVO.setStoreName(r.getSourceName());
 			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
+			productSkuStockVO.setCommAttributeName(commAttributeMap.get(r.getCommAttribute()).getCommAttributeName());
 			productSkuStockVOS.add(productSkuStockVO);
 		});
 		return productSkuStockVOS;

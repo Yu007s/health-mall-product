@@ -35,6 +35,9 @@ public class ProductSkuStockVO implements Serializable {
 	@ApiModelProperty("商品属性")
 	private Integer commAttribute;
 
+	@ApiModelProperty("商品属性名称")
+	private String commAttributeName;
+
 	@ApiModelProperty("实物库存")
 	private Integer stockNum;
 }
