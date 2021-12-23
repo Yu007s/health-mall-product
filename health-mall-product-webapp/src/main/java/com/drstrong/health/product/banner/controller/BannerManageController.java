@@ -53,7 +53,7 @@ public class BannerManageController implements BannerManageFacade {
     }
 
     @Override
-    public ResultVO<PageVO<BannerListResponse>> queryList(@Validated BannerListRequest request){
+    public ResultVO<PageVO<BannerListResponse>> queryList(@RequestBody @Validated BannerListRequest request){
         return ResultVO.success(bannerService.queryList(request));
     }
 
