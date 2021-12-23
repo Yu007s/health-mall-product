@@ -1,6 +1,7 @@
-package com.drstrong.health.product.remote.cms;
+package com.drstrong.health.product.remote.api.product;
 
 import com.drstrong.health.product.model.response.cms.DictVO;
+import com.drstrong.health.product.remote.model.DictResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,9 +14,9 @@ import java.util.List;
  * @author liuqiuyi
  * @date 2021/12/22 16:55
  */
-@FeignClient(name = "cms", url = "sys/dict")
+@FeignClient(value = "cms", path = "/sys/dict")
 public interface ICMSFeignClient {
 
-	@GetMapping("/vue/list/{type}")
-	ResponseEntity<List<DictVO>> vueList(@PathVariable("type") String type);
+	@GetMapping("/vue/query/{type}")
+	DictResponse<List<DictVO>> vueQuery(@PathVariable("type") String type);
 }
