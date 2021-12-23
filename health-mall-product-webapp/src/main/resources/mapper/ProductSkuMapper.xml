@@ -77,5 +77,12 @@
             )
         </foreach>
     </insert>
+    <select id="searchSkuNameByName" resultType="java.lang.String">
+       select sku_name
+        FROM pms_product_sku
+        where del_flag = 0 AND state = 1
+        AND sku_name like "%"#{content}"%"
+        limit #{count}
+    </select>
 
 </mapper>

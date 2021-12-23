@@ -219,6 +219,20 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	}
 
 	/**
+	 * 根据条件查询 sku 信息
+	 *
+	 * @param querySkuRequest 查询条件
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2021/12/23 21:17
+	 */
+	@Override
+	public List<ProductSkuEntity> querySkuByParam(QuerySkuRequest querySkuRequest) {
+		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = buildQuerySkuParam(querySkuRequest);
+		return productSkuMapper.selectList(queryWrapper);
+	}
+
+	/**
 	 * 根据条件分页查询 sku库存 信息
 	 *
 	 * @param querySkuStockRequest 查询参数
@@ -282,6 +296,20 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			productSkuStockVOS.add(productSkuStockVO);
 		});
 		return productSkuStockVOS;
+	}
+
+	/**
+	 * 模糊搜索 sku 名称
+	 *
+	 * @param content 内容
+	 * @param count   查询条数
+	 * @return sku 名称集合
+	 * @author liuqiuyi
+	 * @date 2021/12/23 21:04
+	 */
+	@Override
+	public List<String> searchSkuNameByName(String content, Integer count) {
+		return productSkuMapper.searchSkuNameByName(content, count);
 	}
 
 	/**
@@ -456,6 +484,9 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		}
 		if (Objects.nonNull(querySkuRequest.getPriceEnd())) {
 			queryWrapper.le(ProductSkuEntity::getSkuPrice, querySkuRequest.getPriceEnd());
+		}
+		if (Objects.nonNull(querySkuRequest.getUpOffEnum())) {
+			queryWrapper.eq(ProductSkuEntity::getState, querySkuRequest.getUpOffEnum().getCode());
 		}
 		return queryWrapper;
 	}

@@ -3,6 +3,7 @@ package com.drstrong.health.product.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -24,4 +25,12 @@ public interface ProductSkuMapper extends BaseMapper<ProductSkuEntity> {
 	 * @date 2021/12/13 17:09
 	 */
 	int batchInsert(List<ProductSkuEntity> skuEntityList);
+
+	/**
+	 * 模糊查询 skuName
+	 *
+	 * @author liuqiuyi
+	 * @date 2021/12/23 21:09
+	 */
+	List<String> searchSkuNameByName(@Param("content") String content, @Param("count") Integer count);
 }

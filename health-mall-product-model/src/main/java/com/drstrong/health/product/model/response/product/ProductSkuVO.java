@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.response.product;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -56,9 +57,11 @@ public class ProductSkuVO implements Serializable {
 	private BigDecimal price;
 
 	@ApiModelProperty("创建时间")
+	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime createTime;
 
 	@ApiModelProperty("更新时间")
+	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime updateTime;
 
 	@ApiModelProperty("店铺 id")

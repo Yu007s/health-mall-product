@@ -21,4 +21,25 @@ public interface ProductRemoteService {
 	 * @date 2021/12/22 15:03
 	 */
 	List<ProductSkuInfoDTO> getSkuInfoBySkuIds(Set<Long> skuIds);
+
+	/**
+	 * 分页查询搜索的内容,只返回商品名称
+	 *
+	 * @param content 搜索条件
+	 * @param count   返回的个数
+	 * @return 搜索结果
+	 * @author liuqiuyi
+	 * @date 2021/12/17 15:49
+	 */
+	List<String> searchSkuNameByName(String content, Integer count);
+
+	/**
+	 * 根据名称模糊查询 sku 信息
+	 *
+	 * @param content 商品 sku 名称
+	 * @return sku 集合
+	 * @author liuqiuyi
+	 * @date 2021/12/23 21:12
+	 */
+	List<ProductSkuInfoDTO> searchSkuDetail(String content);
 }

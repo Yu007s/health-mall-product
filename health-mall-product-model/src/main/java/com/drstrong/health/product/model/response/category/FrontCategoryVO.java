@@ -1,6 +1,7 @@
 package com.drstrong.health.product.model.response.category;
 
 import com.drstrong.health.product.model.BaseTree;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -44,6 +45,7 @@ public class FrontCategoryVO extends BaseTree implements Serializable {
 	private Integer categoryStatus;
 
 	@ApiModelProperty("创建时间")
+	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime createTime;
 
 	@ApiModelProperty(value = "关联的后台分类 id 集合")

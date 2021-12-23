@@ -73,7 +73,7 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	 */
 	@Override
 	public List<String> searchSkuNameByName(String content, Integer count) {
-		return null;
+		return productRemoteService.searchSkuNameByName(content, count);
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	 */
 	@Override
 	public List<ProductSkuInfoDTO> searchSkuDetail(@RequestParam("content") String content) {
-		return null;
+		return productRemoteService.searchSkuDetail(content);
 	}
 
 }

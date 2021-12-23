@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.request.product;
 
+import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.PageRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -44,4 +45,7 @@ public class QuerySkuRequest extends PageRequest implements Serializable {
 
 	@ApiModelProperty("价格结束值")
 	private Long priceEnd;
+
+	@ApiModelProperty(value = "上下架状态", hidden = true)
+	private UpOffEnum upOffEnum;
 }

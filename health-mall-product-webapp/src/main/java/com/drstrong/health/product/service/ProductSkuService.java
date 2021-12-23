@@ -91,6 +91,16 @@ public interface ProductSkuService {
 	PageVO<ProductSkuVO> pageQuerySkuByParam(QuerySkuRequest querySkuRequest);
 
 	/**
+	 * 根据条件查询 sku 信息
+	 *
+	 * @param querySkuRequest 查询条件
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2021/12/23 21:17
+	 */
+	List<ProductSkuEntity> querySkuByParam(QuerySkuRequest querySkuRequest);
+
+	/**
 	 * 根据 skuId 或者 skuCode 查询 sku 信息
 	 *
 	 * @param skuCode   sku 编码
@@ -148,4 +158,15 @@ public interface ProductSkuService {
 	PageVO<ProductSkuStockVO> pageQuerySkuStockByParam(QuerySkuStockRequest querySkuStockRequest);
 
 	List<ProductSkuStockVO> searchSkuStock(QuerySkuStockRequest querySkuStockRequest);
+
+	/**
+	 * 模糊搜索 sku 名称
+	 *
+	 * @param content 内容
+	 * @param count   查询条数
+	 * @return sku 名称集合
+	 * @author liuqiuyi
+	 * @date 2021/12/23 21:04
+	 */
+	List<String> searchSkuNameByName(String content, Integer count);
 }
