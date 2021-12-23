@@ -18,6 +18,7 @@ import com.drstrong.health.product.model.request.store.UpdateThreeRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.store.StoreSkuResponse;
+import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.service.StoreService;
 import com.drstrong.health.product.service.StoreThreeRelevanceService;
@@ -33,9 +34,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -53,6 +52,8 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
     private StoreThreeRelevanceMapper storeThreeRelevanceMapper;
     @Resource
     private ProductSkuService productSkuService;
+    @Resource
+    private ProductBasicsInfoService productBasicsInfoService;
     @Resource
     private StoreService storeService;
     @Autowired
@@ -121,7 +122,30 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
             checkSetPostage(skuIdList);
         }
         productSkuService.updateState(skuIdList,state,userId);
+        checkAndUpdateSpu(skuIdList,state,userId);
         //TODO 发送mq消息通知库存
+    }
+
+    private void checkAndUpdateSpu(List<Long> skuIdList, Integer state, String userId) {
+        List<ProductSkuEntity> allSpu = productSkuService.queryBySkuIdOrCode(skuIdList.stream().collect(Collectors.toSet()), Collections.EMPTY_SET, null);
+        Set<Long> spuIds = allSpu.stream().map(ProductSkuEntity::getProductId).collect(Collectors.toSet());
+        List<ProductSkuEntity> allSku = productSkuService.queryByProductIdList(spuIds);
+        Map<Long, List<ProductSkuEntity>> spuMap = allSku.stream().collect(Collectors.groupingBy(ProductSkuEntity::getProductId));
+        if(state.equals(ProductStateEnum.HAS_PUT.getCode())){
+           //上架，更新这些spu为上架状态
+            productBasicsInfoService.updateState(spuMap.keySet(),state,userId);
+        }
+        if(state.equals(ProductStateEnum.UN_PUT.getCode())){
+           //下架，更新商品全被下架的spu为下架状态
+           Set<Long> downSpuIds = new HashSet<>();
+           spuMap.forEach((k,v) -> {
+               List<ProductSkuEntity> collect = v.stream().filter(p -> p.getState().equals(ProductStateEnum.HAS_PUT.getCode())).collect(Collectors.toList());
+               if(CollectionUtils.isEmpty(collect)){
+                  downSpuIds.add(k);
+               }
+           });
+           productBasicsInfoService.updateState(downSpuIds,state,userId);
+        }
     }
 
     @Override

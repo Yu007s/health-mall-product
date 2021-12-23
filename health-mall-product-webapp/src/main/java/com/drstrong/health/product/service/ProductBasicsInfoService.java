@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
-import com.drstrong.health.product.model.enums.SourceEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.PageRequest;
 import com.drstrong.health.product.model.request.product.ProductSearchRequest;
@@ -15,6 +14,7 @@ import com.drstrong.health.product.model.response.product.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 商品信息 service
@@ -169,4 +169,12 @@ public interface ProductBasicsInfoService {
 	 * @return
 	 */
 	PageVO<ProductRecommendVO> pageSearchRecommend(PageRequest pageRequest);
+
+	/**
+	 * 批量更改spu上下架状态
+	 * @param spuIdList
+	 * @param state
+	 * @param userId
+	 */
+	void updateState(Set<Long> spuIdList, Integer state, String userId);
 }

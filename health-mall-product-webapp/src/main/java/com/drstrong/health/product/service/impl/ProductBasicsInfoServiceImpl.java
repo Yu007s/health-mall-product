@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.ProductBasicsInfoMapper;
@@ -413,6 +414,19 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			recommendVOS.add(recommendVO);
 		});
 		return PageVO.newBuilder().pageNo(pageRequest.getPageNo()).pageSize(pageRequest.getPageSize()).totalCount((int) resultPage.getTotal()).result(recommendVOS).build();
+	}
+
+	@Override
+	public void updateState(Set<Long> spuIdList, Integer state, String userId) {
+		ProductBasicsInfoEntity productBasicsInfoEntity = new ProductBasicsInfoEntity();
+		productBasicsInfoEntity.setState(state);
+		productBasicsInfoEntity.setChangedAt(LocalDateTime.now());
+		productBasicsInfoEntity.setChangedBy(userId);
+		LambdaUpdateWrapper<ProductBasicsInfoEntity> updateWrapper = new LambdaUpdateWrapper<>();
+		updateWrapper.eq(ProductBasicsInfoEntity::getDelFlag,DelFlagEnum.UN_DELETED)
+				.eq(ProductBasicsInfoEntity::getState,(ProductStateEnum.HAS_PUT.getCode()).equals(state) ? ProductStateEnum.UN_PUT.getCode() : ProductStateEnum.HAS_PUT.getCode())
+				.in(ProductBasicsInfoEntity::getId,spuIdList);
+		productBasicsInfoMapper.update(productBasicsInfoEntity,updateWrapper);
 	}
 
 	private Map<Long, BigDecimal> getSpuLowPriceMap(Map<Long, List<ProductSkuEntity>> spuSkuMap) {
