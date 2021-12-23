@@ -239,12 +239,13 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		Map<Integer, CommAttributeDTO> commAttributeMap = cmsRemoteProService.getCommAttributeByIdListToMap();
 		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
 		records.forEach(r -> {
+			CommAttributeDTO commAttributeDTO = commAttributeMap.get(r.getCommAttribute());
 			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
 			BeanUtils.copyProperties(r,productSkuStockVO);
 			productSkuStockVO.setSkuId(r.getId());
 			productSkuStockVO.setStoreName(r.getSourceName());
 			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
-			productSkuStockVO.setCommAttributeName(commAttributeMap.get(r.getCommAttribute()).getCommAttributeName());
+			productSkuStockVO.setCommAttributeName(commAttributeDTO == null ? "--" : commAttributeDTO.getCommAttributeName());
 			productSkuStockVOS.add(productSkuStockVO);
 		});
         return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount((int) productSkuEntityPage.getTotal()).result(productSkuStockVOS).build();
@@ -270,12 +271,13 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		Map<Integer, CommAttributeDTO> commAttributeMap = cmsRemoteProService.getCommAttributeByIdListToMap();
 		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
 		productSkuEntities.forEach(r -> {
+			CommAttributeDTO commAttributeDTO = commAttributeMap.get(r.getCommAttribute());
 			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
 			BeanUtils.copyProperties(r,productSkuStockVO);
 			productSkuStockVO.setSkuId(r.getId());
 			productSkuStockVO.setStoreName(r.getSourceName());
 			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
-			productSkuStockVO.setCommAttributeName(commAttributeMap.get(r.getCommAttribute()).getCommAttributeName());
+			productSkuStockVO.setCommAttributeName(commAttributeDTO == null ? "--" : commAttributeDTO.getCommAttributeName());
 			productSkuStockVOS.add(productSkuStockVO);
 		});
 		return productSkuStockVOS;

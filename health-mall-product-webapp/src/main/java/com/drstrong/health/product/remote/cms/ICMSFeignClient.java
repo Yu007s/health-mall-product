@@ -1,4 +1,4 @@
-package com.drstrong.health.product.remote.api.product;
+package com.drstrong.health.product.remote.cms;
 
 import com.drstrong.health.product.model.response.cms.DictVO;
 import com.drstrong.health.product.remote.model.DictResponse;
