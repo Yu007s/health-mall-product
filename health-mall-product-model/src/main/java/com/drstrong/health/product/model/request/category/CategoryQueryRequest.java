@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * 分类查询的 request
@@ -25,4 +26,7 @@ public class CategoryQueryRequest implements Serializable {
 
 	@ApiModelProperty("分类级别")
 	private Integer level;
+
+	@ApiModelProperty(value = "分类id 集合", hidden = true)
+	private Set<Long> categoryIdList;
 }

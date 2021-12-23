@@ -37,11 +37,13 @@
                 del_flag
     </sql>
 
-
-    <delete id="delete">
-        UPDATE pms_product_front_category set del_flag = 1
-        WHERE id = #{id}
-    </delete>
+    <update id="deleteByIdList">
+        update pms_product_front_category set del_flag = 1, changed_at = now(),changed_by = #{userId} where
+        id in
+        <foreach collection="categoryIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
 
     <select id="queryByParam" resultMap="BaseResultMap"
             parameterType="com.drstrong.health.product.model.request.category.CategoryQueryRequest">

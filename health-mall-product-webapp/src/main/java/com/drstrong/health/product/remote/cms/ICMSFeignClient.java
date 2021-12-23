@@ -16,6 +16,6 @@ import java.util.List;
 @FeignClient(name = "cms", url = "sys/dict")
 public interface ICMSFeignClient {
 
-	@GetMapping("sys/dict/vue/list/{type}")
+	@GetMapping("/vue/list/{type}")
 	ResponseEntity<List<DictVO>> vueList(@PathVariable("type") String type);
 }

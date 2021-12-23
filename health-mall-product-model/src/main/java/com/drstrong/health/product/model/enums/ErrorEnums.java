@@ -32,19 +32,20 @@ public enum ErrorEnums implements IBaseResult {
 	 *
 	 */
 	QUERY_SIZE_TOO_BIG("100001", "查询参数过大"),
-	PARAM_IS_NOT_NULL("11000","参数不能为空"),
-	CATEGORY_NOT_EXIST("11100","分类不存在"),
-	SAVE_UPDATE_NOT_EXIST("11101","更新或者保存的数据不存在"),
-	PRODUCT_NOT_EXIST("11102","商品数据不存在或已下架"),
-	CATEGORY_NAME_IS_EXIST("11103","同级分类中,分类名称已经存在"),
-	UPDATE_NOT_ALLOW("11104","已上架的商品不允许修改"),
-	STORE_NAME_LENGTH("17000","店铺名称长度不正确"),
-	STORE_NAME_REPEAT("17100","店铺名称已存在"),
-	STORE_NOT_EXIST("17110","店铺不存在"),
-	STORE_NOT_RELEVANCE("17111","商品需要关联sku"),
-	STORE_NOT_SETPOSTAGE("17211","sku商品未设置邮费，请设置邮费后再上架"),
-	EXCEL_EXPORT_ERROR("21000","文档导出错误"),
-	EXCEL_IMPORT_ERROR("21100","文档导入错误"),
+	PARAM_IS_NOT_NULL("11000", "参数不能为空"),
+	CATEGORY_NOT_EXIST("11100", "分类不存在"),
+	SAVE_UPDATE_NOT_EXIST("11101", "更新或者保存的数据不存在"),
+	PRODUCT_NOT_EXIST("11102", "商品数据不存在或已下架"),
+	CATEGORY_NAME_IS_EXIST("11103", "同级分类中,分类名称已经存在"),
+	UPDATE_NOT_ALLOW("11104", "已上架的商品不允许修改"),
+	CATEGORY_DELETED_ERROR("11105", "分类下存在商品,不允许删除"),
+	STORE_NAME_LENGTH("17000", "店铺名称长度不正确"),
+	STORE_NAME_REPEAT("17100", "店铺名称已存在"),
+	STORE_NOT_EXIST("17110", "店铺不存在"),
+	STORE_NOT_RELEVANCE("17111", "商品需要关联sku"),
+	STORE_NOT_SETPOSTAGE("17211", "sku商品未设置邮费，请设置邮费后再上架"),
+	EXCEL_EXPORT_ERROR("21000", "文档导出错误"),
+	EXCEL_IMPORT_ERROR("21100", "文档导入错误"),
 	;
 
 	private String code;

@@ -8,9 +8,9 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.category.CategoryProductVO;
 import com.drstrong.health.product.model.response.category.FrontCategoryVO;
 import com.drstrong.health.product.model.response.category.HomeCategoryVO;
-import com.drstrong.health.product.model.response.product.ProductSpuVO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,6 +20,8 @@ import java.util.Set;
  * @date 2021/12/7 20:02
  */
 public interface FrontCategoryService {
+	List<FrontCategoryEntity> queryByParam(CategoryQueryRequest categoryQueryRequest);
+
 	/**
 	 * 查询所有的前台分类,并组装树形结构
 	 *
@@ -29,6 +31,8 @@ public interface FrontCategoryService {
 	 * @date 2021/12/7 20:37
 	 */
 	List<FrontCategoryVO> queryByParamToTree(CategoryQueryRequest categoryQueryRequest);
+
+	Map<Long, Integer> getFrontIdProductCountMap(Set<Long> frontIdCategoryIdList);
 
 	/**
 	 * 根据分类 id 集合查询分类信息
@@ -49,6 +53,16 @@ public interface FrontCategoryService {
 	 * @date 2021/12/10 17:41
 	 */
 	FrontCategoryEntity queryById(Long categoryId);
+
+	/**
+	 * 根据分类 id 查询分类信息
+	 *
+	 * @param parentCategoryId 父类 id
+	 * @return 分类信息
+	 * @author liuqiuyi
+	 * @date 2021/12/23 00:10
+	 */
+	List<FrontCategoryEntity> queryByParentId(Long parentCategoryId);
 
 	/**
 	 * 添加前台分类
