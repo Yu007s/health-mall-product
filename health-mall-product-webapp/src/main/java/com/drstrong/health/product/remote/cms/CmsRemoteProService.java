@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.drstrong.health.product.model.constans.banner.CommonConstants;
 import com.drstrong.health.product.model.dto.CommAttributeDTO;
 import com.drstrong.health.product.model.response.cms.DictVO;
+import com.drstrong.health.product.remote.api.product.ICMSFeignClient;
+import com.drstrong.health.product.remote.model.DictResponse;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,7 +42,7 @@ public class CmsRemoteProService {
 		String dictCommAttribute = CommonConstants.DICT_COMM_ATTRIBUTE;
 		try {
 			log.info("invoke CmsRemoteProService.getCommAttributeByIdListToMap param:{}", dictCommAttribute);
-			ResponseEntity<List<DictVO>> listResponseEntity = cmsFeignClient.vueList(dictCommAttribute);
+			DictResponse<List<DictVO>> listResponseEntity = cmsFeignClient.vueQuery(dictCommAttribute);
 			log.info("invoke ICMSFeignClient.vueList result:{}", dictCommAttribute);
 			if (Objects.isNull(listResponseEntity) || !Objects.equals(SUCCESS, listResponseEntity.getMsg())) {
 				log.info("invoke pharmacyGoodsRemoteApi.getSkuStockNum return failed. param:{}", dictCommAttribute);

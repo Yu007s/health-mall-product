@@ -112,6 +112,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateSkuState(UpdateSkuRequest updateSkuRequest, String userId) {
         List<Long> skuIdList = updateSkuRequest.getSkuIdList();
         Integer state = updateSkuRequest.getState();
