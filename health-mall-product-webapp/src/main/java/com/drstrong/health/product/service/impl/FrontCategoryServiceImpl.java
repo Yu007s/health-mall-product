@@ -201,7 +201,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 				continue;
 			}
 			// 如果是二级分类,获取一级分类的商品数量
-			Integer oneLevelProductNum = frontIdProductCountMap.get(categoryEntity.getParentId());
+			Integer oneLevelProductNum = frontIdProductCountMap.getOrDefault(categoryEntity.getParentId(), 0);
 			frontProductEntry.setValue(frontProductEntry.getValue() + oneLevelProductNum);
 		}
 		return frontIdProductCountMap;
