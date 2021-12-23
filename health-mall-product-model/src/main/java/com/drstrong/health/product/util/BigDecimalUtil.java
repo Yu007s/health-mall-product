@@ -12,7 +12,7 @@ public class BigDecimalUtil {
     }
 
     public static BigDecimal F2Y(Long fen) {
-        BigDecimal yuan = BigDecimal.valueOf(fen);
+        BigDecimal yuan = BigDecimal.valueOf(fen).divide(hundred);
         return yuan.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 }
