@@ -22,6 +22,7 @@ import com.drstrong.health.product.model.response.category.CategoryProductVO;
 import com.drstrong.health.product.model.response.category.FrontCategoryVO;
 import com.drstrong.health.product.model.response.category.HomeCategoryVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.remote.pro.PharmacyGoodsRemoteProService;
 import com.drstrong.health.product.service.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -77,6 +78,9 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 
 	@Resource
 	ProductSkuService productSkuService;
+
+	@Resource
+	PharmacyGoodsRemoteProService pharmacyGoodsRemoteProService;
 
 	/**
 	 * 公共的查询方法
@@ -197,7 +201,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 				continue;
 			}
 			// 如果是二级分类,获取一级分类的商品数量
-			Integer oneLevelProductNum = frontIdProductCountMap.get(categoryEntity.getParentId());
+			Integer oneLevelProductNum = frontIdProductCountMap.getOrDefault(categoryEntity.getParentId(), 0);
 			frontProductEntry.setValue(frontProductEntry.getValue() + oneLevelProductNum);
 		}
 		return frontIdProductCountMap;
@@ -438,7 +442,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 	@Override
 	public List<HomeCategoryVO> getHomeCategory(Integer level) {
 		LambdaQueryWrapper<FrontCategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(FrontCategoryEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+		queryWrapper.eq(FrontCategoryEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode()).eq(FrontCategoryEntity::getState, 1);
 		if (Objects.isNull(level)) {
 			queryWrapper.eq(FrontCategoryEntity::getLevel, 1);
 		} else {
@@ -472,7 +476,10 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 			return Lists.newArrayList();
 		}
 		LambdaQueryWrapper<FrontCategoryEntity> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(FrontCategoryEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode()).eq(FrontCategoryEntity::getLevel, 2).eq(FrontCategoryEntity::getParentId, oneLevelId);
+		queryWrapper.eq(FrontCategoryEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+				.eq(FrontCategoryEntity::getLevel, 2)
+				.eq(FrontCategoryEntity::getState, 1)
+				.eq(FrontCategoryEntity::getParentId, oneLevelId);
 		return buildCategoryVOList(queryWrapper);
 	}
 
@@ -525,18 +532,31 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		querySpuRequest.setBackCategoryIdList(backIdList);
 		Page<ProductBasicsInfoEntity> productBasicsInfoEntityPage = productBasicsInfoService.pageQueryProductByParam(querySpuRequest);
 		Map<Long, List<ProductSkuEntity>> productIdSkusMap = productBasicsInfoService.buildSkuMap(productBasicsInfoEntityPage.getRecords());
-		// 6.封装返回值
+		// 6.查询库存信息
+		Set<Long> skuIdList = productIdSkusMap.values().stream().flatMap(Collection::stream).map(ProductSkuEntity::getId).collect(Collectors.toSet());
+		Map<Long, Integer> skuHasStockToMap = pharmacyGoodsRemoteProService.getSkuStockNumToMap(skuIdList);
+		// 7.封装返回值
 		List<CategoryProductVO> productVOList = Lists.newArrayListWithCapacity(productBasicsInfoEntityPage.getRecords().size());
 		for (ProductBasicsInfoEntity record : productBasicsInfoEntityPage.getRecords()) {
 			CategoryProductVO categoryProductVO = new CategoryProductVO();
 			categoryProductVO.setSpuCode(record.getSpuCode());
 			categoryProductVO.setProductName(record.getTitle());
 			categoryProductVO.setMasterImageUrl(record.getMasterImageUrl());
-			Map<String, BigDecimal> priceSectionMap = productSkuService.getPriceSectionMap(productIdSkusMap.get(record.getId()));
+			List<ProductSkuEntity> skuEntityList = productIdSkusMap.get(record.getId());
+			Map<String, BigDecimal> priceSectionMap = productSkuService.getPriceSectionMap(skuEntityList);
 			categoryProductVO.setLowPrice(priceSectionMap.get("lowPrice"));
+			categoryProductVO.setHasInventory(checkProductHasInventory(skuEntityList, skuHasStockToMap));
 			productVOList.add(categoryProductVO);
 		}
 		return PageVO.newBuilder().pageNo(pageCategoryIdRequest.getPageNo()).pageSize(pageCategoryIdRequest.getPageSize()).totalCount((int) productBasicsInfoEntityPage.getTotal()).result(productVOList).build();
+	}
+
+	private Boolean checkProductHasInventory(List<ProductSkuEntity> skuEntityList, Map<Long, Integer> skuHasStockToMap) {
+		int stockNum = 0;
+		for (ProductSkuEntity productSkuEntity : skuEntityList) {
+			stockNum = stockNum + skuHasStockToMap.getOrDefault(productSkuEntity.getId(), 0);
+		}
+		return stockNum > 0;
 	}
 
 	/**

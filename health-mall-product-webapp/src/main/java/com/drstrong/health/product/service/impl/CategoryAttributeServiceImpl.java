@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.drstrong.health.product.dao.CategoryAttributeItemMapper;
@@ -40,31 +41,34 @@ public class CategoryAttributeServiceImpl implements CategoryAttributeService {
 	/**
 	 * 根据 id 集合查询商品关联的属性
 	 *
-	 * @param idList id 集合
+	 * @param attributeIdList 属性 id 集合
 	 * @return 关联的属性集合
 	 * @author liuqiuyi
 	 * @date 2021/12/13 20:57
 	 */
 	@Override
-	public List<CategoryAttributeItemEntity> queryByIdList(Set<Long> idList) {
-		if (CollectionUtils.isEmpty(idList)) {
+	public List<CategoryAttributeItemEntity> queryByAttributeIdList(Set<Long> attributeIdList, Long categoryId) {
+		if (CollectionUtils.isEmpty(attributeIdList) || Objects.isNull(categoryId)) {
+			log.error("invoke CategoryAttributeServiceImpl.queryByAttributeIdList param is null ,param:{},{}", attributeIdList, categoryId);
 			return Lists.newArrayList();
 		}
-		return categoryAttributeItemMapper.selectBatchIds(idList);
+		LambdaQueryWrapper<CategoryAttributeItemEntity> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(CategoryAttributeItemEntity::getCategoryId, categoryId).in(CategoryAttributeItemEntity::getAttributeId, attributeIdList);
+		return categoryAttributeItemMapper.selectList(queryWrapper);
 	}
 
 	/**
 	 * 根据 id 集合查询商品关联的属性,并转成 map结构
 	 *
-	 * @param idList id 集合
+	 * @param attributeIdList 属性 id 集合
 	 * @return 属性的 map 结构 ,key = id,value = 属性值
 	 * @author liuqiuyi
 	 * @date 2021/12/13 21:08
 	 */
 	@Override
-	public Map<Long, CategoryAttributeItemEntity> queryByIdListToMap(Set<Long> idList) {
-		List<CategoryAttributeItemEntity> attributeItemEntityList = queryByIdList(idList);
-		return attributeItemEntityList.stream().collect(toMap(CategoryAttributeItemEntity::getId, dto -> dto, (v1, v2) -> v1));
+	public Map<Long, CategoryAttributeItemEntity> queryByIdListToMap(Set<Long> attributeIdList, Long categoryId) {
+		List<CategoryAttributeItemEntity> attributeItemEntityList = queryByAttributeIdList(attributeIdList, categoryId);
+		return attributeItemEntityList.stream().collect(toMap(CategoryAttributeItemEntity::getAttributeId, dto -> dto, (v1, v2) -> v1));
 	}
 
 	/**

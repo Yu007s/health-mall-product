@@ -135,7 +135,7 @@ public class ProductAttributeServiceImpl extends ServiceImpl<ProductAttributeMap
 		// 3.查询属性信息
 		List<ProductAttributeEntity> attributeEntityList = queryByProductId(basicsInfoEntity.getId());
 		Set<Long> attributeItemIdList = attributeEntityList.stream().map(ProductAttributeEntity::getAttributeItemId).collect(Collectors.toSet());
-		Map<Long, CategoryAttributeItemEntity> idEntityMap = categoryAttributeService.queryByIdListToMap(attributeItemIdList);
+		Map<Long, CategoryAttributeItemEntity> idEntityMap = categoryAttributeService.queryByIdListToMap(attributeItemIdList, basicsInfoEntity.getCategoryId());
 		return buildProductPropertyVO(basicsInfoEntity, extendEntity, attributeEntityList, idEntityMap);
 	}
 
