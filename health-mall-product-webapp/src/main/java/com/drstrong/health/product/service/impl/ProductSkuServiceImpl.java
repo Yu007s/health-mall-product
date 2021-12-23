@@ -210,8 +210,9 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			productSkuVO.setStoreName(record.getSourceName());
 			String masterImageUrl = productIdEntityMap.getOrDefault(productSkuVO.getProductId(), new ProductBasicsInfoEntity()).getMasterImageUrl();
 			productSkuVO.setMasterImageUrl(masterImageUrl);
-			String revenueCode = skuIdRevenueEntityMap.getOrDefault(productSkuVO.getSkuId(), new ProductSkuRevenueEntity()).getRevenueCode();
-			productSkuVO.setRevenueCode(revenueCode);
+			ProductSkuRevenueEntity skuRevenueEntity = skuIdRevenueEntityMap.getOrDefault(productSkuVO.getSkuId(), new ProductSkuRevenueEntity());
+			productSkuVO.setRevenueCode(skuRevenueEntity.getRevenueCode());
+			productSkuVO.setRevenueRate(skuRevenueEntity.getRevenueRate());
 			productSkuVOList.add(productSkuVO);
 		}
 		return PageVO.newBuilder().pageNo(querySkuRequest.getPageNo()).pageSize(querySkuRequest.getPageSize()).totalCount((int) productSkuEntityPage.getTotal()).result(productSkuVOList).build();

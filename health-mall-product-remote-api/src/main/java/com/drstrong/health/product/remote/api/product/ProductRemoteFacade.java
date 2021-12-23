@@ -1,7 +1,5 @@
 package com.drstrong.health.product.remote.api.product;
 
-import com.drstrong.health.product.model.request.product.ProductSearchRequest;
-import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -38,7 +36,7 @@ public interface ProductRemoteFacade {
 	 * 搜索sku的名称,只返回sku名称
 	 *
 	 * @param content 搜索条件
-	 * @param count   返回的个数
+	 * @param count   返回的个数(不传默认返回 10 条数据)
 	 * @return 搜索结果
 	 * @author liuqiuyi
 	 * @date 2021/12/17 15:49
@@ -48,14 +46,15 @@ public interface ProductRemoteFacade {
 	List<String> searchSkuNameByName(@RequestParam("content") String content, @RequestParam("count") Integer count);
 
 	/**
-	 * 分页查询sku搜索结果
+	 * 查询sku搜索结果
+	 * <p> 目前主要是空中药房使用,因两边数据未打通,无法分页查询 </>
 	 *
-	 * @param productSearchRequest 搜索条件
+	 * @param content 搜索内容
 	 * @return 搜索结果
 	 * @author liuqiuyi
 	 * @date 2021/12/18 14:05
 	 */
-	@ApiOperation("分页查询sku搜索结果")
-	@PostMapping("/pageSearchSkuDetail")
-	PageVO<ProductSkuInfoDTO> pageSearchSkuDetail(@RequestBody ProductSearchRequest productSearchRequest);
+	@ApiOperation("查询sku搜索结果")
+	@GetMapping("/searchSkuDetail")
+	List<ProductSkuInfoDTO> searchSkuDetail(@RequestParam("content") String content);
 }

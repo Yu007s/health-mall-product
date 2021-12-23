@@ -43,6 +43,9 @@ public class ProductSkuVO implements Serializable {
 	@ApiModelProperty("税收编码")
 	private String revenueCode;
 
+	@ApiModelProperty("税率")
+	private Integer revenueRate;
+
 	@ApiModelProperty("规格名称")
 	private String packName;
 

@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -76,15 +77,16 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	}
 
 	/**
-	 * 分页查询搜索结果
+	 * 查询sku搜索结果
+	 * <p> 目前主要是空中药房使用,因两边数据未打通,无法分页查询 </>
 	 *
-	 * @param productSearchRequest 搜索条件
+	 * @param content 搜索内容
 	 * @return 搜索结果
 	 * @author liuqiuyi
 	 * @date 2021/12/18 14:05
 	 */
 	@Override
-	public PageVO<ProductSkuInfoDTO> pageSearchSkuDetail(ProductSearchRequest productSearchRequest) {
+	public List<ProductSkuInfoDTO> searchSkuDetail(@RequestParam("content") String content) {
 		return null;
 	}
 
