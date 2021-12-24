@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service;
 
+import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
 
 import java.util.List;
@@ -42,4 +43,27 @@ public interface ProductRemoteService {
 	 * @date 2021/12/23 21:12
 	 */
 	List<ProductSkuInfoDTO> searchSkuDetail(String content);
+
+	/**
+	 * 根据 skuId 或者 skuCode 查询商品详情
+	 * <p> 目前主要提供给空中药房调用 </>
+	 * <p> 两个入参任传其一 </>
+	 *
+	 * @param skuCode sku 编码
+	 * @param skuId   skuId
+	 * @return 商品的 sku 详情
+	 * @author liuqiuyi
+	 * @date 2021/12/24 11:30
+	 */
+	ProductSkuDetailsDTO getSkuDetail(String skuCode, Long skuId);
+
+	/**
+	 * 根据后台分类 id 查询商品信息
+	 *
+	 * @param categoryId 分类 id
+	 * @return 商品详细信息
+	 * @author liuqiuyi
+	 * @date 2021/12/24 13:54
+	 */
+	List<ProductSkuInfoDTO> getSkuInfoByCategoryId(Long categoryId);
 }

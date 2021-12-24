@@ -10,8 +10,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -54,4 +52,7 @@ public class QuerySpuRequest extends PageRequest implements Serializable {
 
 	@ApiModelProperty(value = "后台分类集合", hidden = true)
 	private Set<Long> backCategoryIdList;
+
+	@ApiModelProperty(value = "后台分类id", hidden = true)
+	private Long categoryId;
 }

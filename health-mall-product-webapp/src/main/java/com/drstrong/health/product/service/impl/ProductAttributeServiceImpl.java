@@ -115,18 +115,19 @@ public class ProductAttributeServiceImpl extends ServiceImpl<ProductAttributeMap
 	/**
 	 * 根据 spuCode 查询商品属性
 	 *
-	 * @param spuCode 商品编码
+	 * @param spuCode   商品编码
+	 * @param productId 商品 id
 	 * @return 属性集合
 	 * @author liuqiuyi
 	 * @date 2021/12/17 14:32
 	 */
 	@Override
-	public List<ProductPropertyVO> getPropertyByCode(String spuCode) {
+	public List<ProductPropertyVO> getPropertyByCode(String spuCode, Long productId) {
 		if (StringUtils.isBlank(spuCode)) {
 			return Lists.newArrayList();
 		}
 		// 1.校验 spuCode
-		ProductBasicsInfoEntity basicsInfoEntity = productBasicsInfoService.getByProductIdOrSpuCode(null, spuCode, UpOffEnum.UP);
+		ProductBasicsInfoEntity basicsInfoEntity = productBasicsInfoService.getByProductIdOrSpuCode(productId, spuCode, UpOffEnum.UP);
 		if (Objects.isNull(basicsInfoEntity)) {
 			throw new BusinessException(ErrorEnums.PRODUCT_NOT_EXIST);
 		}

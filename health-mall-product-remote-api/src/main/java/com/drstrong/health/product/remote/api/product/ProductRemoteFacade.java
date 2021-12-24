@@ -1,5 +1,6 @@
 package com.drstrong.health.product.remote.api.product;
 
+import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -57,4 +58,31 @@ public interface ProductRemoteFacade {
 	@ApiOperation("查询sku搜索结果")
 	@GetMapping("/searchSkuDetail")
 	List<ProductSkuInfoDTO> searchSkuDetail(@RequestParam("content") String content);
+
+	/**
+	 * 根据后台分类 id 查询商品信息
+	 *
+	 * @param categoryId 分类 id
+	 * @return 商品详细信息
+	 * @author liuqiuyi
+	 * @date 2021/12/24 13:54
+	 */
+	@ApiOperation("根据后台分类 id 查询商品信息")
+	@PostMapping("getSkuInfoByCategoryId")
+	List<ProductSkuInfoDTO> getSkuInfoByCategoryId(@RequestParam("categoryId") Long categoryId);
+
+	/**
+	 * 根据 skuId 或者 skuCode 查询商品详情
+	 * <p> 目前主要提供给空中药房调用 </>
+	 * <p> 两个入参任传其一 </>
+	 *
+	 * @param skuId   skuId
+	 * @param skuCode sku 编码
+	 * @return 商品的 sku 详情
+	 * @author liuqiuyi
+	 * @date 2021/12/24 11:30
+	 */
+	@ApiOperation(value = "根据 skuId 或者 skuCode 查询商品详情", notes = "空中药房中需要查询商品详情")
+	@GetMapping("/sku/getDetail")
+	ProductSkuDetailsDTO getSkuDetail(@RequestParam(value = "skuCode", required = false) String skuCode, @RequestParam(value = "skuId", required = false) Long skuId);
 }
