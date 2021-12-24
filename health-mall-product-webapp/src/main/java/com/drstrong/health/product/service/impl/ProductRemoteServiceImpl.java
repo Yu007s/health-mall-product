@@ -199,6 +199,7 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 		if (Objects.isNull(productSkuEntity)) {
 			return null;
 		}
+
 		SkuIdAndCodeDTO skuIdAndCodeDTO = new SkuIdAndCodeDTO();
 		skuIdAndCodeDTO.setSkuCode(productSkuEntity.getSkuCode());
 		skuIdAndCodeDTO.setSkuId(productSkuEntity.getId());
