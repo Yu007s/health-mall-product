@@ -2,6 +2,7 @@ package com.drstrong.health.product.service;
 
 import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
+import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
 
 import java.util.List;
 import java.util.Set;
@@ -66,4 +67,16 @@ public interface ProductRemoteService {
 	 * @date 2021/12/24 13:54
 	 */
 	List<ProductSkuInfoDTO> getSkuInfoByCategoryId(Long categoryId);
+
+	/**
+	 * skuCode 和 skuId 进行转换
+	 * <p> 主要用于两者相互查询,两个入参不能同时为空 </>
+	 *
+	 * @param skuCode sku编码
+	 * @param skuId   skuId
+	 * @return sku 编码和 id 信息
+	 * @author liuqiuyi
+	 * @date 2021/12/24 20:07
+	 */
+	SkuIdAndCodeDTO getSkuIdOrCode(String skuCode, Long skuId);
 }

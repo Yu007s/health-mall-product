@@ -2,14 +2,11 @@ package com.drstrong.health.product.controller;
 
 import com.drstrong.health.product.model.constans.banner.CommonConstants;
 import com.drstrong.health.product.model.enums.ErrorEnums;
-import com.drstrong.health.product.model.enums.SourceEnum;
-import com.drstrong.health.product.model.request.product.ProductSearchRequest;
-import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.ProductSearchDetailVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.api.product.ProductRemoteFacade;
 import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
+import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductRemoteService;
 import com.google.common.collect.Lists;
@@ -118,5 +115,20 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	@Override
 	public ProductSkuDetailsDTO getSkuDetail(String skuCode, Long skuId) {
 		return productRemoteService.getSkuDetail(skuCode, skuId);
+	}
+
+	/**
+	 * skuCode 和 skuId 进行转换
+	 * <p> 主要用于两者相互查询,两个入参不能同时为空 </>
+	 *
+	 * @param skuCode sku编码
+	 * @param skuId   skuId
+	 * @return sku 编码和 id 信息
+	 * @author liuqiuyi
+	 * @date 2021/12/24 20:07
+	 */
+	@Override
+	public SkuIdAndCodeDTO getSkuIdOrCode(String skuCode, Long skuId) {
+		return productRemoteService.getSkuIdOrCode(skuCode, skuId);
 	}
 }

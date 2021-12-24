@@ -24,6 +24,9 @@ import java.util.Set;
 public class QuerySkuRequest extends PageRequest implements Serializable {
 	private static final long serialVersionUID = -4324050401624089885L;
 
+	@ApiModelProperty(value = "skuId", hidden = true)
+	private Long skuId;
+
 	@ApiModelProperty("sku 编码")
 	private String skuCode;
 
@@ -31,7 +34,7 @@ public class QuerySkuRequest extends PageRequest implements Serializable {
 	private String productName;
 
 	@ApiModelProperty("店铺 id")
-	private String storeId;
+	private Long storeId;
 
 	@ApiModelProperty("开始时间")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
