@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -32,6 +33,9 @@ public class ProductSkuDetailsDTO implements Serializable {
 
 	@ApiModelProperty("规格名称")
 	private String packName;
+
+	@ApiModelProperty("商品sku价格")
+	private BigDecimal price;
 
 	@ApiModelProperty("规格值")
 	private String packValue;
