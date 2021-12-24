@@ -467,10 +467,13 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		if (!CollectionUtils.isEmpty(querySkuRequest.getProductIdList())) {
 			queryWrapper.in(ProductSkuEntity::getProductId, querySkuRequest.getProductIdList());
 		}
-		if (Objects.nonNull(querySkuRequest.getSkuCode())) {
+		if (StringUtils.isNotBlank(querySkuRequest.getSkuCode())) {
 			queryWrapper.eq(ProductSkuEntity::getSkuCode, querySkuRequest.getSkuCode());
 		}
-		if (Objects.nonNull(querySkuRequest.getProductName())) {
+		if (Objects.nonNull(querySkuRequest.getSkuId())) {
+			queryWrapper.eq(ProductSkuEntity::getId, querySkuRequest.getSkuId());
+		}
+		if (StringUtils.isNotBlank(querySkuRequest.getProductName())) {
 			queryWrapper.like(ProductSkuEntity::getSkuName, querySkuRequest.getProductName());
 		}
 		if (Objects.nonNull(querySkuRequest.getStoreId())) {

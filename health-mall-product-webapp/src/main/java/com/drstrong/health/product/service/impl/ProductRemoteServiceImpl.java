@@ -14,6 +14,7 @@ import com.drstrong.health.product.remote.cms.CmsRemoteProService;
 import com.drstrong.health.product.remote.model.ProductPropertyDTO;
 import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
+import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
 import com.drstrong.health.product.remote.pro.PharmacyGoodsRemoteProService;
 import com.drstrong.health.product.service.*;
 import com.drstrong.health.product.util.BigDecimalUtil;
@@ -180,6 +181,28 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 			return Lists.newArrayList();
 		}
 		return getProductSkuInfoDTOList(productSkuEntityList);
+	}
+
+	/**
+	 * skuCode 和 skuId 进行转换
+	 * <p> 主要用于两者相互查询,两个入参不能同时为空 </>
+	 *
+	 * @param skuCode sku编码
+	 * @param skuId   skuId
+	 * @return sku 编码和 id 信息
+	 * @author liuqiuyi
+	 * @date 2021/12/24 20:07
+	 */
+	@Override
+	public SkuIdAndCodeDTO getSkuIdOrCode(String skuCode, Long skuId) {
+		ProductSkuEntity productSkuEntity = productSkuService.queryBySkuIdOrCode(skuId, skuCode, UpOffEnum.UP);
+		if (Objects.isNull(productSkuEntity)) {
+			return null;
+		}
+		SkuIdAndCodeDTO skuIdAndCodeDTO = new SkuIdAndCodeDTO();
+		skuIdAndCodeDTO.setSkuCode(productSkuEntity.getSkuCode());
+		skuIdAndCodeDTO.setSkuId(productSkuEntity.getId());
+		return skuIdAndCodeDTO;
 	}
 
 	/**

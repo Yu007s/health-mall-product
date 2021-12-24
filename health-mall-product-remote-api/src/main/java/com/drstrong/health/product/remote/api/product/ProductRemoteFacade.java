@@ -2,6 +2,7 @@ package com.drstrong.health.product.remote.api.product;
 
 import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
+import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -85,4 +86,18 @@ public interface ProductRemoteFacade {
 	@ApiOperation(value = "根据 skuId 或者 skuCode 查询商品详情", notes = "空中药房中需要查询商品详情")
 	@GetMapping("/sku/getDetail")
 	ProductSkuDetailsDTO getSkuDetail(@RequestParam(value = "skuCode", required = false) String skuCode, @RequestParam(value = "skuId", required = false) Long skuId);
+
+	/**
+	 * skuCode 和 skuId 进行转换
+	 * <p> 主要用于两者相互查询,两个入参不能同时为空 </>
+	 *
+	 * @param skuId   skuId
+	 * @param skuCode sku编码
+	 * @return sku 编码和 id 信息
+	 * @author liuqiuyi
+	 * @date 2021/12/24 20:07
+	 */
+	@ApiOperation("skuCode 和 skuId 进行转换")
+	@GetMapping("/sku/id/code")
+	SkuIdAndCodeDTO getSkuIdOrCode(String skuCode, Long skuId);
 }
