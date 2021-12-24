@@ -99,5 +99,5 @@ public interface ProductRemoteFacade {
 	 */
 	@ApiOperation("skuCode 和 skuId 进行转换")
 	@GetMapping("/sku/id/code")
-	SkuIdAndCodeDTO getSkuIdOrCode(String skuCode, Long skuId);
+	SkuIdAndCodeDTO getSkuIdOrCode(@RequestParam(value = "skuCode", required = false) String skuCode, @RequestParam(value = "skuId", required = false) Long skuId);
 }
