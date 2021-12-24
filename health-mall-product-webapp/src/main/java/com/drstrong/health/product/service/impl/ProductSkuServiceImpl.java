@@ -464,6 +464,9 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	private LambdaQueryWrapper<ProductSkuEntity> buildQuerySkuParam(QuerySkuRequest querySkuRequest) {
 		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(ProductSkuEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+		if (!CollectionUtils.isEmpty(querySkuRequest.getProductIdList())) {
+			queryWrapper.in(ProductSkuEntity::getProductId, querySkuRequest.getProductIdList());
+		}
 		if (Objects.nonNull(querySkuRequest.getSkuCode())) {
 			queryWrapper.eq(ProductSkuEntity::getSkuCode, querySkuRequest.getSkuCode());
 		}

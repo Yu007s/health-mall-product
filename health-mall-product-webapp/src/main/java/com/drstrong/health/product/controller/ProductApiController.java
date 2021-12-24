@@ -87,7 +87,7 @@ public class ProductApiController {
 	})
 	@GetMapping("/property/get")
 	public ResultVO<List<ProductPropertyVO>> getPropertyByCode(@NotBlank(message = "spuCode 不能为空") String spuCode) {
-		List<ProductPropertyVO> productPropertyVOList = productAttributeService.getPropertyByCode(spuCode);
+		List<ProductPropertyVO> productPropertyVOList = productAttributeService.getPropertyByCode(spuCode, null);
 		return ResultVO.success(productPropertyVOList);
 	}
 

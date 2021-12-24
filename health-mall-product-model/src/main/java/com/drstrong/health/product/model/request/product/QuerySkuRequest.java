@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * 查询 sku 的入参
@@ -48,4 +49,7 @@ public class QuerySkuRequest extends PageRequest implements Serializable {
 
 	@ApiModelProperty(value = "上下架状态", hidden = true)
 	private UpOffEnum upOffEnum;
+
+	@ApiModelProperty(value = "商品 id 集合", hidden = true)
+	private Set<Long> productIdList;
 }

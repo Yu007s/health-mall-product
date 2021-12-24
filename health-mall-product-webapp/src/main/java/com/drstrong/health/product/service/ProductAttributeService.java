@@ -43,9 +43,10 @@ public interface ProductAttributeService {
 	 * 根据 spuCode 查询商品属性
 	 *
 	 * @param spuCode 商品编码
+	 * @param productId 商品 id
 	 * @return 属性集合
 	 * @author liuqiuyi
 	 * @date 2021/12/17 14:32
 	 */
-	List<ProductPropertyVO> getPropertyByCode(String spuCode);
+	List<ProductPropertyVO> getPropertyByCode(String spuCode, Long productId);
 }

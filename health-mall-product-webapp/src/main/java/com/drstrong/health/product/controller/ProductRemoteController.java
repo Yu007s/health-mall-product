@@ -8,6 +8,7 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ProductSearchDetailVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.api.product.ProductRemoteFacade;
+import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductRemoteService;
@@ -90,4 +91,32 @@ public class ProductRemoteController implements ProductRemoteFacade {
 		return productRemoteService.searchSkuDetail(content);
 	}
 
+	/**
+	 * 根据后台分类 id 查询商品信息
+	 *
+	 * @param categoryId 分类 id
+	 * @return 商品详细信息
+	 * @author liuqiuyi
+	 * @date 2021/12/24 13:54
+	 */
+	@Override
+	public List<ProductSkuInfoDTO> getSkuInfoByCategoryId(Long categoryId) {
+		return productRemoteService.getSkuInfoByCategoryId(categoryId);
+	}
+
+	/**
+	 * 根据 skuId 或者 skuCode 查询商品详情
+	 * <p> 目前主要提供给空中药房调用 </>
+	 * <p> 两个入参任传其一 </>
+	 *
+	 * @param skuCode sku 编码
+	 * @param skuId   skuId
+	 * @return 商品的 sku 详情
+	 * @author liuqiuyi
+	 * @date 2021/12/24 11:30
+	 */
+	@Override
+	public ProductSkuDetailsDTO getSkuDetail(String skuCode, Long skuId) {
+		return productRemoteService.getSkuDetail(skuCode, skuId);
+	}
 }
