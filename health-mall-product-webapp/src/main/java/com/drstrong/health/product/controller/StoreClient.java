@@ -2,11 +2,13 @@ package com.drstrong.health.product.controller;
 
 import com.drstrong.health.product.model.request.store.*;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreSkuResponse;
 import com.drstrong.health.product.remote.api.store.StoreRemoteApi;
 import com.drstrong.health.product.remote.model.StorePostageDTO;
+import com.drstrong.health.product.service.AreaService;
 import com.drstrong.health.product.service.StoreService;
 import com.drstrong.health.product.service.StoreThreeRelevanceService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,9 @@ public class StoreClient implements StoreRemoteApi {
 	private StoreService storeService;
 	@Resource
 	private StoreThreeRelevanceService storeThreeRelevanceService;
+
+	@Resource
+	private AreaService areaService;
 
 	@Override
 	public ResultVO<List<StoreInfoResponse>> queryAllStore() {
@@ -103,5 +108,11 @@ public class StoreClient implements StoreRemoteApi {
 	@Override
 	public List<StorePostageDTO> getStorePostageByIds(Set<Long> storeIds, String areaName) {
 		return storeService.getStorePostageByIds(storeIds,areaName);
+	}
+
+	@Override
+	public ResultVO<List<AreaInfoResponse>> queryAllProvince() {
+		List<AreaInfoResponse> areaInfoResponses = areaService.queryAllProvince();
+		return ResultVO.success(areaInfoResponses);
 	}
 }
