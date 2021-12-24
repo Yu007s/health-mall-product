@@ -2,6 +2,7 @@ package com.drstrong.health.product.remote.api.store;
 
 import com.drstrong.health.product.model.request.store.*;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreSkuResponse;
@@ -74,4 +75,8 @@ public interface StoreRemoteApi {
     @ApiOperation("批量获取店铺地区邮费")
     @GetMapping("getStorePostageByIds")
     List<StorePostageDTO> getStorePostageByIds(@RequestParam("storeIds") Set<Long> storeIds,@RequestParam("areaName") String areaName);
+
+    @ApiOperation("获取所有的省份地区")
+    @GetMapping("/queryAllProvince")
+    ResultVO<List<AreaInfoResponse>> queryAllProvince();
 }
