@@ -217,6 +217,7 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 		ProductSkuDetailsDTO detailsDTO = new ProductSkuDetailsDTO();
 		BeanUtils.copyProperties(productSkuEntity, detailsDTO);
 		detailsDTO.setSkuId(productSkuEntity.getId());
+		detailsDTO.setPrice(BigDecimalUtil.F2Y(productSkuEntity.getSkuPrice().longValue()));
 		detailsDTO.setStoreId(productSkuEntity.getSourceId());
 		detailsDTO.setStoreName(productSkuEntity.getSourceName());
 		detailsDTO.setImageUrlList(Lists.newArrayList(extendEntity.getImageUrl().split(",")));
