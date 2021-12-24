@@ -123,7 +123,7 @@ public class ProductAttributeServiceImpl extends ServiceImpl<ProductAttributeMap
 	 */
 	@Override
 	public List<ProductPropertyVO> getPropertyByCode(String spuCode, Long productId) {
-		if (StringUtils.isBlank(spuCode)) {
+		if (StringUtils.isBlank(spuCode) && Objects.isNull(productId)) {
 			return Lists.newArrayList();
 		}
 		// 1.校验 spuCode
