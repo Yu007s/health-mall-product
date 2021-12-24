@@ -1,7 +1,7 @@
 package com.drstrong.health.product.remote.pro;
 
-import cn.strong.common.base.Result;
 import com.alibaba.fastjson.JSON;
+import com.drstrong.health.common.model.Result;
 import com.drstrong.health.ware.model.vo.SkuHasStockListVO;
 import com.drstrong.health.ware.model.vo.SkuHasStockVO;
 import com.drstrong.health.ware.model.vo.SkuStockNumListVO;
@@ -48,7 +48,7 @@ public class PharmacyGoodsRemoteProService {
 			log.info("invoke pharmacyGoodsRemoteApi.getSkuHasStock param:{}", skuIdList);
 			Result<SkuHasStockListVO> stockListVoResult = pharmacyGoodsRemoteApi.getSkuHasStock(Lists.newArrayList(skuIdList));
 			log.info("invoke pharmacyGoodsRemoteApi.getSkuHasStock result:{}", JSON.toJSONString(stockListVoResult));
-			if (Objects.isNull(stockListVoResult) || Objects.equals(Boolean.FALSE, stockListVoResult.getSuccess())) {
+			if (Objects.isNull(stockListVoResult) || Objects.equals(Boolean.FALSE, stockListVoResult.isSuccess())) {
 				log.info("invoke pharmacyGoodsRemoteApi.getSkuHasStock return failed:{}", JSON.toJSONString(stockListVoResult));
 				return Maps.newHashMap();
 			}
@@ -77,7 +77,7 @@ public class PharmacyGoodsRemoteProService {
 			log.info("invoke pharmacyGoodsRemoteApi.getSkuStockNum param:{}", skuIdList);
 			Result<SkuStockNumListVO> numListVoResult = pharmacyGoodsRemoteApi.getSkuStockNum(Lists.newArrayList(skuIdList));
 			log.info("invoke pharmacyGoodsRemoteApi.getSkuStockNum result:{}", JSON.toJSONString(numListVoResult));
-			if (Objects.isNull(numListVoResult) || Objects.equals(Boolean.FALSE, numListVoResult.getSuccess())) {
+			if (Objects.isNull(numListVoResult) || Objects.equals(Boolean.FALSE, numListVoResult.isSuccess())) {
 				log.info("invoke pharmacyGoodsRemoteApi.getSkuStockNum return failed:{}", JSON.toJSONString(numListVoResult));
 				return Maps.newHashMap();
 			}
