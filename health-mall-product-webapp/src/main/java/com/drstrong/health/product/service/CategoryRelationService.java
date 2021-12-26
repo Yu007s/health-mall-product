@@ -43,7 +43,7 @@ public interface CategoryRelationService {
 	 * @author liuqiuyi
 	 * @date 2021/12/9 16:36
 	 */
-	Map<Long, List<Long>> getFrontAndBackCategoryToMap(Set<Long> frontCategoryIdList);
+	Map<Long, Set<Long>> getFrontAndBackCategoryToMap(Set<Long> frontCategoryIdList);
 
 	/**
 	 * 批量保存关联信息

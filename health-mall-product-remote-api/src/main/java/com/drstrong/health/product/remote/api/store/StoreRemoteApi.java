@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreSkuResponse;
+import com.drstrong.health.product.model.response.store.ThreeSkuInfoResponse;
 import com.drstrong.health.product.remote.model.StorePostageDTO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -79,4 +80,8 @@ public interface StoreRemoteApi {
     @ApiOperation("获取所有的省份地区")
     @GetMapping("/queryAllProvince")
     ResultVO<List<AreaInfoResponse>> queryAllProvince();
+
+    @ApiOperation("批量获取sku关联三方信息")
+    @GetMapping("/queryBySkuIds")
+    List<ThreeSkuInfoResponse> queryBySkuIds(List<Long> skuIds);
 }

@@ -21,6 +21,9 @@ public class CategoryQueryRequest implements Serializable {
 	@ApiModelProperty("分类名称")
 	private String categoryName;
 
+	@ApiModelProperty(value = "分类名称,精确匹配", hidden = true)
+	private String compareName;
+
 	@ApiModelProperty("分类状态 0-启用,1-禁用")
 	private Integer state;
 

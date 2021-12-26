@@ -1,7 +1,13 @@
 package com.drstrong.health.product.service;
 
 import com.drstrong.health.product.SpringBootTests;
+import com.drstrong.health.product.mq.model.SkuStateStockMqEvent;
+import com.drstrong.health.product.utils.MqMessageUtil;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import javax.annotation.Resource;
+import java.util.Collections;
 
 
 /**
@@ -10,10 +16,19 @@ import org.junit.jupiter.api.DisplayName;
  */
 public class ExampleServiceTest extends SpringBootTests {
 
-
+    @Resource
+    private MqMessageUtil mqMessageUtil;
     @DisplayName("测试样例2")
     public void test1() {
         System.out.println("test for health-mall-product");
     }
 
+    @Test
+    public void testMqToWare(){
+        SkuStateStockMqEvent stateStockMqEvent = new SkuStateStockMqEvent();
+        stateStockMqEvent.setUserId("888");
+        stateStockMqEvent.setState(1);
+        stateStockMqEvent.setSkuIdList(Collections.EMPTY_LIST);
+        mqMessageUtil.sendMsg(MqMessageUtil.SKU_STATE_STOCK_TOPIC,MqMessageUtil.SKU_STATE_STOCK_TAG,stateStockMqEvent);
+    }
 }

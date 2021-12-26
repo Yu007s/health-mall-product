@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 /**
  * 前台分类的返回值
@@ -49,5 +49,5 @@ public class FrontCategoryVO extends BaseTree implements Serializable {
 	private LocalDateTime createTime;
 
 	@ApiModelProperty(value = "关联的后台分类 id 集合")
-	private List<Long> backCategoryIdList;
+	private Set<Long> backCategoryIdList;
 }

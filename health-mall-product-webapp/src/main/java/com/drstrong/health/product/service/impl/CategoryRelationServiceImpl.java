@@ -80,13 +80,13 @@ public class CategoryRelationServiceImpl implements CategoryRelationService {
 	 * @date 2021/12/9 16:36
 	 */
 	@Override
-	public Map<Long, List<Long>> getFrontAndBackCategoryToMap(Set<Long> frontCategoryIdList) {
+	public Map<Long, Set<Long>> getFrontAndBackCategoryToMap(Set<Long> frontCategoryIdList) {
 		List<CategoryRelationEntity> relationByFrontCategoryIds = getRelationByFrontCategoryIds(frontCategoryIdList);
 		if (CollectionUtils.isEmpty(relationByFrontCategoryIds)) {
 			return Maps.newHashMap();
 		}
 		return relationByFrontCategoryIds.stream()
-				.collect(groupingBy(CategoryRelationEntity::getFrontCategoryId, mapping(CategoryRelationEntity::getBackCategoryId, toList())));
+				.collect(groupingBy(CategoryRelationEntity::getFrontCategoryId, mapping(CategoryRelationEntity::getBackCategoryId, toSet())));
 	}
 
 	/**
