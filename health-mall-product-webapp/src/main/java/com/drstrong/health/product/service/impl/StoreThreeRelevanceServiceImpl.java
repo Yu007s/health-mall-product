@@ -18,10 +18,13 @@ import com.drstrong.health.product.model.request.store.UpdateThreeRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.store.StoreSkuResponse;
+import com.drstrong.health.product.model.response.store.ThreeSkuInfoResponse;
+import com.drstrong.health.product.mq.model.SkuStateStockMqEvent;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.service.StoreService;
 import com.drstrong.health.product.service.StoreThreeRelevanceService;
+import com.drstrong.health.product.utils.MqMessageUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.easy.excel.ExcelContext;
@@ -58,6 +61,10 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
     private StoreService storeService;
     @Autowired
     private ExcelContext excelContext;
+
+    @Resource
+    private MqMessageUtil mqMessageUtil;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -124,6 +131,14 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
         productSkuService.updateState(skuIdList,state,userId);
         checkAndUpdateSpu(skuIdList,state,userId);
         //TODO 发送mq消息通知库存
+        sendWareMessage(updateSkuRequest,userId);
+    }
+
+    private void sendWareMessage(UpdateSkuRequest updateSkuRequest, String userId) {
+        SkuStateStockMqEvent stateStockMqEvent = new SkuStateStockMqEvent();
+        BeanUtils.copyProperties(updateSkuRequest,stateStockMqEvent);
+        stateStockMqEvent.setUserId(userId);
+        mqMessageUtil.sendMsg(MqMessageUtil.SKU_STATE_STOCK_TOPIC,MqMessageUtil.SKU_STATE_STOCK_TAG,stateStockMqEvent);
     }
 
     private void checkAndUpdateSpu(List<Long> skuIdList, Integer state, String userId) {
@@ -170,6 +185,19 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
             queryWrapper.eq("t.three_sku_id",storeSkuRequest.getThreeSkuId());
         }
         return storeThreeRelevanceMapper.searchSkuList(queryWrapper);
+    }
+
+    @Override
+    public List<ThreeSkuInfoResponse> queryBySkuIds(List<Long> skuIds) {
+        LambdaQueryWrapper<StoreThreeRelevanceEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(StoreThreeRelevanceEntity::getSkuId,skuIds)
+                .eq(StoreThreeRelevanceEntity::getDelFlag,DelFlagEnum.UN_DELETED);
+        List<StoreThreeRelevanceEntity> storeThreeRelevanceEntities = storeThreeRelevanceMapper.selectList(queryWrapper);
+        return storeThreeRelevanceEntities.stream().map(e -> {
+            ThreeSkuInfoResponse threeSkuInfoResponse = new ThreeSkuInfoResponse();
+            BeanUtils.copyProperties(e,threeSkuInfoResponse);
+            return threeSkuInfoResponse;
+        }).collect(Collectors.toList());
     }
 
     /**

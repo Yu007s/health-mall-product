@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreSkuResponse;
+import com.drstrong.health.product.model.response.store.ThreeSkuInfoResponse;
 import com.drstrong.health.product.remote.api.store.StoreRemoteApi;
 import com.drstrong.health.product.remote.model.StorePostageDTO;
 import com.drstrong.health.product.service.AreaService;
@@ -114,5 +115,10 @@ public class StoreClient implements StoreRemoteApi {
 	public ResultVO<List<AreaInfoResponse>> queryAllProvince() {
 		List<AreaInfoResponse> areaInfoResponses = areaService.queryAllProvince();
 		return ResultVO.success(areaInfoResponses);
+	}
+
+	@Override
+	public List<ThreeSkuInfoResponse> queryBySkuIds(List<Long> skuIds) {
+		return storeThreeRelevanceService.queryBySkuIds(skuIds);
 	}
 }

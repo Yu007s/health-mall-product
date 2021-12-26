@@ -78,3 +78,8 @@ strong:
     title: 商品模块接口文档
     description: 茴茴健康商城,商品模块接口文档
     url: http://localhost:9092/doc.html
+
+rocketmq:
+  name-server: 192.168.21.202:9876
+  producer:
+    group: gid_health_mall_product_producer_tes

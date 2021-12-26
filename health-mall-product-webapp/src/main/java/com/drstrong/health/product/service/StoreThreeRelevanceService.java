@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.request.store.UpdateSkuRequest;
 import com.drstrong.health.product.model.request.store.UpdateThreeRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.store.StoreSkuResponse;
+import com.drstrong.health.product.model.response.store.ThreeSkuInfoResponse;
 
 import java.util.List;
 
@@ -27,4 +28,6 @@ public interface StoreThreeRelevanceService {
     void updateSkuState(UpdateSkuRequest updateSkuRequest, String userId);
 
     List<StoreSkuResponse> searchSkuList(StoreSkuRequest storeSkuRequest);
+
+    List<ThreeSkuInfoResponse> queryBySkuIds(List<Long> skuIds);
 }
