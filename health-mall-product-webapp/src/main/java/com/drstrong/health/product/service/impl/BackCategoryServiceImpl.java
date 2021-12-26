@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.drstrong.health.product.dao.BackCategoryMapper;
 import com.drstrong.health.product.model.BaseTree;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
+import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
 import com.drstrong.health.product.model.response.category.BackCategoryVO;
+import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.BackCategoryService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -30,6 +33,21 @@ public class BackCategoryServiceImpl implements BackCategoryService {
 
 	@Resource
 	BackCategoryMapper backCategoryMapper;
+
+	/**
+	 * 校验后台分类是否存在
+	 *
+	 * @param backCategoryIdList 后台分类 id
+	 * @author liuqiuyi
+	 * @date 2021/12/26 16:07
+	 */
+	@Override
+	public void checkCategoryIsExist(Set<Long> backCategoryIdList) {
+		List<BackCategoryEntity> backCategoryEntityList = queryByIdList(backCategoryIdList);
+		if (CollectionUtils.isEmpty(backCategoryEntityList) || !Objects.equals(backCategoryEntityList.size(), backCategoryIdList.size())) {
+			throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
+		}
+	}
 
 	/**
 	 * 查询所有的后台分类
@@ -48,6 +66,20 @@ public class BackCategoryServiceImpl implements BackCategoryService {
 		// 之前老表的删除状态是 -1
 		backWrapper.in(BackCategoryEntity::getId, categoryIdList).ne(BackCategoryEntity::getStatus, -1);
 		return backCategoryMapper.selectList(backWrapper);
+	}
+
+	/**
+	 * 根据后台分类 id,获取商品数量,组装成 map
+	 *
+	 * @param categoryIdList 后台分类 id
+	 * @return map.key = 后台分类 id, map.value = 商品数量
+	 * @author liuqiuyi
+	 * @date 2021/12/26 16:48
+	 */
+	@Override
+	public Map<Long, Integer> getBackIdProductNumMap(Set<Long> categoryIdList) {
+		List<BackCategoryEntity> backCategoryEntityList = queryByIdList(categoryIdList);
+		return BackCategoryEntity.buildCategoryProductCount(backCategoryEntityList, true);
 	}
 
 	/**

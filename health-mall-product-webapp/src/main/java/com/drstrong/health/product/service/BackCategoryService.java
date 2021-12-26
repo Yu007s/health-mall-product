@@ -5,6 +5,7 @@ import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
 import com.drstrong.health.product.model.response.category.BackCategoryVO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -14,6 +15,16 @@ import java.util.Set;
  * @date 2021/12/7 20:02
  */
 public interface BackCategoryService {
+
+	/**
+	 * 校验后台分类是否存在
+	 *
+	 * @param backCategoryIdList 后台分类 id
+	 * @author liuqiuyi
+	 * @date 2021/12/26 16:07
+	 */
+	void checkCategoryIsExist(Set<Long> backCategoryIdList);
+
 	/**
 	 * 根据 id 集合,查询后台分类集合
 	 *
@@ -23,6 +34,17 @@ public interface BackCategoryService {
 	 * @date 2021/12/7 20:37
 	 */
 	List<BackCategoryEntity> queryByIdList(Set<Long> categoryIdList);
+
+
+	/**
+	 * 根据后台分类 id,获取商品数量,组装成 map
+	 *
+	 * @param categoryIdList 后台分类 id
+	 * @return map.key = 后台分类 id, map.value = 商品数量
+	 * @author liuqiuyi
+	 * @date 2021/12/26 16:48
+	 */
+	Map<Long, Integer> getBackIdProductNumMap(Set<Long> categoryIdList);
 
 	/**
 	 * 根据 id 查询后台分类
@@ -38,7 +60,7 @@ public interface BackCategoryService {
 	 * 查询后台分类集合,组装成树形结构
 	 *
 	 * @param categoryQueryRequest 查询条件
-	 * @return 后台分类的集合,树形结构
+	 * @return 后台分类的集合, 树形结构
 	 * @author liuqiuyi
 	 * @date 2021/12/7 20:37
 	 */

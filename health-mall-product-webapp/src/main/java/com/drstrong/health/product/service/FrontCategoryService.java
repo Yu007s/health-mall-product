@@ -65,6 +65,25 @@ public interface FrontCategoryService {
 	List<FrontCategoryEntity> queryByParentId(Long parentCategoryId);
 
 	/**
+	 * 校验分类是否存在
+	 *
+	 * @param categoryId 分类 id
+	 * @author liuqiuyi
+	 * @date 2021/12/26 15:40
+	 */
+	void checkCategoryIsExist(Long categoryId);
+
+	/**
+	 * 校验分类名称是否重复
+	 *
+	 * @param name     名称
+	 * @param parentId 父类 id
+	 * @author liuqiuyi
+	 * @date 2021/12/26 15:40
+	 */
+	void checkNameIsRepeat(String name, Long parentId);
+
+	/**
 	 * 添加前台分类
 	 *
 	 * @param categoryRequest 入参信息
