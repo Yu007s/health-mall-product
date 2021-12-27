@@ -82,6 +82,6 @@ public interface StoreRemoteApi {
     ResultVO<List<AreaInfoResponse>> queryAllProvince();
 
     @ApiOperation("批量获取sku关联三方信息")
-    @GetMapping("/queryBySkuIds")
-    List<ThreeSkuInfoResponse> queryBySkuIds(List<Long> skuIds);
+    @PostMapping("/queryBySkuIds")
+    List<ThreeSkuInfoResponse> queryBySkuIds(@RequestBody List<Long> skuIds);
 }

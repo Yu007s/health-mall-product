@@ -47,6 +47,7 @@ public class StoreServiceImpl implements StoreService {
     private static final Integer STORE_NAME_MIN_LENGTH = 0;
     private static final Integer STORE_NAME_MAX_LENGTH = 20;
     private static final String STORE_NAME_PREFIX = "mall:product:store:";
+    private static final String STORE_CODE_KEY = "mall:product:store:code";
 
     @Resource
     private StoreMapper storeMapper;
@@ -74,8 +75,7 @@ public class StoreServiceImpl implements StoreService {
         StoreEntity storeSaveEntity = new StoreEntity();
         storeSaveEntity.setName(storeName);
         storeSaveEntity.setStoreStatus(storeAddOrUpdateRequest.getStatus());
-        //TODO 店铺编码生成规则暂定
-        storeSaveEntity.setCode("110");
+        storeSaveEntity.setCode("" + redisUtils.incr(STORE_CODE_KEY,1));
         storeSaveEntity.setCreatedBy(userId);
         storeSaveEntity.setChangedBy(userId);
         storeMapper.insert(storeSaveEntity);
