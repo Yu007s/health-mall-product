@@ -12,7 +12,7 @@ import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.response.product.ProductPropertyVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
-import com.drstrong.health.product.service.CategoryAttributeService;
+import com.drstrong.health.product.service.CategoryAttributeItemService;
 import com.drstrong.health.product.service.ProductAttributeService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductExtendService;
@@ -54,7 +54,7 @@ public class ProductAttributeServiceImpl extends ServiceImpl<ProductAttributeMap
 	ProductExtendService productExtendService;
 
 	@Resource
-	CategoryAttributeService categoryAttributeService;
+	CategoryAttributeItemService categoryAttributeItemService;
 
 	/**
 	 * 保存关联关系
@@ -136,7 +136,7 @@ public class ProductAttributeServiceImpl extends ServiceImpl<ProductAttributeMap
 		// 3.查询属性信息
 		List<ProductAttributeEntity> attributeEntityList = queryByProductId(basicsInfoEntity.getId());
 		Set<Long> attributeItemIdList = attributeEntityList.stream().map(ProductAttributeEntity::getAttributeItemId).collect(Collectors.toSet());
-		Map<Long, CategoryAttributeItemEntity> idEntityMap = categoryAttributeService.queryByIdListToMap(attributeItemIdList, basicsInfoEntity.getCategoryId());
+		Map<Long, CategoryAttributeItemEntity> idEntityMap = categoryAttributeItemService.queryByIdListToMap(attributeItemIdList, basicsInfoEntity.getCategoryId());
 		return buildProductPropertyVO(basicsInfoEntity, extendEntity, attributeEntityList, idEntityMap);
 	}
 

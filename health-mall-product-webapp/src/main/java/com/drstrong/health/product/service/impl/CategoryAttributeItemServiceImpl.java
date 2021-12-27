@@ -8,7 +8,7 @@ import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.entity.product.CategoryAttributeItemEntity;
 import com.drstrong.health.product.model.response.product.CategoryAttributeItemVO;
 import com.drstrong.health.product.service.BackCategoryService;
-import com.drstrong.health.product.service.CategoryAttributeService;
+import com.drstrong.health.product.service.CategoryAttributeItemService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toMap;
  */
 @Slf4j
 @Service
-public class CategoryAttributeServiceImpl implements CategoryAttributeService {
+public class CategoryAttributeItemServiceImpl implements CategoryAttributeItemService {
 
 	@Resource
 	BackCategoryService backCategoryService;

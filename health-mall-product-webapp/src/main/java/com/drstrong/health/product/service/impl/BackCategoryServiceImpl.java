@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.BackCategoryMapper;
 import com.drstrong.health.product.model.BaseTree;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
@@ -29,7 +30,7 @@ import java.util.Set;
  */
 @Service
 @Slf4j
-public class BackCategoryServiceImpl implements BackCategoryService {
+public class BackCategoryServiceImpl extends ServiceImpl<BackCategoryMapper, BackCategoryEntity> implements BackCategoryService {
 
 	@Resource
 	BackCategoryMapper backCategoryMapper;

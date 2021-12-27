@@ -13,7 +13,7 @@ import java.util.Set;
  * @author liuqiuyi
  * @date 2021/12/13 14:22
  */
-public interface CategoryAttributeService {
+public interface CategoryAttributeItemService {
 
 	/**
 	 * 根据 id 集合查询商品关联的属性

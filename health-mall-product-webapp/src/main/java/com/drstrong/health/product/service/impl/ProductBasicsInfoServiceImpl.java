@@ -61,7 +61,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	ProductSkuService productSkuService;
 
 	@Resource
-	CategoryAttributeService categoryAttributeService;
+	CategoryAttributeItemService categoryAttributeItemService;
 
 	@Resource
 	BackCategoryService backCategoryService;
@@ -226,7 +226,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		// 4.查询属性信息
 		List<ProductAttributeEntity> attributeEntityList = productAttributeService.queryByProductId(productId);
 		Set<Long> attributeItemIdList = attributeEntityList.stream().map(ProductAttributeEntity::getAttributeItemId).collect(Collectors.toSet());
-		Map<Long, CategoryAttributeItemEntity> idEntityMap = categoryAttributeService.queryByIdListToMap(attributeItemIdList, basicsInfoEntity.getCategoryId());
+		Map<Long, CategoryAttributeItemEntity> idEntityMap = categoryAttributeItemService.queryByIdListToMap(attributeItemIdList, basicsInfoEntity.getCategoryId());
 		// 5.查询 sku 信息
 		List<ProductSkuEntity> skuEntityList = productSkuService.queryByProductId(productId, null);
 		// 6.组装返回值

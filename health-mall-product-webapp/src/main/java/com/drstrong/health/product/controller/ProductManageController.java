@@ -5,7 +5,7 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.*;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.product.ProductManageFacade;
-import com.drstrong.health.product.service.CategoryAttributeService;
+import com.drstrong.health.product.service.CategoryAttributeItemService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductSkuRevenueService;
 import com.drstrong.health.product.service.ProductSkuService;
@@ -34,7 +34,7 @@ import java.util.List;
 @Api(tags = {"商品管理"}, description = "商品管理")
 public class ProductManageController implements ProductManageFacade {
 	@Resource
-	CategoryAttributeService categoryAttributeService;
+	CategoryAttributeItemService categoryAttributeItemService;
 
 	@Resource
 	ProductBasicsInfoService productBasicsInfoService;
@@ -47,7 +47,7 @@ public class ProductManageController implements ProductManageFacade {
 
 	@Override
 	public ResultVO<List<CategoryAttributeItemVO>> getProperty(@Valid @NotNull(message = "categoryId 不能为空") Long categoryId) {
-		List<CategoryAttributeItemVO> categoryAttributeServiceItems = categoryAttributeService.getItems(categoryId);
+		List<CategoryAttributeItemVO> categoryAttributeServiceItems = categoryAttributeItemService.getItems(categoryId);
 		return ResultVO.success(categoryAttributeServiceItems);
 	}
 
