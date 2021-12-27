@@ -40,16 +40,16 @@ public class CmsRemoteProService {
 	public Map<Integer, CommAttributeDTO> getCommAttributeByIdListToMap() {
 		String dictCommAttribute = CommonConstants.DICT_COMM_ATTRIBUTE;
 		try {
-			log.info("invoke CmsRemoteProService.getCommAttributeByIdListToMap param:{}", dictCommAttribute);
+			log.info("invoke ICMSFeignClient.vueQuery param:{}", dictCommAttribute);
 			DictResponse<List<DictVO>> listResponseEntity = cmsFeignClient.vueQuery(dictCommAttribute);
-			log.info("invoke ICMSFeignClient.vueList result:{}", dictCommAttribute);
+			log.info("invoke ICMSFeignClient.vueQuery result:{}", dictCommAttribute);
 			if (Objects.isNull(listResponseEntity) || !Objects.equals(SUCCESS, listResponseEntity.getMsg())) {
-				log.info("invoke pharmacyGoodsRemoteApi.getSkuStockNum return failed. param:{}", dictCommAttribute);
+				log.info("invoke ICMSFeignClient.vueQuery return failed. param:{}", dictCommAttribute);
 				return Maps.newHashMap();
 			}
 			List<DictVO> dictVOList = listResponseEntity.getData();
 			if (CollectionUtils.isEmpty(dictVOList)) {
-				log.info("invoke pharmacyGoodsRemoteApi.getSkuStockNum return null. param:{},result:{}", dictCommAttribute, JSON.toJSONString(listResponseEntity));
+				log.info("invoke ICMSFeignClient.vueQuery return null. param:{},result:{}", dictCommAttribute, JSON.toJSONString(listResponseEntity));
 				return Maps.newHashMap();
 			}
 			return dictVOList.stream().collect(toMap(vo -> Integer.valueOf(vo.getCode()), vo -> {
@@ -60,7 +60,7 @@ public class CmsRemoteProService {
 				return commAttributeDTO;
 			}, (o, n) -> o));
 		} catch (Exception e) {
-			log.info("invoke ICMSFeignClient.vueList an error occurred,param:{}", dictCommAttribute, e);
+			log.info("invoke ICMSFeignClient.vueQuery an error occurred,param:{}", dictCommAttribute, e);
 			throw e;
 		}
 	}

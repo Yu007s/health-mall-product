@@ -21,14 +21,13 @@ import com.drstrong.health.product.model.response.product.ProductSkuVO;
 import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.cms.CmsRemoteProService;
+import com.drstrong.health.product.remote.pro.PharmacyGoodsRemoteProService;
 import com.drstrong.health.product.service.IRedisService;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductSkuRevenueService;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.util.RedisKeyUtils;
-import com.drstrong.health.ware.model.vo.SkuStockNumVO;
-import com.drstrong.health.ware.remote.api.PharmacyGoodsRemoteApi;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -68,7 +67,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	ProductSkuRevenueService productSkuRevenueService;
 
 	@Resource
-	PharmacyGoodsRemoteApi pharmacyGoodsRemoteApi;
+	PharmacyGoodsRemoteProService pharmacyGoodsRemoteProService;
 
 	@Resource
 	CmsRemoteProService cmsRemoteProService;
@@ -250,9 +249,8 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
             return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
 		}
 		List<ProductSkuStockVO> productSkuStockVOS = Lists.newArrayListWithCapacity(records.size());
-		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(records.stream().map(ProductSkuEntity::getId).collect(Collectors.toList())).getData().getSkuStockNumList();
+		Map<Long, Integer> stockMap = pharmacyGoodsRemoteProService.getSkuStockNumToMap(records.stream().map(ProductSkuEntity::getId).collect(Collectors.toSet()));
 		Map<Integer, CommAttributeDTO> commAttributeMap = cmsRemoteProService.getCommAttributeByIdListToMap();
-		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
 		records.forEach(r -> {
 			CommAttributeDTO commAttributeDTO = commAttributeMap.get(r.getCommAttribute());
 			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
@@ -282,9 +280,8 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			return Lists.newArrayList();
 		}
 		List<ProductSkuStockVO> productSkuStockVOS = Lists.newArrayListWithCapacity(productSkuEntities.size());
-		List<SkuStockNumVO> skuStockNumVOS = pharmacyGoodsRemoteApi.getSkuStockNum(productSkuEntities.stream().map(ProductSkuEntity::getId).collect(Collectors.toList())).getData().getSkuStockNumList();
+		Map<Long, Integer> stockMap = pharmacyGoodsRemoteProService.getSkuStockNumToMap(productSkuEntities.stream().map(ProductSkuEntity::getId).collect(Collectors.toSet()));
 		Map<Integer, CommAttributeDTO> commAttributeMap = cmsRemoteProService.getCommAttributeByIdListToMap();
-		Map<Long, Integer> stockMap = skuStockNumVOS.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum));
 		productSkuEntities.forEach(r -> {
 			CommAttributeDTO commAttributeDTO = commAttributeMap.get(r.getCommAttribute());
 			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
@@ -421,12 +418,8 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			throw new BusinessException(ErrorEnums.PRODUCT_NOT_EXIST);
 		}
 		// 3.调用库存
-		List<Long> skuIdList = productSkuEntityList.stream().map(ProductSkuEntity::getId).collect(Collectors.toList());
-		List<SkuStockNumVO> skuStockNum = pharmacyGoodsRemoteApi.getSkuStockNum(skuIdList).getData().getSkuStockNumList();
-		Map<Long, Integer> skuIdStockNumMap = Maps.newHashMapWithExpectedSize(skuIdList.size());
-		if (!CollectionUtils.isEmpty(skuStockNum)) {
-			skuIdStockNumMap = skuStockNum.stream().collect(Collectors.toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum, (v1, v2) -> v1));
-		}
+		Set<Long> skuIdList = productSkuEntityList.stream().map(ProductSkuEntity::getId).collect(Collectors.toSet());
+		Map<Long, Integer> skuIdStockNumMap = pharmacyGoodsRemoteProService.getSkuStockNumToMap(skuIdList);
 		// 4.组装返回值
 		List<SkuBaseInfoVO> skuBaseInfoVOList = Lists.newArrayListWithCapacity(productSkuEntityList.size());
 		for (ProductSkuEntity productSkuEntity : productSkuEntityList) {
