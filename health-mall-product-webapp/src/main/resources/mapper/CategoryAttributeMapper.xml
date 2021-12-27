@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.CategoryAttributeMapper">
+
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.category.CategoryAttributeEntity">
+        <result column="id" property="id"/>
+        <result column="attribute_key" property="attributeKey"/>
+        <result column="attribute_name" property="attributeName"/>
+        <result column="attribute_type" property="attributeType"/>
+        <result column="form_type" property="formType"/>
+        <result column="attribute_options" property="attributeOptions"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="changed_at" property="changedAt"/>
+        <result column="changed_by" property="changedBy"/>
+        <result column="version" property="version"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                id,
+                attribute_key,
+                attribute_name,
+                attribute_type,
+                form_type,
+                attribute_options,
+                created_at,
+                created_by,
+                changed_at,
+                changed_by,
+                version
+    </sql>
+    <insert id="syncDateInsertOne"
+            parameterType="com.drstrong.health.product.model.entity.category.CategoryAttributeEntity">
+        INSERT INTO p_category_attribute
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="null != id and '' != id">
+                id,
+            </if>
+            <if test="null != attributeKey and '' != attributeKey">
+                attribute_key,
+            </if>
+            <if test="null != attributeName and '' != attributeName">
+                attribute_name,
+            </if>
+            <if test="null != attributeType and '' != attributeType">
+                attribute_type,
+            </if>
+            <if test="null != formType and '' != formType">
+                form_type,
+            </if>
+            <if test="null != attributeOptions and '' != attributeOptions">
+                attribute_options,
+            </if>
+            <if test="null != createdAt">
+                created_at,
+            </if>
+            <if test="null != createdBy and '' != createdBy">
+                created_by,
+            </if>
+            <if test="null != changedAt">
+                changed_at,
+            </if>
+            <if test="null != changedBy and '' != changedBy">
+                changed_by,
+            </if>
+            <if test="null != version and '' != version">
+                version
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="null != id and '' != id">
+                #{id},
+            </if>
+            <if test="null != attributeKey and '' != attributeKey">
+                #{attributeKey},
+            </if>
+            <if test="null != attributeName and '' != attributeName">
+                #{attributeName},
+            </if>
+            <if test="null != attributeType and '' != attributeType">
+                #{attributeType},
+            </if>
+            <if test="null != formType and '' != formType">
+                #{formType},
+            </if>
+            <if test="null != attributeOptions and '' != attributeOptions">
+                #{attributeOptions},
+            </if>
+            <if test="null != createdAt">
+                #{createdAt},
+            </if>
+            <if test="null != createdBy and '' != createdBy">
+                #{createdBy},
+            </if>
+            <if test="null != changedAt">
+                #{changedAt},
+            </if>
+            <if test="null != changedBy and '' != changedBy">
+                #{changedBy},
+            </if>
+            <if test="null != version and '' != version">
+                #{version}
+            </if>
+        </trim>
+    </insert>
+
+</mapper>

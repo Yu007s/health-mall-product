@@ -339,7 +339,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	 * @date 2021/12/17 15:49
 	 */
 	@Override
-	public List<String> pageSearchByName(String content, Integer count) {
+	public List<String> searchByName(String content, Integer count) {
 		if (StringUtils.isBlank(content)) {
 			return Lists.newArrayList();
 		}
@@ -347,6 +347,26 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			count = 10;
 		}
 		return productBasicsInfoMapper.likeProductTitle(content, count);
+	}
+
+	/**
+	 * 模糊查询商品标题和品牌名
+	 *
+	 * @param content 查询内容
+	 * @param count   个数
+	 * @return 满足条件的标题集合
+	 * @author liuqiuyi
+	 * @date 2021/12/17 16:12
+	 */
+	@Override
+	public List<ProductBasicsInfoEntity> searchTitleAndBrandName(String content, Integer count) {
+		if (StringUtils.isBlank(content)) {
+			return Lists.newArrayList();
+		}
+		if (Objects.isNull(count)) {
+			count = 10;
+		}
+		return productBasicsInfoMapper.likeTitleAndBrandName(content, count);
 	}
 
 	/**

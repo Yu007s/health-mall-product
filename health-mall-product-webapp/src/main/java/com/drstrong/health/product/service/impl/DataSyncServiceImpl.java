@@ -48,7 +48,7 @@ public class DataSyncServiceImpl {
 		}
 		// 先删除所有,在插入
 		backCategoryMapper.delete(null);
-		categoryEntityList.forEach(categoryEntity -> backCategoryMapper.insert(categoryEntity));
+		categoryEntityList.forEach(categoryEntity -> backCategoryMapper.syncDateInsertOne(categoryEntity));
 		log.info("p_category data sync success!!");
 	}
 
@@ -65,7 +65,7 @@ public class DataSyncServiceImpl {
 			throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
 		}
 		categoryAttributeMapper.delete(null);
-		entityList.forEach(categoryAttributeEntity -> categoryAttributeMapper.insert(categoryAttributeEntity));
+		entityList.forEach(categoryAttributeEntity -> categoryAttributeMapper.syncDateInsertOne(categoryAttributeEntity));
 		log.info("p_category_attribute data sync success!!");
 	}
 
@@ -83,7 +83,7 @@ public class DataSyncServiceImpl {
 			throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
 		}
 		categoryAttributeItemMapper.delete(null);
-		entityList.forEach(categoryAttributeItemEntity -> categoryAttributeItemMapper.insert(categoryAttributeItemEntity));
+		entityList.forEach(categoryAttributeItemEntity -> categoryAttributeItemMapper.syncDateInsertOne(categoryAttributeItemEntity));
 		log.info("p_category_attribute_item data sync success!!");
 	}
 }

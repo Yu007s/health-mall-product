@@ -11,10 +11,7 @@ import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.response.product.ProductPropertyVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.cms.CmsRemoteProService;
-import com.drstrong.health.product.remote.model.ProductPropertyDTO;
-import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
-import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
-import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
+import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.pro.PharmacyGoodsRemoteProService;
 import com.drstrong.health.product.service.*;
 import com.drstrong.health.product.util.BigDecimalUtil;
@@ -43,6 +40,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class ProductRemoteServiceImpl implements ProductRemoteService {
+	/**
+	 * 空格
+	 */
+	private static final String SPACE = " ";
+
 	@Resource
 	ProductSkuService productSkuService;
 
@@ -112,15 +114,22 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 	 * @date 2021/12/17 15:49
 	 */
 	@Override
-	public List<String> searchSkuNameByName(String content, Integer count) {
-		log.info("invoke ProductRemoteServiceImpl.searchSkuNameByName param:{},{}", content, count);
-		if (StringUtils.isBlank(content)) {
+	public List<SearchNameResultDTO> searchSpuNameByName(String content, Integer count) {
+		log.info("invoke ProductRemoteServiceImpl.searchSpuNameByName param:{},{}", content, count);
+		List<ProductBasicsInfoEntity> infoEntityList = productBasicsInfoService.searchTitleAndBrandName(content, count);
+		if (CollectionUtils.isEmpty(infoEntityList)) {
+			log.info("invoke ProductRemoteServiceImpl.searchSpuNameByName result is null, param:{},{}", content, count);
 			return Lists.newArrayList();
 		}
-		if (Objects.isNull(count)) {
-			count = 10;
+		List<SearchNameResultDTO> resultDTOList = Lists.newArrayListWithCapacity(infoEntityList.size());
+		for (ProductBasicsInfoEntity infoEntity : infoEntityList) {
+			SearchNameResultDTO resultDTO = new SearchNameResultDTO();
+			// 和之前的老业务保持一致
+			resultDTO.setName(infoEntity.getBrandName() + SPACE + infoEntity.getTitle());
+			resultDTO.setCommonName(infoEntity.getTitle());
+			resultDTOList.add(resultDTO);
 		}
-		return productSkuService.searchSkuNameByName(content, count);
+		return resultDTOList;
 	}
 
 	/**
@@ -136,6 +145,11 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 		log.info("invoke ProductRemoteServiceImpl.searchSkuDetail param:{}", content);
 		if (StringUtils.isBlank(content)) {
 			return Lists.newArrayList();
+		}
+		// 判断是否含有空格,如果有空格,需要进行截取(主要是为了和之前空中药房搜索方式保持一致),获取真实的商品名称
+		if (content.contains(SPACE)) {
+			int index = content.indexOf(SPACE) + 1;
+			content = content.substring(index);
 		}
 		QuerySkuRequest querySkuRequest = new QuerySkuRequest();
 		querySkuRequest.setProductName(content);

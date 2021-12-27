@@ -26,4 +26,15 @@ public interface ProductBasicsInfoMapper extends BaseMapper<ProductBasicsInfoEnt
 	 * @date 2021/12/17 16:12
 	 */
 	List<String> likeProductTitle(@Param("content") String content, @Param("count") Integer count);
+
+	/**
+	 * 模糊查询商品标题和品牌名
+	 *
+	 * @param content 查询内容
+	 * @param count   个数
+	 * @return 满足条件的标题集合
+	 * @author liuqiuyi
+	 * @date 2021/12/17 16:12
+	 */
+	List<ProductBasicsInfoEntity> likeTitleAndBrandName(@Param("content") String content, @Param("count") Integer count);
 }

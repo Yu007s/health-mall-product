@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.api.product.ProductRemoteFacade;
 import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
+import com.drstrong.health.product.remote.model.SearchNameResultDTO;
 import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductRemoteService;
@@ -70,8 +71,8 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	 * @date 2021/12/17 15:49
 	 */
 	@Override
-	public List<String> searchSkuNameByName(String content, Integer count) {
-		return productRemoteService.searchSkuNameByName(content, count);
+	public List<SearchNameResultDTO> searchSpuNameByName(String content, Integer count) {
+		return productRemoteService.searchSpuNameByName(content, count);
 	}
 
 	/**

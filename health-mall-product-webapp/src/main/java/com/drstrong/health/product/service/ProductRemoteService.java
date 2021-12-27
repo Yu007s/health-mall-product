@@ -2,6 +2,7 @@ package com.drstrong.health.product.service;
 
 import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
+import com.drstrong.health.product.remote.model.SearchNameResultDTO;
 import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public interface ProductRemoteService {
 	 * @author liuqiuyi
 	 * @date 2021/12/17 15:49
 	 */
-	List<String> searchSkuNameByName(String content, Integer count);
+	List<SearchNameResultDTO> searchSpuNameByName(String content, Integer count);
 
 	/**
 	 * 根据名称模糊查询 sku 信息

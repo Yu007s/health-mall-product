@@ -469,8 +469,12 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		} else {
 			queryWrapper.le(FrontCategoryEntity::getLevel, level);
 		}
-		// 封装返回值
+		// 查询分类信息
 		List<HomeCategoryVO> homeCategoryVOList = buildCategoryVOList(queryWrapper);
+		if (CollectionUtils.isEmpty(homeCategoryVOList)) {
+			return Lists.newArrayList();
+		}
+		// 封装返回值
 		if (Objects.isNull(level) || Objects.equals(level, 1)) {
 			// 一级分类,进行返回值大小裁剪,并添加最后的全部分类
 			if (homeCategoryVOList.size() > FIRST_CATEGORY_SIZE) {

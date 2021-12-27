@@ -50,7 +50,7 @@ public class ProductApiController {
 	})
 	@GetMapping("/searchByName")
 	public ResultVO<SearchNameResultVO> pageSearchByName(String content, Integer count) {
-		List<String> resultList = productBasicsInfoService.pageSearchByName(content, count);
+		List<String> resultList = productBasicsInfoService.searchByName(content, count);
 		return ResultVO.success(new SearchNameResultVO(resultList));
 	}
 

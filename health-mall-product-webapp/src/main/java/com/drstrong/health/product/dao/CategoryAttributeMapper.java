@@ -12,4 +12,13 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface CategoryAttributeMapper extends BaseMapper<CategoryAttributeEntity> {
+	/**
+	 * 插入数据
+	 * <p> 仅供数据同步使用 </>
+	 *
+	 * @author liuqiuyi
+	 * @date 2021/12/27 17:24
+	 */
+	@Deprecated
+	void syncDateInsertOne(CategoryAttributeEntity categoryAttributeEntity);
 }

@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,6 +24,19 @@ import java.util.Objects;
 @TableName("pms_product_back_category")
 public class BackCategoryEntity extends BaseTree implements Serializable {
 	private static final long serialVersionUID = -1581848198754072917L;
+
+	/** 中西药品顶级父分类ID值（新版本） */
+	public static final Long MEDICINE_TOP_PARENT_ID_NEW = 0L;
+	/** 中西药品顶级父分类ID值（旧版本） */
+	public static final Long MEDICINE_TOP_PARENT_ID_OLD = -1L;
+	/** 健康用品顶级父分类ID值：旧版本 */
+	public static final Long HEALTH_PRODUCT_TOP_PARENT_ID = -2L;
+	/**
+	 * 最大分类级别
+	 */
+	public static final Integer MAX_LEVEL = 3;
+	public static final Integer STATUS_DISABLE = 0;
+	public static final Integer STATUS_ENABLE = 1;
 
 	/**
 	 * 名称
@@ -83,7 +96,7 @@ public class BackCategoryEntity extends BaseTree implements Serializable {
 	/**
 	 * 创建时间
 	 */
-	private LocalDateTime createdAt;
+	private Date createdAt;
 
 	/**
 	 * 创建人
@@ -93,7 +106,7 @@ public class BackCategoryEntity extends BaseTree implements Serializable {
 	/**
 	 * 修改时间
 	 */
-	private LocalDateTime changedAt;
+	private Date changedAt;
 
 	/**
 	 * 修改人

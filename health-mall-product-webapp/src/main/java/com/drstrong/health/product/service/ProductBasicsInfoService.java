@@ -151,7 +151,18 @@ public interface ProductBasicsInfoService {
 	 * @author liuqiuyi
 	 * @date 2021/12/17 15:49
 	 */
-	List<String> pageSearchByName(String content, Integer count);
+	List<String> searchByName(String content, Integer count);
+
+	/**
+	 * 模糊查询商品标题和品牌名
+	 *
+	 * @param content 查询内容
+	 * @param count   个数
+	 * @return 满足条件的标题集合
+	 * @author liuqiuyi
+	 * @date 2021/12/17 16:12
+	 */
+	List<ProductBasicsInfoEntity> searchTitleAndBrandName(String content, Integer count);
 
 	/**
 	 * 分页查询搜索结果

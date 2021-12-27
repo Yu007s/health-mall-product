@@ -53,5 +53,13 @@
         limit #{count}
     </select>
 
+    <select id="likeTitleAndBrandName" resultMap="BaseResultMap">
+        select title,brand_name
+        FROM pms_product_basics_info
+        where del_flag = 0 AND state = 1
+        AND title like "%"#{content}"%"
+        limit #{count}
+    </select>
+
 
 </mapper>

@@ -2,6 +2,7 @@ package com.drstrong.health.product.remote.api.product;
 
 import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
+import com.drstrong.health.product.remote.model.SearchNameResultDTO;
 import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -35,7 +36,7 @@ public interface ProductRemoteFacade {
 	List<ProductSkuInfoDTO> getSkuInfoBySkuIds(@RequestBody Set<Long> skuIds);
 
 	/**
-	 * 搜索sku的名称,只返回sku名称
+	 * 搜索spu的名称,只返回spu名称
 	 *
 	 * @param content 搜索条件
 	 * @param count   返回的个数(不传默认返回 10 条数据)
@@ -43,9 +44,9 @@ public interface ProductRemoteFacade {
 	 * @author liuqiuyi
 	 * @date 2021/12/17 15:49
 	 */
-	@ApiOperation("搜索sku的名称,只返回sku名称")
-	@GetMapping("/searchSkuNameByName")
-	List<String> searchSkuNameByName(@RequestParam("content") String content, @RequestParam(value = "count", required = false) Integer count);
+	@ApiOperation(value = "搜索spu的名称,只返回spu名称和标题", notes = "和之前空中药房的搜索结果数据结构保持一致")
+	@GetMapping("/searchSpuNameByName")
+	List<SearchNameResultDTO> searchSpuNameByName(@RequestParam("content") String content, @RequestParam(value = "count", required = false) Integer count);
 
 	/**
 	 * 查询sku搜索结果
