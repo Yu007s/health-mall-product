@@ -21,9 +21,7 @@ ENV JVM_AGENT ''
 ENV SERVER_PORT 8080
 EXPOSE ${SERVER_PORT}
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo 'Asia/Shanghai' >/etc/timezone \
-    && mkdir logs \
+RUN mkdir logs \
     && cd logs \
     && touch start.log \
     && ln -sf /dev/stdout start.log \
