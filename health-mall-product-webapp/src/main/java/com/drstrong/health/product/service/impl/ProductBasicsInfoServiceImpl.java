@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.ProductBasicsInfoMapper;
+import com.drstrong.health.product.model.dto.CommAttributeDTO;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.entity.product.*;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
@@ -16,6 +17,7 @@ import com.drstrong.health.product.model.request.product.SaveProductRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.*;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.remote.cms.CmsRemoteProService;
 import com.drstrong.health.product.remote.pro.PharmacyGoodsRemoteProService;
 import com.drstrong.health.product.service.*;
 import com.drstrong.health.product.util.BigDecimalUtil;
@@ -74,6 +76,9 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 
 	@Resource
 	PharmacyGoodsRemoteProService pharmacyGoodsRemoteProService;
+
+	@Resource
+	CmsRemoteProService cmsRemoteProService;
 
 	/**
 	 * 根据条件,分页查询商品基础信息
@@ -267,6 +272,8 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			productSpuVO.setUpdateTime(infoEntity.getChangedAt());
 			spuVOList.add(productSpuVO);
 		}
+		// 4.排序
+		spuVOList.sort(Comparator.comparing(ProductSpuVO::getCreateTime).reversed());
 		return PageVO.newBuilder().pageNo(querySpuRequest.getPageNo()).pageSize(querySpuRequest.getPageSize()).totalCount((int) infoEntityPage.getTotal()).result(spuVOList).build();
 	}
 
@@ -505,6 +512,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		productDetailVO.setHighPrice(BigDecimalUtil.F2Y(highSku.getSkuPrice().longValue()));
 		productDetailVO.setPackName(lowSku.getPackName());
 		productDetailVO.setPackValue(lowSku.getPackValue());
+		// TODO 需要调用购物车
 //		productDetailVO.setHasUnpaidFlag();
 		return productDetailVO;
 	}
@@ -539,8 +547,9 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			packInfoResponse.setPackValue(productSkuEntity.getPackValue());
 			packInfoResponse.setPrice(BigDecimalUtil.F2Y(productSkuEntity.getSkuPrice().longValue()));
 			packInfoResponse.setCommAttributeId(productSkuEntity.getCommAttribute());
-			// TODO 这里需要 cms 提供远程接口
-			packInfoResponse.setCommAttributeName(CommAttributeEnum.getValueByCode(productSkuEntity.getCommAttribute()));
+			Map<Integer, CommAttributeDTO> commAttributeByIdListToMap = cmsRemoteProService.getCommAttributeByIdListToMap();
+			CommAttributeDTO commAttributeDTO = commAttributeByIdListToMap.getOrDefault(productSkuEntity.getCommAttribute(), new CommAttributeDTO());
+			packInfoResponse.setCommAttributeName(commAttributeDTO.getCommAttributeName());
 			packInfoResponse.setSkuCode(productSkuEntity.getSkuCode());
 			packInfoList.add(packInfoResponse);
 		}

@@ -87,6 +87,8 @@ public class CategoryAttributeItemManageServiceImpl implements CategoryAttribute
 			entity = getAttributeItem(attributeItemId);
 			entity.setRequired(vo.getRequired());
 			entity.setOrderNumber(vo.getOrderNumber());
+			entity.setChangedAt(vo.getChangedAt());
+			entity.setChangedBy(vo.getChangedBy());
 			categoryAttributeItemMapper.updateById(entity);
 		}
 		return entity;

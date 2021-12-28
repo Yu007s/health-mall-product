@@ -13,10 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 后台分类的增删改方法,直接拷贝的之前的代码,未改动
@@ -157,6 +154,7 @@ public class BackCategoryManageServiceImpl extends ServiceImpl<BackCategoryMappe
 			category.setIcon(entity.getIcon());
 			category.setDescription(entity.getDescription());
 			category.setOrderNumber(entity.getOrderNumber());
+			category.setChangedAt(new Date());
 			baseMapper.updateById(category);
 
 			Long parentIdParam = entity.getParentId();
