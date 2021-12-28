@@ -1,7 +1,11 @@
 package com.drstrong.health.product.service;
 
+import com.drstrong.health.common.utils.JsonUtils;
 import com.drstrong.health.product.SpringBootTests;
+import com.drstrong.health.product.model.request.store.StoreSkuRequest;
 import com.drstrong.health.product.model.request.store.UpdateSkuRequest;
+import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.store.StoreSkuResponse;
 import com.drstrong.health.product.mq.model.SkuStateStockMqEvent;
 import com.drstrong.health.product.service.impl.StoreThreeRelevanceServiceImpl;
 import com.drstrong.health.product.utils.MqMessageUtil;
@@ -46,5 +50,15 @@ public class ExampleServiceTest extends SpringBootTests {
         skuIds.add(11L);
         updateSkuRequest.setSkuIdList(skuIds);
         storeThreeRelevanceService.updateSkuState(updateSkuRequest,"888");
+    }
+
+    @Test
+    public void testPage(){
+        StoreSkuRequest storeSkuRequest = new StoreSkuRequest();
+        storeSkuRequest.setPageNo(1);
+        storeSkuRequest.setPageSize(10);
+        storeSkuRequest.setStoreId(1L);
+        PageVO<StoreSkuResponse> pageVO = storeThreeRelevanceService.pageSkuList(storeSkuRequest);
+        System.out.println(JsonUtils.toJSONString(pageVO.getResult()));
     }
 }

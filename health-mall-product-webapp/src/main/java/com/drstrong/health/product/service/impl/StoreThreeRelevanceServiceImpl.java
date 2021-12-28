@@ -36,6 +36,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -116,7 +117,11 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
         .map(e -> {
             StoreSkuResponse storeSkuResponse = new StoreSkuResponse();
             BeanUtils.copyProperties(e,storeSkuResponse);
-            storeSkuResponse.setIntoPrice(BigDecimalUtil.F2Y(e.getIntoPrice().longValue()));
+            if(Objects.isNull(e.getIntoPrice())){
+                storeSkuResponse.setIntoPrice(BigDecimal.ZERO);
+            }else {
+                storeSkuResponse.setIntoPrice(BigDecimalUtil.F2Y(e.getIntoPrice().longValue()));
+            }
             storeSkuResponse.setPrice(BigDecimalUtil.F2Y(e.getPrice().longValue()));
             return storeSkuResponse;
         }).collect(Collectors.toList());
