@@ -59,7 +59,7 @@ public class StoreClient implements StoreRemoteApi {
 
 	@Override
 	public ResultVO<Object> updateState(StoreIdRequest storeIdRequest,String userId) {
-		storeService.disable(storeIdRequest,userId);
+		storeService.updateState(storeIdRequest,userId);
 		return ResultVO.success();
 	}
 
