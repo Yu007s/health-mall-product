@@ -16,6 +16,7 @@ import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.drstrong.health.product.service.IRedisService;
 import com.drstrong.health.redis.utils.RedisUtils;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
  * @author mybatis plus generator
  * @since 2021-12-14
  */
+@Slf4j
 @Service
 public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> implements BannerService {
 
@@ -101,18 +103,24 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
             Integer status=banner.getShowStatus();
             setBannerShowStatus(banner);
             if (!status.equals(banner.getShowStatus())){
-                if (status == BannerConstants.NOT_ON_SALE) {notOnSale.add(banner.getId());}
-                if (status == BannerConstants.ON_SALE) {onSale.add(banner.getId());}
-                if (status == BannerConstants.OFF_ON_SHELF) {offOnSale.add(banner.getId());}
+                if (banner.getShowStatus() == BannerConstants.NOT_ON_SALE) {notOnSale.add(banner.getId());}
+                if (banner.getShowStatus() == BannerConstants.ON_SALE) {onSale.add(banner.getId());}
+                if (banner.getShowStatus() == BannerConstants.OFF_ON_SHELF) {offOnSale.add(banner.getId());}
             }
         }
         Integer count = 0;
         if (CollectionUtils.isNotEmpty(notOnSale)){
-            count += bannerDao.updateBannerStatus(onSale, BannerConstants.NOT_ON_SALE);}
+            count += bannerDao.updateBannerStatus(notOnSale, BannerConstants.NOT_ON_SALE);
+            log.info("设置未上架：bannerIds:{}",notOnSale);
+        }
         if (CollectionUtils.isNotEmpty(onSale)){
-            count += bannerDao.updateBannerStatus(onSale, BannerConstants.ON_SALE);}
+            count += bannerDao.updateBannerStatus(onSale, BannerConstants.ON_SALE);
+            log.info("设置已上架：bannerIds:{}",onSale);
+        }
         if (CollectionUtils.isNotEmpty(offOnSale)){
-            count += bannerDao.updateBannerStatus(onSale, BannerConstants.OFF_ON_SHELF);}
+            count += bannerDao.updateBannerStatus(offOnSale, BannerConstants.OFF_ON_SHELF);
+            log.info("设置已下架：bannerIds:{}",offOnSale);
+        }
         return count;
     }
 

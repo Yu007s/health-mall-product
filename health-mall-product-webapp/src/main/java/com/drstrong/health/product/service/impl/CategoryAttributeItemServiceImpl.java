@@ -52,8 +52,12 @@ public class CategoryAttributeItemServiceImpl implements CategoryAttributeItemSe
 			log.error("invoke CategoryAttributeServiceImpl.queryByAttributeIdList param is null ,param:{},{}", attributeIdList, categoryId);
 			return Lists.newArrayList();
 		}
+		// 获取父类的关联信息,和之前的逻辑保持一致
+		BackCategoryEntity backCategoryEntity = backCategoryService.queryById(categoryId);
+		List<String> categoryIdList = Lists.newArrayList(backCategoryEntity.getIdPath().split(","));
+
 		LambdaQueryWrapper<CategoryAttributeItemEntity> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(CategoryAttributeItemEntity::getCategoryId, categoryId).in(CategoryAttributeItemEntity::getAttributeId, attributeIdList);
+		queryWrapper.in(CategoryAttributeItemEntity::getCategoryId, categoryIdList).in(CategoryAttributeItemEntity::getAttributeId, attributeIdList);
 		return categoryAttributeItemMapper.selectList(queryWrapper);
 	}
 

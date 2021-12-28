@@ -124,12 +124,12 @@
             <artifactId>health-redis-spring-boot-starter</artifactId>
             <version>1.0.0</version>
         </dependency>
-        <!-- xxl-job -->
+        <!-- xxl-job-core -->
         <dependency>
-            <groupId>cn.strong</groupId>
-            <artifactId>xxl-job-spring-boot-starter</artifactId>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+            <version>2.2.0</version>
         </dependency>
-
         <!--    自定义区域结束    -->
 
         <!--    junit    -->

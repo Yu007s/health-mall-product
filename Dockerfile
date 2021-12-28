@@ -1,11 +1,11 @@
-FROM openjdk:8-jdk-alpine as builder
+FROM harbor.leke.cn/basic/openjdk:8-jdk-alpine as builder
 ARG APP_NAME
 MAINTAINER wangfeng1 "wangfeng1@cnstrong.com"
 WORKDIR application
 COPY ${APP_NAME}-webapp/target/${APP_NAME}.jar application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
-FROM openjdk:8-jdk-alpine
+FROM harbor.leke.cn/basic/openjdk:8-jdk-alpine
 MAINTAINER wangfeng1 "wangfeng1@cnstrong.com"
 WORKDIR application
 COPY --from=builder /application/dependencies/ ./
@@ -21,9 +21,7 @@ ENV JVM_AGENT ''
 ENV SERVER_PORT 8080
 EXPOSE ${SERVER_PORT}
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo 'Asia/Shanghai' >/etc/timezone \
-    && mkdir logs \
+RUN mkdir logs \
     && cd logs \
     && touch start.log \
     && ln -sf /dev/stdout start.log \

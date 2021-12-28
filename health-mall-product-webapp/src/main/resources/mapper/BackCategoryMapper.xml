@@ -180,21 +180,21 @@
 
 
     <update id="updateLeafCountByIds">
-        update p_category set leaf_count = leaf_count + #{offset} where id in
+        update pms_product_back_category set leaf_count = leaf_count + #{offset} where id in
         <foreach collection="categoryIds" item="categoryId" open="(" separator="," close=")">
             #{categoryId}
         </foreach>
     </update>
 
     <update id="updateStatusById">
-		update p_category set `status` = #{status} where id = #{categoryId}
+		update pms_product_back_category set `status` = #{status} where id = #{categoryId}
 	</update>
 
     <update id="updatePNumberById">
-		update p_category set p_number = p_number + #{offset} where id = #{categoryId}
+		update pms_product_back_category set p_number = p_number + #{offset} where id = #{categoryId}
 	</update>
 
     <update id="updateChildrenNamePath">
-		update p_category set name_path = replace(name_path, #{oldNamePath}, #{newNamePath}) where id_path like concat(#{idPath}, '%')
+		update pms_product_back_category set name_path = replace(name_path, #{oldNamePath}, #{newNamePath}) where id_path like concat(#{idPath}, '%')
 	</update>
 </mapper>

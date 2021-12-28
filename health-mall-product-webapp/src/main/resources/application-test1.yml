@@ -4,7 +4,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:mysql:replication://192.168.21.3:3306/mall_product?rewriteBatchedStatements=true&useUnicode=true&characterEncoding=UTF8&useSSL=false
+    url: jdbc:mysql:replication://192.168.21.3:3306/mall_product?rewriteBatchedStatements=true&useUnicode=true&characterEncoding=UTF8&useSSL=false&serverTimezone=Asia/Shanghai
     username: strongEhp
     password: WgqciKVG
   redis:

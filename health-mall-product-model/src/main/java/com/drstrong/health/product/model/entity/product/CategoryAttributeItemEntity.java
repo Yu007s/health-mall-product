@@ -1,10 +1,12 @@
 package com.drstrong.health.product.model.entity.product;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author liuqiuyi
@@ -27,6 +29,7 @@ public class CategoryAttributeItemEntity implements Serializable {
 	/**
 	 *
 	 */
+	@TableId(value = "id", type = IdType.AUTO)
 	private Long id;
 	/**
 	 * 后端分类 id
@@ -67,7 +70,7 @@ public class CategoryAttributeItemEntity implements Serializable {
 	/**
 	 * 创建时间
 	 */
-	private LocalDateTime createdAt;
+	private Date createdAt;
 	/**
 	 * 创建人
 	 */
@@ -75,7 +78,7 @@ public class CategoryAttributeItemEntity implements Serializable {
 	/**
 	 * 修改时间
 	 */
-	private LocalDateTime changedAt;
+	private Date changedAt;
 	/**
 	 * 修改人
 	 */

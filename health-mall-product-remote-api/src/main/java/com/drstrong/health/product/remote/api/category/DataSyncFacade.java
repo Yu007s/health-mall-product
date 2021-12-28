@@ -83,7 +83,7 @@ public interface DataSyncFacade {
 	 * @date 2021/12/28 09:50
 	 */
 	@PostMapping("p_category_attribute_item/saveItem")
-	ResultVO<CategoryAttributeItemEntity> categoryAttributeItemSaveItem(CategoryAttributeItemEntity vo) throws BusinessException;
+	ResultVO<CategoryAttributeItemEntity> categoryAttributeItemSaveItem(@RequestBody CategoryAttributeItemEntity vo) throws BusinessException;
 
 	/**
 	 * p_category_attribute_item 删除分类属性项
@@ -91,6 +91,6 @@ public interface DataSyncFacade {
 	 * @author liuqiuyi
 	 * @date 2021/12/28 09:50
 	 */
-	@PostMapping("p_category_attribute_item/deleteItem")
-	ResultVO<CategoryAttributeItemEntity> categoryAttributeItemDeleteItem(Long attributeItemId) throws BusinessException;
+	@GetMapping("p_category_attribute_item/deleteItem")
+	ResultVO<CategoryAttributeItemEntity> categoryAttributeItemDeleteItem(@RequestParam("attributeItemId") Long attributeItemId) throws BusinessException;
 }
