@@ -450,7 +450,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		productBasicsInfoEntity.setChangedAt(LocalDateTime.now());
 		productBasicsInfoEntity.setChangedBy(userId);
 		LambdaUpdateWrapper<ProductBasicsInfoEntity> updateWrapper = new LambdaUpdateWrapper<>();
-		updateWrapper.eq(ProductBasicsInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED)
+		updateWrapper.eq(ProductBasicsInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
 				.eq(ProductBasicsInfoEntity::getState, (ProductStateEnum.HAS_PUT.getCode()).equals(state) ? ProductStateEnum.UN_PUT.getCode() : ProductStateEnum.HAS_PUT.getCode())
 				.in(ProductBasicsInfoEntity::getId, spuIdList);
 		productBasicsInfoMapper.update(productBasicsInfoEntity, updateWrapper);

@@ -167,7 +167,7 @@ public class StoreServiceImpl implements StoreService {
         LambdaQueryWrapper<StoreEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(StoreEntity::getStoreStatus, StoreStatusEnum.ENABLE.getCode())
-                .eq(StoreEntity::getSetPostage,StorePostageEnum.HAS_SET)
+                .eq(StoreEntity::getSetPostage,StorePostageEnum.HAS_SET.getCode())
                 .in(StoreEntity::getId,storeIds);
         return storeMapper.selectList(queryWrapper);
     }
