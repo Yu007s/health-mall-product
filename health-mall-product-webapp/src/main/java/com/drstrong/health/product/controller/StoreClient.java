@@ -121,4 +121,10 @@ public class StoreClient implements StoreRemoteApi {
 	public List<ThreeSkuInfoResponse> queryBySkuIds(List<Long> skuIds) {
 		return storeThreeRelevanceService.queryBySkuIds(skuIds);
 	}
+
+	@Override
+	public ResultVO<List<StoreInfoResponse>> queryByStoreIds(Set<Long> storeIds) {
+		List<StoreInfoResponse> storeInfoResponses = storeService.queryByStoreIds(storeIds);
+		return ResultVO.success(storeInfoResponses);
+	}
 }

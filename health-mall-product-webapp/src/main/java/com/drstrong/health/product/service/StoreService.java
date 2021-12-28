@@ -35,4 +35,6 @@ public interface StoreService {
     List<StoreEntity> querySetPostageByStoreIds(List<Long> storeIds);
 
     List<StorePostageDTO> getStorePostageByIds(Set<Long> storeIds, String areaName);
+
+    List<StoreInfoResponse> queryByStoreIds(Set<Long> storeIds);
 }

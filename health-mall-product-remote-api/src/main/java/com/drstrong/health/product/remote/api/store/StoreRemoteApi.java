@@ -84,4 +84,8 @@ public interface StoreRemoteApi {
     @ApiOperation("批量获取sku关联三方信息")
     @PostMapping("/queryBySkuIds")
     List<ThreeSkuInfoResponse> queryBySkuIds(@RequestBody List<Long> skuIds);
+
+    @ApiOperation("根据店铺ID批量获取店铺信息")
+    @GetMapping("/queryByStoreIds")
+    ResultVO<List<StoreInfoResponse>> queryByStoreIds(@RequestParam("storeIds") Set<Long> storeIds);
 }

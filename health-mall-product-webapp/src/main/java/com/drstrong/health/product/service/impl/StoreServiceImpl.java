@@ -185,6 +185,11 @@ public class StoreServiceImpl implements StoreService {
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public List<StoreInfoResponse> queryByStoreIds(Set<Long> storeIds) {
+        return buildResponse(selectByStoreIds(storeIds));
+    }
+
     private StoreEntity selectByStoreId(Long storeId) {
         LambdaQueryWrapper<StoreEntity> storeWrapper = new LambdaQueryWrapper<>();
         storeWrapper.eq(StoreEntity::getId, storeId)
