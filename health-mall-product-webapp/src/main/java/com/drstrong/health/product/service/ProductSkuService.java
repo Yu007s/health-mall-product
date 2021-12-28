@@ -169,4 +169,11 @@ public interface ProductSkuService {
 	 * @date 2021/12/23 21:04
 	 */
 	List<String> searchSkuNameByName(String content, Integer count);
+
+	/**
+	 * 批量获取店铺对应的sku数量
+	 * @param storeIds
+	 * @return
+	 */
+	Map<Long,Integer> searchSkuCountMap(List<Long> storeIds);
 }

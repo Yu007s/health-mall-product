@@ -309,6 +309,18 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		return productSkuMapper.searchSkuNameByName(content, count);
 	}
 
+	@Override
+	public Map<Long, Integer> searchSkuCountMap(List<Long> storeIds) {
+		Map<Long, Integer> result = new HashMap<>();
+		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(ProductSkuEntity::getDelFlag,DelFlagEnum.UN_DELETED)
+				.in(ProductSkuEntity::getSourceId,storeIds);
+		List<ProductSkuEntity> productSkuEntities = productSkuMapper.selectList(queryWrapper);
+		Map<Long, List<ProductSkuEntity>> map = productSkuEntities.stream().collect(groupingBy(ProductSkuEntity::getSourceId));
+		map.forEach((k,v) -> result.put(k,v.size()));
+		return result;
+	}
+
 	/**
 	 * 根据 skuId 或者 skuCode 查询 sku 信息
 	 *

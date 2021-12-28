@@ -14,6 +14,7 @@ import com.drstrong.health.product.model.request.store.StorePostage;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.remote.model.StorePostageDTO;
+import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.service.StorePostageAreaService;
 import com.drstrong.health.product.service.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
@@ -54,6 +55,9 @@ public class StoreServiceImpl implements StoreService {
     private StorePostageAreaMapper storePostageAreaMapper;
     @Resource
     private RedisUtils redisUtils;
+
+    @Resource
+    private ProductSkuService productSkuService;
 
     @Override
     public List<StoreInfoResponse> queryAll() {
@@ -290,7 +294,9 @@ public class StoreServiceImpl implements StoreService {
      * @return
      */
     private List<StoreInfoResponse> buildResponse(List<StoreEntity> storeEntities) {
-       if(CollectionUtils.isEmpty(storeEntities)){
+        List<Long> storeIds = storeEntities.stream().map(StoreEntity::getId).collect(Collectors.toList());
+        Map<Long, Integer> storeCountMap = productSkuService.searchSkuCountMap(storeIds);
+        if(CollectionUtils.isEmpty(storeEntities)){
           return Collections.emptyList();
        }
        List<StoreInfoResponse> responses = Lists.newArrayListWithCapacity(storeEntities.size());
@@ -299,7 +305,7 @@ public class StoreServiceImpl implements StoreService {
          storeInfoResponse.setStoreId(s.getId());
          storeInfoResponse.setStoreCode(s.getCode());
          storeInfoResponse.setFreePostage(BigDecimalUtil.F2Y(s.getFreePostage().longValue()));
-         storeInfoResponse.setSkuCount(s.getProductCount());
+         storeInfoResponse.setSkuCount(storeCountMap.get(s.getId()));
          storeInfoResponse.setStoreName(s.getName());
          storeInfoResponse.setStoreStatus(s.getStoreStatus());
          responses.add(storeInfoResponse);
