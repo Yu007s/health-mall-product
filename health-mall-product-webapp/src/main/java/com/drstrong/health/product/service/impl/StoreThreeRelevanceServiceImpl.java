@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.dao.StoreThreeRelevanceMapper;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.entity.store.StoreSkuEntity;
 import com.drstrong.health.product.model.entity.store.StoreThreeRelevanceEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
@@ -24,12 +25,11 @@ import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.service.StoreService;
 import com.drstrong.health.product.service.StoreThreeRelevanceService;
+import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.utils.MqMessageUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import org.easy.excel.ExcelContext;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -59,9 +59,6 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
     private ProductBasicsInfoService productBasicsInfoService;
     @Resource
     private StoreService storeService;
-    @Autowired
-    private ExcelContext excelContext;
-
     @Resource
     private MqMessageUtil mqMessageUtil;
 
@@ -70,7 +67,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchasePrice(UpdateThreeRequest updateThreeRequest, String userId) {
         StoreThreeRelevanceEntity storeThreeRelevanceEntity = new StoreThreeRelevanceEntity();
-        storeThreeRelevanceEntity.setThreePurchasePrice(updateThreeRequest.getPurchasePrice());
+        storeThreeRelevanceEntity.setThreePurchasePrice(BigDecimalUtil.Y2F(updateThreeRequest.getPurchasePrice()).intValue());
         storeThreeRelevanceEntity.setChangedBy(userId);
         storeThreeRelevanceEntity.setChangedAt(LocalDateTime.now());
         LambdaUpdateWrapper<StoreThreeRelevanceEntity> updateWrapper = new LambdaUpdateWrapper();
@@ -85,27 +82,44 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
         if(Objects.isNull(storeId)){
           throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
         }
-        Page<StoreSkuResponse> page = new Page<>(storeSkuRequest.getPageNo(),storeSkuRequest.getPageSize());
-        QueryWrapper<StoreSkuResponse> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("p.del_flag", DelFlagEnum.UN_DELETED.getCode());
-        queryWrapper.eq("p.source_id", storeId);
-        if(StringUtils.hasLength(storeSkuRequest.getSkuCode())){
-           queryWrapper.eq("p.sku_code",storeSkuRequest.getSkuCode());
-        }
-        if(StringUtils.hasLength(storeSkuRequest.getSkuName())){
-            queryWrapper.like(" p.sku_name",storeSkuRequest.getSkuName());
-        }
-        if(Objects.nonNull(storeSkuRequest.getSkuState())){
-            queryWrapper.eq("p.state",storeSkuRequest.getSkuState());
-        }
-        if(Objects.nonNull(storeSkuRequest.getThreeSkuId())){
-            queryWrapper.eq("t.three_sku_id",storeSkuRequest.getThreeSkuId());
-        }
-        List<StoreSkuResponse> storeSkuResponses =  storeThreeRelevanceMapper.pageSkuList(page,queryWrapper);
+        Page<StoreSkuEntity> page = new Page<>(storeSkuRequest.getPageNo(),storeSkuRequest.getPageSize());
+        QueryWrapper<StoreSkuEntity> queryWrapper = buildSkuQuery(storeSkuRequest, storeId);
+        List<StoreSkuEntity> storeSkuEntities =  storeThreeRelevanceMapper.pageSkuList(page,queryWrapper);
+        List<StoreSkuResponse> storeSkuResponses = convetResponse(storeSkuEntities);
         if(CollectionUtils.isEmpty(storeSkuResponses)){
             return PageVO.newBuilder().pageNo(storeSkuRequest.getPageNo()).pageSize(storeSkuRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
         }
         return PageVO.newBuilder().pageNo(storeSkuRequest.getPageNo()).pageSize(storeSkuRequest.getPageSize()).totalCount((int) page.getTotal()).result(storeSkuResponses).build();
+    }
+
+    private QueryWrapper<StoreSkuEntity> buildSkuQuery(StoreSkuRequest storeSkuRequest, Long storeId) {
+        QueryWrapper<StoreSkuEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("p.del_flag", DelFlagEnum.UN_DELETED.getCode());
+        queryWrapper.eq("p.source_id", storeId);
+        if (StringUtils.hasLength(storeSkuRequest.getSkuCode())) {
+            queryWrapper.eq("p.sku_code", storeSkuRequest.getSkuCode());
+        }
+        if (StringUtils.hasLength(storeSkuRequest.getSkuName())) {
+            queryWrapper.like(" p.sku_name", storeSkuRequest.getSkuName());
+        }
+        if (Objects.nonNull(storeSkuRequest.getSkuState())) {
+            queryWrapper.eq("p.state", storeSkuRequest.getSkuState());
+        }
+        if (Objects.nonNull(storeSkuRequest.getThreeSkuId())) {
+            queryWrapper.eq("t.three_sku_id", storeSkuRequest.getThreeSkuId());
+        }
+        return queryWrapper;
+    }
+
+    private List<StoreSkuResponse> convetResponse(List<StoreSkuEntity> storeSkuEntities) {
+        return storeSkuEntities.stream()
+        .map(e -> {
+            StoreSkuResponse storeSkuResponse = new StoreSkuResponse();
+            BeanUtils.copyProperties(e,storeSkuResponse);
+            storeSkuResponse.setIntoPrice(BigDecimalUtil.F2Y(e.getIntoPrice().longValue()));
+            storeSkuResponse.setPrice(BigDecimalUtil.F2Y(e.getPrice().longValue()));
+            return storeSkuResponse;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -169,22 +183,9 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
         if(Objects.isNull(storeId)){
             throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
         }
-        QueryWrapper<StoreSkuResponse> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("p.del_flag", DelFlagEnum.UN_DELETED.getCode());
-        queryWrapper.eq("p.source_id", storeId);
-        if(StringUtils.hasLength(storeSkuRequest.getSkuCode())){
-            queryWrapper.eq("p.sku_code",storeSkuRequest.getSkuCode());
-        }
-        if(StringUtils.hasLength(storeSkuRequest.getSkuName())){
-            queryWrapper.like(" p.sku_name",storeSkuRequest.getSkuName());
-        }
-        if(Objects.nonNull(storeSkuRequest.getSkuState())){
-            queryWrapper.eq("p.state",storeSkuRequest.getSkuState());
-        }
-        if(Objects.nonNull(storeSkuRequest.getThreeSkuId())){
-            queryWrapper.eq("t.three_sku_id",storeSkuRequest.getThreeSkuId());
-        }
-        return storeThreeRelevanceMapper.searchSkuList(queryWrapper);
+        QueryWrapper<StoreSkuEntity> queryWrapper = buildSkuQuery(storeSkuRequest, storeId);
+        List<StoreSkuEntity> storeSkuEntities = storeThreeRelevanceMapper.searchSkuList(queryWrapper);
+        return convetResponse(storeSkuEntities);
     }
 
     @Override

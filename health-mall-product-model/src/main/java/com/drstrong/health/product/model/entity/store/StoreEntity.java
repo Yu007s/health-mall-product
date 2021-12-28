@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * @author lsx
@@ -69,9 +68,9 @@ public class StoreEntity extends BaseEntity implements Serializable {
     private Integer setPostage;
 
     /**
-     * 满多少包邮(分)，默认为-1
+     * 满多少包邮(分)，默认为0
      */
-    private BigDecimal freePostage;
+    private Integer freePostage;
 
     /**
      * 0-启用,1-未启用

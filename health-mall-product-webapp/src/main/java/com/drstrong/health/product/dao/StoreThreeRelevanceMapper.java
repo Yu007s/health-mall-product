@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.drstrong.health.product.model.entity.store.StoreSkuEntity;
 import com.drstrong.health.product.model.entity.store.StoreThreeRelevanceEntity;
-import com.drstrong.health.product.model.response.store.StoreSkuResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -23,9 +23,9 @@ import java.util.List;
 public interface StoreThreeRelevanceMapper extends BaseMapper<StoreThreeRelevanceEntity> {
     @Select("SELECT p.id as skuId,p.sku_code,p.sku_name,p.sku_price as price,p.state as skuState,t.three_purchase_price as intoPrice,t.three_sku_id FROM `pms_product_sku` p LEFT JOIN product_three_store_relevance t ON p.id = t.sku_id "
     + "${ew.customSqlSegment}" + "ORDER BY p.created_at DESC")
-    List<StoreSkuResponse> pageSkuList(Page<StoreSkuResponse> page, @Param(Constants.WRAPPER) QueryWrapper<StoreSkuResponse> queryWrapper);
+    List<StoreSkuEntity> pageSkuList(Page<StoreSkuEntity> page, @Param(Constants.WRAPPER) QueryWrapper<StoreSkuEntity> queryWrapper);
 
     @Select("SELECT p.id as skuId,p.sku_code,p.sku_name,p.sku_price as price,p.state as skuState,t.three_purchase_price as intoPrice,t.three_sku_id FROM `pms_product_sku` p LEFT JOIN product_three_store_relevance t ON p.id = t.sku_id "
             + "${ew.customSqlSegment}" + "ORDER BY p.created_at DESC")
-    List<StoreSkuResponse> searchSkuList(@Param(Constants.WRAPPER) QueryWrapper<StoreSkuResponse> queryWrapper);
+    List<StoreSkuEntity> searchSkuList(@Param(Constants.WRAPPER) QueryWrapper<StoreSkuEntity> queryWrapper);
 }

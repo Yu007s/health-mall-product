@@ -19,6 +19,7 @@ import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.remote.model.StorePostageDTO;
 import com.drstrong.health.product.service.StorePostageAreaService;
 import com.drstrong.health.product.service.StoreService;
+import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.redis.utils.RedisUtils;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -111,7 +111,7 @@ public class StoreServiceImpl implements StoreService {
     public StorePostage getPostage(Long storeId) {
         StorePostage storePostage = new StorePostage();
         StoreEntity storeEntity = checkStoreIdExist(storeId);
-        storePostage.setFreePostage(storeEntity.getFreePostage());
+        storePostage.setFreePostage(BigDecimalUtil.F2Y(storeEntity.getFreePostage().longValue()));
         storePostage.setStoreId(storeEntity.getId());
         List<StorePostageAreaEntity> storePostageAreaEntities = storePostageAreaService.queryByStoreId(storeId);
         if(CollectionUtils.isEmpty(storePostageAreaEntities)){
@@ -120,6 +120,7 @@ public class StoreServiceImpl implements StoreService {
             storePostage.setAreaPostageList(storePostageAreaEntities.stream().map(s -> {
                 AreaPostage areaPostage = new AreaPostage();
                 BeanUtils.copyProperties(s, areaPostage);
+                areaPostage.setPostage(BigDecimalUtil.F2Y(s.getPostage().longValue()));
                 return areaPostage;
             }).collect(Collectors.toList()));
         }
@@ -137,7 +138,7 @@ public class StoreServiceImpl implements StoreService {
     public void updatePostage(StorePostage storePostage,String userId) {
         Long storeId = storePostage.getStoreId();
         StoreEntity storeEntity = checkStoreIdExist(storeId);
-        storeEntity.setFreePostage(storePostage.getFreePostage());
+        storeEntity.setFreePostage(BigDecimalUtil.Y2F(storePostage.getFreePostage()).intValue());
         storeEntity.setChangedAt(LocalDateTime.now());
         storeEntity.setChangedBy(userId);
         storeEntity.setSetPostage(StorePostageEnum.HAS_SET.getCode());
@@ -147,6 +148,7 @@ public class StoreServiceImpl implements StoreService {
         List<StorePostageAreaEntity> collect = areaPostageList.stream().map(areaPostage -> {
             StorePostageAreaEntity storePostageAreaEntity = new StorePostageAreaEntity();
             BeanUtils.copyProperties(areaPostage, storePostageAreaEntity);
+            storePostageAreaEntity.setPostage(BigDecimalUtil.Y2F(areaPostage.getPostage()).intValue());
             storePostageAreaEntity.setStoreId(storeId);
             storePostageAreaEntity.setCreatedBy(userId);
             storePostageAreaEntity.setChangedBy(userId);
@@ -174,13 +176,13 @@ public class StoreServiceImpl implements StoreService {
     public List<StorePostageDTO> getStorePostageByIds(Set<Long> storeIds, String areaName) {
         List<StoreEntity> storeEntities = selectByStoreIds(storeIds);
         List<StorePostageAreaEntity> storePostageAreaEntities = storePostageAreaService.queryByStoreIdsAndAreaName(storeIds, areaName);
-        Map<Long, BigDecimal> map = storePostageAreaEntities.stream().collect(Collectors.toMap(StorePostageAreaEntity::getStoreId, StorePostageAreaEntity::getPostage));
+        Map<Long, Integer> map = storePostageAreaEntities.stream().collect(Collectors.toMap(StorePostageAreaEntity::getStoreId, StorePostageAreaEntity::getPostage));
         return storeEntities.stream().map(s -> {
             StorePostageDTO storePostageDTO = new StorePostageDTO();
             storePostageDTO.setStoreId(s.getId());
             storePostageDTO.setStoreName(s.getName());
-            storePostageDTO.setFreePostage(s.getFreePostage());
-            storePostageDTO.setPostage(map.getOrDefault(s.getId(),BigDecimal.valueOf(0)));
+            storePostageDTO.setFreePostage(BigDecimalUtil.F2Y(s.getFreePostage().longValue()));
+            storePostageDTO.setPostage(BigDecimalUtil.F2Y(map.getOrDefault(s.getId(),0).longValue()));
             return storePostageDTO;
         }).collect(Collectors.toList());
     }
@@ -261,7 +263,7 @@ public class StoreServiceImpl implements StoreService {
          StoreInfoResponse storeInfoResponse = new StoreInfoResponse();
          storeInfoResponse.setStoreId(s.getId());
          storeInfoResponse.setStoreCode(s.getCode());
-         storeInfoResponse.setFreePostage(s.getFreePostage());
+         storeInfoResponse.setFreePostage(BigDecimalUtil.F2Y(s.getFreePostage().longValue()));
          storeInfoResponse.setSkuCount(s.getProductCount());
          storeInfoResponse.setStoreName(s.getName());
          storeInfoResponse.setStoreStatus(s.getStoreStatus());
