@@ -78,6 +78,18 @@ strong:
     title: 商品模块接口文档
     description: 茴茴健康商城,商品模块接口文档
     url: http://localhost:9092/doc.html
+xxl:
+  job:
+    admin:
+      addresses: http://192.168.40.44:8080/xxl-job-admin/
+    accessToken:
+    executor:
+      appname: test2-health-mall-product
+      address:
+      ip:
+      port: 5050
+      logpath: logs
+      logretentiondays: 30
 
 rocketmq:
   name-server: 192.168.21.202:9876
