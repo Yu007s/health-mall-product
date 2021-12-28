@@ -61,7 +61,7 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public List<StoreInfoResponse> queryAll() {
         LambdaQueryWrapper<StoreEntity> storeWrapper = new LambdaQueryWrapper<>();
-        storeWrapper.eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode()).eq(StoreEntity::getStoreStatus, StoreStatusEnum.ENABLE.getCode());
+        storeWrapper.eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         List<StoreEntity> storeEntities = storeMapper.selectList(storeWrapper);
         return buildResponse(storeEntities);
     }
@@ -98,12 +98,12 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public void disable(StoreIdRequest storeIdRequest, String userId) {
+    public void updateState(StoreIdRequest storeIdRequest, String userId) {
         StoreEntity disEntity = new StoreEntity();
         disEntity.setId(storeIdRequest.getStoreId());
         disEntity.setChangedBy(userId);
         disEntity.setChangedAt(LocalDateTime.now());
-        disEntity.setStoreStatus(StoreStatusEnum.DISABLE.getCode());
+        disEntity.setStoreStatus(storeIdRequest.getStoreStatus());
         storeMapper.updateById(disEntity);
     }
 

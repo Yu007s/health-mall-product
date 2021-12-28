@@ -41,7 +41,7 @@ public interface StoreRemoteApi {
     @PostMapping("/update")
     ResultVO<Object> update(@RequestBody @Valid StoreAddOrUpdateRequest storeAddOrUpdateRequest,@RequestParam("userId") String userId);
 
-    @ApiOperation("禁用店铺")
+    @ApiOperation("启用、禁用店铺")
     @PostMapping("/updateState")
     ResultVO<Object> updateState(@RequestBody @Valid StoreIdRequest storeIdRequest,@RequestParam("userId") String userId);
 
