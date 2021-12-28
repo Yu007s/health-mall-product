@@ -24,7 +24,7 @@ public interface StoreService {
 
     void update(StoreAddOrUpdateRequest storeAddOrUpdateRequest,String userId);
 
-    void disable(StoreIdRequest storeIdRequest, String userId);
+    void updateState(StoreIdRequest storeIdRequest, String userId);
 
     StorePostage getPostage(Long storeId);
     
