@@ -103,23 +103,23 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
             Integer status=banner.getShowStatus();
             setBannerShowStatus(banner);
             if (!status.equals(banner.getShowStatus())){
-                if (status == BannerConstants.NOT_ON_SALE) {notOnSale.add(banner.getId());}
-                if (status == BannerConstants.ON_SALE) {onSale.add(banner.getId());}
-                if (status == BannerConstants.OFF_ON_SHELF) {offOnSale.add(banner.getId());}
+                if (banner.getShowStatus() == BannerConstants.NOT_ON_SALE) {notOnSale.add(banner.getId());}
+                if (banner.getShowStatus() == BannerConstants.ON_SALE) {onSale.add(banner.getId());}
+                if (banner.getShowStatus() == BannerConstants.OFF_ON_SHELF) {offOnSale.add(banner.getId());}
             }
         }
         Integer count = 0;
         if (CollectionUtils.isNotEmpty(notOnSale)){
             count += bannerDao.updateBannerStatus(notOnSale, BannerConstants.NOT_ON_SALE);
-            log.debug("设置未上架：bannerIds:{}",notOnSale);
+            log.info("设置未上架：bannerIds:{}",notOnSale);
         }
         if (CollectionUtils.isNotEmpty(onSale)){
             count += bannerDao.updateBannerStatus(onSale, BannerConstants.ON_SALE);
-            log.debug("设置已上架：bannerIds:{}",onSale);
+            log.info("设置已上架：bannerIds:{}",onSale);
         }
         if (CollectionUtils.isNotEmpty(offOnSale)){
             count += bannerDao.updateBannerStatus(offOnSale, BannerConstants.OFF_ON_SHELF);
-            log.debug("设置已下架：bannerIds:{}",offOnSale);
+            log.info("设置已下架：bannerIds:{}",offOnSale);
         }
         return count;
     }

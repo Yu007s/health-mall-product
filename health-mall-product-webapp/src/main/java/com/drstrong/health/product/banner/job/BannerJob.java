@@ -18,6 +18,9 @@ import javax.annotation.Resource;
 @Slf4j
 public class BannerJob {
 
+    @Resource
+    private BannerService bannerService;
+
     /**
      * 更新轮播图上下架状态
      */
@@ -28,7 +31,6 @@ public class BannerJob {
         log.info("task running pollingBannerStatus");
         Integer count = 0;
         try {
-            BannerService bannerService = SpringContextHolder.getBean("bannerServiceImpl", BannerService.class);
             count =bannerService.pollingStatus();
         } catch (Exception e) {
             log.info("SyncYtPharmacyInventoryJob fail", e);
