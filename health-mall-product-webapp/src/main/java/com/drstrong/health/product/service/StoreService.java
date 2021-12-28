@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service;
 
 import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.enums.CategoryProductNumOperateEnum;
 import com.drstrong.health.product.model.request.store.StoreAddOrUpdateRequest;
 import com.drstrong.health.product.model.request.store.StoreIdRequest;
 import com.drstrong.health.product.model.request.store.StorePostage;
@@ -27,7 +28,7 @@ public interface StoreService {
     void updateState(StoreIdRequest storeIdRequest, String userId);
 
     StorePostage getPostage(Long storeId);
-    
+
     StoreEntity getByStoreId(Long storeId);
 
     void updatePostage(StorePostage storePostage,String userId);
@@ -37,4 +38,14 @@ public interface StoreService {
     List<StorePostageDTO> getStorePostageByIds(Set<Long> storeIds, String areaName);
 
     List<StoreInfoResponse> queryByStoreIds(Set<Long> storeIds);
+
+	/**
+	 * 增加或者减少 店铺的商品数量
+	 *
+	 * @param storeId 店铺id
+	 * @param count   要累加的商品数量
+	 * @author liuqiuyi
+	 * @date 2021/12/28 11:08
+	 */
+	void addOrReduceProductNumById(Long storeId, Integer count, CategoryProductNumOperateEnum operateEnum);
 }

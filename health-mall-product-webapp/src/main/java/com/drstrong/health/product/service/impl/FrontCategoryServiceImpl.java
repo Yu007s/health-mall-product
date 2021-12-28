@@ -358,8 +358,10 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		if (Objects.isNull(categoryEntity)) {
 			throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
 		}
-		// 校验名称是否重复
-		checkNameIsRepeat(updateFrontCategoryRequest.getCategoryName(), categoryEntity.getParentId());
+		// 如果名称不一致,需要校验名称是否重复
+		if (!Objects.equals(categoryEntity.getName(), updateFrontCategoryRequest.getCategoryName())) {
+			checkNameIsRepeat(updateFrontCategoryRequest.getCategoryName(), categoryEntity.getParentId());
+		}
 		FrontCategoryEntity frontEntity = new FrontCategoryEntity();
 		frontEntity.setId(updateFrontCategoryRequest.getCategoryId());
 		frontEntity.setName(updateFrontCategoryRequest.getCategoryName());
