@@ -634,6 +634,8 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		}
 		// 更新分类下的商品数量
 		updateCategoryProductNum(infoEntity.getId(), saveProductRequest.getCategoryId(), infoEntity.getCategoryId());
+		// 更新店铺下商品数量
+		updateStoreProductNum(infoEntity.getId(), saveProductRequest.getStoreId(), infoEntity.getSourceId());
 		// 更新商品基础信息
 		BeanUtils.copyProperties(saveProductRequest, infoEntity);
 		infoEntity.setMasterImageUrl(saveProductRequest.getImageUrlList().get(0));
@@ -653,6 +655,17 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			// 如果是修改商品,并且修改前后分类 id 不一致,老的分类需要 -1,新的分类需要 +1
 			backCategoryService.addOrReduceProductNumById(oldCategoryId, 1, CategoryProductNumOperateEnum.REDUCE);
 			backCategoryService.addOrReduceProductNumById(newCategoryId, 1, CategoryProductNumOperateEnum.ADD);
+		}
+	}
+
+	private void updateStoreProductNum(Long productId, Long newStoreId, Long oldStoreId) {
+		// 如果是新增商品,增加对应的店铺的商品数量
+		if (Objects.isNull(productId)) {
+			storeService.addOrReduceProductNumById(newStoreId, 1, CategoryProductNumOperateEnum.ADD);
+		} else if (!Objects.equals(newStoreId, oldStoreId)) {
+			// 如果是修改商品,并且修改前后店铺 id 不一致,老的店铺需要 -1,新的店铺需要 +1
+			storeService.addOrReduceProductNumById(oldStoreId, 1, CategoryProductNumOperateEnum.REDUCE);
+			storeService.addOrReduceProductNumById(newStoreId, 1, CategoryProductNumOperateEnum.ADD);
 		}
 	}
 

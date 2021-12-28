@@ -6,10 +6,7 @@ import com.drstrong.health.product.dao.StoreMapper;
 import com.drstrong.health.product.dao.StorePostageAreaMapper;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.entity.store.StorePostageAreaEntity;
-import com.drstrong.health.product.model.enums.DelFlagEnum;
-import com.drstrong.health.product.model.enums.ErrorEnums;
-import com.drstrong.health.product.model.enums.StorePostageEnum;
-import com.drstrong.health.product.model.enums.StoreStatusEnum;
+import com.drstrong.health.product.model.enums.*;
 import com.drstrong.health.product.model.request.store.AreaPostage;
 import com.drstrong.health.product.model.request.store.StoreAddOrUpdateRequest;
 import com.drstrong.health.product.model.request.store.StoreIdRequest;
@@ -190,6 +187,44 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public List<StoreInfoResponse> queryByStoreIds(Set<Long> storeIds) {
         return buildResponse(selectByStoreIds(storeIds));
+    }
+
+    /**
+     * 增加或者减少 店铺的商品数量
+     *
+     * @param storeId     店铺id
+     * @param count       要累加的商品数量
+     * @param operateEnum 操作类型
+     * @author liuqiuyi
+     * @date 2021/12/28 11:08
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addOrReduceProductNumById(Long storeId, Integer count, CategoryProductNumOperateEnum operateEnum) {
+        if (Objects.isNull(storeId) || Objects.isNull(operateEnum)) {
+            log.error("StoreServiceImpl.addOrReduceProductNumById param is null");
+            return;
+        }
+        if (Objects.isNull(count)) {
+            count = 1;
+        }
+        // 查询店铺
+        StoreEntity storeEntity = storeMapper.selectById(storeId);
+        if (Objects.isNull(storeEntity)) {
+            throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
+        }
+        // 如果是增加操作
+        if (Objects.equals(CategoryProductNumOperateEnum.ADD, operateEnum)) {
+            storeEntity.setProductCount(storeEntity.getProductCount() + count);
+        } else {
+            int num = storeEntity.getProductCount() - count;
+            if (num < 0) {
+                num = 0;
+            }
+            storeEntity.setProductCount(num);
+        }
+        storeEntity.setChangedAt(LocalDateTime.now());
+        storeMapper.updateById(storeEntity);
     }
 
     private StoreEntity selectByStoreId(Long storeId) {

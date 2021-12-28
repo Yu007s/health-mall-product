@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -57,6 +58,7 @@ public class BackCategoryServiceImpl extends ServiceImpl<BackCategoryMapper, Bac
 	 * @date 2021/12/28 11:08
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void addOrReduceProductNumById(Long categoryId, Integer count, CategoryProductNumOperateEnum operateEnum) {
 		if (Objects.isNull(categoryId) || Objects.isNull(operateEnum)) {
 			log.error("BackCategoryServiceImpl.incProductNumById param is null");
