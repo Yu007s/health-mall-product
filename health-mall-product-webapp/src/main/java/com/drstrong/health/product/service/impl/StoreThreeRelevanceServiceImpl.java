@@ -225,7 +225,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
      */
     private void checkRelevance(List<Long> skuIdList) {
         LambdaQueryWrapper<StoreThreeRelevanceEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(StoreThreeRelevanceEntity::getDelFlag,DelFlagEnum.UN_DELETED)
+        lambdaQueryWrapper.eq(StoreThreeRelevanceEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode())
                 .in(StoreThreeRelevanceEntity::getSkuId,skuIdList);
         Integer count = storeThreeRelevanceMapper.selectCount(lambdaQueryWrapper);
         if(skuIdList.size() != count){
