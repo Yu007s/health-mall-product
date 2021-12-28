@@ -443,10 +443,10 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		productBasicsInfoEntity.setChangedAt(LocalDateTime.now());
 		productBasicsInfoEntity.setChangedBy(userId);
 		LambdaUpdateWrapper<ProductBasicsInfoEntity> updateWrapper = new LambdaUpdateWrapper<>();
-		updateWrapper.eq(ProductBasicsInfoEntity::getDelFlag,DelFlagEnum.UN_DELETED)
-				.eq(ProductBasicsInfoEntity::getState,(ProductStateEnum.HAS_PUT.getCode()).equals(state) ? ProductStateEnum.UN_PUT.getCode() : ProductStateEnum.HAS_PUT.getCode())
-				.in(ProductBasicsInfoEntity::getId,spuIdList);
-		productBasicsInfoMapper.update(productBasicsInfoEntity,updateWrapper);
+		updateWrapper.eq(ProductBasicsInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED)
+				.eq(ProductBasicsInfoEntity::getState, (ProductStateEnum.HAS_PUT.getCode()).equals(state) ? ProductStateEnum.UN_PUT.getCode() : ProductStateEnum.HAS_PUT.getCode())
+				.in(ProductBasicsInfoEntity::getId, spuIdList);
+		productBasicsInfoMapper.update(productBasicsInfoEntity, updateWrapper);
 	}
 
 	private Map<Long, BigDecimal> getSpuLowPriceMap(Map<Long, List<ProductSkuEntity>> spuSkuMap) {
@@ -623,6 +623,9 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			infoEntity.setSpuCode(getNextProductNumber(ProductTypeEnum.PRODUCT));
 			infoEntity.setCreatedBy(saveProductRequest.getUserId());
 		}
+		// 更新分类下的商品数量
+		updateCategoryProductNum(infoEntity.getId(), saveProductRequest.getCategoryId(), infoEntity.getCategoryId());
+		// 更新商品基础信息
 		BeanUtils.copyProperties(saveProductRequest, infoEntity);
 		infoEntity.setMasterImageUrl(saveProductRequest.getImageUrlList().get(0));
 		infoEntity.setSourceId(storeEntity.getId());
@@ -631,6 +634,17 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		infoEntity.setChangedAt(LocalDateTime.now());
 		saveOrUpdate(infoEntity);
 		return infoEntity;
+	}
+
+	private void updateCategoryProductNum(Long productId, Long newCategoryId, Long oldCategoryId) {
+		// 如果是新增商品,增加对应的分类商品数量
+		if (Objects.isNull(productId)) {
+			backCategoryService.addOrReduceProductNumById(newCategoryId, 1, CategoryProductNumOperateEnum.ADD);
+		} else if (!Objects.equals(newCategoryId, oldCategoryId)) {
+			// 如果是修改商品,并且修改前后分类 id 不一致,老的分类需要 -1,新的分类需要 +1
+			backCategoryService.addOrReduceProductNumById(oldCategoryId, 1, CategoryProductNumOperateEnum.REDUCE);
+			backCategoryService.addOrReduceProductNumById(newCategoryId, 1, CategoryProductNumOperateEnum.ADD);
+		}
 	}
 
 	private LambdaQueryWrapper<ProductBasicsInfoEntity> buildQuerySpuParam(QuerySpuRequest querySpuRequest) {

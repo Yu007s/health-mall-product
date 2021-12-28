@@ -3,8 +3,11 @@ package com.drstrong.health.product.controller;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.entity.category.CategoryAttributeEntity;
 import com.drstrong.health.product.model.entity.product.CategoryAttributeItemEntity;
+import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.category.DataSyncFacade;
+import com.drstrong.health.product.service.BackCategoryManageService;
+import com.drstrong.health.product.service.CategoryAttributeItemManageService;
 import com.drstrong.health.product.service.impl.DataSyncServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +28,12 @@ import java.util.List;
 public class DataSyncController implements DataSyncFacade {
 	@Resource
 	DataSyncServiceImpl dataSyncService;
+
+	@Resource
+	BackCategoryManageService backCategoryManageService;
+
+	@Resource
+	CategoryAttributeItemManageService categoryAttributeItemManageService;
 
 	/**
 	 * 同步 p_category 表的数据
@@ -63,5 +72,67 @@ public class DataSyncController implements DataSyncFacade {
 	public ResultVO<Object> categoryAttributeItem(List<CategoryAttributeItemEntity> entityList) {
 		dataSyncService.categoryAttributeItem(entityList);
 		return ResultVO.success();
+	}
+
+	/**
+	 * p_category 保存或更新分类
+	 *
+	 * @param entity
+	 * @author liuqiuyi
+	 * @date 2021/12/28 09:42
+	 */
+	@Override
+	public ResultVO<BackCategoryEntity> categorySaveEntity(BackCategoryEntity entity) throws BusinessException {
+		BackCategoryEntity backCategoryEntity = backCategoryManageService.saveEntity(entity);
+		return ResultVO.success(backCategoryEntity);
+	}
+
+	/**
+	 * p_category 删除分类
+	 *
+	 * @param categoryId 分类ID
+	 */
+	@Override
+	public ResultVO<BackCategoryEntity> categoryDeleteEntity(Long categoryId) throws BusinessException {
+		BackCategoryEntity backCategoryEntity = backCategoryManageService.deleteEntity(categoryId);
+		return ResultVO.success(backCategoryEntity);
+	}
+
+	/**
+	 * 更新分类状态
+	 *
+	 * @param categoryId 分类ID
+	 * @param status     状态值：0-禁用，1-启用
+	 */
+	@Override
+	public ResultVO<Object> categoryUpdateStatus(Long categoryId, Integer status) {
+		backCategoryManageService.updateStatus(categoryId, status);
+		return ResultVO.success();
+	}
+
+	/**
+	 * p_category_attribute_item 保存分类属性项
+	 *
+	 * @param vo
+	 * @author liuqiuyi
+	 * @date 2021/12/28 09:50
+	 */
+	@Override
+	public ResultVO<CategoryAttributeItemEntity> categoryAttributeItemSaveItem(CategoryAttributeItemEntity vo) throws BusinessException {
+		CategoryAttributeItemEntity itemEntity = categoryAttributeItemManageService.saveItem(vo);
+		return ResultVO.success(itemEntity);
+	}
+
+	/**
+	 * p_category_attribute_item 删除分类属性项
+	 *
+	 * @param attributeItemId
+	 * @author liuqiuyi
+	 * @date 2021/12/28 09:50
+	 */
+	@Override
+	public ResultVO<CategoryAttributeItemEntity> categoryAttributeItemDeleteItem(Long attributeItemId) throws BusinessException {
+		CategoryAttributeItemEntity itemEntity = categoryAttributeItemManageService.deleteItem(attributeItemId);
+		return ResultVO.success(itemEntity);
 	}
 }

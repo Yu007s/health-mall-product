@@ -11,6 +11,7 @@ import com.drstrong.health.product.service.CategoryAttributeItemManageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
@@ -50,6 +51,7 @@ public class CategoryAttributeItemManageServiceImpl implements CategoryAttribute
 	 * @param vo 分类属性项数据
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public CategoryAttributeItemEntity saveItem(CategoryAttributeItemEntity vo) throws BusinessException {
 		Assert.notNull(vo, "分类属性项数据不能为空");
 		Long attributeItemId = vo.getId();
@@ -107,6 +109,7 @@ public class CategoryAttributeItemManageServiceImpl implements CategoryAttribute
 	 * @param attributeItemId 分类属性项ID
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public CategoryAttributeItemEntity deleteItem(Long attributeItemId) throws BusinessException {
 		CategoryAttributeItemEntity entity = getAttributeItem(attributeItemId);
 		categoryAttributeItemMapper.deleteById(attributeItemId);

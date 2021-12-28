@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.BackCategoryMapper;
 import com.drstrong.health.product.model.BaseTree;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
+import com.drstrong.health.product.model.enums.CategoryProductNumOperateEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.request.category.CategoryQueryRequest;
 import com.drstrong.health.product.model.response.category.BackCategoryVO;
@@ -17,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 后台分类 service impl
@@ -48,6 +46,42 @@ public class BackCategoryServiceImpl extends ServiceImpl<BackCategoryMapper, Bac
 		if (CollectionUtils.isEmpty(backCategoryEntityList) || !Objects.equals(backCategoryEntityList.size(), backCategoryIdList.size())) {
 			throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
 		}
+	}
+
+	/**
+	 * 增加或者减少后台分类 id 的商品数量
+	 *
+	 * @param categoryId 后台分类id
+	 * @param count      要累加的商品数量
+	 * @author liuqiuyi
+	 * @date 2021/12/28 11:08
+	 */
+	@Override
+	public void addOrReduceProductNumById(Long categoryId, Integer count, CategoryProductNumOperateEnum operateEnum) {
+		if (Objects.isNull(categoryId) || Objects.isNull(operateEnum)) {
+			log.error("BackCategoryServiceImpl.incProductNumById param is null");
+			return;
+		}
+		if (Objects.isNull(count)) {
+			count = 1;
+		}
+		// 查询分类
+		BackCategoryEntity categoryEntity = backCategoryMapper.selectById(categoryId);
+		if (Objects.isNull(categoryEntity)) {
+			throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
+		}
+		// 如果是增加操作
+		if (Objects.equals(CategoryProductNumOperateEnum.ADD, operateEnum)) {
+			categoryEntity.setPNumber(categoryEntity.getPNumber() + count);
+		} else {
+			int num = categoryEntity.getPNumber() - count;
+			if (num < 0) {
+				num = 0;
+			}
+			categoryEntity.setPNumber(num);
+		}
+		categoryEntity.setChangedAt(new Date());
+		backCategoryMapper.updateById(categoryEntity);
 	}
 
 	/**
