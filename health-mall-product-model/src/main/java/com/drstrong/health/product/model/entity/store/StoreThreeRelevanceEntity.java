@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * @author lsx
@@ -44,7 +43,7 @@ public class StoreThreeRelevanceEntity extends BaseEntity implements Serializabl
     /**
      * 三方药店商品进货价
      */
-    private BigDecimal threePurchasePrice;
+    private Integer threePurchasePrice;
 
 
     /**
