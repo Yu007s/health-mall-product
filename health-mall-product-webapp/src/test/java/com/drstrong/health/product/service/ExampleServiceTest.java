@@ -2,11 +2,13 @@ package com.drstrong.health.product.service;
 
 import com.drstrong.health.common.utils.JsonUtils;
 import com.drstrong.health.product.SpringBootTests;
+import com.drstrong.health.product.controller.StoreClient;
 import com.drstrong.health.product.model.request.store.StoreSkuRequest;
 import com.drstrong.health.product.model.request.store.UpdateSkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.store.StoreSkuResponse;
 import com.drstrong.health.product.mq.model.SkuStateStockMqEvent;
+import com.drstrong.health.product.remote.api.store.StoreRemoteApi;
 import com.drstrong.health.product.service.impl.StoreThreeRelevanceServiceImpl;
 import com.drstrong.health.product.utils.MqMessageUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +29,11 @@ public class ExampleServiceTest extends SpringBootTests {
     @Resource
     private StoreThreeRelevanceServiceImpl storeThreeRelevanceService;
     @Resource
+    private StoreClient storeClient;
+    @Resource
     private MqMessageUtil mqMessageUtil;
+    @Resource
+    private StoreRemoteApi storeRemoteApi;
     @DisplayName("测试样例2")
     public void test1() {
         System.out.println("test for health-mall-product");
@@ -47,9 +53,9 @@ public class ExampleServiceTest extends SpringBootTests {
         UpdateSkuRequest updateSkuRequest = new UpdateSkuRequest();
         updateSkuRequest.setState(1);
         List<Long> skuIds = new ArrayList<>();
-        skuIds.add(11L);
+        skuIds.add(99L);
         updateSkuRequest.setSkuIdList(skuIds);
-        storeThreeRelevanceService.updateSkuState(updateSkuRequest,"888");
+        storeRemoteApi.updateSkuState(updateSkuRequest,"888");
     }
 
     @Test
