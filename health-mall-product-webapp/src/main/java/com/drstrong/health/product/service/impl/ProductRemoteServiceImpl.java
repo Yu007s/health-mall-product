@@ -12,6 +12,7 @@ import com.drstrong.health.product.model.response.product.ProductPropertyVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.cms.CmsRemoteProService;
 import com.drstrong.health.product.remote.model.*;
+import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 import com.drstrong.health.product.remote.pro.PharmacyGoodsRemoteProService;
 import com.drstrong.health.product.service.*;
 import com.drstrong.health.product.util.BigDecimalUtil;
@@ -66,23 +67,27 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 	/**
 	 * 根据 skuId 查询商品 sku 信息集合
 	 *
-	 * @param skuIds 商品 skuId 集合
+	 * @param queryProductRequest 请求参数
 	 * @return 商品 sku 信息
 	 * @author liuqiuyi
 	 * @date 2021/12/22 15:03
 	 */
 	@Override
-	public List<ProductSkuInfoDTO> getSkuInfoBySkuIds(Set<Long> skuIds) {
-		log.info("ProductRemoteServiceImpl.getSkuInfoBySkuIds param:{}", skuIds);
-		if (CollectionUtils.isEmpty(skuIds)) {
-			return Lists.newArrayList();
-		}
-		// 1.查询 sku 信息是否存在
-		List<ProductSkuEntity> productSkuEntityList = productSkuService.queryBySkuIdOrCode(skuIds, null, UpOffEnum.UP);
+	public List<ProductSkuInfoDTO> getSkuInfoBySkuIds(QueryProductRequest queryProductRequest) {
+		log.info("ProductRemoteServiceImpl.getSkuInfoBySkuIds param:{}", queryProductRequest);
+		List<ProductSkuEntity> productSkuEntityList = getSkuList(queryProductRequest);
 		if (CollectionUtils.isEmpty(productSkuEntityList)) {
 			return Lists.newArrayList();
 		}
 		return getProductSkuInfoDTOList(productSkuEntityList);
+	}
+
+	private List<ProductSkuEntity> getSkuList(QueryProductRequest queryProductRequest) {
+		if (Objects.isNull(queryProductRequest) || (CollectionUtils.isEmpty(queryProductRequest.getSkuIdList()) && CollectionUtils.isEmpty(queryProductRequest.getSkuCodeList()))) {
+			return Lists.newArrayList();
+		}
+		// 1.查询 sku 信息是否存在
+		return productSkuService.queryBySkuIdOrCode(queryProductRequest.getSkuIdList(), queryProductRequest.getSkuCodeList(), UpOffEnum.getEnumByCode(queryProductRequest.getUpOffStatus()));
 	}
 
 	private List<ProductSkuInfoDTO> getProductSkuInfoDTOList(List<ProductSkuEntity> productSkuEntityList) {
@@ -198,26 +203,27 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 	}
 
 	/**
-	 * skuCode 和 skuId 进行转换
+	 * skuCode 和 skuId 进行转换,批量接口
 	 * <p> 主要用于两者相互查询,两个入参不能同时为空 </>
 	 *
-	 * @param skuCode sku编码
-	 * @param skuId   skuId
+	 * @param queryProductRequest 查询参数
 	 * @return sku 编码和 id 信息
 	 * @author liuqiuyi
 	 * @date 2021/12/24 20:07
 	 */
 	@Override
-	public SkuIdAndCodeDTO getSkuIdOrCode(String skuCode, Long skuId) {
-		ProductSkuEntity productSkuEntity = productSkuService.queryBySkuIdOrCode(skuId, skuCode, UpOffEnum.UP);
-		if (Objects.isNull(productSkuEntity)) {
-			return null;
-		}
-
-		SkuIdAndCodeDTO skuIdAndCodeDTO = new SkuIdAndCodeDTO();
-		skuIdAndCodeDTO.setSkuCode(productSkuEntity.getSkuCode());
-		skuIdAndCodeDTO.setSkuId(productSkuEntity.getId());
-		return skuIdAndCodeDTO;
+	public List<SkuIdAndCodeDTO> listSkuIdOrCode(QueryProductRequest queryProductRequest) {
+		log.info("ProductRemoteServiceImpl.getSkuInfoBySkuIds param:{}", queryProductRequest);
+		List<ProductSkuEntity> productSkuEntityList = getSkuList(queryProductRequest);
+		// 组装返回值
+		List<SkuIdAndCodeDTO> skuIdAndCodeDTOList = Lists.newArrayListWithCapacity(productSkuEntityList.size());
+		productSkuEntityList.forEach(productSkuEntity -> {
+			SkuIdAndCodeDTO skuIdAndCodeDTO = new SkuIdAndCodeDTO();
+			skuIdAndCodeDTO.setSkuCode(productSkuEntity.getSkuCode());
+			skuIdAndCodeDTO.setSkuId(productSkuEntity.getId());
+			skuIdAndCodeDTOList.add(skuIdAndCodeDTO);
+		});
+		return skuIdAndCodeDTOList;
 	}
 
 	/**

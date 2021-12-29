@@ -272,8 +272,6 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			productSpuVO.setUpdateTime(infoEntity.getChangedAt());
 			spuVOList.add(productSpuVO);
 		}
-		// 4.排序
-		spuVOList.sort(Comparator.comparing(ProductSpuVO::getCreateTime).reversed());
 		return PageVO.newBuilder().pageNo(querySpuRequest.getPageNo()).pageSize(querySpuRequest.getPageSize()).totalCount((int) infoEntityPage.getTotal()).result(spuVOList).build();
 	}
 
