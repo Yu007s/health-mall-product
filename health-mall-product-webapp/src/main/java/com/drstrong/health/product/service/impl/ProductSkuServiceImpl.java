@@ -322,6 +322,23 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	}
 
 	/**
+	 * 根据 skuId 集合删除 sku
+	 *
+	 * @param skuIdList skuId
+	 * @param userId    用户 id
+	 * @author liuqiuyi
+	 * @date 2021/12/29 20:13
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void deleteBySkuIdList(Set<Long> skuIdList, String userId) {
+		if (CollectionUtils.isEmpty(skuIdList) || StringUtils.isBlank(userId)) {
+			throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
+		}
+		productSkuMapper.deleteBySkuIdList(skuIdList, userId);
+	}
+
+	/**
 	 * 根据 skuId 或者 skuCode 查询 sku 信息
 	 *
 	 * @param skuId   sku 的 id
@@ -495,6 +512,9 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		}
 		if (Objects.nonNull(querySkuRequest.getPriceEnd())) {
 			queryWrapper.le(ProductSkuEntity::getSkuPrice, querySkuRequest.getPriceEnd());
+		}
+		if (Objects.nonNull(querySkuRequest.getSkuState())) {
+			queryWrapper.eq(ProductSkuEntity::getState, querySkuRequest.getSkuState());
 		}
 		if (Objects.nonNull(querySkuRequest.getUpOffEnum())) {
 			queryWrapper.eq(ProductSkuEntity::getState, querySkuRequest.getUpOffEnum().getCode());

@@ -140,7 +140,7 @@ public interface ProductBasicsInfoService {
 	 * @author liuqiuyi
 	 * @date 2021/12/16 19:55
 	 */
-	ProductDetailVO getSpuInfo(String spuCode);
+	ProductDetailVO getSpuInfo(String spuCode, Long userId);
 
 	/**
 	 * 分页查询搜索的内容,只返回商品名称

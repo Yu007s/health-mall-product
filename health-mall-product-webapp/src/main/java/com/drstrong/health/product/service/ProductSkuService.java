@@ -172,8 +172,19 @@ public interface ProductSkuService {
 
 	/**
 	 * 批量获取店铺对应的sku数量
+	 *
 	 * @param storeIds
 	 * @return
 	 */
-	Map<Long,Integer> searchSkuCountMap(List<Long> storeIds);
+	Map<Long, Integer> searchSkuCountMap(List<Long> storeIds);
+
+	/**
+	 * 根据 skuId 集合删除 sku
+	 *
+	 * @param skuIdList skuId
+	 * @param userId    用户 id
+	 * @author liuqiuyi
+	 * @date 2021/12/29 20:13
+	 */
+	void deleteBySkuIdList(Set<Long> skuIdList, String userId);
 }
