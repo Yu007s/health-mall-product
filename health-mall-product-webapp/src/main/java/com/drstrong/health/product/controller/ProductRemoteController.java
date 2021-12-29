@@ -1,19 +1,15 @@
 package com.drstrong.health.product.controller;
 
-import com.drstrong.health.product.model.constans.banner.CommonConstants;
-import com.drstrong.health.product.model.enums.ErrorEnums;
-import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.api.product.ProductRemoteFacade;
 import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
 import com.drstrong.health.product.remote.model.SearchNameResultDTO;
 import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
+import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductRemoteService;
-import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 商品模块远程接口
@@ -43,22 +38,15 @@ public class ProductRemoteController implements ProductRemoteFacade {
 
 	/**
 	 * 根据 skuId 集合,获取 sku 信息
-	 * <p>集合大小不超过 200</>
 	 *
-	 * @param skuIds skuId 集合
+	 * @param queryProductRequest 请求参数
 	 * @return sku 信息
 	 * @author liuqiuyi
 	 * @date 2021/12/14 17:21
 	 */
 	@Override
-	public List<ProductSkuInfoDTO> getSkuInfoBySkuIds(Set<Long> skuIds) {
-		if (CollectionUtils.isEmpty(skuIds)) {
-			return Lists.newArrayList();
-		}
-		if (skuIds.size() > CommonConstants.COLLECTION_MAX_SIZE) {
-			throw new BusinessException(ErrorEnums.QUERY_SIZE_TOO_BIG);
-		}
-		return productRemoteService.getSkuInfoBySkuIds(skuIds);
+	public List<ProductSkuInfoDTO> getSkuInfoBySkuIds(QueryProductRequest queryProductRequest) {
+		return productRemoteService.getSkuInfoBySkuIds(queryProductRequest);
 	}
 
 	/**
@@ -119,17 +107,16 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	}
 
 	/**
-	 * skuCode 和 skuId 进行转换
+	 * skuCode 和 skuId 进行转换,批量接口
 	 * <p> 主要用于两者相互查询,两个入参不能同时为空 </>
 	 *
-	 * @param skuCode sku编码
-	 * @param skuId   skuId
+	 * @param queryProductRequest 请求参数
 	 * @return sku 编码和 id 信息
 	 * @author liuqiuyi
 	 * @date 2021/12/24 20:07
 	 */
 	@Override
-	public SkuIdAndCodeDTO getSkuIdOrCode(String skuCode, Long skuId) {
-		return productRemoteService.getSkuIdOrCode(skuCode, skuId);
+	public List<SkuIdAndCodeDTO> listSkuIdOrCode(QueryProductRequest queryProductRequest) {
+		return productRemoteService.listSkuIdOrCode(queryProductRequest);
 	}
 }

@@ -4,6 +4,7 @@ import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
 import com.drstrong.health.product.remote.model.SearchNameResultDTO;
 import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
+import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * sku 远程接口
@@ -24,16 +24,15 @@ import java.util.Set;
 public interface ProductRemoteFacade {
 	/**
 	 * 根据 skuId 集合,获取 sku 信息
-	 * <p>集合大小不超过 200</>
 	 *
-	 * @param skuIds skuId 集合
+	 * @param queryProductRequest 查询参数
 	 * @return sku 信息
 	 * @author liuqiuyi
 	 * @date 2021/12/14 17:21
 	 */
 	@ApiOperation("根据 skuId 集合,获取 sku 信息")
 	@PostMapping("getSkuBySkuIds")
-	List<ProductSkuInfoDTO> getSkuInfoBySkuIds(@RequestBody Set<Long> skuIds);
+	List<ProductSkuInfoDTO> getSkuInfoBySkuIds(@RequestBody QueryProductRequest queryProductRequest);
 
 	/**
 	 * 搜索spu的名称,只返回spu名称
@@ -89,16 +88,15 @@ public interface ProductRemoteFacade {
 	ProductSkuDetailsDTO getSkuDetail(@RequestParam(value = "skuCode", required = false) String skuCode, @RequestParam(value = "skuId", required = false) Long skuId);
 
 	/**
-	 * skuCode 和 skuId 进行转换
+	 * skuCode 和 skuId 进行转换,批量接口
 	 * <p> 主要用于两者相互查询,两个入参不能同时为空 </>
 	 *
-	 * @param skuId   skuId
-	 * @param skuCode sku编码
+	 * @param queryProductRequest 查询参数
 	 * @return sku 编码和 id 信息
 	 * @author liuqiuyi
 	 * @date 2021/12/24 20:07
 	 */
 	@ApiOperation("skuCode 和 skuId 进行转换")
-	@GetMapping("/sku/id/code")
-	SkuIdAndCodeDTO getSkuIdOrCode(@RequestParam(value = "skuCode", required = false) String skuCode, @RequestParam(value = "skuId", required = false) Long skuId);
+	@PostMapping("/sku/id/code")
+	List<SkuIdAndCodeDTO> listSkuIdOrCode(@RequestBody QueryProductRequest queryProductRequest);
 }

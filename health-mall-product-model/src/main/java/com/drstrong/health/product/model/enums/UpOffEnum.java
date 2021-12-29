@@ -20,6 +20,15 @@ public enum UpOffEnum {
 
 	private String value;
 
+	public static UpOffEnum getEnumByCode(Integer code){
+		for (UpOffEnum upOffEnum : UpOffEnum.values()) {
+			if (Objects.equals(upOffEnum.getCode(), code)) {
+				return upOffEnum;
+			}
+		}
+		return null;
+	}
+
 	public static String getValueByCode(Integer code){
 		for (UpOffEnum upOffEnum : UpOffEnum.values()) {
 			if (Objects.equals(upOffEnum.getCode(), code)) {

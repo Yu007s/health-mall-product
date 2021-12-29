@@ -4,6 +4,7 @@ import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
 import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
 import com.drstrong.health.product.remote.model.SearchNameResultDTO;
 import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
+import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 
 import java.util.List;
 import java.util.Set;
@@ -18,12 +19,12 @@ public interface ProductRemoteService {
 	/**
 	 * 根据 skuId 查询商品 sku 信息集合
 	 *
-	 * @param skuIds 商品 skuId 集合
+	 * @param queryProductRequest 查询参数
 	 * @return 商品 sku 信息
 	 * @author liuqiuyi
 	 * @date 2021/12/22 15:03
 	 */
-	List<ProductSkuInfoDTO> getSkuInfoBySkuIds(Set<Long> skuIds);
+	List<ProductSkuInfoDTO> getSkuInfoBySkuIds(QueryProductRequest queryProductRequest);
 
 	/**
 	 * 分页查询搜索的内容,只返回商品名称
@@ -70,14 +71,13 @@ public interface ProductRemoteService {
 	List<ProductSkuInfoDTO> getSkuInfoByCategoryId(Long categoryId);
 
 	/**
-	 * skuCode 和 skuId 进行转换
+	 * skuCode 和 skuId 进行转换,批量接口
 	 * <p> 主要用于两者相互查询,两个入参不能同时为空 </>
 	 *
-	 * @param skuCode sku编码
-	 * @param skuId   skuId
+	 * @param queryProductRequest 请求参数
 	 * @return sku 编码和 id 信息
 	 * @author liuqiuyi
 	 * @date 2021/12/24 20:07
 	 */
-	SkuIdAndCodeDTO getSkuIdOrCode(String skuCode, Long skuId);
+	List<SkuIdAndCodeDTO> listSkuIdOrCode(QueryProductRequest queryProductRequest);
 }
