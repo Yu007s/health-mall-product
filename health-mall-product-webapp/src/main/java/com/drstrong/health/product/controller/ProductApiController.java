@@ -1,5 +1,6 @@
 package com.drstrong.health.product.controller;
 
+import com.drstrong.health.common.utils.UserUtil;
 import com.drstrong.health.product.model.request.PageRequest;
 import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -67,7 +68,7 @@ public class ProductApiController {
 	})
 	@GetMapping("/spu/get")
 	public ResultVO<ProductDetailVO> getSpu(@NotBlank(message = "spuCode 不能为空") String spuCode) {
-		ProductDetailVO productDetailVO = productBasicsInfoService.getSpuInfo(spuCode);
+		ProductDetailVO productDetailVO = productBasicsInfoService.getSpuInfo(spuCode, UserUtil.getUserId());
 		return ResultVO.success(productDetailVO);
 	}
 

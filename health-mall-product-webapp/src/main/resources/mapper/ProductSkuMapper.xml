@@ -77,6 +77,22 @@
             )
         </foreach>
     </insert>
+
+    <update id="deleteBySkuIdList">
+        UPDATE
+            pms_product_sku
+        SET
+            del_flag = 1,
+            changed_by = #{userId},
+            changed_at=now()
+        WHERE
+            id
+        IN
+        <foreach collection="skuIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
     <select id="searchSkuNameByName" resultType="java.lang.String">
        select sku_name
         FROM pms_product_sku

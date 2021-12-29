@@ -50,6 +50,9 @@ public class QuerySkuRequest extends PageRequest implements Serializable {
 	@ApiModelProperty("价格结束值")
 	private Long priceEnd;
 
+	@ApiModelProperty("sku 状态 0-未上架,1-已上架")
+	private Integer skuState;
+
 	@ApiModelProperty(value = "上下架状态", hidden = true)
 	private UpOffEnum upOffEnum;
 

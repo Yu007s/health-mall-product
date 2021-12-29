@@ -19,6 +19,7 @@ import com.drstrong.health.product.model.response.product.*;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.cms.CmsRemoteProService;
 import com.drstrong.health.product.remote.pro.PharmacyGoodsRemoteProService;
+import com.drstrong.health.product.remote.pro.ShopCartRemoteProService;
 import com.drstrong.health.product.service.*;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.util.DateUtil;
@@ -79,6 +80,9 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 
 	@Resource
 	CmsRemoteProService cmsRemoteProService;
+
+	@Resource
+	ShopCartRemoteProService shopCartRemoteProService;
 
 	/**
 	 * 根据条件,分页查询商品基础信息
@@ -190,6 +194,11 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public Long saveOrUpdateProduct(SaveProductRequest saveProductRequest) {
+		// 校验金额(必须大于 0)
+		boolean priceFlag = saveProductRequest.getPackInfoList().stream().anyMatch(packInfoRequest -> packInfoRequest.getPrice().compareTo(new BigDecimal("0")) < 1);
+		if (priceFlag) {
+			throw new BusinessException(ErrorEnums.PRICE_IS_ERROR);
+		}
 		// 1.校验店铺 id 是否存在
 		StoreEntity storeEntity = storeService.getByStoreId(saveProductRequest.getStoreId());
 		if (Objects.isNull(storeEntity)) {
@@ -308,7 +317,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	 * @date 2021/12/16 19:55
 	 */
 	@Override
-	public ProductDetailVO getSpuInfo(String spuCode) {
+	public ProductDetailVO getSpuInfo(String spuCode, Long userId) {
 		if (StringUtils.isBlank(spuCode)) {
 			return new ProductDetailVO();
 		}
@@ -328,10 +337,12 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		// 3.查询库存信息
 		Set<Long> skuIdList = productSkuEntityList.stream().map(ProductSkuEntity::getId).collect(Collectors.toSet());
 		Map<Long, Integer> skuStockNumToMap = pharmacyGoodsRemoteProService.getSkuStockNumToMap(skuIdList);
-		// 4.调用商品购物车接口,设置用户购物车是否有商品
-		// TODO 购物车
-		// 5.组装返回值
-		return buildProductDetailVO(productEntity, extendEntity, productSkuEntityList, skuStockNumToMap);
+		// 4.组装返回值
+		ProductDetailVO productDetailVO = buildProductDetailVO(productEntity, extendEntity, productSkuEntityList, skuStockNumToMap);
+		// 5.调用商品购物车接口,设置用户购物车是否有商品
+		Boolean hasProduct = shopCartRemoteProService.checkHasProduct(userId);
+		productDetailVO.setHasUnpaidFlag(hasProduct);
+		return productDetailVO;
 	}
 
 	/**
@@ -510,8 +521,6 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		productDetailVO.setHighPrice(BigDecimalUtil.F2Y(highSku.getSkuPrice().longValue()));
 		productDetailVO.setPackName(lowSku.getPackName());
 		productDetailVO.setPackValue(lowSku.getPackValue());
-		// TODO 需要调用购物车
-//		productDetailVO.setHasUnpaidFlag();
 		return productDetailVO;
 	}
 
@@ -549,6 +558,8 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			CommAttributeDTO commAttributeDTO = commAttributeByIdListToMap.getOrDefault(productSkuEntity.getCommAttribute(), new CommAttributeDTO());
 			packInfoResponse.setCommAttributeName(commAttributeDTO.getCommAttributeName());
 			packInfoResponse.setSkuCode(productSkuEntity.getSkuCode());
+			packInfoResponse.setSkuId(productSkuEntity.getId());
+			packInfoResponse.setSkuState(productSkuEntity.getState());
 			packInfoList.add(packInfoResponse);
 		}
 		productManageVO.setPackInfoList(packInfoList);
@@ -557,14 +568,15 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	}
 
 	private void saveOrUpdateSku(SaveProductRequest saveProductRequest, StoreEntity storeEntity, ProductBasicsInfoEntity infoEntity) {
+		// 获取商品的 sku 列表
 		Map<Long, ProductSkuEntity> skuIdEntityMap = productSkuService.queryByProductIdToMap(infoEntity.getId(), null);
-
+		// 组装参数
 		List<ProductSkuEntity> skuEntityList = Lists.newArrayListWithCapacity(saveProductRequest.getPackInfoList().size());
 		for (SaveProductRequest.PackInfoRequest packInfoRequest : saveProductRequest.getPackInfoList()) {
 			ProductSkuEntity skuEntity = new ProductSkuEntity();
+			// 如果 sku 信息之前存在,则校验是否下架,未下架不让修改
 			if (Objects.nonNull(packInfoRequest.getSkuId()) && skuIdEntityMap.containsKey(packInfoRequest.getSkuId())) {
-				// 更新
-				skuEntity = skuIdEntityMap.get(packInfoRequest.getSkuId());
+				skuEntity = skuIdEntityMap.remove(packInfoRequest.getSkuId());
 				if (Objects.equals(UpOffEnum.UP.getCode(), skuEntity.getState())) {
 					throw new BusinessException(ErrorEnums.UPDATE_NOT_ALLOW);
 				}
@@ -585,10 +597,14 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			skuEntityList.add(skuEntity);
 		}
 		productSkuService.saveOrUpdateBatch(skuEntityList, skuEntityList.size());
+		// 如果 skuIdEntityMap 中还存在 skuId,则是本次修改时删除的 skuId
+		Set<Long> oldSkuIds = skuIdEntityMap.keySet();
+		productSkuService.deleteBySkuIdList(oldSkuIds, saveProductRequest.getUserId());
 	}
 
 	private void saveAttribute(SaveProductRequest saveProductRequest, Long product) {
 		productAttributeService.deletedByProductId(saveProductRequest.getProductId(), saveProductRequest.getUserId());
+		LocalDateTime dateTime = LocalDateTime.now();
 		List<ProductAttributeEntity> entityList = Lists.newArrayListWithCapacity(saveProductRequest.getPropertyValueList().size());
 		for (SaveProductRequest.PropertyInfoRequest propertyInfoRequest : saveProductRequest.getPropertyValueList()) {
 			ProductAttributeEntity attributeEntity = new ProductAttributeEntity();
@@ -597,6 +613,8 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			attributeEntity.setAttributeValue(propertyInfoRequest.getAttributeValue());
 			attributeEntity.setCreatedBy(saveProductRequest.getUserId());
 			attributeEntity.setChangedBy(saveProductRequest.getUserId());
+			attributeEntity.setChangedAt(dateTime);
+			attributeEntity.setCreatedAt(dateTime);
 			entityList.add(attributeEntity);
 		}
 		productAttributeService.batchSave(entityList);
@@ -604,9 +622,11 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 
 	private void saveProductExtend(SaveProductRequest saveProductRequest, Long productId) {
 		ProductExtendEntity extendEntity = productExtendService.queryByProductId(saveProductRequest.getProductId());
+		LocalDateTime dateTime = LocalDateTime.now();
 		if (Objects.isNull(extendEntity)) {
 			extendEntity = new ProductExtendEntity();
 			extendEntity.setCreatedBy(saveProductRequest.getUserId());
+			extendEntity.setCreatedAt(dateTime);
 		}
 		extendEntity.setProductId(productId);
 		extendEntity.setDescription(saveProductRequest.getDescription());
@@ -615,12 +635,13 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		extendEntity.setImageUrl(Joiner.on(",").join(saveProductRequest.getImageUrlList()));
 		extendEntity.setDetailUrl(Joiner.on(",").join(saveProductRequest.getDetailUrlList()));
 		extendEntity.setChangedBy(saveProductRequest.getUserId());
-		extendEntity.setChangedAt(LocalDateTime.now());
+		extendEntity.setChangedAt(dateTime);
 		productExtendService.saveOrUpdate(extendEntity);
 	}
 
 	private ProductBasicsInfoEntity saveProductBaseInfo(SaveProductRequest saveProductRequest, StoreEntity storeEntity) {
 		ProductBasicsInfoEntity infoEntity = new ProductBasicsInfoEntity();
+		LocalDateTime dateTime = LocalDateTime.now();
 		if (Objects.nonNull(saveProductRequest.getProductId()) && !Objects.equals(saveProductRequest.getProductId(), 0L)) {
 			infoEntity = queryBasicsInfoByProductId(saveProductRequest.getProductId());
 			if (Objects.isNull(infoEntity)) {
@@ -629,7 +650,9 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		} else {
 			infoEntity.setSpuCode(getNextProductNumber(ProductTypeEnum.PRODUCT));
 			infoEntity.setCreatedBy(saveProductRequest.getUserId());
+			infoEntity.setCreatedAt(dateTime);
 		}
+		infoEntity.setChangedAt(dateTime);
 		// 更新分类下的商品数量
 		updateCategoryProductNum(infoEntity.getId(), saveProductRequest.getCategoryId(), infoEntity.getCategoryId());
 		// 更新店铺下商品数量
@@ -640,7 +663,6 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		infoEntity.setSourceId(storeEntity.getId());
 		infoEntity.setSourceName(storeEntity.getName());
 		infoEntity.setChangedBy(saveProductRequest.getUserId());
-		infoEntity.setChangedAt(LocalDateTime.now());
 		saveOrUpdate(infoEntity);
 		return infoEntity;
 	}

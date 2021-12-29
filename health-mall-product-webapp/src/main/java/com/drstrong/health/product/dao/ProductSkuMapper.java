@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 商品 sku mapper
@@ -33,4 +34,14 @@ public interface ProductSkuMapper extends BaseMapper<ProductSkuEntity> {
 	 * @date 2021/12/23 21:09
 	 */
 	List<String> searchSkuNameByName(@Param("content") String content, @Param("count") Integer count);
+
+	/**
+	 * 根据 skuId 集合删除 sku
+	 *
+	 * @param skuIdList skuId
+	 * @param userId    用户 id
+	 * @author liuqiuyi
+	 * @date 2021/12/29 20:13
+	 */
+	int deleteBySkuIdList(@Param("skuIdList") Set<Long> skuIdList, @Param("userId") String userId);
 }
