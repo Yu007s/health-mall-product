@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -45,10 +46,10 @@ public class QuerySkuRequest extends PageRequest implements Serializable {
 	private LocalDate createEnd;
 
 	@ApiModelProperty("价格开始值")
-	private Long priceStart;
+	private BigDecimal priceStart;
 
 	@ApiModelProperty("价格结束值")
-	private Long priceEnd;
+	private BigDecimal priceEnd;
 
 	@ApiModelProperty("sku 状态 0-未上架,1-已上架")
 	private Integer skuState;

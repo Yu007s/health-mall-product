@@ -95,3 +95,7 @@ rocketmq:
   name-server: 192.168.21.3:9876
   producer:
     group: gid_health_mall_product_producer_tes
+
+mq-topic-config:
+  store-change-topic: storeChange-topic
+  store-change-tag: storeChange-tag

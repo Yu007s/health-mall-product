@@ -257,8 +257,11 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	 */
 	@Override
 	public PageVO<ProductSpuVO> pageQuerySpuByParam(QuerySpuRequest querySpuRequest) {
+		Page<ProductBasicsInfoEntity> queryPage = new Page<>(querySpuRequest.getPageNo(), querySpuRequest.getPageSize());
+		LambdaQueryWrapper<ProductBasicsInfoEntity> queryWrapper = buildQuerySpuParam(querySpuRequest);
+		queryWrapper.orderByDesc(ProductBasicsInfoEntity::getId);
 		// 1.分页查询 spu 信息
-		Page<ProductBasicsInfoEntity> infoEntityPage = pageQueryProductByParam(querySpuRequest);
+		Page<ProductBasicsInfoEntity> infoEntityPage = productBasicsInfoMapper.selectPage(queryPage, queryWrapper);
 		if (Objects.isNull(infoEntityPage) || CollectionUtils.isEmpty(infoEntityPage.getRecords())) {
 			return PageVO.newBuilder().pageNo(querySpuRequest.getPageNo()).pageSize(querySpuRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
 		}

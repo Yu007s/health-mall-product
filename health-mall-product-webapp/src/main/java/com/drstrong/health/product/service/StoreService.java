@@ -48,4 +48,14 @@ public interface StoreService {
 	 * @date 2021/12/28 11:08
 	 */
 	void addOrReduceProductNumById(Long storeId, Integer count, CategoryProductNumOperateEnum operateEnum);
+
+	/**
+	 * 发送店铺变更的事件
+	 *
+	 * @param userId 操作人 id
+	 * @param storeId 店铺 id
+	 * @author liuqiuyi
+	 * @date 2021/12/30 11:03
+	 */
+	void sendStoreChangeEvent(Long storeId, String userId);
 }
