@@ -1,6 +1,5 @@
 package com.drstrong.health.product.service.impl;
 
-import cn.strong.common.utils.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.drstrong.health.product.config.MqTopicConfig;
 import com.drstrong.health.product.dao.StoreMapper;
@@ -24,6 +23,7 @@ import com.drstrong.health.product.utils.MqMessageUtil;
 import com.drstrong.health.redis.utils.RedisUtils;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -91,6 +91,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void update(StoreAddOrUpdateRequest storeAddOrUpdateRequest,String userId) {
         String storeName = storeAddOrUpdateRequest.getName();
         checkStoreName(storeName);
@@ -106,6 +107,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateState(StoreIdRequest storeIdRequest, String userId) {
         StoreEntity disEntity = new StoreEntity();
         disEntity.setId(storeIdRequest.getStoreId());
@@ -197,6 +199,9 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public List<StoreInfoResponse> queryByStoreIds(Set<Long> storeIds) {
+        if(CollectionUtils.isEmpty(storeIds)){
+           return Collections.emptyList();
+        }
         return buildResponse(selectByStoreIds(storeIds));
     }
 
@@ -322,6 +327,9 @@ public class StoreServiceImpl implements StoreService {
      */
     private List<StoreInfoResponse> buildResponse(List<StoreEntity> storeEntities) {
         List<Long> storeIds = storeEntities.stream().map(StoreEntity::getId).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(storeIds)){
+           return Collections.emptyList();
+        }
         Map<Long, Integer> storeCountMap = productSkuService.searchSkuCountMap(storeIds);
         if(CollectionUtils.isEmpty(storeEntities)){
           return Collections.emptyList();
