@@ -1,0 +1,27 @@
+package com.drstrong.health.product.config;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * mq topic 配置类
+ *
+ * @author liuqiuyi
+ * @date 2021/12/30 11:39
+ */
+@Data
+@Configuration
+@ConfigurationProperties(prefix = "mq-topic-config")
+public class MqTopicConfig {
+
+	/**
+	 * 店铺信息变更 topic
+	 */
+	private String storeChangeTopic;
+
+	/**
+	 * 店铺信息变更 tag
+	 */
+	private String storeChangeTag;
+}

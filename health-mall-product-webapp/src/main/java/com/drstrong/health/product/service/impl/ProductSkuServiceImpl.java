@@ -508,10 +508,10 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			queryWrapper.le(ProductSkuEntity::getCreatedAt, querySkuRequest.getCreateEnd());
 		}
 		if (Objects.nonNull(querySkuRequest.getPriceStart())) {
-			queryWrapper.ge(ProductSkuEntity::getSkuPrice, querySkuRequest.getPriceStart());
+			queryWrapper.ge(ProductSkuEntity::getSkuPrice, BigDecimalUtil.Y2F(querySkuRequest.getPriceStart()));
 		}
 		if (Objects.nonNull(querySkuRequest.getPriceEnd())) {
-			queryWrapper.le(ProductSkuEntity::getSkuPrice, querySkuRequest.getPriceEnd());
+			queryWrapper.le(ProductSkuEntity::getSkuPrice, BigDecimalUtil.Y2F(querySkuRequest.getPriceEnd()));
 		}
 		if (Objects.nonNull(querySkuRequest.getSkuState())) {
 			queryWrapper.eq(ProductSkuEntity::getState, querySkuRequest.getSkuState());
