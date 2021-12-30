@@ -29,6 +29,9 @@ public class HomeCategoryVO extends BaseTree implements Serializable {
 	@ApiModelProperty("前台分类层级")
 	private Integer level;
 
+	@ApiModelProperty("排序字段")
+	private Integer sort;
+
 	public static HomeCategoryVO buildDefault(String categoryName, String icon) {
 		HomeCategoryVO categoryVO = new HomeCategoryVO();
 		categoryVO.setId(0L);

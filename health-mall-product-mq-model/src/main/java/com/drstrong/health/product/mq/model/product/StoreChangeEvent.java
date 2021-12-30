@@ -23,4 +23,9 @@ public class StoreChangeEvent implements Serializable {
 	 * 操作人 id
 	 */
 	private String operatorId;
+
+	/**
+	 * 店铺更新的类型枚举
+	 */
+	private StoreChangeTypeEnum storeChangeTypeEnum;
 }

@@ -159,7 +159,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		Set<Long> backCategoryIdSet = frontIdBackIdListMap.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
 		// 获取后台分类和对应的商品数量
 		Map<Long, Integer> backIdProductNumMap = backCategoryService.getBackIdProductNumMap(backCategoryIdSet);
-		// 组装返回参数
+		// 组装每个分类的商品数量
 		Map<Long, Integer> frontIdProductCountMap = Maps.newHashMapWithExpectedSize(frontCategoryEntityList.size());
 		for (FrontCategoryEntity categoryEntity : frontCategoryEntityList) {
 			Set<Long> backIdSet = frontIdBackIdListMap.getOrDefault(categoryEntity.getId(), Sets.newHashSet());
@@ -173,6 +173,21 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 				Integer productNum = getProductNum(backIdSet, backIdProductNumMap);
 				frontIdProductCountMap.put(categoryEntity.getId(), productNum);
 			}
+		}
+		// 组装返回值:一级分类的数量 = 一级分类的自己的商品数 + 二级分类的商品数
+		BaseTree.listToTree(frontCategoryEntityList);
+		for (FrontCategoryEntity categoryEntity : frontCategoryEntityList) {
+			if (!Objects.equals(1, categoryEntity.getLevel())) {
+				continue;
+			}
+			int productNum = 0;
+			List<? super BaseTree> childrenList = categoryEntity.getChildren();
+			for (Object obj : childrenList) {
+				FrontCategoryEntity children = (FrontCategoryEntity) obj;
+				Integer childNum = frontIdProductCountMap.getOrDefault(children.getId(), 0);
+				productNum = productNum + childNum;
+			}
+			frontIdProductCountMap.put(categoryEntity.getId(), productNum);
 		}
 		return frontIdProductCountMap;
 	}
@@ -235,7 +250,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 	@Override
 	public List<FrontCategoryEntity> queryByParentId(Long parentCategoryId) {
 		if (Objects.isNull(parentCategoryId)) {
-			return null;
+			return Lists.newArrayList();
 		}
 		LambdaQueryWrapper<FrontCategoryEntity> wrapper = new LambdaQueryWrapper<>();
 		wrapper.eq(FrontCategoryEntity::getParentId, parentCategoryId).eq(FrontCategoryEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
@@ -401,16 +416,20 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		if (Objects.isNull(categoryEntity)) {
 			throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
 		}
-		if (Objects.equals(0, categoryEntity.getState())) {
-			// 更新为启用
-			categoryEntity.setState(1);
-		} else {
-			categoryEntity.setState(0);
+		Integer state = Objects.equals(0, categoryEntity.getState()) ? 1 : 0;
+
+		Set<Long> categoryIdList = Sets.newHashSet(categoryId);
+		// 如果更新的是一级分类
+		if (Objects.equals(1, categoryEntity.getLevel())) {
+			// 获取子分类id
+			List<FrontCategoryEntity> frontCategoryEntities = queryByParentId(categoryId);
+			if (!CollectionUtils.isEmpty(frontCategoryEntities)) {
+				Set<Long> childList = frontCategoryEntities.stream().map(FrontCategoryEntity::getId).collect(Collectors.toSet());
+				categoryIdList.addAll(childList);
+			}
 		}
-		categoryEntity.setChangedBy(userId);
-		categoryEntity.setChangedAt(LocalDateTime.now());
-		frontCategoryMapper.updateById(categoryEntity);
-		categoryRelationService.updateStateByFrontCategoryId(categoryId, categoryEntity.getState(), userId);
+		frontCategoryMapper.updateStateByIdList(categoryIdList, state, userId);
+		categoryRelationService.updateStateByFrontCategoryIdList(categoryIdList, state, userId);
 	}
 
 	/**
@@ -451,7 +470,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 			throw new BusinessException(ErrorEnums.CATEGORY_DELETED_ERROR);
 		}
 		frontCategoryMapper.deleteByIdList(categoryIdList, userId);
-		categoryRelationService.deletedByFrontCategoryId(categoryId, userId);
+		categoryRelationService.deletedByFrontCategoryIdList(categoryIdList, userId);
 	}
 
 	/**
@@ -476,6 +495,8 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		if (CollectionUtils.isEmpty(homeCategoryVOList)) {
 			return Lists.newArrayList();
 		}
+		// 按照优先级排序
+		homeCategoryVOList.sort(Comparator.comparing(HomeCategoryVO::getSort));
 		// 封装返回值
 		if (Objects.isNull(level) || Objects.equals(level, 1)) {
 			// 一级分类,进行返回值大小裁剪,并添加最后的全部分类

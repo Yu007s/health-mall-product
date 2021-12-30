@@ -46,9 +46,23 @@
     </insert>
 
 
-    <update id="updateStateByFrontCategoryId">
+    <update id="updateStateByFrontCategoryIdList">
         UPDATE pms_product_category_relation
         set state = #{state} , changed_at = now(),changed_by = #{userId}
-        where front_category_id = #{frontCategoryId} and del_flag = 0;
+        where del_flag = 0 and
+        front_category_id in
+        <foreach collection="frontCategoryIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="deletedByFrontCategoryIdList">
+        UPDATE pms_product_category_relation
+        set del_flag = 1 , changed_at = now(),changed_by = #{userId}
+        where del_flag = 0 and
+        front_category_id in
+        <foreach collection="frontCategoryIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </update>
 </mapper>

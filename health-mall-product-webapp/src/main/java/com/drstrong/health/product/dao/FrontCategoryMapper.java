@@ -32,9 +32,20 @@ public interface FrontCategoryMapper extends BaseMapper<FrontCategoryEntity> {
 	 * 根据分类 id 逻辑删除,批量操作
 	 *
 	 * @param categoryIdList 分类 id
-	 * @param userId 用户 id
+	 * @param userId         用户 id
 	 * @author liuqiuyi
 	 * @date 2021/12/23 09:36
 	 */
 	void deleteByIdList(@Param("categoryIdList") Set<Long> categoryIdList, @Param("userId") String userId);
+
+	/**
+	 * 根据分类 id 修改状态
+	 *
+	 * @param categoryIdList 分类 id
+	 * @param userId         用户 id
+	 * @param state          状态
+	 * @author liuqiuyi
+	 * @date 2021/12/30 19:50
+	 */
+	void updateStateByIdList(@Param("categoryIdList") Set<Long> categoryIdList, @Param("state") Integer state, @Param("userId") String userId);
 }

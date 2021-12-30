@@ -14,6 +14,7 @@ import com.drstrong.health.product.model.request.store.StorePostage;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.mq.model.product.StoreChangeEvent;
+import com.drstrong.health.product.mq.model.product.StoreChangeTypeEnum;
 import com.drstrong.health.product.remote.model.StorePostageDTO;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.service.StorePostageAreaService;
@@ -252,7 +253,7 @@ public class StoreServiceImpl implements StoreService {
      * @date 2021/12/30 11:03
      */
     @Override
-    public void sendStoreChangeEvent(Long storeId, String userId) {
+    public void sendStoreChangeEvent(Long storeId, String userId, StoreChangeTypeEnum storeChangeTypeEnum) {
         if (Objects.isNull(storeId) || StringUtils.isBlank(userId)) {
             log.error("invoke StoreServiceImpl.sendStoreChangeEvent error,param is null. param:{},{}", storeId, userId);
             return;
@@ -260,6 +261,7 @@ public class StoreServiceImpl implements StoreService {
         StoreChangeEvent changeEvent = new StoreChangeEvent();
         changeEvent.setOperatorId(userId);
         changeEvent.setStoreId(storeId);
+        changeEvent.setStoreChangeTypeEnum(storeChangeTypeEnum);
         mqMessageUtil.sendMsg(mqTopicConfig.getStoreChangeTopic(), mqTopicConfig.getStoreChangeTag(), changeEvent);
     }
 

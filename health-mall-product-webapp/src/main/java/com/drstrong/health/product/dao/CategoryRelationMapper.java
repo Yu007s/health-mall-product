@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 前后台分类关联 mapper
@@ -27,14 +28,18 @@ public interface CategoryRelationMapper extends BaseMapper<CategoryRelationEntit
 	Integer batchInsert(@Param("saveParamList") List<CategoryRelationEntity> saveParamList);
 
 	/**
-	 * 根据前台分类 id,更新关联状态
+	 * 根据前台分类 id,删除
 	 *
-	 * @param frontCategoryId 前台分类 id
-	 * @param userId          用户 id
-	 * @param state           状态
-	 * @return 操作行数
 	 * @author liuqiuyi
-	 * @date 2021/12/13 11:24
+	 * @date 2021/12/30 19:59
 	 */
-	int updateStateByFrontCategoryId(@Param("frontCategoryId") Long frontCategoryId, @Param("state") Integer state, @Param("userId") Long userId);
+	void deletedByFrontCategoryIdList(@Param("frontCategoryIdList") Set<Long> frontCategoryIdList, @Param("userId") String userId);
+
+	/**
+	 * 根据前台分类 id,更新状态
+	 *
+	 * @author liuqiuyi
+	 * @date 2021/12/30 20:13
+	 */
+	void updateStateByFrontCategoryIdList(@Param("frontCategoryIdList") Set<Long> frontCategoryIdList, @Param("state") Integer state, @Param("userId") String userId);
 }

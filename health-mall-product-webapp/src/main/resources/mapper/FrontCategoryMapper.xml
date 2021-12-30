@@ -39,6 +39,16 @@
 
     <update id="deleteByIdList">
         update pms_product_front_category set del_flag = 1, changed_at = now(),changed_by = #{userId} where
+        del_flag = 0 and
+        id in
+        <foreach collection="categoryIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateStateByIdList">
+        update pms_product_front_category set state = #{state}, changed_at = now(),changed_by = #{userId} where
+        del_flag = 0 and
         id in
         <foreach collection="categoryIdList" item="item" open="(" close=")" separator=",">
             #{item}

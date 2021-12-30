@@ -129,47 +129,36 @@ public class CategoryRelationServiceImpl implements CategoryRelationService {
 	/**
 	 * 根据前台分类 id 进行逻辑删除
 	 *
-	 * @param frontCategoryId 前台分类 id
+	 * @param frontCategoryIdList 前台分类 id
 	 * @author liuqiuyi
 	 * @date 2021/12/13 11:10
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void deletedByFrontCategoryId(Long frontCategoryId, String userId) {
-		if (Objects.isNull(frontCategoryId) || Objects.isNull(userId)) {
+	public void deletedByFrontCategoryIdList(Set<Long> frontCategoryIdList, String userId) {
+		if (CollectionUtils.isEmpty(frontCategoryIdList) || Objects.isNull(userId)) {
+			log.error("categoryRelationServiceImpl.deletedByFrontCategoryIdList param is null.param:{},{}", frontCategoryIdList, userId);
 			return;
 		}
-		CategoryRelationEntity entity = CategoryRelationEntity.buildUpdateEntity(userId);
-		entity.setDelFlag(DelFlagEnum.IS_DELETED.getCode());
-
-		LambdaQueryWrapper<CategoryRelationEntity> queryWrapper = getUpdateWrapper(frontCategoryId);
-		categoryRelationMapper.update(entity, queryWrapper);
+		categoryRelationMapper.deletedByFrontCategoryIdList(frontCategoryIdList, userId);
 	}
 
 	/**
-	 * 根据前台分类 id,更新关联信息的状态
+	 * 根据前台分类 id 进行逻辑删除
 	 *
-	 * @param frontCategoryId 前台分类 id
+	 * @param frontCategoryIdList 前台分类 id
+	 * @param state               状态
+	 * @param userId              用户 id
 	 * @author liuqiuyi
-	 * @date 2021/12/13 11:20
+	 * @date 2021/12/13 11:10
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void updateStateByFrontCategoryId(Long frontCategoryId, Integer state, String userId) {
-		if (Objects.isNull(frontCategoryId) || Objects.isNull(state) || Objects.isNull(userId)) {
+	public void updateStateByFrontCategoryIdList(Set<Long> frontCategoryIdList, Integer state, String userId) {
+		if (CollectionUtils.isEmpty(frontCategoryIdList) || Objects.isNull(userId) || Objects.isNull(state)) {
+			log.error("categoryRelationServiceImpl.deletedByFrontCategoryIdList param is null.param:{},{},{}", frontCategoryIdList, state, userId);
 			return;
 		}
-		CategoryRelationEntity entity = CategoryRelationEntity.buildUpdateEntity(userId);
-		entity.setState(state);
-
-		LambdaQueryWrapper<CategoryRelationEntity> queryWrapper = getUpdateWrapper(frontCategoryId);
-		categoryRelationMapper.update(entity, queryWrapper);
-	}
-
-	private LambdaQueryWrapper<CategoryRelationEntity> getUpdateWrapper(Long frontCategoryId) {
-		LambdaQueryWrapper<CategoryRelationEntity> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(CategoryRelationEntity::getFrontCategoryId, frontCategoryId)
-				.eq(CategoryRelationEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
-		return queryWrapper;
+		categoryRelationMapper.updateStateByFrontCategoryIdList(frontCategoryIdList, state, userId);
 	}
 }

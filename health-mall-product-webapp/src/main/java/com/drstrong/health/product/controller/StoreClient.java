@@ -7,6 +7,7 @@ import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreSkuResponse;
 import com.drstrong.health.product.model.response.store.ThreeSkuInfoResponse;
+import com.drstrong.health.product.mq.model.product.StoreChangeTypeEnum;
 import com.drstrong.health.product.remote.api.store.StoreRemoteApi;
 import com.drstrong.health.product.remote.model.StorePostageDTO;
 import com.drstrong.health.product.service.AreaService;
@@ -46,20 +47,22 @@ public class StoreClient implements StoreRemoteApi {
 	}
 
 	@Override
-	public ResultVO<Object> add(StoreAddOrUpdateRequest storeAddOrUpdateRequest,String userId) {
-		storeService.add(storeAddOrUpdateRequest,userId);
+	public ResultVO<Object> add(StoreAddOrUpdateRequest storeAddOrUpdateRequest, String userId) {
+		storeService.add(storeAddOrUpdateRequest, userId);
 		return ResultVO.success();
 	}
 
 	@Override
-	public ResultVO<Object> update(StoreAddOrUpdateRequest storeAddOrUpdateRequest,String userId) {
-		storeService.update(storeAddOrUpdateRequest,userId);
+	public ResultVO<Object> update(StoreAddOrUpdateRequest storeAddOrUpdateRequest, String userId) {
+		storeService.update(storeAddOrUpdateRequest, userId);
+		storeService.sendStoreChangeEvent(storeAddOrUpdateRequest.getStoreId(), userId, StoreChangeTypeEnum.UPDATE_NAME);
 		return ResultVO.success();
 	}
 
 	@Override
-	public ResultVO<Object> updateState(StoreIdRequest storeIdRequest,String userId) {
-		storeService.updateState(storeIdRequest,userId);
+	public ResultVO<Object> updateState(StoreIdRequest storeIdRequest, String userId) {
+		storeService.updateState(storeIdRequest, userId);
+		storeService.sendStoreChangeEvent(storeIdRequest.getStoreId(), userId, StoreChangeTypeEnum.UPDATE_STATE);
 		return ResultVO.success();
 	}
 
@@ -70,8 +73,8 @@ public class StoreClient implements StoreRemoteApi {
 	}
 
 	@Override
-	public ResultVO<Object> updatePostage(StorePostage storePostage,String userId) {
-		storeService.updatePostage(storePostage,userId);
+	public ResultVO<Object> updatePostage(StorePostage storePostage, String userId) {
+		storeService.updatePostage(storePostage, userId);
 		return ResultVO.success();
 	}
 
@@ -82,20 +85,20 @@ public class StoreClient implements StoreRemoteApi {
 	}
 
 	@Override
-	public ResultVO<Object> updatePurchasePrice(UpdateThreeRequest updateThreeRequest,String userId) {
-		storeThreeRelevanceService.updatePurchasePrice(updateThreeRequest,userId);
+	public ResultVO<Object> updatePurchasePrice(UpdateThreeRequest updateThreeRequest, String userId) {
+		storeThreeRelevanceService.updatePurchasePrice(updateThreeRequest, userId);
 		return ResultVO.success();
 	}
 
 	@Override
-	public ResultVO<Object> relevanceAdd(RelevanceThreeRequest relevanceThreeRequest,String userId) {
-		storeThreeRelevanceService.relevanceAdd(relevanceThreeRequest,userId);
+	public ResultVO<Object> relevanceAdd(RelevanceThreeRequest relevanceThreeRequest, String userId) {
+		storeThreeRelevanceService.relevanceAdd(relevanceThreeRequest, userId);
 		return ResultVO.success();
 	}
 
 	@Override
-	public ResultVO<Object> updateSkuState(UpdateSkuRequest updateSkuRequest,String userId) {
-		storeThreeRelevanceService.updateSkuState(updateSkuRequest,userId);
+	public ResultVO<Object> updateSkuState(UpdateSkuRequest updateSkuRequest, String userId) {
+		storeThreeRelevanceService.updateSkuState(updateSkuRequest, userId);
 		return ResultVO.success();
 	}
 
@@ -108,7 +111,7 @@ public class StoreClient implements StoreRemoteApi {
 
 	@Override
 	public List<StorePostageDTO> getStorePostageByIds(Set<Long> storeIds, String areaName) {
-		return storeService.getStorePostageByIds(storeIds,areaName);
+		return storeService.getStorePostageByIds(storeIds, areaName);
 	}
 
 	@Override

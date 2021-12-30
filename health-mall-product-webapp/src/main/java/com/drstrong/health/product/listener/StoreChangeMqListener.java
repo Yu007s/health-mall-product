@@ -10,6 +10,7 @@ import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.mq.model.product.StoreChangeEvent;
+import com.drstrong.health.product.mq.model.product.StoreChangeTypeEnum;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductSkuService;
 import com.drstrong.health.product.service.StoreService;
@@ -28,6 +29,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 店铺修改 MQ 处理类
@@ -81,22 +83,30 @@ public class StoreChangeMqListener implements RocketMQListener<StoreChangeEvent>
 		} finally {
 			redisUtils.del(lockKey);
 		}
+		log.info("invoke StoreChangeMqListener.onMessage() success!!! param:{}", storeChangeEvent);
 	}
 
 	private void doStoreChange(StoreChangeEvent storeChangeEvent) {
 		StoreEntity storeEntity = storeService.getByStoreId(storeChangeEvent.getStoreId());
-		if (Objects.isNull(storeEntity) || Objects.equals(StoreStatusEnum.DISABLE.getCode(), storeEntity.getStoreStatus())) {
-			// 店铺已经被删除或者禁用,判断商品是否需要禁用
-
-
+		if (Objects.equals(StoreChangeTypeEnum.UPDATE_NAME, storeChangeEvent.getStoreChangeTypeEnum())) {
+			if (Objects.isNull(storeEntity)) {
+				log.error("invoke StoreChangeMqListener.onMessage(),store not found .param:{}", storeChangeEvent);
+				return;
+			}
+			doUpdateStoreName(null, storeEntity.getName(), storeChangeEvent);
+		} else if (Objects.equals(StoreChangeTypeEnum.UPDATE_STATE, storeChangeEvent.getStoreChangeTypeEnum())) {
+			if (Objects.isNull(storeEntity) || Objects.equals(storeEntity.getStoreStatus(), StoreStatusEnum.DISABLE.getCode())) {
+				doUpdateStoreName(UpOffEnum.DOWN, null, storeChangeEvent);
+			} else {
+				doUpdateStoreName(UpOffEnum.UP, null, storeChangeEvent);
+			}
 		}
-
 	}
 
 	/**
 	 * 执行更新操作
 	 */
-	private void doUpdate(UpOffEnum upOffEnum, String storeName, StoreChangeEvent storeChangeEvent) {
+	private void doUpdateStoreName(UpOffEnum upOffEnum, String storeName, StoreChangeEvent storeChangeEvent) {
 		// 1.查询 spu 表
 		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
 		querySpuRequest.setStoreId(storeChangeEvent.getStoreId());
@@ -106,21 +116,32 @@ public class StoreChangeMqListener implements RocketMQListener<StoreChangeEvent>
 			return;
 		}
 		// 判断是否需要更新 spu 表
-	/*	basicsInfoEntityList.stream().filter(productBasicsInfoEntity -> {
-			if (Objects.nonNull(upOffEnum)) {
+		basicsInfoEntityList = basicsInfoEntityList.stream()
+				.filter(productBasicsInfoEntity -> {
+					if (Objects.nonNull(upOffEnum)) {
+						return !Objects.equals(upOffEnum.getCode(), productBasicsInfoEntity.getState());
+					} else if (StringUtils.isNotBlank(storeName)) {
+						return !Objects.equals(storeName, productBasicsInfoEntity.getSourceName());
+					} else {
+						return false;
+					}
+				})
+				.collect(Collectors.toList());
+		if (CollectionUtils.isNotEmpty(basicsInfoEntityList)) {
+			// 更新 spu 表的名称信息
+			basicsInfoEntityList.forEach(productBasicsInfoEntity -> {
+				if (Objects.nonNull(upOffEnum)) {
+					productBasicsInfoEntity.setState(upOffEnum.getCode());
+				} else if (StringUtils.isNotBlank(storeName)) {
+					productBasicsInfoEntity.setSourceName(storeName);
+				}
+				productBasicsInfoEntity.setChangedAt(LocalDateTime.now());
+				productBasicsInfoEntity.setChangedBy(storeChangeEvent.getOperatorId());
+			});
+			productBasicsInfoService.updateBatchById(basicsInfoEntityList, basicsInfoEntityList.size());
+			log.info("invoke StoreChangeMqListener.onMessage(),update spu size:{}", basicsInfoEntityList.size());
+		}
 
-			}
-		})*/
-
-
-		// 更新 spu 表的信息
-		basicsInfoEntityList.forEach(productBasicsInfoEntity -> {
-			productBasicsInfoEntity.setSourceName(storeName);
-			productBasicsInfoEntity.setState(upOffEnum.getCode());
-			productBasicsInfoEntity.setChangedAt(LocalDateTime.now());
-			productBasicsInfoEntity.setChangedBy(storeChangeEvent.getOperatorId());
-		});
-		productBasicsInfoService.updateBatchById(basicsInfoEntityList, basicsInfoEntityList.size());
 		// 2.查询 sku 表
 		QuerySkuRequest querySkuRequest = new QuerySkuRequest();
 		querySkuRequest.setStoreId(storeChangeEvent.getStoreId());
@@ -128,13 +149,31 @@ public class StoreChangeMqListener implements RocketMQListener<StoreChangeEvent>
 		if (CollectionUtils.isEmpty(productSkuEntityList)) {
 			return;
 		}
-		// 更新 sku 表信息
-		productSkuEntityList.forEach(productSkuEntity -> {
-			productSkuEntity.setSourceName(storeName);
-			productSkuEntity.setState(upOffEnum.getCode());
-			productSkuEntity.setChangedAt(LocalDateTime.now());
-			productSkuEntity.setChangedBy(storeChangeEvent.getOperatorId());
-		});
-		productSkuService.saveOrUpdateBatch(productSkuEntityList, productSkuEntityList.size());
+		// 判断是否需要更新 sku 表
+		productSkuEntityList = productSkuEntityList.stream()
+				.filter(productSkuEntity -> {
+					if (Objects.nonNull(upOffEnum)) {
+						return !Objects.equals(upOffEnum.getCode(), productSkuEntity.getState());
+					} else if (StringUtils.isNotBlank(storeName)) {
+						return !Objects.equals(storeName, productSkuEntity.getSourceName());
+					} else {
+						return false;
+					}
+				})
+				.collect(Collectors.toList());
+		if (CollectionUtils.isNotEmpty(productSkuEntityList)) {
+			// 更新 sku 表信息
+			productSkuEntityList.forEach(productSkuEntity -> {
+				if (Objects.nonNull(upOffEnum)) {
+					productSkuEntity.setState(upOffEnum.getCode());
+				} else if (StringUtils.isNotBlank(storeName)) {
+					productSkuEntity.setSourceName(storeName);
+				}
+				productSkuEntity.setChangedAt(LocalDateTime.now());
+				productSkuEntity.setChangedBy(storeChangeEvent.getOperatorId());
+			});
+			productSkuService.saveOrUpdateBatch(productSkuEntityList, productSkuEntityList.size());
+			log.info("invoke StoreChangeMqListener.onMessage(),update sku size:{}", productSkuEntityList.size());
+		}
 	}
 }

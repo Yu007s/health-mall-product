@@ -66,21 +66,21 @@ public interface CategoryRelationService {
 	/**
 	 * 根据前台分类 id 进行逻辑删除
 	 *
-	 * @param frontCategoryId 前台分类 id
+	 * @param frontCategoryIdList 前台分类 id
 	 * @param userId          用户 id
 	 * @author liuqiuyi
 	 * @date 2021/12/13 11:10
 	 */
-	void deletedByFrontCategoryId(Long frontCategoryId, String userId);
+	void deletedByFrontCategoryIdList(Set<Long> frontCategoryIdList, String userId);
 
 	/**
-	 * 根据前台分类 id,更新关联信息的状态
+	 * 根据前台分类 id 进行逻辑删除
 	 *
-	 * @param frontCategoryId 前台分类 id
-	 * @param userId          用户 id
+	 * @param frontCategoryIdList 前台分类 id
+	 * @param userId              用户 id
 	 * @param state 状态
 	 * @author liuqiuyi
-	 * @date 2021/12/13 11:20
+	 * @date 2021/12/13 11:10
 	 */
-	void updateStateByFrontCategoryId(Long frontCategoryId, Integer state, String userId);
+	void updateStateByFrontCategoryIdList(Set<Long> frontCategoryIdList, Integer state, String userId);
 }

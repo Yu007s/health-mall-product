@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.request.store.StoreAddOrUpdateRequest;
 import com.drstrong.health.product.model.request.store.StoreIdRequest;
 import com.drstrong.health.product.model.request.store.StorePostage;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
+import com.drstrong.health.product.mq.model.product.StoreChangeTypeEnum;
 import com.drstrong.health.product.remote.model.StorePostageDTO;
 
 import java.util.List;
@@ -52,10 +53,10 @@ public interface StoreService {
 	/**
 	 * 发送店铺变更的事件
 	 *
-	 * @param userId 操作人 id
+	 * @param userId  操作人 id
 	 * @param storeId 店铺 id
 	 * @author liuqiuyi
 	 * @date 2021/12/30 11:03
 	 */
-	void sendStoreChangeEvent(Long storeId, String userId);
+	void sendStoreChangeEvent(Long storeId, String userId, StoreChangeTypeEnum storeChangeTypeEnum);
 }
