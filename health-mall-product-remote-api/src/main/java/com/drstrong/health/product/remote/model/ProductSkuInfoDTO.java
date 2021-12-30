@@ -40,7 +40,7 @@ public class ProductSkuInfoDTO implements Serializable {
 	private String packValue;
 
 	@ApiModelProperty("商品sku价格")
-	private BigDecimal price;
+	private BigDecimal productAmount;
 
 	@ApiModelProperty(value = "店铺id")
 	private Long storeId;
