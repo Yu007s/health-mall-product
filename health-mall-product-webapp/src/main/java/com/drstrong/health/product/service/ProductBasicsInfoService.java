@@ -12,6 +12,7 @@ import com.drstrong.health.product.model.request.product.SaveProductRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,6 +43,16 @@ public interface ProductBasicsInfoService {
 	 * @date 2021/12/16 00:10
 	 */
 	List<ProductBasicsInfoEntity> queryProductByParam(QuerySpuRequest querySpuRequest);
+
+	/**
+	 * 根据条件,查询商品基础信息
+	 *
+	 * @param querySpuRequest 查询条件
+	 * @return 商品基础信息集合
+	 * @author liuqiuyi
+	 * @date 2021/12/16 00:10
+	 */
+	ProductBasicsInfoEntity queryOneProductByParam(QuerySpuRequest querySpuRequest);
 
 	/**
 	 * 根据条件,查询商品基础信息,转成 map 结构
@@ -188,4 +199,12 @@ public interface ProductBasicsInfoService {
 	 * @param userId
 	 */
 	void updateState(Set<Long> spuIdList, Integer state, String userId);
+
+	/**
+	 * 根据 id 集合批量更新
+	 *
+	 * @author liuqiuyi
+	 * @date 2021/12/30 15:17
+	 */
+	boolean updateBatchById(Collection<ProductBasicsInfoEntity> entityList, int batchSize);
 }
