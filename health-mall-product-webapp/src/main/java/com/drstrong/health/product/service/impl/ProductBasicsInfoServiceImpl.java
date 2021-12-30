@@ -84,6 +84,11 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	@Resource
 	ShopCartRemoteProService shopCartRemoteProService;
 
+	@Override
+	public boolean updateBatchById(Collection<ProductBasicsInfoEntity> entityList, int batchSize) {
+		return super.updateBatchById(entityList, batchSize);
+	}
+
 	/**
 	 * 根据条件,分页查询商品基础信息
 	 *
@@ -109,6 +114,20 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	@Override
 	public List<ProductBasicsInfoEntity> queryProductByParam(QuerySpuRequest querySpuRequest) {
 		return productBasicsInfoMapper.selectList(buildQuerySpuParam(querySpuRequest));
+	}
+
+	/**
+	 * 根据条件,查询商品基础信息
+	 *
+	 * @param querySpuRequest 查询条件
+	 * @return 商品基础信息集合
+	 * @author liuqiuyi
+	 * @date 2021/12/16 00:10
+	 */
+	@Override
+	public ProductBasicsInfoEntity queryOneProductByParam(QuerySpuRequest querySpuRequest) {
+		List<ProductBasicsInfoEntity> infoEntityList = productBasicsInfoMapper.selectList(buildQuerySpuParam(querySpuRequest));
+		return CollectionUtils.isEmpty(infoEntityList) ? null : infoEntityList.get(0);
 	}
 
 	/**
@@ -403,6 +422,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		}
 		// 1.模糊查询商品信息
 		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
+		querySpuRequest.setProductName(productSearchRequest.getContent());
 		querySpuRequest.setPageNo(productSearchRequest.getPageNo());
 		querySpuRequest.setPageSize(productSearchRequest.getPageSize());
 		querySpuRequest.setUpOffEnum(UpOffEnum.UP);

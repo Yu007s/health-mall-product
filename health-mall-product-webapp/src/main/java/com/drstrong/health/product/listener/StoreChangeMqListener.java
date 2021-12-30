@@ -1,7 +1,13 @@
 package com.drstrong.health.product.listener;
 
+import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
+import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.enums.StoreStatusEnum;
+import com.drstrong.health.product.model.enums.UpOffEnum;
+import com.drstrong.health.product.model.request.product.QuerySkuRequest;
+import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.mq.model.product.StoreChangeEvent;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
@@ -10,6 +16,7 @@ import com.drstrong.health.product.service.StoreService;
 import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.redis.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
@@ -18,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -75,18 +84,57 @@ public class StoreChangeMqListener implements RocketMQListener<StoreChangeEvent>
 	}
 
 	private void doStoreChange(StoreChangeEvent storeChangeEvent) {
-
-
-		// 1.校验店铺名称是否变动
 		StoreEntity storeEntity = storeService.getByStoreId(storeChangeEvent.getStoreId());
-		if (Objects.isNull(storeEntity)) {
-			// 店铺已经被删除或者禁用
+		if (Objects.isNull(storeEntity) || Objects.equals(StoreStatusEnum.DISABLE.getCode(), storeEntity.getStoreStatus())) {
+			// 店铺已经被删除或者禁用,判断商品是否需要禁用
+
+
 		}
 
 	}
 
-	private void doUpdate(){
+	/**
+	 * 执行更新操作
+	 */
+	private void doUpdate(UpOffEnum upOffEnum, String storeName, StoreChangeEvent storeChangeEvent) {
 		// 1.查询 spu 表
-//		productBasicsInfoService.queryProductByParam();
+		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
+		querySpuRequest.setStoreId(storeChangeEvent.getStoreId());
+		List<ProductBasicsInfoEntity> basicsInfoEntityList = productBasicsInfoService.queryProductByParam(querySpuRequest);
+		if (CollectionUtils.isEmpty(basicsInfoEntityList)) {
+			log.info("invoke StoreChangeMqListener.onMessage(),product not found,end of run. param:{}", storeChangeEvent);
+			return;
+		}
+		// 判断是否需要更新 spu 表
+	/*	basicsInfoEntityList.stream().filter(productBasicsInfoEntity -> {
+			if (Objects.nonNull(upOffEnum)) {
+
+			}
+		})*/
+
+
+		// 更新 spu 表的信息
+		basicsInfoEntityList.forEach(productBasicsInfoEntity -> {
+			productBasicsInfoEntity.setSourceName(storeName);
+			productBasicsInfoEntity.setState(upOffEnum.getCode());
+			productBasicsInfoEntity.setChangedAt(LocalDateTime.now());
+			productBasicsInfoEntity.setChangedBy(storeChangeEvent.getOperatorId());
+		});
+		productBasicsInfoService.updateBatchById(basicsInfoEntityList, basicsInfoEntityList.size());
+		// 2.查询 sku 表
+		QuerySkuRequest querySkuRequest = new QuerySkuRequest();
+		querySkuRequest.setStoreId(storeChangeEvent.getStoreId());
+		List<ProductSkuEntity> productSkuEntityList = productSkuService.querySkuByParam(querySkuRequest);
+		if (CollectionUtils.isEmpty(productSkuEntityList)) {
+			return;
+		}
+		// 更新 sku 表信息
+		productSkuEntityList.forEach(productSkuEntity -> {
+			productSkuEntity.setSourceName(storeName);
+			productSkuEntity.setState(upOffEnum.getCode());
+			productSkuEntity.setChangedAt(LocalDateTime.now());
+			productSkuEntity.setChangedBy(storeChangeEvent.getOperatorId());
+		});
+		productSkuService.saveOrUpdateBatch(productSkuEntityList, productSkuEntityList.size());
 	}
 }
