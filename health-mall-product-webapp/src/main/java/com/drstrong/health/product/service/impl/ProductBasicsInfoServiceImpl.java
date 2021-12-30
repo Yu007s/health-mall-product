@@ -599,7 +599,9 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 		productSkuService.saveOrUpdateBatch(skuEntityList, skuEntityList.size());
 		// 如果 skuIdEntityMap 中还存在 skuId,则是本次修改时删除的 skuId
 		Set<Long> oldSkuIds = skuIdEntityMap.keySet();
-		productSkuService.deleteBySkuIdList(oldSkuIds, saveProductRequest.getUserId());
+		if (!CollectionUtils.isEmpty(oldSkuIds)) {
+			productSkuService.deleteBySkuIdList(oldSkuIds, saveProductRequest.getUserId());
+		}
 	}
 
 	private void saveAttribute(SaveProductRequest saveProductRequest, Long product) {
