@@ -33,7 +33,8 @@ public class BannerJob {
         try {
             count =bannerService.pollingStatus();
         } catch (Exception e) {
-            log.info("SyncYtPharmacyInventoryJob fail", e);
+            log.info("changeAllActivityTimeStatus fail", e);
+            return ReturnT.FAIL;
         }
         log.info("定时任务，更新轮播图上下架状态-----------修改行数:{}",count);
         XxlJobLogger.log("xxl-job, pollingBannerStatus end.");
