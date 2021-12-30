@@ -29,10 +29,10 @@ import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.utils.MqMessageUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -178,7 +178,9 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
                   downSpuIds.add(k);
                }
            });
-           productBasicsInfoService.updateState(downSpuIds,state,userId);
+           if(CollectionUtils.isNotEmpty(downSpuIds)){
+               productBasicsInfoService.updateState(downSpuIds,state,userId);
+           }
         }
     }
 
