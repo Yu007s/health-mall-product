@@ -177,7 +177,6 @@ public class StoreServiceImpl implements StoreService {
     public List<StoreEntity> querySetPostageByStoreIds(List<Long> storeIds) {
         LambdaQueryWrapper<StoreEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .eq(StoreEntity::getStoreStatus, StoreStatusEnum.ENABLE.getCode())
                 .eq(StoreEntity::getSetPostage,StorePostageEnum.HAS_SET.getCode())
                 .in(StoreEntity::getId,storeIds);
         return storeMapper.selectList(queryWrapper);
@@ -185,6 +184,9 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public List<StorePostageDTO> getStorePostageByIds(Set<Long> storeIds, String areaName) {
+        if(CollectionUtils.isEmpty(storeIds)){
+           return Collections.emptyList();
+        }
         List<StoreEntity> storeEntities = selectByStoreIds(storeIds);
         List<StorePostageAreaEntity> storePostageAreaEntities = storePostageAreaService.queryByStoreIdsAndAreaName(storeIds, areaName);
         Map<Long, Integer> map = storePostageAreaEntities.stream().collect(Collectors.toMap(StorePostageAreaEntity::getStoreId, StorePostageAreaEntity::getPostage));
