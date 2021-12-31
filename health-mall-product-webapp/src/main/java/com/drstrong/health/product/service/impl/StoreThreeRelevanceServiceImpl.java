@@ -197,6 +197,9 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
 
     @Override
     public List<ThreeSkuInfoResponse> queryBySkuIds(List<Long> skuIds) {
+        if(CollectionUtils.isEmpty(skuIds)){
+           return Collections.emptyList();
+        }
         LambdaQueryWrapper<StoreThreeRelevanceEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.in(StoreThreeRelevanceEntity::getSkuId,skuIds)
                 .eq(StoreThreeRelevanceEntity::getDelFlag,DelFlagEnum.UN_DELETED);
