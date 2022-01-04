@@ -3,6 +3,7 @@ package com.drstrong.health.product.model.entity.category;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -44,5 +45,6 @@ public class CategoryRelationEntity extends BaseEntity implements Serializable {
 	/**
 	 * 乐观锁字段
 	 */
+	@Version
 	private Integer version;
 }
