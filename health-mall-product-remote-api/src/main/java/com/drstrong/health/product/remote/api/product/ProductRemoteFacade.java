@@ -1,9 +1,6 @@
 package com.drstrong.health.product.remote.api.product;
 
-import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
-import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
-import com.drstrong.health.product.remote.model.SearchNameResultDTO;
-import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
+import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -99,4 +96,8 @@ public interface ProductRemoteFacade {
 	@ApiOperation("skuCode 和 skuId 进行转换")
 	@PostMapping("/sku/id/code")
 	List<SkuIdAndCodeDTO> listSkuIdOrCode(@RequestBody QueryProductRequest queryProductRequest);
+
+	@ApiOperation("根据skuId查询发票所需相关信息")
+	@GetMapping("invoiceInfoBySkuId")
+	SkuInvoiceDTO getInvoiceInfoBySkuId(@RequestParam("skuId") Long skuId);
 }

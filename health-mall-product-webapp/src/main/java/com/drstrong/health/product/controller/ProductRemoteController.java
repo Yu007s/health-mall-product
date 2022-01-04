@@ -1,13 +1,16 @@
 package com.drstrong.health.product.controller;
 
+import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
+import com.drstrong.health.product.model.entity.product.ProductSkuRevenueEntity;
+import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.api.product.ProductRemoteFacade;
-import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
-import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
-import com.drstrong.health.product.remote.model.SearchNameResultDTO;
-import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
+import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 import com.drstrong.health.product.service.ProductBasicsInfoService;
 import com.drstrong.health.product.service.ProductRemoteService;
+import com.drstrong.health.product.service.ProductSkuRevenueService;
+import com.drstrong.health.product.service.ProductSkuService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 商品模块远程接口
@@ -35,6 +39,12 @@ public class ProductRemoteController implements ProductRemoteFacade {
 
 	@Resource
 	ProductBasicsInfoService productBasicsInfoService;
+
+	@Resource
+	private ProductSkuService productSkuService;
+
+	@Resource
+	private ProductSkuRevenueService productSkuRevenueService;
 
 	/**
 	 * 根据 skuId 集合,获取 sku 信息
@@ -119,4 +129,23 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	public List<SkuIdAndCodeDTO> listSkuIdOrCode(QueryProductRequest queryProductRequest) {
 		return productRemoteService.listSkuIdOrCode(queryProductRequest);
 	}
+
+	@Override
+	public SkuInvoiceDTO getInvoiceInfoBySkuId(Long skuId) {
+		if(Objects.isNull(skuId)){
+			throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
+		}
+		SkuInvoiceDTO skuInvoiceDTO = new SkuInvoiceDTO();
+		skuInvoiceDTO.skuId(skuId);
+		ProductSkuEntity productSkuEntity = productSkuService.queryBySkuIdOrCode(skuId, "", null);
+		ProductSkuRevenueEntity skuRevenue = productSkuRevenueService.getSkuRevenue(skuId, "");
+		if(Objects.nonNull(productSkuEntity)){
+			skuInvoiceDTO.packName(productSkuEntity.getPackName()).packValue(productSkuEntity.getPackValue());
+		}
+		if(Objects.nonNull(skuRevenue)){
+			skuInvoiceDTO.revenueCode(skuRevenue.getRevenueCode()).revenueRate(skuRevenue.getRevenueRate());
+		}
+		return skuInvoiceDTO;
+	}
+
 }
