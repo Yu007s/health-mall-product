@@ -32,4 +32,7 @@ public class SkuBaseInfoVO implements Serializable {
 
 	@ApiModelProperty("sku 库存数")
 	private Long inventoryNum;
+
+	@ApiModelProperty("商品的 sku 库存数")
+	private Long productInventoryNum;
 }
