@@ -189,7 +189,7 @@ public class StoreServiceImpl implements StoreService {
         }
         List<StoreEntity> storeEntities = selectByStoreIds(storeIds);
         List<StorePostageAreaEntity> storePostageAreaEntities = storePostageAreaService.queryByStoreIdsAndAreaName(storeIds, areaName);
-        Map<Long, Integer> map = storePostageAreaEntities.stream().collect(Collectors.toMap(StorePostageAreaEntity::getStoreId, StorePostageAreaEntity::getPostage));
+        Map<Long, Integer> map = storePostageAreaEntities.stream().collect(Collectors.toMap(StorePostageAreaEntity::getStoreId, StorePostageAreaEntity::getPostage, (v1, v2) -> v1));
         return storeEntities.stream().map(s -> {
             StorePostageDTO storePostageDTO = new StorePostageDTO();
             storePostageDTO.setStoreId(s.getId());
