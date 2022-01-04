@@ -1,5 +1,8 @@
 package com.drstrong.health.product.model.entity.category;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,6 +21,7 @@ public class BaseEntity implements Serializable {
 	/**
 	 * 创建时间
 	 */
+	@TableField(fill = FieldFill.INSERT)
 	private LocalDateTime createdAt;
 
 	/**
@@ -28,6 +32,7 @@ public class BaseEntity implements Serializable {
 	/**
 	 * 修改时间
 	 */
+	@TableField(fill = FieldFill.INSERT_UPDATE)
 	private LocalDateTime changedAt;
 
 	/**
@@ -38,5 +43,6 @@ public class BaseEntity implements Serializable {
 	/**
 	 * 是否删除 0：正常 1：删除
 	 */
+	@TableLogic
 	private Integer delFlag;
 }
