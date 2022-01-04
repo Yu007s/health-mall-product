@@ -246,7 +246,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		Page<ProductSkuEntity> productSkuEntityPage = productSkuMapper.selectPage(queryPage, queryWrapper);
 		List<ProductSkuEntity> records = productSkuEntityPage.getRecords();
 		if (Objects.isNull(productSkuEntityPage) || CollectionUtils.isEmpty(records)) {
-            return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
+			return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount(0).result(Lists.newArrayList()).build();
 		}
 		List<ProductSkuStockVO> productSkuStockVOS = Lists.newArrayListWithCapacity(records.size());
 		Map<Long, Integer> stockMap = pharmacyGoodsRemoteProService.getSkuStockNumToMap(records.stream().map(ProductSkuEntity::getId).collect(Collectors.toSet()));
@@ -254,14 +254,14 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		records.forEach(r -> {
 			CommAttributeDTO commAttributeDTO = commAttributeMap.get(r.getCommAttribute());
 			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
-			BeanUtils.copyProperties(r,productSkuStockVO);
+			BeanUtils.copyProperties(r, productSkuStockVO);
 			productSkuStockVO.setSkuId(r.getId());
 			productSkuStockVO.setStoreName(r.getSourceName());
 			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
 			productSkuStockVO.setCommAttributeName(commAttributeDTO == null ? "--" : commAttributeDTO.getCommAttributeName());
 			productSkuStockVOS.add(productSkuStockVO);
 		});
-        return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount((int) productSkuEntityPage.getTotal()).result(productSkuStockVOS).build();
+		return PageVO.newBuilder().pageNo(querySkuStockRequest.getPageNo()).pageSize(querySkuStockRequest.getPageSize()).totalCount((int) productSkuEntityPage.getTotal()).result(productSkuStockVOS).build();
 	}
 
 	/**
@@ -285,7 +285,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		productSkuEntities.forEach(r -> {
 			CommAttributeDTO commAttributeDTO = commAttributeMap.get(r.getCommAttribute());
 			ProductSkuStockVO productSkuStockVO = new ProductSkuStockVO();
-			BeanUtils.copyProperties(r,productSkuStockVO);
+			BeanUtils.copyProperties(r, productSkuStockVO);
 			productSkuStockVO.setSkuId(r.getId());
 			productSkuStockVO.setStoreName(r.getSourceName());
 			productSkuStockVO.setStockNum(stockMap.get(r.getId()));
@@ -313,11 +313,11 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	public Map<Long, Integer> searchSkuCountMap(List<Long> storeIds) {
 		Map<Long, Integer> result = new HashMap<>();
 		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(ProductSkuEntity::getDelFlag,DelFlagEnum.UN_DELETED)
-				.in(ProductSkuEntity::getSourceId,storeIds);
+		queryWrapper.eq(ProductSkuEntity::getDelFlag, DelFlagEnum.UN_DELETED)
+				.in(ProductSkuEntity::getSourceId, storeIds);
 		List<ProductSkuEntity> productSkuEntities = productSkuMapper.selectList(queryWrapper);
 		Map<Long, List<ProductSkuEntity>> map = productSkuEntities.stream().collect(groupingBy(ProductSkuEntity::getSourceId));
-		map.forEach((k,v) -> result.put(k,v.size()));
+		map.forEach((k, v) -> result.put(k, v.size()));
 		return result;
 	}
 
@@ -458,6 +458,9 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			infoVO.setInventoryNum(skuIdStockNumMap.getOrDefault(productSkuEntity.getId(), 0).longValue());
 			skuBaseInfoVOList.add(infoVO);
 		}
+		// 5.整合所有的库存总数,前端需要根据该值进行判断
+		long productCount = skuBaseInfoVOList.stream().mapToLong(SkuBaseInfoVO::getInventoryNum).sum();
+		skuBaseInfoVOList.forEach(skuBaseInfoVO -> skuBaseInfoVO.setProductInventoryNum(productCount));
 		return skuBaseInfoVOList;
 	}
 
@@ -534,7 +537,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		if (Objects.nonNull(querySkuStockRequest.getStoreId())) {
 			queryWrapper.eq(ProductSkuEntity::getSourceId, querySkuStockRequest.getStoreId());
 		}
-		if(Objects.nonNull(querySkuStockRequest.getCommAttribute())){
+		if (Objects.nonNull(querySkuStockRequest.getCommAttribute())) {
 			queryWrapper.eq(ProductSkuEntity::getCommAttribute, querySkuStockRequest.getCommAttribute());
 		}
 		return queryWrapper;
