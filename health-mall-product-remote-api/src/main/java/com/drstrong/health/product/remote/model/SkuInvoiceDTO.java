@@ -15,7 +15,7 @@ import java.io.Serializable;
  */
 @ApiModel(" sku发票相关 信息")
 @Data
-@Accessors(fluent = true)
+@Accessors(chain = true)
 public class SkuInvoiceDTO implements Serializable {
 
 

@@ -136,14 +136,14 @@ public class ProductRemoteController implements ProductRemoteFacade {
 			throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
 		}
 		SkuInvoiceDTO skuInvoiceDTO = new SkuInvoiceDTO();
-		skuInvoiceDTO.skuId(skuId);
+		skuInvoiceDTO.setSkuId(skuId);
 		ProductSkuEntity productSkuEntity = productSkuService.queryBySkuIdOrCode(skuId, "", null);
 		ProductSkuRevenueEntity skuRevenue = productSkuRevenueService.getSkuRevenue(skuId, "");
 		if(Objects.nonNull(productSkuEntity)){
-			skuInvoiceDTO.packName(productSkuEntity.getPackName()).packValue(productSkuEntity.getPackValue());
+			skuInvoiceDTO.setPackName(productSkuEntity.getPackName()).setPackValue(productSkuEntity.getPackValue());
 		}
 		if(Objects.nonNull(skuRevenue)){
-			skuInvoiceDTO.revenueCode(skuRevenue.getRevenueCode()).revenueRate(skuRevenue.getRevenueRate());
+			skuInvoiceDTO.setRevenueCode(skuRevenue.getRevenueCode()).setRevenueRate(skuRevenue.getRevenueRate());
 		}
 		return skuInvoiceDTO;
 	}
