@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -45,11 +46,13 @@ public class BannerListResponse {
     @ApiModelProperty("序列号")
     private Integer sort;
 
-    @JsonFormat(timezone="GMT+8",pattern="yyyy-MM-dd hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     @ApiModelProperty("开始时间")
     private Date startTime;
 
-    @JsonFormat(timezone="GMT+8",pattern="yyyy-MM-dd hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     @ApiModelProperty("结束时间")
     private Date endTime;
 
