@@ -177,17 +177,20 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		// 组装返回值:一级分类的数量 = 一级分类的自己的商品数 + 二级分类的商品数
 		BaseTree.listToTree(frontCategoryEntityList);
 		for (FrontCategoryEntity categoryEntity : frontCategoryEntityList) {
+			// 不是一级分类,不修改
 			if (!Objects.equals(1, categoryEntity.getLevel())) {
 				continue;
 			}
-			int productNum = 0;
+			// 获取一级分类的商品数量
+			Integer parentProductNum = frontIdProductCountMap.getOrDefault(categoryEntity.getId(), 0);
+			// 获取一级分类下二级分类的商品数量
 			List<? super BaseTree> childrenList = categoryEntity.getChildren();
 			for (Object obj : childrenList) {
 				FrontCategoryEntity children = (FrontCategoryEntity) obj;
 				Integer childNum = frontIdProductCountMap.getOrDefault(children.getId(), 0);
-				productNum = productNum + childNum;
+				parentProductNum = parentProductNum + childNum;
 			}
-			frontIdProductCountMap.put(categoryEntity.getId(), productNum);
+			frontIdProductCountMap.put(categoryEntity.getId(), parentProductNum);
 		}
 		return frontIdProductCountMap;
 	}
