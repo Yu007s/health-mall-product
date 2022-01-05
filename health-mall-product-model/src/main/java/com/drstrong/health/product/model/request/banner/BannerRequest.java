@@ -6,11 +6,13 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -53,11 +55,11 @@ public class BannerRequest {
     @ApiModelProperty("序列号")
     private Integer sort;
 
-    @JsonFormat(timezone="GMT+8",pattern="yyyy-MM-dd hh:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     @ApiModelProperty("开始时间")
     private Date startTime;
 
-    @JsonFormat(timezone="GMT+8",pattern="yyyy-MM-dd hh:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     @ApiModelProperty("结束时间")
     private Date endTime;
 
