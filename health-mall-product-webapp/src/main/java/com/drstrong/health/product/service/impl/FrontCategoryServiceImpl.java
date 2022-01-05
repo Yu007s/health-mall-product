@@ -29,7 +29,6 @@ import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -57,9 +56,9 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 
 	private static final String ALL_CATEGORY = "全部分类";
 	/**
-	 * 全部分类的 icon 地址
+	 * 默认的前台分类图标地址
 	 */
-	private static final String ALL_CATEGORY_ICON = "";
+	private static final String DEFAULT_CATEGORY_ICON = "https://file.drstrong.cn/mall/product/category_icon.png";
 
 	@Resource
 	FrontCategoryMapper frontCategoryMapper;
@@ -333,7 +332,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		// 1.保存前台分类信息
 		FrontCategoryEntity categoryEntity = new FrontCategoryEntity();
 		categoryEntity.setName(categoryRequest.getCategoryName());
-		categoryEntity.setIcon(categoryRequest.getIconUrl());
+		categoryEntity.setIcon(StringUtils.isBlank(categoryRequest.getIconUrl()) ? DEFAULT_CATEGORY_ICON : categoryRequest.getIconUrl());
 		categoryEntity.setLevel(isTwoLevel ? 2 : 1);
 		categoryEntity.setParentId(isTwoLevel ? categoryRequest.getParentId() : 0);
 		categoryEntity.setSort(categoryRequest.getSort());
@@ -506,7 +505,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 			if (homeCategoryVOList.size() > FIRST_CATEGORY_SIZE) {
 				homeCategoryVOList = homeCategoryVOList.subList(0, FIRST_CATEGORY_SIZE);
 			}
-			homeCategoryVOList.add(HomeCategoryVO.buildDefault(ALL_CATEGORY, ALL_CATEGORY_ICON));
+			homeCategoryVOList.add(HomeCategoryVO.buildDefault(ALL_CATEGORY, ""));
 		} else {
 			homeCategoryVOList = BaseTree.listToTree(homeCategoryVOList);
 		}
