@@ -55,12 +55,12 @@ public class BannerRequest {
     @ApiModelProperty("序列号")
     private Integer sort;
 
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss",timezone="GMT+8")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     @ApiModelProperty("开始时间")
     private Date startTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss",timezone="GMT+8")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     @ApiModelProperty("结束时间")
     private Date endTime;
