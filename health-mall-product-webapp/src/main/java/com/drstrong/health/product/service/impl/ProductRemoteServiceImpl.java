@@ -293,6 +293,7 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 			infoDTO.setProductName(basicsInfoEntity.getTitle());
 			infoDTO.setSkuId(productSkuEntity.getId());
 			infoDTO.setSkuCode(productSkuEntity.getSkuCode());
+			infoDTO.setSkuName(productSkuEntity.getSkuName());
 			infoDTO.setPackValue(productSkuEntity.getPackValue());
 			infoDTO.setProductAmount(BigDecimalUtil.F2Y(productSkuEntity.getSkuPrice().longValue()));
 			infoDTO.setStoreId(productSkuEntity.getSourceId());
