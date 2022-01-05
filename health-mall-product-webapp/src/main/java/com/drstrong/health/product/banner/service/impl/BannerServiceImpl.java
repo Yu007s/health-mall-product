@@ -61,7 +61,7 @@ public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> i
         }
         // 限制条目数量
         if (bannerResponses.size() > pageSize) {
-            bannerResponses.stream().limit(pageSize);
+            bannerResponses = bannerResponses.stream().limit(pageSize).collect(Collectors.toList());
         }
         return bannerResponses.size() > 0 ? bannerResponses : new ArrayList<>();
     }
