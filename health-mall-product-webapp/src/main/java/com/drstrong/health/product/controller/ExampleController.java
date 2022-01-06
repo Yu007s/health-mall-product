@@ -1,7 +1,9 @@
 package com.drstrong.health.product.controller;
 
 import cn.strong.common.base.Result;
-import cn.strong.common.exception.ParamValiateException;
+import com.drstrong.health.common.utils.JsonUtils;
+import com.drstrong.health.ware.model.vo.SkuStockNumListVO;
+import com.drstrong.health.ware.remote.api.PharmacyGoodsRemoteApi;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
@@ -10,12 +12,17 @@ import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -24,19 +31,21 @@ import java.util.List;
  * @since 2021/6/8 16:41.
  */
 
-//@RestController
+@RestController
 //@RequestMapping("/example")
 @Slf4j
 @Api(tags = {"v1.0", "example"}, description = "示例控制器，可以删除")
 public class ExampleController {
 
+    @Resource
+    private PharmacyGoodsRemoteApi pharmacyGoodsRemoteApi;
+
     @ApiOperation("哈喽")
     @GetMapping("/hello")
     public Result<String> hello(String message) {
-        if ("error".equals(message)) {
-            throw new ParamValiateException("参数错误");
-        }
-        return Result.ok(message);
+        log.info("product项目接收到消息："+ message);
+        com.drstrong.health.common.model.Result<SkuStockNumListVO> skuStockNum = pharmacyGoodsRemoteApi.getSkuStockNumTest(Arrays.asList(1L));
+        return Result.ok(JsonUtils.toJSONString(skuStockNum.getData()));
     }
 
 
