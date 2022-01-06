@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -49,13 +48,8 @@ public class StorePostageAreaServiceImpl implements StorePostageAreaService {
 
     @Override
     public void deleteByStoreId(Long storeId,String userId) {
-        StorePostageAreaEntity deleteEntity = new StorePostageAreaEntity();
-        deleteEntity.setChangedAt(LocalDateTime.now());
-        deleteEntity.setChangedBy(userId);
-        deleteEntity.setDelFlag(DelFlagEnum.IS_DELETED.getCode());
         LambdaUpdateWrapper<StorePostageAreaEntity> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(StorePostageAreaEntity::getStoreId,storeId)
-                .eq(StorePostageAreaEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode());
-        storePostageAreaMapper.update(deleteEntity,updateWrapper);
+        updateWrapper.eq(StorePostageAreaEntity::getStoreId,storeId);
+        storePostageAreaMapper.delete(updateWrapper);
     }
 }
