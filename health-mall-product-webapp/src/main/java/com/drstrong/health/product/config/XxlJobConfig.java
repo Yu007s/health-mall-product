@@ -1,7 +1,7 @@
 package com.drstrong.health.product.config;
 
 
-import com.drstrong.health.product.banner.job.BannerJob;
+import com.drstrong.health.product.job.BannerJob;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

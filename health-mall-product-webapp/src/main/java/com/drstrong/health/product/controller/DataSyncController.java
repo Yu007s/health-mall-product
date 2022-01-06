@@ -6,9 +6,9 @@ import com.drstrong.health.product.model.entity.product.CategoryAttributeItemEnt
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.category.DataSyncFacade;
-import com.drstrong.health.product.service.BackCategoryManageService;
-import com.drstrong.health.product.service.CategoryAttributeItemManageService;
-import com.drstrong.health.product.service.impl.DataSyncServiceImpl;
+import com.drstrong.health.product.service.category.BackCategoryManageService;
+import com.drstrong.health.product.service.category.CategoryAttributeItemManageService;
+import com.drstrong.health.product.service.other.DataSyncServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
