@@ -1,10 +1,9 @@
 package com.drstrong.health.product.model.entity.banner;
 
-import cn.strong.mybatis.model.MyBatisPlusBaseModel;
-import com.baomidou.mybatisplus.annotation.*;
-import com.drstrong.health.product.model.entity.category.BaseEntity;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
