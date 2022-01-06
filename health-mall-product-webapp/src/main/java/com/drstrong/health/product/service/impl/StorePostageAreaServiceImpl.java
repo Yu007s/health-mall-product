@@ -34,7 +34,7 @@ public class StorePostageAreaServiceImpl implements StorePostageAreaService {
     public List<StorePostageAreaEntity> queryByStoreId(Long storeId) {
         LambdaQueryWrapper<StorePostageAreaEntity> storePostageAreaEntityWrapper = new LambdaQueryWrapper<>();
         storePostageAreaEntityWrapper.eq(StorePostageAreaEntity::getStoreId,storeId)
-                .eq(StorePostageAreaEntity::getDelFlag, DelFlagEnum.UN_DELETED);
+                .eq(StorePostageAreaEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         return storePostageAreaMapper.selectList(storePostageAreaEntityWrapper);
     }
 
@@ -42,7 +42,7 @@ public class StorePostageAreaServiceImpl implements StorePostageAreaService {
     public List<StorePostageAreaEntity> queryByStoreIdsAndAreaName(Set<Long> storeIds, String areaName) {
         LambdaQueryWrapper<StorePostageAreaEntity> storePostageAreaEntityWrapper = new LambdaQueryWrapper<>();
         storePostageAreaEntityWrapper.in(StorePostageAreaEntity::getStoreId,storeIds)
-                .eq(StorePostageAreaEntity::getDelFlag, DelFlagEnum.UN_DELETED)
+                .eq(StorePostageAreaEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(StorePostageAreaEntity::getAreaName,areaName);
         return storePostageAreaMapper.selectList(storePostageAreaEntityWrapper);
     }
@@ -55,7 +55,7 @@ public class StorePostageAreaServiceImpl implements StorePostageAreaService {
         deleteEntity.setDelFlag(DelFlagEnum.IS_DELETED.getCode());
         LambdaUpdateWrapper<StorePostageAreaEntity> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(StorePostageAreaEntity::getStoreId,storeId)
-                .eq(StorePostageAreaEntity::getDelFlag,DelFlagEnum.UN_DELETED);
+                .eq(StorePostageAreaEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode());
         storePostageAreaMapper.update(deleteEntity,updateWrapper);
     }
 }
