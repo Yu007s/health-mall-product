@@ -378,6 +378,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	 */
 	@Override
 	public List<String> searchByName(String content, Integer count) {
+		log.info("invoke com.drstrong.health.product.service.impl.ProductBasicsInfoServiceImpl.searchByName param:{}", content);
 		if (StringUtils.isBlank(content)) {
 			return Lists.newArrayList();
 		}
@@ -417,6 +418,7 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 	 */
 	@Override
 	public PageVO<ProductSearchDetailVO> pageSearchDetail(ProductSearchRequest productSearchRequest) {
+		log.info("invoke com.drstrong.health.product.service.impl.ProductBasicsInfoServiceImpl.pageSearchDetail param:{}", productSearchRequest);
 		if (StringUtils.isBlank(productSearchRequest.getContent())) {
 			return PageVO.newBuilder().pageNo(productSearchRequest.getPageNo()).pageSize(productSearchRequest.getPageSize()).totalCount(0).result(new ArrayList<>()).build();
 		}

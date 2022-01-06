@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProductAttributeServiceImpl extends ServiceImpl<ProductAttributeMapper, ProductAttributeEntity> implements ProductAttributeService {
 	private static final String BRAND_NAME = "商品品牌";
+	private static final String ALIAS_NAME = "通用名";
 	private static final String APPROVAL_NUMBER = "批文编号";
 	private static final String VENDOR_NAME = "生产厂商";
 
@@ -145,6 +146,7 @@ public class ProductAttributeServiceImpl extends ServiceImpl<ProductAttributeMap
 		List<ProductPropertyVO> productPropertyVOList = Lists.newArrayListWithCapacity(attributeEntityList.size());
 		// 1.组装固定属性
 		productPropertyVOList.add(new ProductPropertyVO(BRAND_NAME, basicsInfoEntity.getBrandName()));
+		productPropertyVOList.add(new ProductPropertyVO(ALIAS_NAME, basicsInfoEntity.getAliasName()));
 		productPropertyVOList.add(new ProductPropertyVO(APPROVAL_NUMBER, extendEntity.getApprovalNumber()));
 		productPropertyVOList.add(new ProductPropertyVO(VENDOR_NAME, extendEntity.getVendorName()));
 		// 2.组装动态属性
