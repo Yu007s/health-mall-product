@@ -113,8 +113,10 @@ public class ProductSkuManageServiceImpl implements ProductSkuManageService {
 			productSkuVO.setSkuStateName(UpOffEnum.getValueByCode(record.getState()));
 			productSkuVO.setStoreId(record.getSourceId());
 			productSkuVO.setStoreName(record.getSourceName());
-			String masterImageUrl = productIdEntityMap.getOrDefault(productSkuVO.getProductId(), new ProductBasicsInfoEntity()).getMasterImageUrl();
-			productSkuVO.setMasterImageUrl(masterImageUrl);
+			ProductBasicsInfoEntity infoEntity = productIdEntityMap.getOrDefault(productSkuVO.getProductId(), new ProductBasicsInfoEntity());
+			productSkuVO.setMasterImageUrl(infoEntity.getMasterImageUrl());
+			// 最后临时修改需求,不展示 sku 名称,展示 spu 名称,为了不修改返回字段
+			productSkuVO.setSkuName(infoEntity.getTitle());
 			ProductSkuRevenueEntity skuRevenueEntity = skuIdRevenueEntityMap.getOrDefault(productSkuVO.getSkuId(), new ProductSkuRevenueEntity());
 			productSkuVO.setRevenueCode(skuRevenueEntity.getRevenueCode());
 			productSkuVO.setRevenueRate(skuRevenueEntity.getRevenueRate());
