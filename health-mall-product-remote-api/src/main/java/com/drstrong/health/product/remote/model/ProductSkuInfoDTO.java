@@ -18,6 +18,9 @@ import java.math.BigDecimal;
 public class ProductSkuInfoDTO implements Serializable {
 	private static final long serialVersionUID = 814358534732690036L;
 
+	@ApiModelProperty("商品后台分类 id")
+	private Long productCategoryId;
+
 	@ApiModelProperty("商品id")
 	private Long productId;
 
@@ -42,8 +45,11 @@ public class ProductSkuInfoDTO implements Serializable {
 	@ApiModelProperty("商品规格值")
 	private String packValue;
 
-	@ApiModelProperty("商品sku价格")
+	@ApiModelProperty("商品sku价格(元)")
 	private BigDecimal productAmount;
+
+	@ApiModelProperty(value = "三方药店sku进货价(元)")
+	private BigDecimal purchasePrice;
 
 	@ApiModelProperty(value = "店铺id")
 	private Long storeId;

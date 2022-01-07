@@ -33,6 +33,7 @@ public interface ProductRemoteFacade {
 
 	/**
 	 * 搜索spu的名称,只返回spu名称
+	 * <p> 目前主要是空中药房使用,因两边数据未打通 </>
 	 *
 	 * @param content 搜索条件
 	 * @param count   返回的个数(不传默认返回 10 条数据)
@@ -59,6 +60,7 @@ public interface ProductRemoteFacade {
 
 	/**
 	 * 根据后台分类 id 查询商品信息
+	 * <p> 目前主要是空中药房使用,因两边数据未打通 </>
 	 *
 	 * @param categoryId 分类 id
 	 * @return 商品详细信息

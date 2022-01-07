@@ -15,6 +15,7 @@ import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 import com.drstrong.health.product.remote.pro.PharmacyGoodsRemoteProService;
 import com.drstrong.health.product.service.product.*;
+import com.drstrong.health.product.service.store.StoreThreeRelevanceService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -63,6 +65,9 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 
 	@Resource
 	ProductAttributeService productAttributeService;
+
+	@Resource
+	StoreThreeRelevanceService storeThreeRelevanceService;
 
 	/**
 	 * 根据 skuId 查询商品 sku 信息集合
@@ -105,8 +110,10 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 		Map<Long, Integer> skuIdStockNumMap = pharmacyGoodsRemoteProService.getSkuStockNumToMap(skuIds);
 		// 4.查询商品属性,从 cms 接口中获取
 		Map<Integer, CommAttributeDTO> commAttributeByIdListToMap = cmsRemoteProService.getCommAttributeByIdListToMap();
-		// 5.组装返回值
-		return buildSkuInfoResult(productSkuEntityList, productIdInfoMap, skuIdStockNumMap, commAttributeByIdListToMap);
+		// 5.查询三方进货价
+		Map<Long, BigDecimal> threadPriceSkuIdMap = storeThreeRelevanceService.getThreadPriceBySkuIdsToMap(skuIds);
+		// 6.组装返回值
+		return buildSkuInfoResult(productSkuEntityList, productIdInfoMap, skuIdStockNumMap, commAttributeByIdListToMap, threadPriceSkuIdMap);
 	}
 
 	/**
@@ -278,7 +285,8 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 	}
 
 	private List<ProductSkuInfoDTO> buildSkuInfoResult(List<ProductSkuEntity> productSkuEntityList, Map<Long, ProductBasicsInfoEntity> productIdInfoMap,
-													   Map<Long, Integer> skuIdStockNumMap, Map<Integer, CommAttributeDTO> commAttributeByIdListToMap) {
+													   Map<Long, Integer> skuIdStockNumMap, Map<Integer, CommAttributeDTO> commAttributeByIdListToMap, Map<Long, BigDecimal> threadPriceSkuIdMap) {
+
 		List<ProductSkuInfoDTO> resultSkuInfoList = Lists.newArrayListWithCapacity(productSkuEntityList.size());
 		for (ProductSkuEntity productSkuEntity : productSkuEntityList) {
 			ProductBasicsInfoEntity basicsInfoEntity = productIdInfoMap.getOrDefault(productSkuEntity.getProductId(), new ProductBasicsInfoEntity());
@@ -287,6 +295,7 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 			CommAttributeDTO commAttributeDTO = commAttributeByIdListToMap.getOrDefault(productSkuEntity.getCommAttribute(), new CommAttributeDTO());
 
 			ProductSkuInfoDTO infoDTO = new ProductSkuInfoDTO();
+			infoDTO.setProductCategoryId(basicsInfoEntity.getCategoryId());
 			infoDTO.setProductId(productSkuEntity.getProductId());
 			infoDTO.setSpuCode(basicsInfoEntity.getSpuCode());
 			infoDTO.setMasterImageUrl(basicsInfoEntity.getMasterImageUrl());
@@ -296,6 +305,7 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 			infoDTO.setSkuName(productSkuEntity.getSkuName());
 			infoDTO.setPackValue(productSkuEntity.getPackValue());
 			infoDTO.setProductAmount(BigDecimalUtil.F2Y(productSkuEntity.getSkuPrice().longValue()));
+			infoDTO.setPurchasePrice(threadPriceSkuIdMap.get(productSkuEntity.getId()));
 			infoDTO.setStoreId(productSkuEntity.getSourceId());
 			infoDTO.setStoreName(productSkuEntity.getSourceName());
 			infoDTO.setUpOffStatus(productSkuEntity.getState());
