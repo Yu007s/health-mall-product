@@ -22,6 +22,7 @@ import com.drstrong.health.product.model.response.store.StoreSkuResponse;
 import com.drstrong.health.product.model.response.store.ThreeSkuInfoResponse;
 import com.drstrong.health.product.mq.model.SkuStateStockMqEvent;
 import com.drstrong.health.product.service.product.ProductBasicsInfoService;
+import com.drstrong.health.product.service.product.ProductManageService;
 import com.drstrong.health.product.service.product.ProductSkuService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.service.store.StoreThreeRelevanceService;
@@ -58,7 +59,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
     @Resource
     private ProductSkuService productSkuService;
     @Resource
-    private ProductBasicsInfoService productBasicsInfoService;
+    private ProductManageService productManageService;
     @Resource
     private StoreService storeService;
     @Resource
@@ -170,7 +171,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
         Map<Long, List<ProductSkuEntity>> spuMap = allSku.stream().collect(Collectors.groupingBy(ProductSkuEntity::getProductId));
         if(state.equals(ProductStateEnum.HAS_PUT.getCode())){
            //上架，更新这些spu为上架状态
-            productBasicsInfoService.updateState(spuMap.keySet(),state,userId);
+            productManageService.updateState(spuMap.keySet(),state,userId);
         }
         if(state.equals(ProductStateEnum.UN_PUT.getCode())){
            //下架，更新商品全被下架的spu为下架状态
@@ -182,7 +183,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
                }
            });
            if(CollectionUtils.isNotEmpty(downSpuIds)){
-               productBasicsInfoService.updateState(downSpuIds,state,userId);
+               productManageService.updateState(downSpuIds,state,userId);
            }
         }
     }
