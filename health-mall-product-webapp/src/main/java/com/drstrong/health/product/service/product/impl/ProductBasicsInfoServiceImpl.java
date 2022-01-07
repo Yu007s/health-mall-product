@@ -33,6 +33,8 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -411,10 +413,12 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			queryWrapper.eq(ProductBasicsInfoEntity::getSourceId, querySpuRequest.getStoreId());
 		}
 		if (Objects.nonNull(querySpuRequest.getCreateStart())) {
-			queryWrapper.gt(ProductBasicsInfoEntity::getCreatedAt, querySpuRequest.getCreateStart());
+			LocalDateTime localDateTime = LocalDateTime.of(querySpuRequest.getCreateStart(), LocalTime.MIN);
+			queryWrapper.gt(ProductBasicsInfoEntity::getCreatedAt, localDateTime);
 		}
 		if (Objects.nonNull(querySpuRequest.getCreateEnd())) {
-			queryWrapper.lt(ProductBasicsInfoEntity::getCreatedAt, querySpuRequest.getCreateEnd());
+			LocalDateTime localDateTime = LocalDateTime.of(querySpuRequest.getCreateEnd(), LocalTime.MAX);
+			queryWrapper.lt(ProductBasicsInfoEntity::getCreatedAt, localDateTime);
 		}
 		if (!CollectionUtils.isEmpty(querySpuRequest.getBackCategoryIdList())) {
 			queryWrapper.in(ProductBasicsInfoEntity::getCategoryId, querySpuRequest.getBackCategoryIdList());

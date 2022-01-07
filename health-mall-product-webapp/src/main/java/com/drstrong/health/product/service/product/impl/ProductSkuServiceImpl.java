@@ -29,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -338,10 +339,12 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 			queryWrapper.eq(ProductSkuEntity::getSourceId, querySkuRequest.getStoreId());
 		}
 		if (Objects.nonNull(querySkuRequest.getCreateStart())) {
-			queryWrapper.ge(ProductSkuEntity::getCreatedAt, querySkuRequest.getCreateStart());
+			LocalDateTime localDateTime = LocalDateTime.of(querySkuRequest.getCreateStart(), LocalTime.MIN);
+			queryWrapper.ge(ProductSkuEntity::getCreatedAt, localDateTime);
 		}
 		if (Objects.nonNull(querySkuRequest.getCreateEnd())) {
-			queryWrapper.le(ProductSkuEntity::getCreatedAt, querySkuRequest.getCreateEnd());
+			LocalDateTime localDateTime = LocalDateTime.of(querySkuRequest.getCreateEnd(), LocalTime.MAX);
+			queryWrapper.le(ProductSkuEntity::getCreatedAt, localDateTime);
 		}
 		if (Objects.nonNull(querySkuRequest.getPriceStart())) {
 			queryWrapper.ge(ProductSkuEntity::getSkuPrice, BigDecimalUtil.Y2F(querySkuRequest.getPriceStart()));
