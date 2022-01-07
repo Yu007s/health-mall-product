@@ -67,6 +67,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchasePrice(UpdateThreeRequest updateThreeRequest, String userId) {
+        checkRelevanceSingle(updateThreeRequest.getSkuId());
         StoreThreeRelevanceEntity storeThreeRelevanceEntity = new StoreThreeRelevanceEntity();
         storeThreeRelevanceEntity.setThreePurchasePrice(BigDecimalUtil.Y2F(updateThreeRequest.getPurchasePrice()).intValue());
         storeThreeRelevanceEntity.setChangedBy(userId);
@@ -145,6 +146,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
         Integer state = updateSkuRequest.getState();
         if(ProductStateEnum.HAS_PUT.getCode().equals(state)){
             checkRelevance(skuIdList);
+            checkPrice(skuIdList);
             checkSetPostage(skuIdList);
         }
         productSkuService.updateState(skuIdList,state,userId);
@@ -230,11 +232,37 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
      */
     private void checkRelevance(List<Long> skuIdList) {
         LambdaQueryWrapper<StoreThreeRelevanceEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(StoreThreeRelevanceEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode())
-                .in(StoreThreeRelevanceEntity::getSkuId,skuIdList);
+        lambdaQueryWrapper.in(StoreThreeRelevanceEntity::getSkuId,skuIdList);
         Integer count = storeThreeRelevanceMapper.selectCount(lambdaQueryWrapper);
         if(skuIdList.size() != count){
-           throw new BusinessException(ErrorEnums.STORE_NOT_RELEVANCE);
+            throw new BusinessException(ErrorEnums.STORE_NOT_RELEVANCE);
+        }
+    }
+
+    /**
+     * 上架检验商品是否设置进货价
+     * @param skuIdList
+     */
+    private void checkPrice(List<Long> skuIdList) {
+        LambdaQueryWrapper<StoreThreeRelevanceEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(StoreThreeRelevanceEntity::getSkuId,skuIdList)
+                .gt(StoreThreeRelevanceEntity::getThreePurchasePrice,0);
+        Integer count = storeThreeRelevanceMapper.selectCount(lambdaQueryWrapper);
+        if(skuIdList.size() != count){
+            throw new BusinessException(ErrorEnums.STORE_NOT_SETPRICE);
+        }
+    }
+
+    /**
+     * 上架检验商品是否关联三方(单个)
+     * @param skuId
+     */
+    private void checkRelevanceSingle(Long skuId) {
+        LambdaQueryWrapper<StoreThreeRelevanceEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(StoreThreeRelevanceEntity::getSkuId,skuId);
+        StoreThreeRelevanceEntity storeThreeRelevanceEntity = storeThreeRelevanceMapper.selectOne(lambdaQueryWrapper);
+        if(Objects.isNull(storeThreeRelevanceEntity)){
+            throw new BusinessException(ErrorEnums.STORE_NOT_RELEVANCE);
         }
     }
 

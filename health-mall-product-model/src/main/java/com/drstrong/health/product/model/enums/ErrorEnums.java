@@ -45,6 +45,7 @@ public enum ErrorEnums implements IBaseResult {
 	STORE_NAME_REPEAT("17100", "店铺名称已存在"),
 	STORE_NOT_EXIST("17110", "店铺不存在"),
 	STORE_NOT_RELEVANCE("17111", "商品需要关联sku"),
+	STORE_NOT_SETPRICE("17112", "上架商品需要设置进货价"),
 	STORE_NOT_SETPOSTAGE("17211", "sku商品未设置邮费，请设置邮费后再上架"),
 	EXCEL_EXPORT_ERROR("21000", "文档导出错误"),
 	EXCEL_IMPORT_ERROR("21100", "文档导入错误"),
