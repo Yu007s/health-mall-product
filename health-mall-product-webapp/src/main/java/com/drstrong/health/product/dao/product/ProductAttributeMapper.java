@@ -20,7 +20,6 @@ public interface ProductAttributeMapper extends BaseMapper<ProductAttributeEntit
 	 * 批量保存
 	 *
 	 * @param entityList 保存的参数
-	 * @param userId     用户 id
 	 * @return 影响的行数
 	 * @author liuqiuyi
 	 * @date 2021/12/13 16:30
