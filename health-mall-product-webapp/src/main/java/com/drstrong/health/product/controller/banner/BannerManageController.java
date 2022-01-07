@@ -7,7 +7,7 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.banner.BannerListResponse;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.banner.BannerManageFacade;
-import com.drstrong.health.product.service.product.ProductBasicsInfoService;
+import com.drstrong.health.product.service.product.ProductManageService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +31,7 @@ public class BannerManageController implements BannerManageFacade {
     BannerService bannerService;
 
     @Resource
-    ProductBasicsInfoService productBasicsInfoService;
+    ProductManageService productManageService;
 
     @Override
     public ResultVO addOrUpdate(@RequestBody @Validated BannerRequest request){
@@ -45,7 +45,7 @@ public class BannerManageController implements BannerManageFacade {
         if (request.getEndTime().compareTo(request.getStartTime()) == -1){
             return ResultVO.failed("开始时间不得大于结束时间");
         }
-        if (request.getLinkType()== 2 && StringUtils.isNotBlank(request.getProductSpuSn()) && productBasicsInfoService.getCountBySPUCode(request.getProductSpuSn()) <1  ){
+        if (request.getLinkType()== 2 && StringUtils.isNotBlank(request.getProductSpuSn()) && productManageService.getCountBySPUCode(request.getProductSpuSn()) <1  ){
             return ResultVO.failed("SPU不存在，或已下架");
         }
         return bannerService.addOrUpdate(request) ? ResultVO.success() : ResultVO.failed("");

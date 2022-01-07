@@ -1,21 +1,21 @@
 package com.drstrong.health.product.service.product;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
-import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.PageRequest;
 import com.drstrong.health.product.model.request.product.ProductSearchRequest;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
-import com.drstrong.health.product.model.request.product.SaveProductRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.*;
+import com.drstrong.health.product.model.response.product.ProductDetailVO;
+import com.drstrong.health.product.model.response.product.ProductRecommendVO;
+import com.drstrong.health.product.model.response.product.ProductSearchDetailVO;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 商品信息 service
@@ -43,16 +43,6 @@ public interface ProductBasicsInfoService {
 	 * @date 2021/12/16 00:10
 	 */
 	List<ProductBasicsInfoEntity> queryProductByParam(QuerySpuRequest querySpuRequest);
-
-	/**
-	 * 根据条件,查询商品基础信息
-	 *
-	 * @param querySpuRequest 查询条件
-	 * @return 商品基础信息集合
-	 * @author liuqiuyi
-	 * @date 2021/12/16 00:10
-	 */
-	ProductBasicsInfoEntity queryOneProductByParam(QuerySpuRequest querySpuRequest);
 
 	/**
 	 * 根据条件,查询商品基础信息,转成 map 结构
@@ -95,53 +85,6 @@ public interface ProductBasicsInfoService {
 	 */
 	ProductBasicsInfoEntity queryBasicsInfoByProductId(Long productId);
 
-	/**
-	 * 保存或者更新商品信息
-	 *
-	 * @param saveProductRequest 保存商品
-	 * @author liuqiuyi
-	 * @date 2021/12/13 15:48
-	 */
-	Long saveOrUpdateProduct(SaveProductRequest saveProductRequest);
-
-	/**
-	 * 根据商品 id,查询管理端商品信息
-	 *
-	 * @param productId 商品 id
-	 * @return 商品管理端信息
-	 * @author liuqiuyi
-	 * @date 2021/12/13 20:26
-	 */
-	ProductManageVO queryManageProductInfo(Long productId);
-
-	/**
-	 * 管理端页面分页查询 spu 信息
-	 *
-	 * @param querySpuRequest 查询参数
-	 * @return 分页返回值
-	 * @author liuqiuyi
-	 * @date 2021/12/14 10:25
-	 */
-	PageVO<ProductSpuVO> pageQuerySpuByParam(QuerySpuRequest querySpuRequest);
-
-	/**
-	 * 通过SkuCode 查询 已上架条数
-	 *
-	 * @param spuCode spu_code
-	 * @return 上架条目条数
-	 */
-	Integer getCountBySPUCode(String spuCode);
-
-
-	/**
-	 * 生成商品或者药品编码,参照之前的方法
-	 *
-	 * @param productTypeEnum 商品类型
-	 * @return 编码
-	 * @author liuqiuyi
-	 * @date 2021/12/16 14:13
-	 */
-	String getNextProductNumber(ProductTypeEnum productTypeEnum);
 
 	/**
 	 * 小程序 - 根据 spuCode 获取商品详细信息
@@ -187,18 +130,19 @@ public interface ProductBasicsInfoService {
 
 	/**
 	 * 分页查询热门推荐商品
+	 *
 	 * @param pageRequest
 	 * @return
 	 */
 	PageVO<ProductRecommendVO> pageSearchRecommend(PageRequest pageRequest);
 
 	/**
-	 * 批量更改spu上下架状态
-	 * @param spuIdList
-	 * @param state
-	 * @param userId
+	 * TableId 注解存在更新记录，否插入一条记录
+	 *
+	 * @param entity 实体对象
+	 * @return boolean
 	 */
-	void updateState(Set<Long> spuIdList, Integer state, String userId);
+	boolean saveOrUpdate(ProductBasicsInfoEntity entity);
 
 	/**
 	 * 根据 id 集合批量更新
@@ -206,5 +150,7 @@ public interface ProductBasicsInfoService {
 	 * @author liuqiuyi
 	 * @date 2021/12/30 15:17
 	 */
-	boolean updateBatchById(Collection<ProductBasicsInfoEntity> entityList, int batchSize);
+	boolean updateBatchById(Collection<ProductBasicsInfoEntity> entityList);
+
+	LambdaQueryWrapper<ProductBasicsInfoEntity> buildQuerySpuParam(QuerySpuRequest querySpuRequest);
 }

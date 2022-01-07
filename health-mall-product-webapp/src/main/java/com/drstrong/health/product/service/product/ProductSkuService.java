@@ -1,12 +1,9 @@
 package com.drstrong.health.product.service.product;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
-import com.drstrong.health.product.model.request.product.QuerySkuStockRequest;
-import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.ProductSkuStockVO;
-import com.drstrong.health.product.model.response.product.ProductSkuVO;
 import com.drstrong.health.product.model.response.product.SkuBaseInfoVO;
 
 import java.math.BigDecimal;
@@ -81,16 +78,6 @@ public interface ProductSkuService {
 	Map<Long, List<ProductSkuEntity>> queryByProductIdListToMap(Set<Long> productIdList);
 
 	/**
-	 * 根据条件分页查询 sku 信息
-	 *
-	 * @param querySkuRequest 查询参数
-	 * @return sku 信息
-	 * @author liuqiuyi
-	 * @date 2021/12/14 14:04
-	 */
-	PageVO<ProductSkuVO> pageQuerySkuByParam(QuerySkuRequest querySkuRequest);
-
-	/**
 	 * 根据条件查询 sku 信息
 	 *
 	 * @param querySkuRequest 查询条件
@@ -126,16 +113,6 @@ public interface ProductSkuService {
 
 	void updateState(List<Long> skuIdList, Integer state, String userId);
 
-	/**
-	 * 获取下一个 sku 编码,参照之前的逻辑
-	 *
-	 * @param productId 商品 id
-	 * @param spuCode   spu 编码
-	 * @return 生成的 sku 编码
-	 * @author liuqiuyi
-	 * @date 2021/12/16 14:48
-	 */
-	String createNextSkuCode(String spuCode, Long productId);
 
 	/**
 	 * 小程序 - 根据 spuCode 查询 sku 集合
@@ -155,21 +132,6 @@ public interface ProductSkuService {
 	 */
 	Map<String, BigDecimal> getPriceSectionMap(List<ProductSkuEntity> productSkuEntities);
 
-	PageVO<ProductSkuStockVO> pageQuerySkuStockByParam(QuerySkuStockRequest querySkuStockRequest);
-
-	List<ProductSkuStockVO> searchSkuStock(QuerySkuStockRequest querySkuStockRequest);
-
-	/**
-	 * 模糊搜索 sku 名称
-	 *
-	 * @param content 内容
-	 * @param count   查询条数
-	 * @return sku 名称集合
-	 * @author liuqiuyi
-	 * @date 2021/12/23 21:04
-	 */
-	List<String> searchSkuNameByName(String content, Integer count);
-
 	/**
 	 * 批量获取店铺对应的sku数量
 	 *
@@ -187,4 +149,6 @@ public interface ProductSkuService {
 	 * @date 2021/12/29 20:13
 	 */
 	void deleteBySkuIdList(Set<Long> skuIdList, String userId);
+
+	LambdaQueryWrapper<ProductSkuEntity> buildQuerySkuParam(QuerySkuRequest querySkuRequest);
 }

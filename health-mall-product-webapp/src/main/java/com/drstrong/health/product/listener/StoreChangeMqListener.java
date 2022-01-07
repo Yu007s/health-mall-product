@@ -138,7 +138,7 @@ public class StoreChangeMqListener implements RocketMQListener<StoreChangeEvent>
 				productBasicsInfoEntity.setChangedAt(LocalDateTime.now());
 				productBasicsInfoEntity.setChangedBy(storeChangeEvent.getOperatorId());
 			});
-			productBasicsInfoService.updateBatchById(basicsInfoEntityList, basicsInfoEntityList.size());
+			productBasicsInfoService.updateBatchById(basicsInfoEntityList);
 			log.info("invoke StoreChangeMqListener.onMessage(),update spu size:{}", basicsInfoEntityList.size());
 		}
 
