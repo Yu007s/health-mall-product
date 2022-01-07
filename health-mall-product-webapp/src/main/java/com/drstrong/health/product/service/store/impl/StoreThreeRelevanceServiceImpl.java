@@ -28,6 +28,7 @@ import com.drstrong.health.product.service.store.StoreThreeRelevanceService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.utils.MqMessageUtil;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
@@ -209,6 +210,27 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
             BeanUtils.copyProperties(e,threeSkuInfoResponse);
             return threeSkuInfoResponse;
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据 skuId 集合获取三方进货的价格
+     *
+     * @param skuIds skuId 集合
+     * @return key=skuId,value=进货价格
+     * @author liuqiuyi
+     * @date 2022/1/7 09:22
+     */
+    @Override
+    public Map<Long, BigDecimal> getThreadPriceBySkuIdsToMap(Set<Long> skuIds) {
+        if (CollectionUtils.isEmpty(skuIds)) {
+            return Maps.newHashMap();
+        }
+        LambdaQueryWrapper<StoreThreeRelevanceEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(StoreThreeRelevanceEntity::getSkuId, skuIds)
+                .eq(StoreThreeRelevanceEntity::getDelFlag, DelFlagEnum.UN_DELETED);
+        List<StoreThreeRelevanceEntity> storeThreeRelevanceEntities = storeThreeRelevanceMapper.selectList(queryWrapper);
+        return storeThreeRelevanceEntities.stream()
+                .collect(Collectors.toMap(StoreThreeRelevanceEntity::getSkuId, entity -> BigDecimalUtil.F2Y(entity.getThreePurchasePrice().longValue()), (v1, v2) -> v1));
     }
 
     /**
