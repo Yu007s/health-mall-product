@@ -44,4 +44,17 @@ public interface ProductSkuMapper extends BaseMapper<ProductSkuEntity> {
 	 * @date 2021/12/29 20:13
 	 */
 	int deleteBySkuIdList(@Param("skuIdList") Set<Long> skuIdList, @Param("userId") String userId);
+
+	/**
+	 * 根据 skuId 集合或者 skuCode 集合查询 sku 信息(包含已删除的数据)
+	 * <p> 包含 delFlag 为 1 的数据 </>
+	 *
+	 * @param skuIdList   skuId 集合
+	 * @param skuCodeList sku编码集合
+	 * @param upOffCode   上架状态(0-未上架,1-已上架)
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 16:54
+	 */
+	List<ProductSkuEntity> selectListContainDel(@Param("skuIdList") Set<Long> skuIdList, @Param("skuCodeList") Set<String> skuCodeList, @Param("upOffCode") Integer upOffCode);
 }

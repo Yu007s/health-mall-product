@@ -68,6 +68,16 @@ public interface BackCategoryService {
 	BackCategoryEntity queryById(Long categoryId);
 
 	/**
+	 * 根据一级分类 id,查询一级分类下所有子分类 id
+	 *
+	 * @param oneCategoryId 一级分类 id
+	 * @return 所有子分类 id 集合(包含一级分类,二级分类,三级分类的 id)
+	 * @author liuqiuyi
+	 * @date 2022/1/10 11:49
+	 */
+	Set<Long> getCategoryIdsByOneId(Long oneCategoryId);
+
+	/**
 	 * 查询后台分类集合,组装成树形结构
 	 *
 	 * @param categoryQueryRequest 查询条件

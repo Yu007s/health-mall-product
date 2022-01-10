@@ -45,9 +45,9 @@ import java.util.stream.Collectors;
 public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<StoreChangeEvent>> {
 
 	/**
-	 * 超时时间:5 分钟
+	 * 超时时间:3 分钟
 	 */
-	public static final int STORE_CHANGE_TIME = 60 * 5;
+	public static final int STORE_CHANGE_TIME = 60 * 3;
 
 	@Resource
 	private RedisUtils redisUtils;
@@ -77,7 +77,7 @@ public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<St
 		}
 		String lockKey = RedisKeyUtils.getStoreChangeKey(storeChangeEvent.getStoreId());
 		// 先加锁,防止页面重复进行点击
-		boolean lockFlag = redisUtils.set(lockKey, storeChangeEvent.getStoreId(), STORE_CHANGE_TIME);
+		boolean lockFlag = redisUtils.setIfAbsent(lockKey, storeChangeEvent.getStoreId(), STORE_CHANGE_TIME);
 		if (!lockFlag) {
 			// 如果加锁失败,抛出异常,进行重试
 			throw new BusinessException(ErrorEnums.ADD_LOCK_ERROR);
@@ -145,7 +145,7 @@ public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<St
 				productBasicsInfoEntity.setChangedAt(LocalDateTime.now());
 				productBasicsInfoEntity.setChangedBy(storeChangeEvent.getOperatorId());
 			});
-			productBasicsInfoService.updateBatchById(basicsInfoEntityList, basicsInfoEntityList.size());
+			productBasicsInfoService.updateBatchById(basicsInfoEntityList);
 			log.info("invoke StoreChangeMqListener.onMessage(),update spu size:{}", basicsInfoEntityList.size());
 		}
 

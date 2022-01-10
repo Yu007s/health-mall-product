@@ -1,9 +1,6 @@
 package com.drstrong.health.product.service.product;
 
-import com.drstrong.health.product.remote.model.ProductSkuDetailsDTO;
-import com.drstrong.health.product.remote.model.ProductSkuInfoDTO;
-import com.drstrong.health.product.remote.model.SearchNameResultDTO;
-import com.drstrong.health.product.remote.model.SkuIdAndCodeDTO;
+import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 
 import java.util.List;
@@ -25,6 +22,18 @@ public interface ProductRemoteService {
 	 * @date 2021/12/22 15:03
 	 */
 	List<ProductSkuInfoDTO> getSkuInfoBySkuIds(QueryProductRequest queryProductRequest);
+
+
+	/**
+	 * 根据 skuId 集合,获取 sku 信息(包含已删除的数据)
+	 * <p> 包含 delFlag 为 1 的数据 </>
+	 *
+	 * @param queryProductRequest 查询参数
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 16:54
+	 */
+	List<ProductSkuInfoDTO> getSkuInfoBySkuIdsContainDel(QueryProductRequest queryProductRequest);
 
 	/**
 	 * 分页查询搜索的内容,只返回商品名称
@@ -80,4 +89,14 @@ public interface ProductRemoteService {
 	 * @date 2021/12/24 20:07
 	 */
 	List<SkuIdAndCodeDTO> listSkuIdOrCode(QueryProductRequest queryProductRequest);
+
+	/**
+	 * 根据 skuId 或者 skuCode 集合查询发票所需相关信息
+	 *
+	 * @param queryProductRequest 查询入参
+	 * @return 发票相关信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 10:23
+	 */
+	List<SkuInvoiceDTO> listInvoiceBySkuIds(QueryProductRequest queryProductRequest);
 }

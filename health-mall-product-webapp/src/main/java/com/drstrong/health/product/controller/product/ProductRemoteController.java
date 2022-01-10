@@ -56,6 +56,20 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	}
 
 	/**
+	 * 根据 skuId 集合,获取 sku 信息(包含已删除的数据)
+	 * <p> 包含 delFlag 为 1 的数据 </>
+	 *
+	 * @param queryProductRequest 查询参数
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 16:54
+	 */
+	@Override
+	public List<ProductSkuInfoDTO> getSkuInfoBySkuIdsContainDel(QueryProductRequest queryProductRequest) {
+		return productRemoteService.getSkuInfoBySkuIdsContainDel(queryProductRequest);
+	}
+
+	/**
 	 * 分页查询搜索的内容,只返回商品名称
 	 *
 	 * @param content 搜索条件
@@ -144,4 +158,16 @@ public class ProductRemoteController implements ProductRemoteFacade {
 		return skuInvoiceDTO;
 	}
 
+	/**
+	 * 根据 skuId 或者 skuCode 集合查询发票所需相关信息
+	 *
+	 * @param queryProductRequest 查询入参
+	 * @return 发票相关信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 10:23
+	 */
+	@Override
+	public List<SkuInvoiceDTO> listInvoiceBySkuIds(QueryProductRequest queryProductRequest) {
+		return productRemoteService.listInvoiceBySkuIds(queryProductRequest);
+	}
 }

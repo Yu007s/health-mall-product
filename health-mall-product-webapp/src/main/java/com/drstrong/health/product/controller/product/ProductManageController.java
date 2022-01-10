@@ -6,9 +6,9 @@ import com.drstrong.health.product.model.response.product.*;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.product.ProductManageFacade;
 import com.drstrong.health.product.service.category.CategoryAttributeItemService;
-import com.drstrong.health.product.service.product.ProductBasicsInfoService;
+import com.drstrong.health.product.service.product.ProductManageService;
+import com.drstrong.health.product.service.product.ProductSkuManageService;
 import com.drstrong.health.product.service.product.ProductSkuRevenueService;
-import com.drstrong.health.product.service.product.ProductSkuService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -34,16 +34,16 @@ import java.util.List;
 @Api(tags = {"cms-商品管理"}, description = "cms-商品管理")
 public class ProductManageController implements ProductManageFacade {
 	@Resource
+	ProductManageService productManageService;
+
+	@Resource
+	ProductSkuManageService productSkuManageService;
+
+	@Resource
 	CategoryAttributeItemService categoryAttributeItemService;
 
 	@Resource
-	ProductBasicsInfoService productBasicsInfoService;
-
-	@Resource
 	ProductSkuRevenueService productSkuRevenueService;
-
-	@Resource
-	ProductSkuService productSkuService;
 
 	@Override
 	public ResultVO<List<CategoryAttributeItemVO>> getProperty(@Valid @NotNull(message = "categoryId 不能为空") Long categoryId) {
@@ -53,37 +53,37 @@ public class ProductManageController implements ProductManageFacade {
 
 	@Override
 	public ResultVO<ProductSaveResultVO> saveOrUpdateProduct(@RequestBody @Valid SaveProductRequest saveProductRequest) {
-		Long productId = productBasicsInfoService.saveOrUpdateProduct(saveProductRequest);
+		Long productId = productManageService.saveOrUpdateProduct(saveProductRequest);
 		return ResultVO.success(new ProductSaveResultVO(productId));
 	}
 
 	@Override
 	public ResultVO<ProductManageVO> getByProductId(@NotNull(message = "productId 不能为空") Long productId) {
-		ProductManageVO productManageVO = productBasicsInfoService.queryManageProductInfo(productId);
+		ProductManageVO productManageVO = productManageService.queryManageProductInfo(productId);
 		return ResultVO.success(productManageVO);
 	}
 
 	@Override
 	public ResultVO<PageVO<ProductSpuVO>> pageSpu(QuerySpuRequest querySpuRequest) {
-		PageVO<ProductSpuVO> resultPageVO = productBasicsInfoService.pageQuerySpuByParam(querySpuRequest);
+		PageVO<ProductSpuVO> resultPageVO = productManageService.pageQuerySpuByParam(querySpuRequest);
 		return ResultVO.success(resultPageVO);
 	}
 
 	@Override
 	public ResultVO<PageVO<ProductSkuVO>> pageSku(QuerySkuRequest querySkuRequest) {
-		PageVO<ProductSkuVO> resultPageVO = productSkuService.pageQuerySkuByParam(querySkuRequest);
+		PageVO<ProductSkuVO> resultPageVO = productSkuManageService.pageQuerySkuByParam(querySkuRequest);
 		return ResultVO.success(resultPageVO);
 	}
 
 	@Override
 	public ResultVO<PageVO<ProductSkuStockVO>> pageSkuStock(QuerySkuStockRequest querySkuStockRequest) {
-		PageVO<ProductSkuStockVO> resultPageVO = productSkuService.pageQuerySkuStockByParam(querySkuStockRequest);
+		PageVO<ProductSkuStockVO> resultPageVO = productSkuManageService.pageQuerySkuStockByParam(querySkuStockRequest);
 		return ResultVO.success(resultPageVO);
 	}
 
 	@Override
 	public ResultVO<List<ProductSkuStockVO>> searchSkuStock(QuerySkuStockRequest querySkuStockRequest) {
-		List<ProductSkuStockVO> productSkuStockVOS = productSkuService.searchSkuStock(querySkuStockRequest);
+		List<ProductSkuStockVO> productSkuStockVOS = productSkuManageService.searchSkuStock(querySkuStockRequest);
 		return ResultVO.success(productSkuStockVOS);
 	}
 

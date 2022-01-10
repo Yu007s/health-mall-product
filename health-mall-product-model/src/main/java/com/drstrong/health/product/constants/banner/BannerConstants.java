@@ -1,4 +1,4 @@
-package com.drstrong.health.product.model.constans.banner;
+package com.drstrong.health.product.constants.banner;
 
 /**
  * @description: 轮播图相关常量

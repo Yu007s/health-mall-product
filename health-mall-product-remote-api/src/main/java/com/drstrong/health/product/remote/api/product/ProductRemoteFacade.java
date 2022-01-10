@@ -32,6 +32,19 @@ public interface ProductRemoteFacade {
 	List<ProductSkuInfoDTO> getSkuInfoBySkuIds(@RequestBody QueryProductRequest queryProductRequest);
 
 	/**
+	 * 根据 skuId 集合,获取 sku 信息(包含已删除的数据)
+	 * <p> 包含 delFlag 为 1 的数据 </>
+	 *
+	 * @param queryProductRequest 查询参数
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 16:54
+	 */
+	@ApiOperation("根据 skuId 集合,获取 sku 信息")
+	@PostMapping("list/sku/contain/del")
+	List<ProductSkuInfoDTO> getSkuInfoBySkuIdsContainDel(@RequestBody QueryProductRequest queryProductRequest);
+
+	/**
 	 * 搜索spu的名称,只返回spu名称
 	 * <p> 目前主要是空中药房使用,因两边数据未打通 </>
 	 *
@@ -102,4 +115,16 @@ public interface ProductRemoteFacade {
 	@ApiOperation("根据skuId查询发票所需相关信息")
 	@GetMapping("invoiceInfoBySkuId")
 	SkuInvoiceDTO getInvoiceInfoBySkuId(@RequestParam("skuId") Long skuId);
+
+	/**
+	 * 根据 skuId 或者 skuCode 集合查询发票所需相关信息
+	 *
+	 * @param queryProductRequest 查询入参
+	 * @return 发票相关信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 10:23
+	 */
+	@ApiOperation("根据 skuId 或者 skuCode 集合查询发票所需相关信息")
+	@PostMapping("list/invoice")
+	List<SkuInvoiceDTO> listInvoiceBySkuIds(@RequestBody QueryProductRequest queryProductRequest);
 }

@@ -3,7 +3,7 @@ package com.drstrong.health.product.service.banner.impl;
 
 import cn.strong.common.utils.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.drstrong.health.product.model.constans.banner.BannerConstants;
+import com.drstrong.health.product.constants.banner.BannerConstants;
 import com.drstrong.health.product.dao.banner.BannerMapper;
 import com.drstrong.health.product.model.entity.banner.Banner;
 import com.drstrong.health.product.model.request.banner.BannerListRequest;
