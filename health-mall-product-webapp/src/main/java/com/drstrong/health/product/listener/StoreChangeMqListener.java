@@ -15,7 +15,9 @@ import com.drstrong.health.product.service.product.ProductBasicsInfoService;
 import com.drstrong.health.product.service.product.ProductSkuService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.RedisKeyUtils;
+import com.drstrong.health.product.utils.CustomTLogMqConsumerProcessor;
 import com.drstrong.health.redis.utils.RedisUtils;
+import com.yomahub.tlog.core.mq.TLogMqWrapBean;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +42,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RocketMQMessageListener(topic = "${mq-topic-config.store-change-topic}", selectorExpression = "${mq-topic-config.store-change-tag}", consumerGroup = "storeChange-consumer_group")
-public class StoreChangeMqListener implements RocketMQListener<StoreChangeEvent> {
+public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<StoreChangeEvent>> {
 
 	/**
 	 * 超时时间:5 分钟
@@ -62,7 +64,12 @@ public class StoreChangeMqListener implements RocketMQListener<StoreChangeEvent>
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void onMessage(StoreChangeEvent storeChangeEvent) {
+	public void onMessage(TLogMqWrapBean<StoreChangeEvent> tLogMqWrapBean) {
+		CustomTLogMqConsumerProcessor.process(tLogMqWrapBean,this::handle);
+	}
+
+	private void handle(TLogMqWrapBean<StoreChangeEvent> tLogMqWrapBean) {
+		StoreChangeEvent storeChangeEvent = tLogMqWrapBean.getT();
 		log.info("invoke StoreChangeMqListener.onMessage() param:{}", storeChangeEvent);
 		if (Objects.isNull(storeChangeEvent.getStoreId()) || StringUtils.isBlank(storeChangeEvent.getOperatorId())) {
 			log.error("invoke StoreChangeMqListener.onMessage() param is null{}", storeChangeEvent);

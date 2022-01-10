@@ -1,6 +1,7 @@
 package com.drstrong.health.product.utils;
 
 import com.drstrong.health.common.exception.BusinessException;
+import com.yomahub.tlog.core.mq.TLogMqWrapBean;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.client.producer.SendCallback;
@@ -40,7 +41,8 @@ public class MqMessageUtil {
      * @param o
      */
     public void sendMsg(String topic, String tag, Object o) {
-        Message<Object> message = MessageBuilder.withPayload(o).build();
+        TLogMqWrapBean tLogMqWrapBean = new TLogMqWrapBean(o);
+        Message<TLogMqWrapBean> message = MessageBuilder.withPayload(tLogMqWrapBean).build();
         String destination = "";
         if (StringUtils.isNotEmpty(tag)) {
             destination = String.format("%s:%s", topic, tag);
