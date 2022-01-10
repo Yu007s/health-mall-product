@@ -32,6 +32,19 @@ public interface ProductRemoteFacade {
 	List<ProductSkuInfoDTO> getSkuInfoBySkuIds(@RequestBody QueryProductRequest queryProductRequest);
 
 	/**
+	 * 根据 skuId 集合,获取 sku 信息(包含已删除的数据)
+	 * <p> 包含 delFlag 为 1 的数据 </>
+	 *
+	 * @param queryProductRequest 查询参数
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 16:54
+	 */
+	@ApiOperation("根据 skuId 集合,获取 sku 信息")
+	@PostMapping("list/sku/contain/del")
+	List<ProductSkuInfoDTO> getSkuInfoBySkuIdsContainDel(@RequestBody QueryProductRequest queryProductRequest);
+
+	/**
 	 * 搜索spu的名称,只返回spu名称
 	 * <p> 目前主要是空中药房使用,因两边数据未打通 </>
 	 *

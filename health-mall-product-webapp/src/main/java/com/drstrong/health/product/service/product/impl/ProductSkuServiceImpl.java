@@ -244,6 +244,25 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 		return productSkuMapper.selectList(queryWrapper);
 	}
 
+	/**
+	 * 根据 skuId 集合或者 skuCode 集合查询 sku 信息(包含已删除的数据)
+	 * <p> 包含 delFlag 为 1 的数据 </>
+	 *
+	 * @param skuIdList   skuId 集合
+	 * @param skuCodeList sku编码集合
+	 * @param upOffCode   上架状态(0-未上架,1-已上架)
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 16:54
+	 */
+	@Override
+	public List<ProductSkuEntity> queryBySkuIdOrCodeContainDel(Set<Long> skuIdList, Set<String> skuCodeList, Integer upOffCode) {
+		if (CollectionUtils.isEmpty(skuCodeList) && CollectionUtils.isEmpty(skuIdList)) {
+			return Lists.newArrayList();
+		}
+		return productSkuMapper.selectListContainDel(skuIdList, skuCodeList, upOffCode);
+	}
+
 	@Override
 	public void updateState(List<Long> skuIdList, Integer state, String userId) {
 		ProductSkuEntity productSkuEntity = new ProductSkuEntity();

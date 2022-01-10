@@ -111,6 +111,19 @@ public interface ProductSkuService {
 	 */
 	List<ProductSkuEntity> queryBySkuIdOrCode(Set<Long> skuIdList, Set<String> skuCodeList, UpOffEnum upOffEnum);
 
+	/**
+	 * 根据 skuId 集合或者 skuCode 集合查询 sku 信息(包含已删除的数据)
+	 * <p> 包含 delFlag 为 1 的数据 </>
+	 *
+	 * @param skuIdList   skuId 集合
+	 * @param skuCodeList sku编码集合
+	 * @param upOffCode   上架状态(0-未上架,1-已上架)
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 16:54
+	 */
+	List<ProductSkuEntity> queryBySkuIdOrCodeContainDel(Set<Long> skuIdList, Set<String> skuCodeList, Integer upOffCode);
+
 	void updateState(List<Long> skuIdList, Integer state, String userId);
 
 

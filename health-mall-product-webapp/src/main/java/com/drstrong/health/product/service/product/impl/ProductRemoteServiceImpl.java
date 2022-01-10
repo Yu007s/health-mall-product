@@ -93,6 +93,24 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 		return buildProductSkuInfoDTOList(productSkuEntityList);
 	}
 
+	/**
+	 * 根据 skuId 集合,获取 sku 信息(包含已删除的数据)
+	 * <p> 包含 delFlag 为 1 的数据 </>
+	 *
+	 * @param queryProductRequest 查询参数
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 16:54
+	 */
+	@Override
+	public List<ProductSkuInfoDTO> getSkuInfoBySkuIdsContainDel(QueryProductRequest queryProductRequest) {
+		List<ProductSkuEntity> productSkuEntityList = productSkuService.queryBySkuIdOrCodeContainDel(queryProductRequest.getSkuIdList(), queryProductRequest.getSkuCodeList(), queryProductRequest.getUpOffStatus());
+		if (CollectionUtils.isEmpty(productSkuEntityList)) {
+			return Lists.newArrayList();
+		}
+		return buildProductSkuInfoDTOList(productSkuEntityList);
+	}
+
 	private List<ProductSkuEntity> getSkuList(QueryProductRequest queryProductRequest) {
 		if (Objects.isNull(queryProductRequest) || (CollectionUtils.isEmpty(queryProductRequest.getSkuIdList()) && CollectionUtils.isEmpty(queryProductRequest.getSkuCodeList()))) {
 			return Lists.newArrayList();
@@ -359,6 +377,7 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 			infoDTO.setCommAttribute(commAttributeDTO.getCommAttribute());
 			infoDTO.setCommAttributeName(commAttributeDTO.getCommAttributeName());
 			infoDTO.setCommAttributeIcon(commAttributeDTO.getCommAttributeIcon());
+			infoDTO.setDelFlag(productSkuEntity.getDelFlag());
 			resultSkuInfoList.add(infoDTO);
 		}
 		return resultSkuInfoList;

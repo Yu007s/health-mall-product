@@ -101,4 +101,28 @@
         limit #{count}
     </select>
 
+    <select id="selectListContainDel"
+            resultType="com.drstrong.health.product.model.entity.product.ProductSkuEntity">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_product_sku
+        <where>
+            <if test="skuIdList != null and skuIdList.size()>0">
+                id in
+                <foreach collection="skuIdList" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="skuCodeList != null and skuCodeList.size()>0">
+                and sku_code in
+                <foreach collection="skuCodeList" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="upOffCode != null">
+                and state = #{upOffCode}
+            </if>
+        </where>
+    </select>
+
 </mapper>
