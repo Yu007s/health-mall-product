@@ -15,6 +15,7 @@ import com.drstrong.health.product.remote.cms.CmsRemoteProService;
 import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 import com.drstrong.health.product.remote.pro.PharmacyGoodsRemoteProService;
+import com.drstrong.health.product.service.category.BackCategoryService;
 import com.drstrong.health.product.service.product.*;
 import com.drstrong.health.product.service.store.StoreThreeRelevanceService;
 import com.drstrong.health.product.util.BigDecimalUtil;
@@ -74,6 +75,9 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 
 	@Resource
 	ProductSkuRevenueService productSkuRevenueService;
+
+	@Resource
+	BackCategoryService backCategoryService;
 
 	/**
 	 * 根据 skuId 查询商品 sku 信息集合
@@ -194,15 +198,17 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 		if (Objects.isNull(categoryId)) {
 			return Lists.newArrayList();
 		}
-		// 1.根据分类 id 查询 spu 信息
+		// 1.获取后台分类的子分类
+		Set<Long> backCategoryIds = backCategoryService.getCategoryIdsByOneId(categoryId);
+		// 2.根据分类 id 查询 spu 信息
 		QuerySpuRequest querySpuRequest = new QuerySpuRequest();
-		querySpuRequest.setCategoryId(categoryId);
+		querySpuRequest.setBackCategoryIdList(backCategoryIds);
 		querySpuRequest.setUpOffEnum(UpOffEnum.UP);
 		List<ProductBasicsInfoEntity> basicsInfoEntityList = productBasicsInfoService.queryProductByParam(querySpuRequest);
 		if (CollectionUtils.isEmpty(basicsInfoEntityList)) {
 			return Lists.newArrayList();
 		}
-		// 2.获取商品 id,查询 sku 信息
+		// 3.获取商品 id,查询 sku 信息
 		Set<Long> productIdList = basicsInfoEntityList.stream().map(ProductBasicsInfoEntity::getId).collect(Collectors.toSet());
 		QuerySkuRequest querySkuRequest = new QuerySkuRequest();
 		querySkuRequest.setProductIdList(productIdList);

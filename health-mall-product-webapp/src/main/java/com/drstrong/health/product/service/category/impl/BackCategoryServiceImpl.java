@@ -12,6 +12,7 @@ import com.drstrong.health.product.model.response.category.BackCategoryVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.category.BackCategoryService;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * 后台分类 service impl
@@ -148,6 +151,65 @@ public class BackCategoryServiceImpl extends ServiceImpl<BackCategoryMapper, Bac
 	 */
 	@Override
 	public List<BackCategoryVO> queryByParamToTree(CategoryQueryRequest categoryQueryRequest) {
+		List<BackCategoryEntity> backCategoryEntityList = queryEntityList(categoryQueryRequest);
+		// 组装返回值
+		List<BackCategoryVO> backCategoryVOList = Lists.newArrayListWithCapacity(backCategoryEntityList.size());
+		for (BackCategoryEntity backCategoryEntity : backCategoryEntityList) {
+			BackCategoryVO backCategoryVO = new BackCategoryVO();
+			BeanUtils.copyProperties(backCategoryEntity, backCategoryVO);
+			backCategoryVOList.add(backCategoryVO);
+		}
+		return BaseTree.listToTree(backCategoryVOList);
+	}
+
+	/**
+	 * 根据一级分类 id,查询一级分类下所有子分类 id
+	 *
+	 * @param oneCategoryId 一级分类 id
+	 * @return 所有子分类 id 集合(包含一级分类,二级分类,三级分类的 id)
+	 * @author liuqiuyi
+	 * @date 2022/1/10 11:49
+	 */
+	@Override
+	public Set<Long> getCategoryIdsByOneId(Long oneCategoryId) {
+		if (Objects.isNull(oneCategoryId)) {
+			return Sets.newHashSet();
+		}
+		List<BackCategoryEntity> backCategoryEntityList = queryEntityList(new CategoryQueryRequest());
+		BaseTree.listToTree(backCategoryEntityList);
+		// 组装 map
+		Map<Long, BackCategoryEntity> idEntityMap = backCategoryEntityList.stream().collect(toMap(BackCategoryEntity::getId, dto -> dto, (v1, v2) -> v1));
+		// 获取 id
+		BackCategoryEntity backCategoryEntity = idEntityMap.getOrDefault(oneCategoryId, new BackCategoryEntity());
+		return getCategoryId(backCategoryEntity);
+	}
+
+	private Set<Long> getCategoryId(BackCategoryEntity backCategoryEntity) {
+		Set<Long> categoryIdList = Sets.newHashSet();
+		categoryIdList.add(backCategoryEntity.getId());
+		if (!CollectionUtils.isEmpty(backCategoryEntity.getChildren())) {
+			Set<Long> categoryId = getChildrenCategoryId((List<BaseTree>) backCategoryEntity.getChildren());
+			categoryIdList.addAll(categoryId);
+		}
+		return categoryIdList;
+	}
+
+	private Set<Long> getChildrenCategoryId(List<BaseTree> childrenList) {
+		if (CollectionUtils.isEmpty(childrenList)) {
+			return Sets.newHashSet();
+		}
+		Set<Long> categoryIds = Sets.newHashSet();
+		for (BaseTree children : childrenList) {
+			categoryIds.add(children.getId());
+			if (!CollectionUtils.isEmpty(children.getChildren())) {
+				Set<Long> categoryId = getChildrenCategoryId((List<BaseTree>) children.getChildren());
+				categoryIds.addAll(categoryId);
+			}
+		}
+		return categoryIds;
+	}
+
+	private List<BackCategoryEntity> queryEntityList(CategoryQueryRequest categoryQueryRequest){
 		LambdaQueryWrapper<BackCategoryEntity> backWrapper = new LambdaQueryWrapper<>();
 		backWrapper.gt(BackCategoryEntity::getLevel, 0);
 		if (Objects.nonNull(categoryQueryRequest.getLevel())) {
@@ -157,17 +219,6 @@ public class BackCategoryServiceImpl extends ServiceImpl<BackCategoryMapper, Bac
 			backWrapper.eq(BackCategoryEntity::getStatus, categoryQueryRequest.getState());
 		}
 		backWrapper.orderByAsc(BackCategoryEntity::getOrderNumber).orderByAsc(BackCategoryEntity::getId);
-		List<BackCategoryEntity> backCategoryEntityList = backCategoryMapper.selectList(backWrapper);
-		if (CollectionUtils.isEmpty(backCategoryEntityList)) {
-			return Lists.newArrayList();
-		}
-		// 组装返回值
-		List<BackCategoryVO> backCategoryVOList = Lists.newArrayListWithCapacity(backCategoryEntityList.size());
-		for (BackCategoryEntity backCategoryEntity : backCategoryEntityList) {
-			BackCategoryVO backCategoryVO = new BackCategoryVO();
-			BeanUtils.copyProperties(backCategoryEntity, backCategoryVO);
-			backCategoryVOList.add(backCategoryVO);
-		}
-		return BaseTree.listToTree(backCategoryVOList);
+		return backCategoryMapper.selectList(backWrapper);
 	}
 }
