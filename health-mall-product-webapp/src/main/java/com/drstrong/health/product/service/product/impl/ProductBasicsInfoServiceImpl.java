@@ -420,6 +420,9 @@ public class ProductBasicsInfoServiceImpl extends ServiceImpl<ProductBasicsInfoM
 			LocalDateTime localDateTime = LocalDateTime.of(querySpuRequest.getCreateEnd(), LocalTime.MAX);
 			queryWrapper.lt(ProductBasicsInfoEntity::getCreatedAt, localDateTime);
 		}
+		if (Objects.nonNull(querySpuRequest.getCategoryId())) {
+			queryWrapper.eq(ProductBasicsInfoEntity::getCategoryId, querySpuRequest.getCategoryId());
+		}
 		if (!CollectionUtils.isEmpty(querySpuRequest.getBackCategoryIdList())) {
 			queryWrapper.in(ProductBasicsInfoEntity::getCategoryId, querySpuRequest.getBackCategoryIdList());
 		}

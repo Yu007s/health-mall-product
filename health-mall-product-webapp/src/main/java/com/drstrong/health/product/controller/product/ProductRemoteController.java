@@ -144,4 +144,16 @@ public class ProductRemoteController implements ProductRemoteFacade {
 		return skuInvoiceDTO;
 	}
 
+	/**
+	 * 根据 skuId 或者 skuCode 集合查询发票所需相关信息
+	 *
+	 * @param queryProductRequest 查询入参
+	 * @return 发票相关信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 10:23
+	 */
+	@Override
+	public List<SkuInvoiceDTO> listInvoiceBySkuIds(QueryProductRequest queryProductRequest) {
+		return productRemoteService.listInvoiceBySkuIds(queryProductRequest);
+	}
 }

@@ -4,6 +4,7 @@ import com.drstrong.health.product.model.dto.CommAttributeDTO;
 import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductExtendEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
+import com.drstrong.health.product.model.entity.product.ProductSkuRevenueEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
@@ -33,6 +34,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * 商品远程接口实现类
@@ -68,6 +71,9 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 
 	@Resource
 	StoreThreeRelevanceService storeThreeRelevanceService;
+
+	@Resource
+	ProductSkuRevenueService productSkuRevenueService;
 
 	/**
 	 * 根据 skuId 查询商品 sku 信息集合
@@ -263,6 +269,44 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 		// 4.组装返回值
 		return buildSkuDetailResult(productSkuEntity, extendEntity, productPropertyVOList);
 	}
+
+	/**
+	 * 根据 skuId 或者 skuCode 集合查询发票所需相关信息
+	 *
+	 * @param queryProductRequest 查询入参
+	 * @return 发票相关信息
+	 * @author liuqiuyi
+	 * @date 2022/1/10 10:23
+	 */
+	@Override
+	public List<SkuInvoiceDTO> listInvoiceBySkuIds(QueryProductRequest queryProductRequest) {
+		if (org.apache.commons.collections.CollectionUtils.isEmpty(queryProductRequest.getSkuIdList()) && org.apache.commons.collections.CollectionUtils.isEmpty(queryProductRequest.getSkuCodeList())) {
+			log.error("invoke ProductRemoteController.listInvoiceBySkuIds param is null");
+			return Lists.newArrayList();
+		}
+		log.info("invoke ProductRemoteController.listInvoiceBySkuIds param :{}", queryProductRequest);
+		// 1.查询 sku
+		List<ProductSkuEntity> productSkuEntityList = productSkuService.queryBySkuIdOrCode(queryProductRequest.getSkuIdList(), queryProductRequest.getSkuCodeList(), UpOffEnum.getEnumByCode(queryProductRequest.getUpOffStatus()));
+		if (CollectionUtils.isEmpty(productSkuEntityList)) {
+			log.error("invoke ProductRemoteController.listInvoiceBySkuIds,sku does not exist. param:{}", queryProductRequest);
+			return Lists.newArrayList();
+		}
+		// 2.查询税收编码
+		List<ProductSkuRevenueEntity> revenueEntityList = productSkuRevenueService.listSkuRevenue(queryProductRequest.getSkuIdList(), queryProductRequest.getSkuCodeList());
+		Map<Long, ProductSkuRevenueEntity> skuIdRevenueMap = revenueEntityList.stream().collect(toMap(ProductSkuRevenueEntity::getSkuId, dto -> dto, (v1, v2) -> v1));
+		// 3.组装参数,返回
+		List<SkuInvoiceDTO> skuInvoiceDTOList = Lists.newArrayListWithCapacity(productSkuEntityList.size());
+		productSkuEntityList.forEach(productSkuEntity -> {
+			ProductSkuRevenueEntity skuRevenueEntity = skuIdRevenueMap.getOrDefault(productSkuEntity.getId(), new ProductSkuRevenueEntity());
+			SkuInvoiceDTO skuInvoiceDTO = SkuInvoiceDTO.builder().skuId(productSkuEntity.getId()).skuCode(productSkuEntity.getSkuCode())
+					.packName(productSkuEntity.getPackName()).packValue(productSkuEntity.getPackValue())
+					.revenueCode(skuRevenueEntity.getRevenueCode()).revenueRate(skuRevenueEntity.getRevenueRate()).build();
+
+			skuInvoiceDTOList.add(skuInvoiceDTO);
+		});
+		return skuInvoiceDTOList;
+	}
+
 
 	private ProductSkuDetailsDTO buildSkuDetailResult(ProductSkuEntity productSkuEntity, ProductExtendEntity extendEntity, List<ProductPropertyVO> productPropertyVOList) {
 		ProductSkuDetailsDTO detailsDTO = new ProductSkuDetailsDTO();

@@ -21,6 +21,9 @@ public enum UpOffEnum {
 	private String value;
 
 	public static UpOffEnum getEnumByCode(Integer code){
+		if (Objects.isNull(code)) {
+			return null;
+		}
 		for (UpOffEnum upOffEnum : UpOffEnum.values()) {
 			if (Objects.equals(upOffEnum.getCode(), code)) {
 				return upOffEnum;
