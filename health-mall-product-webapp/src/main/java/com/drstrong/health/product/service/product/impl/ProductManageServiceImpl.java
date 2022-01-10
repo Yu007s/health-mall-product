@@ -3,7 +3,7 @@ package com.drstrong.health.product.service.product.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.drstrong.health.product.constants.ProductConstant;
+import com.drstrong.health.product.constants.CommonConstant;
 import com.drstrong.health.product.dao.product.ProductBasicsInfoMapper;
 import com.drstrong.health.product.model.dto.CommAttributeDTO;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
@@ -230,7 +230,7 @@ public class ProductManageServiceImpl implements ProductManageService {
 		if (Objects.isNull(backCategoryEntity)) {
 			throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
 		}
-		if (!Objects.equals(ProductConstant.THREE_LEVEL, backCategoryEntity.getLevel())) {
+		if (!Objects.equals(CommonConstant.THREE_LEVEL, backCategoryEntity.getLevel())) {
 			throw new BusinessException(ErrorEnums.CATEGORY_LEVEL_IS_ERROR);
 		}
 	}

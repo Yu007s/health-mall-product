@@ -6,7 +6,7 @@ package com.drstrong.health.product.constants;
  * @author liuqiuyi
  * @date 2022/1/10 14:56
  */
-public class ProductConstant {
+public class CommonConstant {
 	/**
 	 * 第一级分类
 	 */
@@ -23,4 +23,8 @@ public class ProductConstant {
 	 * 空格
 	 */
 	public static final String SPACE = " ";
+	/**
+	 * 商品属性
+	 */
+	public static final String DICT_COMM_ATTRIBUTE = "comm_attribute";
 }

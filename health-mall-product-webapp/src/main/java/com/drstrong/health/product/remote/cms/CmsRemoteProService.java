@@ -1,7 +1,7 @@
 package com.drstrong.health.product.remote.cms;
 
 import com.alibaba.fastjson.JSON;
-import com.drstrong.health.product.model.constans.banner.CommonConstants;
+import com.drstrong.health.product.constants.CommonConstant;
 import com.drstrong.health.product.model.dto.CommAttributeDTO;
 import com.drstrong.health.product.model.response.cms.DictVO;
 import com.drstrong.health.product.remote.model.DictResponse;
@@ -38,7 +38,7 @@ public class CmsRemoteProService {
 	 * @date 2021/12/22 17:40
 	 */
 	public Map<Integer, CommAttributeDTO> getCommAttributeByIdListToMap() {
-		String dictCommAttribute = CommonConstants.DICT_COMM_ATTRIBUTE;
+		String dictCommAttribute = CommonConstant.DICT_COMM_ATTRIBUTE;
 		try {
 			log.info("invoke ICMSFeignClient.vueQuery param:{}", dictCommAttribute);
 			DictResponse<List<DictVO>> listResponseEntity = cmsFeignClient.vueQuery(dictCommAttribute);

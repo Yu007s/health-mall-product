@@ -1,6 +1,6 @@
 package com.drstrong.health.product.service.product.impl;
 
-import com.drstrong.health.product.constants.ProductConstant;
+import com.drstrong.health.product.constants.CommonConstant;
 import com.drstrong.health.product.model.dto.CommAttributeDTO;
 import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductExtendEntity;
@@ -90,7 +90,7 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 		if (CollectionUtils.isEmpty(productSkuEntityList)) {
 			return Lists.newArrayList();
 		}
-		return getProductSkuInfoDTOList(productSkuEntityList);
+		return buildProductSkuInfoDTOList(productSkuEntityList);
 	}
 
 	private List<ProductSkuEntity> getSkuList(QueryProductRequest queryProductRequest) {
@@ -101,7 +101,7 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 		return productSkuService.queryBySkuIdOrCode(queryProductRequest.getSkuIdList(), queryProductRequest.getSkuCodeList(), UpOffEnum.getEnumByCode(queryProductRequest.getUpOffStatus()));
 	}
 
-	private List<ProductSkuInfoDTO> getProductSkuInfoDTOList(List<ProductSkuEntity> productSkuEntityList) {
+	private List<ProductSkuInfoDTO> buildProductSkuInfoDTOList(List<ProductSkuEntity> productSkuEntityList) {
 		// 2.查询商品信息
 		Set<Long> productIdList = Sets.newHashSetWithExpectedSize(productSkuEntityList.size());
 		Set<Long> skuIds = Sets.newHashSetWithExpectedSize(productSkuEntityList.size());
@@ -143,7 +143,7 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 		for (ProductBasicsInfoEntity infoEntity : infoEntityList) {
 			SearchNameResultDTO resultDTO = new SearchNameResultDTO();
 			// 和之前的老业务保持一致
-			resultDTO.setName(infoEntity.getBrandName() + ProductConstant.SPACE + infoEntity.getTitle());
+			resultDTO.setName(infoEntity.getBrandName() + CommonConstant.SPACE + infoEntity.getTitle());
 			resultDTO.setCommonName(infoEntity.getTitle());
 			resultDTOList.add(resultDTO);
 		}
@@ -165,8 +165,8 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 			return Lists.newArrayList();
 		}
 		// 判断是否含有空格,如果有空格,需要进行截取(主要是为了和之前空中药房搜索方式保持一致),获取真实的商品名称
-		if (content.contains(ProductConstant.SPACE)) {
-			int index = content.indexOf(ProductConstant.SPACE) + 1;
+		if (content.contains(CommonConstant.SPACE)) {
+			int index = content.indexOf(CommonConstant.SPACE) + 1;
 			content = content.substring(index);
 		}
 		QuerySkuRequest querySkuRequest = new QuerySkuRequest();
@@ -177,7 +177,7 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 			log.info("invoke ProductRemoteServiceImpl.searchSkuDetail search result is null. param:{}", content);
 			return Lists.newArrayList();
 		}
-		return getProductSkuInfoDTOList(productSkuEntityList);
+		return buildProductSkuInfoDTOList(productSkuEntityList);
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 			log.info("invoke ProductRemoteServiceImpl.getSkuInfoByCategoryId search result is null. param:{}", categoryId);
 			return Lists.newArrayList();
 		}
-		return getProductSkuInfoDTOList(productSkuEntityList);
+		return buildProductSkuInfoDTOList(productSkuEntityList);
 	}
 
 	/**
