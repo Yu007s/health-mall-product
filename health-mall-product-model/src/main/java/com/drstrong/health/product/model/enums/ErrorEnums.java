@@ -41,6 +41,7 @@ public enum ErrorEnums implements IBaseResult {
 	UPDATE_NOT_ALLOW("11104", "已上架的商品不允许修改"),
 	CATEGORY_DELETED_ERROR("11105", "分类下存在商品,不允许删除"),
 	PRICE_IS_ERROR("11106", "商品金额必须大于 1"),
+	CATEGORY_LEVEL_IS_ERROR("11107", "商品必须关联最小子分类"),
 	STORE_NAME_LENGTH("17000", "店铺名称长度不正确"),
 	STORE_NAME_REPEAT("17100", "店铺名称已存在"),
 	STORE_NOT_EXIST("17110", "店铺不存在"),

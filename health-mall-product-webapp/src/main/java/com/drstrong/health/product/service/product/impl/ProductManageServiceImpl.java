@@ -3,6 +3,7 @@ package com.drstrong.health.product.service.product.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.drstrong.health.product.constants.ProductConstant;
 import com.drstrong.health.product.dao.product.ProductBasicsInfoMapper;
 import com.drstrong.health.product.model.dto.CommAttributeDTO;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
@@ -92,11 +93,7 @@ public class ProductManageServiceImpl implements ProductManageService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public Long saveOrUpdateProduct(SaveProductRequest saveProductRequest) {
-		// 校验金额(必须大于 0)
-		boolean priceFlag = saveProductRequest.getPackInfoList().stream().anyMatch(packInfoRequest -> packInfoRequest.getPrice().compareTo(new BigDecimal("0")) < 1);
-		if (priceFlag) {
-			throw new BusinessException(ErrorEnums.PRICE_IS_ERROR);
-		}
+		checkProductRequest(saveProductRequest);
 		// 1.校验店铺 id 是否存在
 		StoreEntity storeEntity = storeService.getByStoreId(saveProductRequest.getStoreId());
 		if (Objects.isNull(storeEntity)) {
@@ -222,6 +219,21 @@ public class ProductManageServiceImpl implements ProductManageService {
 		return number.toString();
 	}
 
+	private void checkProductRequest(SaveProductRequest saveProductRequest){
+		// 校验金额(必须大于 0)
+		boolean priceFlag = saveProductRequest.getPackInfoList().stream().anyMatch(packInfoRequest -> packInfoRequest.getPrice().compareTo(new BigDecimal("0")) < 1);
+		if (priceFlag) {
+			throw new BusinessException(ErrorEnums.PRICE_IS_ERROR);
+		}
+		// 校验后台分类id 是否存在,并且为三级分类
+		BackCategoryEntity backCategoryEntity = backCategoryService.queryById(saveProductRequest.getCategoryId());
+		if (Objects.isNull(backCategoryEntity)) {
+			throw new BusinessException(ErrorEnums.CATEGORY_NOT_EXIST);
+		}
+		if (!Objects.equals(ProductConstant.THREE_LEVEL, backCategoryEntity.getLevel())) {
+			throw new BusinessException(ErrorEnums.CATEGORY_LEVEL_IS_ERROR);
+		}
+	}
 
 	private ProductManageVO buildProductManageVO(ProductBasicsInfoEntity basicsInfoEntity, ProductExtendEntity extendEntity, BackCategoryEntity backCategoryEntity
 			, List<ProductAttributeEntity> attributeEntityList, Map<Long, CategoryAttributeItemEntity> idEntityMap, List<ProductSkuEntity> skuEntityList) {
