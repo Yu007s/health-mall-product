@@ -9,6 +9,7 @@ import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.mq.model.SkuStateStockMqEvent;
 import com.drstrong.health.product.mq.model.product.StoreChangeEvent;
 import com.drstrong.health.product.mq.model.product.StoreChangeTypeEnum;
 import com.drstrong.health.product.service.product.ProductBasicsInfoService;
@@ -16,7 +17,9 @@ import com.drstrong.health.product.service.product.ProductSkuService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.product.utils.CustomTLogMqConsumerProcessor;
+import com.drstrong.health.product.utils.MqMessageUtil;
 import com.drstrong.health.redis.utils.RedisUtils;
+import com.google.common.collect.Lists;
 import com.yomahub.tlog.core.mq.TLogMqWrapBean;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -61,11 +64,14 @@ public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<St
 	@Resource
 	private ProductSkuService productSkuService;
 
+	@Resource
+	private MqMessageUtil mqMessageUtil;
+
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void onMessage(TLogMqWrapBean<StoreChangeEvent> tLogMqWrapBean) {
-		CustomTLogMqConsumerProcessor.process(tLogMqWrapBean,this::handle);
+		CustomTLogMqConsumerProcessor.process(tLogMqWrapBean, this::handle);
 	}
 
 	private void handle(TLogMqWrapBean<StoreChangeEvent> tLogMqWrapBean) {
@@ -79,6 +85,7 @@ public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<St
 		// 先加锁,防止页面重复进行点击
 		boolean lockFlag = redisUtils.setIfAbsent(lockKey, storeChangeEvent.getStoreId(), STORE_CHANGE_TIME);
 		if (!lockFlag) {
+			log.info("invoke StoreChangeMqListener.onMessage() add lock error,param:{}", storeChangeEvent);
 			// 如果加锁失败,抛出异常,进行重试
 			throw new BusinessException(ErrorEnums.ADD_LOCK_ERROR);
 		}
@@ -94,6 +101,7 @@ public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<St
 	}
 
 	private void doStoreChange(StoreChangeEvent storeChangeEvent) {
+		// 获取店铺信息
 		StoreEntity storeEntity = storeService.getByStoreId(storeChangeEvent.getStoreId());
 		if (Objects.equals(StoreChangeTypeEnum.UPDATE_NAME, storeChangeEvent.getStoreChangeTypeEnum())) {
 			if (Objects.isNull(storeEntity)) {
@@ -104,9 +112,8 @@ public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<St
 		} else if (Objects.equals(StoreChangeTypeEnum.UPDATE_STATE, storeChangeEvent.getStoreChangeTypeEnum())) {
 			if (Objects.isNull(storeEntity) || Objects.equals(storeEntity.getStoreStatus(), StoreStatusEnum.DISABLE.getCode())) {
 				doUpdateStoreName(UpOffEnum.DOWN, null, storeChangeEvent);
-			} else {
-				doUpdateStoreName(UpOffEnum.UP, null, storeChangeEvent);
 			}
+			// 重新上架的情况暂不考虑,因为上架涉及到一系列的判断操作,而且下架前的商品信息还需要保存,后面有这种需求了在补充功能,已同产品确认过
 		}
 	}
 
@@ -169,8 +176,10 @@ public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<St
 				})
 				.collect(Collectors.toList());
 		if (CollectionUtils.isNotEmpty(productSkuEntityList)) {
+			List<Long> skuIds = Lists.newArrayListWithExpectedSize(productSkuEntityList.size());
 			// 更新 sku 表信息
 			productSkuEntityList.forEach(productSkuEntity -> {
+				skuIds.add(productSkuEntity.getId());
 				if (Objects.nonNull(upOffEnum)) {
 					productSkuEntity.setState(upOffEnum.getCode());
 				} else if (StringUtils.isNotBlank(storeName)) {
@@ -180,7 +189,20 @@ public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<St
 				productSkuEntity.setChangedBy(storeChangeEvent.getOperatorId());
 			});
 			productSkuService.saveOrUpdateBatch(productSkuEntityList, productSkuEntityList.size());
+			// 发送 mq 到库存
+			sendMsg2Stock(skuIds, upOffEnum, storeChangeEvent.getOperatorId());
 			log.info("invoke StoreChangeMqListener.onMessage(),update sku size:{}", productSkuEntityList.size());
 		}
+	}
+
+	/**
+	 * 发送 MQ 到库存,通知 sku 上下架状态
+	 */
+	private void sendMsg2Stock(List<Long> skuIdList, UpOffEnum upOffEnum, String operatorId) {
+		SkuStateStockMqEvent stateStockMqEvent = new SkuStateStockMqEvent();
+		stateStockMqEvent.setSkuIdList(skuIdList);
+		stateStockMqEvent.setState(upOffEnum.getCode());
+		stateStockMqEvent.setUserId(operatorId);
+		mqMessageUtil.sendMsg(MqMessageUtil.SKU_STATE_STOCK_TOPIC, MqMessageUtil.SKU_STATE_STOCK_TAG, stateStockMqEvent);
 	}
 }

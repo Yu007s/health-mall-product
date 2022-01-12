@@ -12,7 +12,7 @@ public enum StoreChangeTypeEnum {
 	 */
 	UPDATE_NAME,
 	/**
-	 * 更新
+	 * 更新店铺状态
 	 */
 	UPDATE_STATE,;
 }
