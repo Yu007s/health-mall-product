@@ -13,6 +13,7 @@ import com.drstrong.health.product.remote.model.StorePostageDTO;
 import com.drstrong.health.product.service.area.AreaService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.service.store.StoreThreeRelevanceService;
+import com.yomahub.tlog.core.annotation.TLogAspect;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -121,7 +122,9 @@ public class StoreController implements StoreRemoteApi {
 	}
 
 	@Override
+	@TLogAspect({"skuIds"})
 	public List<ThreeSkuInfoResponse> queryBySkuIds(List<Long> skuIds) {
+		log.info("远程服务提供：获取sku三方关联信息");
 		return storeThreeRelevanceService.queryBySkuIds(skuIds);
 	}
 
