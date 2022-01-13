@@ -26,8 +26,8 @@ public class ProductSkuStockVO implements Serializable {
 	@ApiModelProperty("商品 sku 名称")
 	private String skuName;
 
-	@ApiModelProperty("规格名称")
-	private String packName;
+	@ApiModelProperty("规格值")
+	private String packValue;
 
 	@ApiModelProperty("店铺名称")
 	private String storeName;
