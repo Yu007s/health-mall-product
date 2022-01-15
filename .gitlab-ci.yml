@@ -2,6 +2,7 @@ include:
   - local: '/.developer-vars.yml'
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/.huihui-ops-vars.yml'
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/maven-huihui.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/sonar.yml'
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/docker-image.yml'
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/inside-deploy-java.yml'
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/uat-deploy-java.yml'
@@ -35,6 +36,11 @@ Maven build:
   extends: .maven-build
   script:
     - mvn -DskipTests clean package -P !dev $MAVEN_OPTS
+
+
+SonarQube check:
+  stage: maven package
+  extends: .sonarqube-check
 
 
 Image build:
