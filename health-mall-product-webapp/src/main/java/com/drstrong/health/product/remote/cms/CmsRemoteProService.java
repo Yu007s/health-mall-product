@@ -42,7 +42,7 @@ public class CmsRemoteProService {
 		try {
 			log.info("invoke ICMSFeignClient.vueQuery param:{}", dictCommAttribute);
 			DictResponse<List<DictVO>> listResponseEntity = cmsFeignClient.vueQuery(dictCommAttribute);
-			log.info("invoke ICMSFeignClient.vueQuery result:{}", dictCommAttribute);
+			log.info("invoke ICMSFeignClient.vueQuery result:{}", listResponseEntity);
 			if (Objects.isNull(listResponseEntity) || !Objects.equals(SUCCESS, listResponseEntity.getMsg())) {
 				log.info("invoke ICMSFeignClient.vueQuery return failed. param:{}", dictCommAttribute);
 				return Maps.newHashMap();
