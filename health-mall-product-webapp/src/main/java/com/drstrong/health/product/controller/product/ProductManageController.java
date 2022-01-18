@@ -31,7 +31,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/product/manage")
 @Slf4j
-@Api(tags = {"cms-商品管理"}, description = "cms-商品管理")
+@Api(tags = {"cms-商品管理"})
 public class ProductManageController implements ProductManageFacade {
 	@Resource
 	ProductManageService productManageService;

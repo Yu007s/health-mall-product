@@ -33,7 +33,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/product")
 @Slf4j
-@Api(tags = {"小程序-商品 api"}, description = "小程序-商品 api")
+@Api(tags = {"小程序-商品 api"})
 public class ProductApiController {
 	@Resource
 	ProductBasicsInfoService productBasicsInfoService;

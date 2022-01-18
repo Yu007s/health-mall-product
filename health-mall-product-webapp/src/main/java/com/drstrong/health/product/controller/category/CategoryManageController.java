@@ -29,7 +29,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/product/category")
 @Slf4j
-@Api(tags = {"商品分类"}, description = "商品分类")
+@Api(tags = {"商品分类"})
 public class CategoryManageController implements CategoryManageFacade {
 	@Resource
 	FrontCategoryService frontCategoryService;

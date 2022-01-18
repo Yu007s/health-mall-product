@@ -2,6 +2,7 @@ package com.drstrong.health.product.service.category.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.drstrong.health.product.constants.CommonConstant;
 import com.drstrong.health.product.dao.category.FrontCategoryMapper;
 import com.drstrong.health.product.model.BaseTree;
 import com.drstrong.health.product.model.entity.category.CategoryRelationEntity;
@@ -166,7 +167,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		Map<Long, Integer> frontIdProductCountMap = Maps.newHashMapWithExpectedSize(frontCategoryEntityList.size());
 		for (FrontCategoryEntity categoryEntity : frontCategoryEntityList) {
 			Set<Long> backIdSet = frontIdBackIdListMap.getOrDefault(categoryEntity.getId(), Sets.newHashSet());
-			if (Objects.equals(1, categoryEntity.getLevel())) {
+			if (Objects.equals(CommonConstant.ONE_LEVEL, categoryEntity.getLevel())) {
 				Integer productNum = getProductNum(backIdSet, backIdProductNumMap);
 				frontIdProductCountMap.put(categoryEntity.getId(), productNum);
 			} else {
@@ -181,7 +182,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		BaseTree.listToTree(frontCategoryEntityList);
 		for (FrontCategoryEntity categoryEntity : frontCategoryEntityList) {
 			// 不是一级分类,不修改
-			if (!Objects.equals(1, categoryEntity.getLevel())) {
+			if (!Objects.equals(CommonConstant.ONE_LEVEL, categoryEntity.getLevel())) {
 				continue;
 			}
 			// 获取一级分类的商品数量
@@ -569,7 +570,7 @@ public class FrontCategoryServiceImpl implements FrontCategoryService {
 		// 2.获取前台分类 id (如果是二级分类,还需要拿到父类的 id,然后查询关联信息)
 		Set<Long> frontCategoryIdList = Sets.newHashSetWithExpectedSize(4);
 		frontCategoryIdList.add(categoryEntity.getId());
-		if (Objects.equals(2, categoryEntity.getLevel())) {
+		if (Objects.equals(CommonConstant.TWO_LEVEL, categoryEntity.getLevel())) {
 			frontCategoryIdList.add(categoryEntity.getParentId());
 		}
 		// 3.查询前后台关联关系

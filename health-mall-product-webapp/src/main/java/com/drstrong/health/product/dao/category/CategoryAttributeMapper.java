@@ -19,6 +19,5 @@ public interface CategoryAttributeMapper extends BaseMapper<CategoryAttributeEnt
 	 * @author liuqiuyi
 	 * @date 2021/12/27 17:24
 	 */
-	@Deprecated
 	void syncDateInsertOne(CategoryAttributeEntity categoryAttributeEntity);
 }

@@ -32,7 +32,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/product/category")
 @Slf4j
-@Api(tags = {"小程序-商品分类"}, description = "小程序-商品分类")
+@Api(tags = {"小程序-商品分类"})
 public class CategoryApiController {
 	@Resource
 	FrontCategoryService frontCategoryService;

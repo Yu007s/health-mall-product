@@ -31,7 +31,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/product/remote")
 @Slf4j
-@Api(tags = {"商品远程接口"}, description = "商品远程接口")
+@Api(tags = {"商品远程接口"})
 public class ProductRemoteController implements ProductRemoteFacade {
 	@Resource
 	ProductRemoteService productRemoteService;

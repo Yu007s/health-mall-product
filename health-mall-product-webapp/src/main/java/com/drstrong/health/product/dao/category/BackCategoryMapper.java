@@ -28,13 +28,21 @@ public interface BackCategoryMapper extends BaseMapper<BackCategoryEntity> {
 	List<BackCategoryEntity> queryByParam(CategoryQueryRequest categoryQueryRequest);
 
 	/**
+	 * 单个插入
+	 * <p> 仅用于数据同步使用 </>
+	 *
+	 * @param categoryEntity 保存入参
+	 * @author liuqiuyi
+	 * @date 2022/1/18 09:53
+	 */
+	void syncDateInsertOne(BackCategoryEntity categoryEntity);
+
+	/**
 	 * 下面的都是之前的方法,未改动,直接拷贝
 	 *
 	 * @author liuqiuyi
 	 * @date 2021/12/27 17:57
 	 */
-	@Deprecated
-	void syncDateInsertOne(BackCategoryEntity categoryEntity);
 	int updateLeafCountByIds(@Param("categoryIds") Collection<Long> categoryIds, @Param("offset") Integer offset);
 	int updateStatusById(@Param("categoryId") Long categoryId, @Param("status") Integer status);
 	int updatePNumberById(@Param("categoryId") Long categoryId, @Param("offset") Integer offset);

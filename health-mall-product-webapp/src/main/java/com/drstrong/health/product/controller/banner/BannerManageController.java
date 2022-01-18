@@ -24,7 +24,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/product/banner")
 @Slf4j
-@Api(tags = {"轮播图"}, description = "轮播图")
+@Api(tags = {"轮播图"})
 public class BannerManageController implements BannerManageFacade {
 
     @Resource
