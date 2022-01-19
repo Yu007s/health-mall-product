@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-@RocketMQMessageListener(topic = "${mq-topic-config.store-change-topic}", selectorExpression = "${mq-topic-config.store-change-tag}", consumerGroup = "storeChange-consumer_group")
+@RocketMQMessageListener(topic = "${store.change.topic}", selectorExpression = "${store.change.tag}", consumerGroup = "${store.change.consumer.group}")
 public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<StoreChangeEvent>> {
 
 	/**
