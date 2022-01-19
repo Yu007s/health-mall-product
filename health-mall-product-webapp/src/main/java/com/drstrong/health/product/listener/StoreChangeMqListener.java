@@ -1,5 +1,6 @@
 package com.drstrong.health.product.listener;
 
+import com.drstrong.health.product.config.MqTopicConfig;
 import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
@@ -66,6 +67,9 @@ public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<St
 
 	@Resource
 	private MqMessageUtil mqMessageUtil;
+
+	@Resource
+	private MqTopicConfig mqTopicConfig;
 
 
 	@Override
@@ -203,6 +207,6 @@ public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<St
 		stateStockMqEvent.setSkuIdList(skuIdList);
 		stateStockMqEvent.setState(upOffEnum.getCode());
 		stateStockMqEvent.setUserId(operatorId);
-		mqMessageUtil.sendMsg(MqMessageUtil.SKU_STATE_STOCK_TOPIC, MqMessageUtil.SKU_STATE_STOCK_TAG, stateStockMqEvent);
+		mqMessageUtil.sendMsg(mqTopicConfig.getSkuStateStockTopic(), mqTopicConfig.getSkuStateStockTag(), stateStockMqEvent);
 	}
 }

@@ -27,9 +27,6 @@ public class MqMessageUtil {
 
     private static final Long PRODUCER_TIME_OUT = 3000L;
 
-    public static final String SKU_STATE_STOCK_TOPIC = "skuStateStock-topic";
-    public static final String SKU_STATE_STOCK_TAG = "skuStateStock-tag";
-
     @Resource
     private RocketMQTemplate rocketMQTemplate;
 

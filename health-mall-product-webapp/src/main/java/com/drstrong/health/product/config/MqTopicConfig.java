@@ -25,4 +25,16 @@ public class MqTopicConfig {
 	 */
 	@Value("${store.change.tag}")
 	private String storeChangeTag;
+
+	/**
+	 * sku 上下架 topic
+	 */
+	@Value("${sku.state.stock.topic}")
+	private String skuStateStockTopic;
+
+	/**
+	 * sku 上下架 tag
+	 */
+	@Value("${sku.state.stock.tag}")
+	private String skuStateStockTag;
 }

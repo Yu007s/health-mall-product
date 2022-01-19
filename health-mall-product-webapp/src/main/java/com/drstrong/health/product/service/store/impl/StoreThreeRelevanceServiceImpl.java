@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.drstrong.health.product.config.MqTopicConfig;
 import com.drstrong.health.product.dao.store.StoreThreeRelevanceMapper;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
@@ -64,6 +65,8 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
     private StoreService storeService;
     @Resource
     private MqMessageUtil mqMessageUtil;
+    @Resource
+    private MqTopicConfig mqTopicConfig;
 
 
     @Override
@@ -161,7 +164,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
         SkuStateStockMqEvent stateStockMqEvent = new SkuStateStockMqEvent();
         BeanUtils.copyProperties(updateSkuRequest,stateStockMqEvent);
         stateStockMqEvent.setUserId(userId);
-        mqMessageUtil.sendMsg(MqMessageUtil.SKU_STATE_STOCK_TOPIC,MqMessageUtil.SKU_STATE_STOCK_TAG,stateStockMqEvent);
+        mqMessageUtil.sendMsg(mqTopicConfig.getSkuStateStockTopic(), mqTopicConfig.getSkuStateStockTag(), stateStockMqEvent);
     }
 
     private void checkAndUpdateSpu(List<Long> skuIdList, Integer state, String userId) {
