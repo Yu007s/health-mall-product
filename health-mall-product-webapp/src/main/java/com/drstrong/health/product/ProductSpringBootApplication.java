@@ -16,6 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan({"com.drstrong.health.product", "com.drstrong.health.redis"})
 public class ProductSpringBootApplication {
 	public static void main(String[] args) {
+
 		SpringApplication.run(ProductSpringBootApplication.class, args);
 	}
 }
