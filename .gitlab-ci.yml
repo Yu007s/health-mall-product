@@ -69,7 +69,7 @@ testing-1:
   stage: deploy to testing
   variables:
     ENV_NAME: 'testing-1'
-    APP_CONFIG: '${JVM_OPTS_TEST1}'
+    APP_CONFIG: '${JVM_OPTS_TESTING1}'
     ARGO_PROJ: '${BUSINESS_NAME}-dev'
     CD_GIT_PATH: 'testing'
     DNS: '$DNS_TESTING1'
