@@ -24,6 +24,12 @@
             <groupId>cn.strong</groupId>
             <artifactId>drstrong-webapp-base</artifactId>
             <version>2021.11-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>dynamic-arthas-spring-boot-starter</artifactId>
+                    <groupId>cn.strong</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.alibaba.nacos</groupId>
