@@ -39,6 +39,9 @@ public class ProductSkuInfoDTO implements Serializable {
 	@ApiModelProperty("sku 名称")
 	private String skuName;
 
+	@ApiModelProperty("品牌名称")
+	private String brandName;
+
 	@ApiModelProperty("商品标题")
 	private String productName;
 
