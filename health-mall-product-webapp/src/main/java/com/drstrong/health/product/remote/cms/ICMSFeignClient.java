@@ -14,7 +14,7 @@ import java.util.List;
  * @author liuqiuyi
  * @date 2021/12/22 16:55
  */
-@FeignClient(value = "cms", path = "/sys/dict")
+@FeignClient(value = "${feign.cms.server.name}", path = "/sys/dict")
 public interface ICMSFeignClient {
 
 	@GetMapping("/vue/query/{type}")
