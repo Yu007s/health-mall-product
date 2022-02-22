@@ -9,6 +9,6 @@ variables:
   JVM_OPTS_DEV169: '-Xmx512m -Xms512m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.20.169:8848'
   JVM_OPTS_TESTING1: '-Xmx512m -Xms512m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.21.3:8848 -Dapollo.meta=http://10.43.81.208:8080 -Dapollo.configService=http://10.43.81.208:8080 -Dapollo.env=TESTING1'
   JVM_OPTS_TESTING2: '-Xmx512m -Xms512m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.21.202:8848 -Dapollo.meta=http://10.43.149.19:8080 -Dapollo.configService=http://10.43.149.19:8080 -Dapollo.env=TESTING2'
-  JVM_OPTS_TESTING3: '-Xmx512m -Xms512m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.21.3:8848'
+  JVM_OPTS_TESTING3: '-Xmx512m -Xms512m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.21.121:8848'
   JVM_OPTS_PRE: '-Xmx1024m -Xms1024m -Xss512k -Dspring.cloud.nacos.config.namespace=uat-207 -Dspring.cloud.nacos.config.server-addr=127.0.0.1:8848'
-  JVM_OPTS_PROD: '-Xmx1024m -Xms1024m -Xss512k -Dspring.cloud.nacos.config.namespace=smart-campus-jiashan-prd -Dspring.cloud.nacos.config.server-addr=127.0.0.1:8848'
+  JVM_OPTS_PROD: '-Xmx1024m -Xms1024m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.1.5:8848 -Dapollo.meta=http://10.247.80.169:8080 -Dapollo.configService=http://10.247.80.169:8080 -Dapollo.env=PROD'
