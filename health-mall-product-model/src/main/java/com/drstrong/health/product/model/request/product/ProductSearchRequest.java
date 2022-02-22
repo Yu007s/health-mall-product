@@ -21,5 +21,5 @@ public class ProductSearchRequest extends PageRequest implements Serializable {
 	private static final long serialVersionUID = 586525841318457288L;
 
 	@ApiModelProperty("查询内容")
-	private String name;
+	private String content;
 }

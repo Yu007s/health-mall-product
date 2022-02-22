@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.product.ProductSkuMapper">
+
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.product.ProductSkuEntity">
+        <result column="id" property="id"/>
+        <result column="product_id" property="productId"/>
+        <result column="sku_code" property="skuCode"/>
+        <result column="sku_name" property="skuName"/>
+        <result column="source_id" property="sourceId"/>
+        <result column="source_name" property="sourceName"/>
+        <result column="pack_name" property="packName"/>
+        <result column="pack_value" property="packValue"/>
+        <result column="sku_price" property="skuPrice"/>
+        <result column="state" property="state"/>
+        <result column="comm_attribute" property="commAttribute"/>
+        <result column="version" property="version"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="changed_at" property="changedAt"/>
+        <result column="changed_by" property="changedBy"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                id,
+                product_id,
+                sku_code,
+                sku_name,
+                source_id,
+                source_name,
+                pack_name,
+                pack_value,
+                sku_price,
+                state,
+                comm_attribute,
+                version,
+                created_at,
+                created_by,
+                changed_at,
+                changed_by,
+                del_flag
+    </sql>
+
+    <insert id="batchInsert">
+        INSERT INTO pms_product_sku
+        (
+        product_id,
+        sku_code,
+        sku_name,
+        source_id,
+        source_name,
+        pack_name,
+        pack_value,
+        sku_price,
+        state,
+        comm_attribute,
+        created_by,
+        changed_by
+        )
+        VALUES
+        <foreach collection="saveParamList" item="item" index="index" separator=",">
+            (
+            #{item.productId},
+            #{item.skuCode},
+            #{item.skuName},
+            #{item.sourceId},
+            #{item.sourceName},
+            #{item.packName},
+            #{item.packValue},
+            #{item.skuPrice},
+            #{item.state},
+            #{item.commAttribute},
+            #{createdBy},
+            #{changedBy}
+            )
+        </foreach>
+    </insert>
+
+    <update id="deleteBySkuIdList">
+        UPDATE
+            pms_product_sku
+        SET
+            del_flag = 1,
+            changed_by = #{userId},
+            changed_at=now()
+        WHERE
+            id
+        IN
+        <foreach collection="skuIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="searchSkuNameByName" resultType="java.lang.String">
+       select sku_name
+        FROM pms_product_sku
+        where del_flag = 0 AND state = 1
+        AND sku_name like "%"#{content}"%"
+        limit #{count}
+    </select>
+
+    <select id="selectListContainDel"
+            resultType="com.drstrong.health.product.model.entity.product.ProductSkuEntity">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_product_sku
+        <where>
+            <if test="skuIdList != null and skuIdList.size()>0">
+                id in
+                <foreach collection="skuIdList" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="skuCodeList != null and skuCodeList.size()>0">
+                and sku_code in
+                <foreach collection="skuCodeList" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="upOffCode != null">
+                and state = #{upOffCode}
+            </if>
+        </where>
+    </select>
+
+</mapper>

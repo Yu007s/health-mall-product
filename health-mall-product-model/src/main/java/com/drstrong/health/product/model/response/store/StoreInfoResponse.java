@@ -31,7 +31,7 @@ public class StoreInfoResponse implements Serializable {
 	private Integer storeStatus;
 
 	@ApiModelProperty("店铺 sku 商品的数量")
-	private Long skuCount;
+	private Integer skuCount;
 
 	@ApiModelProperty("店铺的包邮额度")
 	private BigDecimal freePostage;

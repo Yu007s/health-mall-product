@@ -18,8 +18,8 @@ public class PageRequest implements Serializable {
 	private static final long serialVersionUID = 670302761069367870L;
 
 	@ApiModelProperty("查询的页码")
-	private Integer pageNo;
+	private Integer pageNo = 1;
 
 	@ApiModelProperty("查询的条数")
-	private Integer pageSize;
+	private Integer pageSize = 10;
 }

@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -21,8 +23,9 @@ public class StoreAddOrUpdateRequest implements Serializable {
 	private Long storeId;
 
 	@ApiModelProperty("店铺名称")
+	@NotBlank(message = "店铺名称不能为空")
 	private String name;
-
+	@NotNull
 	@ApiModelProperty("店铺状态")
 	private Integer status;
 }

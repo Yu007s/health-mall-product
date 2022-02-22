@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.product.ProductBasicsInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity" >
+        <result column="id" property="id" />
+        <result column="spu_code" property="spuCode" />
+        <result column="title" property="title" />
+        <result column="brand_name" property="brandName" />
+        <result column="alias_name" property="aliasName" />
+        <result column="master_image_url" property="masterImageUrl" />
+        <result column="category_id" property="categoryId" />
+        <result column="source_id" property="sourceId" />
+        <result column="source_name" property="sourceName" />
+        <result column="product_type" property="productType" />
+        <result column="sort" property="sort" />
+        <result column="state" property="state" />
+        <result column="version" property="version" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="changed_at" property="changedAt" />
+        <result column="changed_by" property="changedBy" />
+        <result column="del_flag" property="delFlag" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                id,
+                spu_code,
+                title,
+                brand_name,
+                alias_name,
+                master_image_url,
+                category_id,
+                source_id,
+                source_name,
+                product_type,
+                sort,
+                state,
+                version,
+                created_at,
+                created_by,
+                changed_at,
+                changed_by,
+                del_flag
+    </sql>
+
+    <select id="likeProductTitle" resultType="java.lang.String">
+        select title
+        FROM pms_product_basics_info
+        where del_flag = 0 AND state = 1
+        AND title like "%"#{content}"%"
+        limit #{count}
+    </select>
+
+    <select id="likeTitleAndBrandName" resultMap="BaseResultMap">
+        select title,brand_name
+        FROM pms_product_basics_info
+        where del_flag = 0 AND state = 1
+        AND (title like "%"#{content}"%" OR brand_name like "%"#{content}"%")
+        limit #{count}
+    </select>
+
+</mapper>

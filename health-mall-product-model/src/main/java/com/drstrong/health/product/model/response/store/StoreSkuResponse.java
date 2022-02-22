@@ -17,6 +17,9 @@ import java.math.BigDecimal;
 public class StoreSkuResponse implements Serializable {
 	private static final long serialVersionUID = -4068248972006761569L;
 
+	@ApiModelProperty("skuId")
+	private String skuId;
+
 	@ApiModelProperty("sku 编码")
 	private String skuCode;
 
@@ -30,7 +33,7 @@ public class StoreSkuResponse implements Serializable {
 	private BigDecimal price;
 
 	@ApiModelProperty("三方 skuId")
-	private String threeSkuId;
+	private Long threeSkuId;
 
 	@ApiModelProperty("sku 状态")
 	private Integer skuState;

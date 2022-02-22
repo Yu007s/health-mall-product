@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE excels SYSTEM "easy-excel.dtd">
+<excels>
+
+	<!-- excel标签参看:org.easy.excel.config.ExcelDefinition,Field标签参看:org.easy.excel.config.FieldValue -->
+
+	<!--
+		ps:关于样式相关的都与导入无关
+		limit限制导入最多条数为300000,默认是Integer.MIN_VALUE
+		requestTag标记的列会以红色*开头表示必填项(必须isNull为false否则无效)
+		showBorder是否显示单元格边框(true显示false默认不显示)
+		defaultAlign默认对齐方式，defaultColumnWidth默认单元格(cell)宽度
+		forceText 避免导出的excel使用科学计数法等问题..
+		columnWidth 导出时当前单元格(cell)的宽度
+		导入有效
+		isNull=false表示不允许这个属性为空
+		regex自定义正则匹配规则
+		regexErrMsg正则不通过提示信息
+		pattern导入的如果是字符,如何映射成date类型(如果cell内容本身是日期不受此限制,导出时使用第一个pattern)
+		after 表示结束时间必须在开始时间之后(导入强制校验规则)
+		format 通常用于固定不变的常量映射,比如状态(0:未删除,1:已删除,导入的value在前,导出的value在后
+	-->
+
+	<excel id="storeSkuExport" class="com.drstrong.health.product.model.response.store.StoreSkuResponse"
+			   requiredTag="true" showBorder="true" sheetname="店铺商品信息" defaultAlign="center" defaultColumnWidth="3000">
+			<field name="skuCode" title="商品SKU码"/>
+			<field name="skuName" title="商品SKU名称"/>
+			<field name="intoPrice" title="进货单价"/>
+			<field name="price" title="销售价格"/>
+			<field name="threeSkuId" title="第三方药店代码" />
+			<field name="skuState" title="SKU状态" format="0:未上架,1:已上架"/>
+	</excel>
+
+	<excel id="skuStockExport" class="com.drstrong.health.product.model.response.product.ProductSkuStockVO"
+		   requiredTag="true" showBorder="true" sheetname="店铺商品信息" defaultAlign="center" defaultColumnWidth="3000">
+		<field name="skuCode" title="SKU编号"/>
+		<field name="skuName" title="SKU名称"/>
+		<field name="packName" title="规格"/>
+		<field name="storeName" title="店铺"/>
+		<field name="commAttribute" title="商品属性" />
+		<field name="stockNum" title="实物库存" />
+	</excel>
+
+
+</excels>

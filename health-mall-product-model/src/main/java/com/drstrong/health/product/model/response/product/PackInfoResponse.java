@@ -35,4 +35,10 @@ public class PackInfoResponse implements Serializable {
 
 	@ApiModelProperty("sku编码")
 	private String skuCode;
+
+	@ApiModelProperty("skuId")
+	private Long skuId;
+
+	@ApiModelProperty("sku 状态 0-未上架,1-已上架")
+	private Integer skuState;
 }

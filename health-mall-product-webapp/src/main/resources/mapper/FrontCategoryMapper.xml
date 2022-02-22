@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.category.FrontCategoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.category.FrontCategoryEntity">
+        <result column="id" property="id"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="name" property="name"/>
+        <result column="icon" property="icon"/>
+        <result column="level" property="level"/>
+        <result column="sort" property="sort"/>
+        <result column="description" property="description"/>
+        <result column="state" property="state"/>
+        <result column="version" property="version"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="changed_at" property="changedAt"/>
+        <result column="changed_by" property="changedBy"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                id,
+                parent_id,
+                name,
+                icon,
+                level,
+                sort,
+                description,
+                state,
+                version,
+                created_at,
+                created_by,
+                changed_at,
+                changed_by,
+                del_flag
+    </sql>
+
+    <update id="deleteByIdList">
+        update pms_product_front_category set del_flag = 1, changed_at = now(),changed_by = #{userId} where
+        del_flag = 0 and
+        id in
+        <foreach collection="categoryIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateStateByIdList">
+        update pms_product_front_category set state = #{state}, changed_at = now(),changed_by = #{userId} where
+        del_flag = 0 and
+        id in
+        <foreach collection="categoryIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="queryByParam" resultMap="BaseResultMap"
+            parameterType="com.drstrong.health.product.model.request.category.CategoryQueryRequest">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM pms_product_front_category
+        <where>
+            del_flag = 0
+            <if test="null != categoryName and '' != categoryName">
+                and name like "%"#{categoryName}"%"
+            </if>
+            <if test="null != state">
+                and state = #{state}
+            </if>
+        </where>
+    </select>
+
+</mapper>

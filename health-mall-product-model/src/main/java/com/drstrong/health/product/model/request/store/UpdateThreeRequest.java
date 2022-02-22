@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -19,11 +20,12 @@ public class UpdateThreeRequest implements Serializable {
 	private static final long serialVersionUID = -1098992482960555090L;
 
 	@ApiModelProperty("三方 skuId")
-	private String threeSkuId;
-
+	@NotNull
+	private Long threeSkuId;
+	@NotNull
 	@ApiModelProperty("进货单价")
 	private BigDecimal purchasePrice;
-
+	@NotNull
 	@ApiModelProperty("商城的 skuId")
 	private Long skuId;
 }

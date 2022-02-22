@@ -1,6 +1,9 @@
 package com.drstrong.health.product.model.entity.category;
 
+import com.baomidou.mybatisplus.annotation.*;
+import com.drstrong.health.product.model.BaseTree;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,19 +15,11 @@ import java.time.LocalDateTime;
  * @date 2021/12/7 17:21
  */
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class FrontCategoryEntity implements Serializable {
+@TableName("pms_product_front_category")
+public class FrontCategoryEntity extends BaseTree implements Serializable {
 	private static final long serialVersionUID = -1403402300574048172L;
-
-	/**
-	 * 自增主键 id
-	 */
-	private Long id;
-
-	/**
-	 * 父类 id(一级父类 id 为 0)
-	 */
-	private Integer parentId;
 
 	/**
 	 * 分类名称
@@ -57,27 +52,36 @@ public class FrontCategoryEntity implements Serializable {
 	private Integer state;
 
 	/**
-	 * 删除状态(1-已删除;0-未删除)
+	 * 乐观锁字段
 	 */
-	private Integer deleteStatus;
-
-	/**
-	 * 创建人 id
-	 */
-	private Integer createdBy;
+	@Version
+	private Integer version;
 
 	/**
 	 * 创建时间
 	 */
-	private LocalDateTime createdTime;
+	@TableField(fill = FieldFill.INSERT)
+	private LocalDateTime createdAt;
 
 	/**
-	 * 修改人 id
+	 * 创建人
 	 */
-	private Integer updatedBy;
+	private String createdBy;
 
 	/**
 	 * 修改时间
 	 */
-	private LocalDateTime updatedTime;
+	@TableField(fill = FieldFill.INSERT_UPDATE)
+	private LocalDateTime changedAt;
+
+	/**
+	 * 修改人
+	 */
+	private String changedBy;
+
+	/**
+	 * 是否删除 0：正常 1：删除
+	 */
+	@TableLogic
+	private Integer delFlag;
 }

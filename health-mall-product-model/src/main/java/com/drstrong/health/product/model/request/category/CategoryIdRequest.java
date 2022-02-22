@@ -21,4 +21,6 @@ public class CategoryIdRequest implements Serializable {
 	@ApiModelProperty(value = "分类 id", required = true)
 	@NotNull(message = "分类 id 不能为空")
 	private Long categoryId;
+
+	private String userId;
 }

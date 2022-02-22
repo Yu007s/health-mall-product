@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.category.BackCategoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.category.BackCategoryEntity">
+        <result column="id" property="id"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="name" property="name"/>
+        <result column="leaf_count" property="leafCount"/>
+        <result column="id_path" property="idPath"/>
+        <result column="name_path" property="namePath"/>
+        <result column="level" property="level"/>
+        <result column="order_number" property="orderNumber"/>
+        <result column="status" property="status"/>
+        <result column="icon" property="icon"/>
+        <result column="p_number" property="pNumber"/>
+        <result column="description" property="description"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="changed_at" property="changedAt"/>
+        <result column="changed_by" property="changedBy"/>
+        <result column="version" property="version"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                id,
+                parent_id,
+                name,
+                leaf_count,
+                id_path,
+                name_path,
+                level,
+                order_number,
+                status,
+                icon,
+                p_number,
+                description,
+                created_at,
+                created_by,
+                changed_at,
+                changed_by,
+                version,
+                del_flag
+    </sql>
+
+    <select id="queryByParam" resultMap="BaseResultMap"
+            parameterType="com.drstrong.health.product.model.request.category.CategoryQueryRequest">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM pms_product_back_category
+        <where>
+            del_flag = 0
+            <if test="null != categoryName and '' != categoryName">
+                and name like "%"#{categoryName}"%"
+            </if>
+            <if test="null != state">
+                and status = #{state}
+            </if>
+        </where>
+    </select>
+
+    <insert id="syncDateInsertOne" parameterType="com.drstrong.health.product.model.entity.category.BackCategoryEntity">
+        INSERT INTO pms_product_back_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="null != id and '' != id">
+                id,
+            </if>
+            <if test="null != parentId and '' != parentId">
+                parent_id,
+            </if>
+            <if test="null != name and '' != name">
+                name,
+            </if>
+            <if test="null != leafCount and '' != leafCount">
+                leaf_count,
+            </if>
+            <if test="null != idPath and '' != idPath">
+                id_path,
+            </if>
+            <if test="null != namePath and '' != namePath">
+                name_path,
+            </if>
+            <if test="null != level and '' != level">
+                level,
+            </if>
+            <if test="null != orderNumber and '' != orderNumber">
+                order_number,
+            </if>
+            <if test="null != status and '' != status">
+                status,
+            </if>
+            <if test="null != icon and '' != icon">
+                icon,
+            </if>
+            <if test="null != pNumber and '' != pNumber">
+                p_number,
+            </if>
+            <if test="null != description and '' != description">
+                description,
+            </if>
+            <if test="null != createdAt">
+                created_at,
+            </if>
+            <if test="null != createdBy and '' != createdBy">
+                created_by,
+            </if>
+            <if test="null != changedAt">
+                changed_at,
+            </if>
+            <if test="null != changedBy and '' != changedBy">
+                changed_by,
+            </if>
+            <if test="null != version and '' != version">
+                version,
+            </if>
+            <if test="null != delFlag and '' != delFlag">
+                del_flag
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="null != id and '' != id">
+                #{id},
+            </if>
+            <if test="null != parentId and '' != parentId">
+                #{parentId},
+            </if>
+            <if test="null != name and '' != name">
+                #{name},
+            </if>
+            <if test="null != leafCount and '' != leafCount">
+                #{leafCount},
+            </if>
+            <if test="null != idPath and '' != idPath">
+                #{idPath},
+            </if>
+            <if test="null != namePath and '' != namePath">
+                #{namePath},
+            </if>
+            <if test="null != level and '' != level">
+                #{level},
+            </if>
+            <if test="null != orderNumber and '' != orderNumber">
+                #{orderNumber},
+            </if>
+            <if test="null != status and '' != status">
+                #{status},
+            </if>
+            <if test="null != icon and '' != icon">
+                #{icon},
+            </if>
+            <if test="null != pNumber and '' != pNumber">
+                #{pNumber},
+            </if>
+            <if test="null != description and '' != description">
+                #{description},
+            </if>
+            <if test="null != createdAt">
+                #{createdAt},
+            </if>
+            <if test="null != createdBy and '' != createdBy">
+                #{createdBy},
+            </if>
+            <if test="null != changedAt">
+                #{changedAt},
+            </if>
+            <if test="null != changedBy and '' != changedBy">
+                #{changedBy},
+            </if>
+            <if test="null != version and '' != version">
+                #{version},
+            </if>
+            <if test="null != delFlag and '' != delFlag">
+                #{delFlag}
+            </if>
+        </trim>
+    </insert>
+
+
+
+    <update id="updateLeafCountByIds">
+        update pms_product_back_category set leaf_count = leaf_count + #{offset} where id in
+        <foreach collection="categoryIds" item="categoryId" open="(" separator="," close=")">
+            #{categoryId}
+        </foreach>
+    </update>
+
+    <update id="updateStatusById">
+		update pms_product_back_category set `status` = #{status} where id = #{categoryId}
+	</update>
+
+    <update id="updatePNumberById">
+		update pms_product_back_category set p_number = p_number + #{offset} where id = #{categoryId}
+	</update>
+
+    <update id="updateChildrenNamePath">
+		update pms_product_back_category set name_path = replace(name_path, #{oldNamePath}, #{newNamePath}) where id_path like concat(#{idPath}, '%')
+	</update>
+</mapper>

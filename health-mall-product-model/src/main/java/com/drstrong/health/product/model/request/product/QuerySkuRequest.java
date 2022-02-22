@@ -1,13 +1,17 @@
 package com.drstrong.health.product.model.request.product;
 
+import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.PageRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * 查询 sku 的入参
@@ -21,6 +25,9 @@ import java.time.LocalDateTime;
 public class QuerySkuRequest extends PageRequest implements Serializable {
 	private static final long serialVersionUID = -4324050401624089885L;
 
+	@ApiModelProperty(value = "skuId", hidden = true)
+	private Long skuId;
+
 	@ApiModelProperty("sku 编码")
 	private String skuCode;
 
@@ -28,17 +35,28 @@ public class QuerySkuRequest extends PageRequest implements Serializable {
 	private String productName;
 
 	@ApiModelProperty("店铺 id")
-	private String storeId;
+	private Long storeId;
 
 	@ApiModelProperty("开始时间")
-	private LocalDateTime createStart;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate createStart;
 
 	@ApiModelProperty("结束时间")
-	private LocalDateTime createEnd;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate createEnd;
 
 	@ApiModelProperty("价格开始值")
-	private Long priceStart;
+	private BigDecimal priceStart;
 
 	@ApiModelProperty("价格结束值")
-	private Long priceEnd;
+	private BigDecimal priceEnd;
+
+	@ApiModelProperty("sku 状态 0-未上架,1-已上架")
+	private Integer skuState;
+
+	@ApiModelProperty(value = "上下架状态", hidden = true)
+	private UpOffEnum upOffEnum;
+
+	@ApiModelProperty(value = "商品 id 集合", hidden = true)
+	private Set<Long> productIdList;
 }

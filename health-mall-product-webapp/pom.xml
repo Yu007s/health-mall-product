@@ -15,6 +15,7 @@
         <maven.compiler.target>8</maven.compiler.target>
         <!--    webapp模块不需要deploy    -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <health-common.version>1.0.0</health-common.version>
     </properties>
 
     <dependencies>
@@ -23,6 +24,12 @@
             <groupId>cn.strong</groupId>
             <artifactId>drstrong-webapp-base</artifactId>
             <version>2021.11-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>dynamic-arthas-spring-boot-starter</artifactId>
+                    <groupId>cn.strong</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.alibaba.nacos</groupId>
@@ -41,6 +48,28 @@
         <dependency>
             <groupId>com.drstrong.health</groupId>
             <artifactId>health-mall-product-remote-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-mall-ware-remote-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>health-common</artifactId>
+                    <groupId>com.drstrong.health</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-mall-order-remote-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>health-common</artifactId>
+                    <groupId>com.drstrong.health</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -63,6 +92,11 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>tlog-all-spring-boot-starter</artifactId>
+            <version>1.3.6</version>
+        </dependency>
         <!--log4j2 依赖-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -73,6 +107,27 @@
             <artifactId>disruptor</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-loadbalancer</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client</artifactId>
+            <version>4.6.0</version>
+        </dependency>
+        <!-- 对接 apollo -->
+        <dependency>
+            <groupId>cn.strong</groupId>
+            <artifactId>leke-apollo-spring-boot-starter</artifactId>
+            <version>2021.09-SNAPSHOT</version>
+        </dependency>
 
         <!--    自定义区域    -->
 
@@ -94,8 +149,28 @@
                     <artifactId>klock-spring-boot-starter</artifactId>
                 </dependency>-->
 
-
-
+        <dependency>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-redis-spring-boot-starter</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- xxl-job-core -->
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-common</artifactId>
+            <version>${health-common.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.springfox</groupId>
+                    <artifactId>springfox-swagger2</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <!--    自定义区域结束    -->
 
         <!--    junit    -->
@@ -133,8 +208,13 @@
             <version>2.2</version>
             <scope>test</scope>
         </dependency>
+        <!-- excel -->
+        <dependency>
+            <groupId>org.easy</groupId>
+            <artifactId>easy-excel</artifactId>
+            <version>1.2.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
-
     <build>
         <finalName>health-mall-product</finalName>
         <resources>

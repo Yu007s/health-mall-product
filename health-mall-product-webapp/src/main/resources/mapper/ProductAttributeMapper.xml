@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.product.ProductAttributeMapper">
+
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.product.ProductAttributeEntity">
+        <result column="id" property="id"/>
+        <result column="product_id" property="productId"/>
+        <result column="attribute_item_id" property="attributeItemId"/>
+        <result column="attribute_value" property="attributeValue"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="changed_at" property="changedAt"/>
+        <result column="changed_by" property="changedBy"/>
+        <result column="version" property="version"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                id,
+                product_id,
+                attribute_item_id,
+                attribute_value,
+                created_at,
+                created_by,
+                changed_at,
+                changed_by,
+                version
+    </sql>
+
+    <insert id="batchInsert">
+        INSERT INTO pms_product_attribute
+        (
+        product_id,
+        attribute_item_id,
+        attribute_value,
+        created_by,
+        changed_by
+        )
+        VALUES
+        <foreach collection="saveParamList" item="item" index="index" separator=",">
+            (
+            #{item.productId},
+            #{item.attributeItemId},
+            #{item.attributeValue},
+            #{item.createdBy},
+            #{item.changedBy}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

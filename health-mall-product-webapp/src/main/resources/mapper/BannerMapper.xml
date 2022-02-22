@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.banner.BannerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.banner.Banner">
+        <id column="id" property="id" />
+        <result column="banner_name" property="bannerName" />
+        <result column="photo_url" property="photoUrl" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="link_address" property="linkAddress" />
+        <result column="location" property="location" />
+        <result column="link_type" property="linkType" />
+        <result column="product_spu_sn" property="productSpuSn" />
+        <result column="sort" property="sort" />
+        <result column="show_status" property="showStatus" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="changed_at" property="changedAt" />
+        <result column="changed_by" property="changedBy" />
+        <result column="del_flag" property="delFlag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+    SELECT   id, banner_name, photo_url, start_time, end_time, link_address, location, link_type, product_spu_sn, sort, show_status, created_at, created_by, changed_at, changed_by, del_flag
+    FROM mall_product.mall_banner
+    </sql>
+
+    <select id="getByLocation" resultType="com.drstrong.health.product.model.response.banner.BannerResponse">
+        SELECT photo_url,link_address,link_type,product_spu_sn,banner_name
+        FROM mall_product.mall_banner
+        WHERE del_flag = 0
+        AND   location = #{location}
+        AND   show_status = #{showStatus}
+        ORDER BY sort
+    </select>
+
+    <update id="updateFollowUp">
+        UPDATE
+            mall_product.mall_banner
+        SET sort = sort + 1
+        WHERE sort >= #{sort};
+    </update>
+    
+    <select id="getCount" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM mall_product.mall_banner
+        where sort >= #{sort}
+    </select>
+
+    <update id="updateBannerStatus">
+        UPDATE mall_product.mall_banner
+        SET
+        show_status = #{showStatus}
+        WHERE
+        id IN
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="queryList" resultType="com.drstrong.health.product.model.response.banner.BannerListResponse">
+        SELECT
+        mall_banner.id,banner_name,photo_url,link_address,location,link_type,product_spu_sn,mall_banner.sort,start_time,end_time,show_status,master_image_url
+        FROM mall_banner LEFT JOIN pms_product_basics_info ON spu_code =
+        product_spu_sn
+        WHERE mall_banner.del_flag = 0
+        <if test="bannerName != null">
+            AND banner_name LIKE CONCAT('%',#{bannerName},'%')
+        </if>
+        <if test="showStatus != null">
+            AND show_status = #{showStatus}
+        </if>
+        ORDER BY sort
+    </select>
+</mapper>
