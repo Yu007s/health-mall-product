@@ -2,10 +2,9 @@ include:
   - local: '/.developer-vars.yml'
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/.huihui-ops-vars.yml'
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/maven-huihui.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/sonar.yml'
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/docker-image.yml'
-  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/inside-deploy-java.yml'
-  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/uat-deploy-java.yml'
-  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/prod-deploy-java.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/huihui-jar-deploy-v1.yml'
 
 
 variables:
@@ -35,6 +34,11 @@ Maven build:
   extends: .maven-build
   script:
     - mvn -DskipTests clean package -P !dev $MAVEN_OPTS
+
+
+SonarQube check:
+  stage: maven package
+  extends: .sonarqube-check
 
 
 Image build:
@@ -111,7 +115,7 @@ pre:
     APP_CONFIG: '${JVM_OPTS_PRE}'
     ARGO_PROJ: '${BUSINESS_NAME}-pre'
     DNS: '$DNS_PRE'
-  extends: .prod-deploy
+  extends: .deploy
   only:
     - release
     - /^hotfix-.*/
@@ -123,8 +127,7 @@ prod:
     APP_CONFIG: '${JVM_OPTS_PROD}'
     ARGO_PROJ: '${BUSINESS_NAME}-prod'
     DNS: '$DNS_PROD'
-  extends: .prod-deploy
+  extends: .deploy
   only:
     - release
     - /^hotfix-.*/
-

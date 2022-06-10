@@ -5,6 +5,8 @@ variables:
   APP_NAME: 'health-mall-product'
   # Jar/War path, developer define
   TARGET_PATH: '${APP_NAME}-webapp/target/*.jar'
+  # nacos app service name
+  NACOS_SERVICE_NAME: 'health-mall-product'
   # jvm args, developer define
   JVM_OPTS_DEV169: '-Xmx512m -Xms512m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.20.169:8848'
   JVM_OPTS_TESTING1: '-Xmx512m -Xms512m -Xss512k -Dspring.cloud.nacos.config.namespace=public -Dspring.cloud.nacos.config.server-addr=192.168.21.3:8848 -Dapollo.meta=http://10.43.81.208:8080 -Dapollo.configService=http://10.43.81.208:8080 -Dapollo.env=TESTING1'
