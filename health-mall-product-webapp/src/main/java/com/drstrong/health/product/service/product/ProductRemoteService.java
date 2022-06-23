@@ -4,6 +4,7 @@ import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -99,4 +100,12 @@ public interface ProductRemoteService {
 	 * @date 2022/1/10 10:23
 	 */
 	List<SkuInvoiceDTO> listInvoiceBySkuIds(QueryProductRequest queryProductRequest);
+
+	/**
+	 * sku对应sku编码
+	 * @param skuIds
+	 * @param recomType
+	 * @return
+	 */
+    Map<Long, String> getskuNumber(Set<Long> skuIds, Integer recomType);
 }

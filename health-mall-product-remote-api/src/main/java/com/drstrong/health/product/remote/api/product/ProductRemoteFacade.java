@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * sku 远程接口
@@ -127,4 +129,9 @@ public interface ProductRemoteFacade {
 	@ApiOperation("根据 skuId 或者 skuCode 集合查询发票所需相关信息")
 	@PostMapping("list/invoice")
 	List<SkuInvoiceDTO> listInvoiceBySkuIds(@RequestBody QueryProductRequest queryProductRequest);
+
+	@ApiOperation("sku对应sku编码")
+	@PostMapping("/sku/getskuNumber")
+	List<Map<Long,String>> getskuNumber(@RequestBody Set<Long> skuIds, @RequestParam("recomType")  Integer recomType) ;
+
 }

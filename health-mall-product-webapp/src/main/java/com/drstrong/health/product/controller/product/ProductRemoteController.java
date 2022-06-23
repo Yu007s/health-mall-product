@@ -18,8 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 商品模块远程接口
@@ -169,5 +168,13 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	@Override
 	public List<SkuInvoiceDTO> listInvoiceBySkuIds(QueryProductRequest queryProductRequest) {
 		return productRemoteService.listInvoiceBySkuIds(queryProductRequest);
+	}
+
+	@Override
+	public List<Map<Long, String>> getskuNumber(Set<Long> skuIds, Integer recomType) {
+		Map<Long,String>  page =  productRemoteService.getskuNumber(skuIds,recomType);
+		List<Map<Long,String>> skuList = new ArrayList<>();
+		skuList.add(page);
+		return skuList;
 	}
 }
