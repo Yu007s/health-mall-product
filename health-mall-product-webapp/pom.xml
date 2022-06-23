@@ -213,6 +213,12 @@
             <groupId>org.easy</groupId>
             <artifactId>easy-excel</artifactId>
             <version>1.2.2-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hutool-core</artifactId>
+                    <groupId>cn.hutool</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>
