@@ -191,7 +191,11 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+            <version>3.4.1</version>
+        </dependency>
         <dependency>
             <groupId>cn.strong</groupId>
             <artifactId>strong-mybatis-plus-extend</artifactId>

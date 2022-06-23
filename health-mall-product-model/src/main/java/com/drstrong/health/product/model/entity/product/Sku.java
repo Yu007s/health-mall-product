@@ -1,9 +1,13 @@
 package com.drstrong.health.product.model.entity.product;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.drstrong.health.product.model.entity.category.BaseEntity;
+import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.Date;
 
 /**
  * sku
@@ -11,14 +15,14 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("p_sku")
-public class Sku extends BaseEntity implements java.io.Serializable {
+public class Sku implements java.io.Serializable {
     private static final long serialVersionUID = 61284762700205449L;
     
     /**状态：下架 */
     public static final Integer STATUS_OFFLINE = 0;
     /**状态：上架 */
     public static final Integer STATUS_ONLINE = 1;
-    private Long id;
+
     /**
      * 商品id
      */
@@ -89,4 +93,44 @@ public class Sku extends BaseEntity implements java.io.Serializable {
      */
     private Integer status;
     private Integer commAttribute;
+    @TableId
+    @ApiModelProperty(value = "主键ID(部门Id)")
+    private Long id;
+
+    /**
+     * 创建时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @TableField(fill = FieldFill.INSERT)
+    @ApiModelProperty(value = "创建时间")
+    private Date createdAt;
+
+    /**
+     * 创建人
+     */
+    @TableField(fill = FieldFill.INSERT)
+    @ApiModelProperty(value = "创建人")
+    private String createdBy;
+
+    /**
+     * 修改人
+     */
+    @TableField(fill = FieldFill.UPDATE)
+    @ApiModelProperty(value = "修改人")
+    private String changedBy;
+
+    /**
+     * 修改时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @TableField(fill = FieldFill.UPDATE)
+    @ApiModelProperty(value = "修改时间")
+    private Date changedAt;
+
+    /**
+     * 乐观锁
+     */
+    @Version
+    @JsonIgnore
+    private Integer version;
 }
