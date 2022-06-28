@@ -4,6 +4,7 @@ import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 import com.naiterui.ehp.bp.bo.b2c.cms.CmsSkuBO;
+import com.naiterui.ehp.bp.bo.b2c.cms.ProductBO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -138,4 +139,7 @@ public interface ProductRemoteFacade {
 	@PostMapping("/sku/addErpInfo")
 	ResultVO<String> addErpInfo(@Valid @RequestBody CmsSkuBO skuVO );
 
+	@ApiOperation("根据spu id 获取spu列表")
+	@GetMapping("/getProductList")
+	ResultVO<List<ProductBO>> getProductListByIds(@RequestParam("ids") Set<Long> ids);
 }

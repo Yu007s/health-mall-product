@@ -12,6 +12,7 @@ import com.drstrong.health.product.service.product.ProductRemoteService;
 import com.drstrong.health.product.service.product.ProductSkuRevenueService;
 import com.drstrong.health.product.service.product.ProductSkuService;
 import com.naiterui.ehp.bp.bo.b2c.cms.CmsSkuBO;
+import com.naiterui.ehp.bp.bo.b2c.cms.ProductBO;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -185,6 +186,12 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	public ResultVO<String> addErpInfo(@Valid CmsSkuBO skuVO) {
 		productRemoteService.addErpInfo(skuVO);
 		return ResultVO.success();
+	}
+
+	@Override
+	public ResultVO<List<ProductBO>> getProductListByIds(Set<Long> ids) {
+		List<ProductBO> productBOList = productRemoteService.getProductListByIds(ids);
+		return  ResultVO.success(productBOList);
 	}
 
 }

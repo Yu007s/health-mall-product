@@ -14,4 +14,12 @@
     <select id="selectRepresentInfoList" resultType="com.drstrong.health.product.remote.vo.BsUserInfoVO">
         select id representId,user_name,erp_id,department_id,title_id from bs_user_info WHERE account_status = 0
     </select>
+    <select id="selectSpuList" resultType="com.naiterui.ehp.bp.bo.b2c.cms.ProductBO">
+        select *
+        from p_product  where id in
+        <foreach collection="ids" separator="," open="(" close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+
 </mapper>

@@ -6,6 +6,7 @@ import com.drstrong.health.product.constants.DsName;
 import com.drstrong.health.product.model.entity.product.Sku;
 import com.drstrong.health.product.remote.vo.BsUserInfoVO;
 import com.drstrong.health.product.remote.vo.SkuVO;
+import com.naiterui.ehp.bp.bo.b2c.cms.ProductBO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,4 +21,6 @@ public interface SkuMapper extends BaseMapper<Sku> {
     List<SkuVO> getskuNumber(@Param("ids") Set<Long> skuIds);
 
     List<BsUserInfoVO> selectRepresentInfoList(Object o);
+
+    List<ProductBO> selectSpuList(@Param("ids") Set<Long> ids);
 }

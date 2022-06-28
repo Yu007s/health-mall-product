@@ -25,10 +25,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.naiterui.common.redis.template.IRedisSetTemplate;
 import com.naiterui.ehp.bp.bo.b2c.cms.CmsSkuBO;
+import com.naiterui.ehp.bp.bo.b2c.cms.ProductBO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -362,7 +362,7 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 		if(skuVO.getHistoryId() == null){
 			return;
 		}
-		log.info("保存修改SKU金额添加推送bd记录:"+"sku_"+skuVO.getId()+"_"+skuVO.getHistoryId());
+		log.info("保存修改SKU金额添加推送bd记录: sku_{}_{}" , skuVO.getId() , skuVO.getHistoryId());
 		//判断是否有金额修改，如果有，查询出所有在职bd，保存redis集合
 		List<BsUserInfoVO> bsUserInfoVOS = skuMapper.selectRepresentInfoList(null);
 		List<String> erpList = bsUserInfoVOS.stream().map(BsUserInfoVO::getErpId).collect(Collectors.toList());
@@ -371,6 +371,13 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 			redisSetTemplate.sadd(key,"\""+e.trim()+"\"");
 		});
 		redisTemplate.expire(key,7, TimeUnit.DAYS);
+	}
+
+	@Override
+	public List<ProductBO> getProductListByIds(Set<Long> ids) {
+		log.info(" 根据spu id 获取spu列表:{}",ids);
+		List<ProductBO> products = this.skuMapper.selectSpuList(ids);
+		return products;
 	}
 
 	private ProductSkuDetailsDTO buildSkuDetailResult(ProductSkuEntity productSkuEntity, ProductExtendEntity extendEntity, List<ProductPropertyVO> productPropertyVOList) {
