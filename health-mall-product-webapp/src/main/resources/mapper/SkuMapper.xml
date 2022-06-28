@@ -11,4 +11,7 @@
             #{id}
         </foreach>
     </select>
+    <select id="selectRepresentInfoList" resultType="com.drstrong.health.product.remote.vo.BsUserInfoVO">
+        select id representId,user_name,erp_id,department_id,title_id from bs_user_info WHERE account_status = 0
+    </select>
 </mapper>

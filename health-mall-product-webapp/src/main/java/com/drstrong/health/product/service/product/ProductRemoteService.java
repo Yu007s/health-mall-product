@@ -2,6 +2,7 @@ package com.drstrong.health.product.service.product;
 
 import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
+import com.naiterui.ehp.bp.bo.b2c.cms.CmsSkuBO;
 
 import java.util.List;
 import java.util.Map;
@@ -108,4 +109,6 @@ public interface ProductRemoteService {
 	 * @return
 	 */
     Map<Long, String> getskuNumber(Set<Long> skuIds, Integer recomType);
+
+	void addErpInfo(CmsSkuBO skuVO);
 }

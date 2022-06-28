@@ -1,14 +1,14 @@
 package com.drstrong.health.product.remote.api.product;
 
+import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
+import com.naiterui.ehp.bp.bo.b2c.cms.CmsSkuBO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -133,5 +133,9 @@ public interface ProductRemoteFacade {
 	@ApiOperation("sku对应sku编码")
 	@PostMapping("/sku/getskuNumber")
 	List<Map<Long,String>> getskuNumber(@RequestBody Set<Long> skuIds, @RequestParam("recomType")  Integer recomType) ;
+
+	@ApiOperation("保存修改SKU金额添加推送bd记录")
+	@PostMapping("/sku/addErpInfo")
+	ResultVO<String> addErpInfo(@Valid @RequestBody CmsSkuBO skuVO );
 
 }
