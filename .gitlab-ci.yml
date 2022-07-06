@@ -4,7 +4,7 @@ include:
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/maven-huihui.yml'
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/sonar-huihui.yml'
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/docker-image.yml'
-  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/huihui-jar-deploy-v1.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/huihui-jar-deploy-v2.yml'
 
 
 variables:
