@@ -4,12 +4,15 @@ import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuRevenueEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.product.ProductRemoteFacade;
 import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 import com.drstrong.health.product.service.product.ProductRemoteService;
 import com.drstrong.health.product.service.product.ProductSkuRevenueService;
 import com.drstrong.health.product.service.product.ProductSkuService;
+import com.naiterui.ehp.bp.bo.b2c.cms.CmsSkuBO;
+import com.naiterui.ehp.bp.bo.b2c.cms.ProductBO;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -18,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Objects;
+import javax.validation.Valid;
+import java.util.*;
 
 /**
  * 商品模块远程接口
@@ -170,4 +173,25 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	public List<SkuInvoiceDTO> listInvoiceBySkuIds(QueryProductRequest queryProductRequest) {
 		return productRemoteService.listInvoiceBySkuIds(queryProductRequest);
 	}
+
+	@Override
+	public List<Map<Long, String>> getskuNumber(Set<Long> skuIds, Integer recomType) {
+		Map<Long,String>  page =  productRemoteService.getskuNumber(skuIds,recomType);
+		List<Map<Long,String>> skuList = new ArrayList<>();
+		skuList.add(page);
+		return skuList;
+	}
+
+	@Override
+	public ResultVO<String> addErpInfo(@Valid CmsSkuBO skuVO) {
+		productRemoteService.addErpInfo(skuVO);
+		return ResultVO.success();
+	}
+
+	@Override
+	public ResultVO<List<ProductBO>> getProductListByIds(Set<Long> ids) {
+		List<ProductBO> productBOList = productRemoteService.getProductListByIds(ids);
+		return  ResultVO.success(productBOList);
+	}
+
 }

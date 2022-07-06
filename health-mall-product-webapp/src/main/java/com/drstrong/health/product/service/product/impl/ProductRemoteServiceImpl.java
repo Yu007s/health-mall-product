@@ -1,11 +1,10 @@
 package com.drstrong.health.product.service.product.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.drstrong.health.product.constants.CommonConstant;
+import com.drstrong.health.product.dao.product.SkuMapper;
 import com.drstrong.health.product.model.dto.CommAttributeDTO;
-import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
-import com.drstrong.health.product.model.entity.product.ProductExtendEntity;
-import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
-import com.drstrong.health.product.model.entity.product.ProductSkuRevenueEntity;
+import com.drstrong.health.product.model.entity.product.*;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.QuerySkuRequest;
@@ -16,25 +15,29 @@ import com.drstrong.health.product.remote.cms.CmsRemoteProService;
 import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 import com.drstrong.health.product.remote.pro.PharmacyGoodsRemoteProService;
+import com.drstrong.health.product.remote.vo.BsUserInfoVO;
+import com.drstrong.health.product.remote.vo.SkuVO;
 import com.drstrong.health.product.service.category.BackCategoryService;
 import com.drstrong.health.product.service.product.*;
 import com.drstrong.health.product.service.store.StoreThreeRelevanceService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.naiterui.common.redis.template.IRedisSetTemplate;
+import com.naiterui.ehp.bp.bo.b2c.cms.CmsSkuBO;
+import com.naiterui.ehp.bp.bo.b2c.cms.ProductBO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
@@ -75,6 +78,16 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 	@Resource
 	BackCategoryService backCategoryService;
 
+	@Resource
+	private SkuMapper skuMapper;
+
+	@Resource
+	private RedisTemplate<String, String> redisTemplate;
+
+	@Resource
+	private IRedisSetTemplate redisSetTemplate;
+	//中药处方
+	public static final int RECOM_TYPE_CHINESE = 2;
 	/**
 	 * 根据 skuId 查询商品 sku 信息集合
 	 *
@@ -327,6 +340,45 @@ public class ProductRemoteServiceImpl implements ProductRemoteService {
 		return skuInvoiceDTOList;
 	}
 
+	@Override
+	public Map<Long, String> getskuNumber(Set<Long> skuIds, Integer recomType) {
+		Map<Long,String> skuMap = new HashMap<>();
+		if (RECOM_TYPE_CHINESE == recomType){
+			List<SkuVO> skuVOS = skuMapper.getskuNumber(skuIds);
+			skuVOS.stream().forEach(e->{
+				skuMap.put(e.getId(),e.getNumber());
+			});
+		}else {
+			List<Sku>  skuS = skuMapper.selectList(Wrappers.<Sku>lambdaQuery().in(Sku::getId, skuIds));
+			skuS.stream().forEach(e->{
+				skuMap.put(e.getId(),e.getNumber());
+			});
+		}
+		return skuMap;
+	}
+
+	@Override
+	public void addErpInfo(CmsSkuBO skuVO) {
+		if(skuVO.getHistoryId() == null){
+			return;
+		}
+		log.info("保存修改SKU金额添加推送bd记录: sku_{}_{}" , skuVO.getId() , skuVO.getHistoryId());
+		//判断是否有金额修改，如果有，查询出所有在职bd，保存redis集合
+		List<BsUserInfoVO> bsUserInfoVOS = skuMapper.selectRepresentInfoList(null);
+		List<String> erpList = bsUserInfoVOS.stream().map(BsUserInfoVO::getErpId).collect(Collectors.toList());
+		String key = "sku_"+skuVO.getId()+"_"+skuVO.getHistoryId();
+		erpList.forEach(e->{
+			redisSetTemplate.sadd(key,"\""+e.trim()+"\"");
+		});
+		redisTemplate.expire(key,7, TimeUnit.DAYS);
+	}
+
+	@Override
+	public List<ProductBO> getProductListByIds(Set<Long> ids) {
+		log.info(" 根据spu id 获取spu列表:{}",ids);
+		List<ProductBO> products = this.skuMapper.selectSpuList(ids);
+		return products;
+	}
 
 	private ProductSkuDetailsDTO buildSkuDetailResult(ProductSkuEntity productSkuEntity, ProductExtendEntity extendEntity, List<ProductPropertyVO> productPropertyVOList) {
 		ProductSkuDetailsDTO detailsDTO = new ProductSkuDetailsDTO();

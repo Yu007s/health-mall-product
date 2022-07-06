@@ -1,15 +1,18 @@
 package com.drstrong.health.product.remote.api.product;
 
+import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
+import com.naiterui.ehp.bp.bo.b2c.cms.CmsSkuBO;
+import com.naiterui.ehp.bp.bo.b2c.cms.ProductBO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * sku 远程接口
@@ -127,4 +130,16 @@ public interface ProductRemoteFacade {
 	@ApiOperation("根据 skuId 或者 skuCode 集合查询发票所需相关信息")
 	@PostMapping("list/invoice")
 	List<SkuInvoiceDTO> listInvoiceBySkuIds(@RequestBody QueryProductRequest queryProductRequest);
+
+	@ApiOperation("sku对应sku编码")
+	@PostMapping("/sku/getskuNumber")
+	List<Map<Long,String>> getskuNumber(@RequestBody Set<Long> skuIds, @RequestParam("recomType")  Integer recomType) ;
+
+	@ApiOperation("保存修改SKU金额添加推送bd记录")
+	@PostMapping("/sku/addErpInfo")
+	ResultVO<String> addErpInfo(@Valid @RequestBody CmsSkuBO skuVO );
+
+	@ApiOperation("根据spu id 获取spu列表")
+	@GetMapping("/getProductList")
+	ResultVO<List<ProductBO>> getProductListByIds(@RequestParam("ids") Set<Long> ids);
 }

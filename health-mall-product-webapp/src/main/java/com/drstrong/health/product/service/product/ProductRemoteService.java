@@ -2,8 +2,11 @@ package com.drstrong.health.product.service.product;
 
 import com.drstrong.health.product.remote.model.*;
 import com.drstrong.health.product.remote.model.request.QueryProductRequest;
+import com.naiterui.ehp.bp.bo.b2c.cms.CmsSkuBO;
+import com.naiterui.ehp.bp.bo.b2c.cms.ProductBO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -99,4 +102,16 @@ public interface ProductRemoteService {
 	 * @date 2022/1/10 10:23
 	 */
 	List<SkuInvoiceDTO> listInvoiceBySkuIds(QueryProductRequest queryProductRequest);
+
+	/**
+	 * sku对应sku编码
+	 * @param skuIds
+	 * @param recomType
+	 * @return
+	 */
+    Map<Long, String> getskuNumber(Set<Long> skuIds, Integer recomType);
+
+	void addErpInfo(CmsSkuBO skuVO);
+
+	List<ProductBO> getProductListByIds(Set<Long> ids);
 }

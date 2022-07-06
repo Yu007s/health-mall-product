@@ -18,6 +18,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.naiterui.ehp</groupId>
+            <artifactId>bp-bo</artifactId>
+            <version>TEST1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>com.drstrong.health</groupId>
             <artifactId>health-mall-product-model</artifactId>
         </dependency>
