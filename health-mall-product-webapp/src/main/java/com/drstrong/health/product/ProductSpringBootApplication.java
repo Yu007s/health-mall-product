@@ -1,5 +1,6 @@
 package com.drstrong.health.product;
 
+import com.naiterui.common.redis.config.EnableRedisAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -13,6 +14,8 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @EnableFeignClients(basePackages = {"com.drstrong.health.ware.remote", "com.drstrong.health.product.remote.cms", "com.drstrong.health.order.remote"})
 @EnableDiscoveryClient
+//启用redis配置
+@EnableRedisAutoConfiguration
 @ComponentScan({"com.drstrong.health.product", "com.drstrong.health.redis"})
 public class ProductSpringBootApplication {
 	public static void main(String[] args) {
