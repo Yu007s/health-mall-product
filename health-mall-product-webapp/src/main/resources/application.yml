@@ -16,4 +16,4 @@ apollo:
     enabled: true
     namespaces: common,config,db,cache,mq,quartz,log4j2-spring,hhjk.redis
     eagerLoad:
-      enabled: false
+      enabled: true
