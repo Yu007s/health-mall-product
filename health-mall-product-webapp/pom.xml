@@ -124,9 +124,9 @@
         </dependency>
         <!-- 对接 apollo -->
         <dependency>
-            <groupId>com.ctrip.framework.apollo</groupId>
-            <artifactId>apollo-client</artifactId>
-            <version>1.9.1</version>
+            <groupId>cn.strong</groupId>
+            <artifactId>leke-apollo-spring-boot-starter</artifactId>
+            <version>2021.09-SNAPSHOT</version>
         </dependency>
 
         <!--    自定义区域    -->
