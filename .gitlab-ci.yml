@@ -135,7 +135,7 @@ testing-4:
     ENV_NAME: 'testing-4'
     APP_CONFIG: '${JVM_OPTS_TESTING4}'
     ARGO_PROJ: '${BUSINESS_NAME}-dev'
-    CD_GIT_PATH: 'testing'
+    CD_GIT_PATH: 'testing-cce1'
     DNS: '$DNS_TESTING4'
     # nacos
     NACOS_IP: '$NACOS_IP_TESTING4'
