@@ -1,19 +1,7 @@
 spring:
   profiles:
     include: apollo
-  main:
-    allow-bean-definition-overriding: true
+
 arthas:  #解决 阿尔萨斯 端口冲突
   telnet-port: 10001
   http-port: 10011
-
-
-app:
-  id: health-mall-product
-apollo:
-  autoUpdateInjectedSpringProperties: true
-  bootstrap:
-    enabled: true
-    namespaces: common,config,db,cache,mq,quartz,log4j2-spring,hhjk.redis
-    eagerLoad:
-      enabled: false

@@ -128,6 +128,25 @@ testing-3:
     - master
 
 
+testing-4:
+  stage: deploy to testing
+  variables:
+    K8S_CLUSTER: '$INSIDE_K8S_CLUSTER'
+    ENV_NAME: 'testing-4'
+    APP_CONFIG: '${JVM_OPTS_TESTING4}'
+    ARGO_PROJ: '${BUSINESS_NAME}-dev'
+    CD_GIT_PATH: 'testing-cce1'
+    DNS: '$DNS_TESTING4'
+    # nacos
+    NACOS_IP: '$NACOS_IP_TESTING4'
+    NACOS_NS: '$NACOS_NS_TESTING4'
+  extends: .deploy
+  only:
+    - /^testing-4-.*/
+    - /^hotfix-.*/
+    - master
+
+
 pre:
   stage: deploy to pre
   variables:
