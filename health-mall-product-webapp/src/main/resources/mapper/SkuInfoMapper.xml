@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.product.SkuInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.product.SkuInfoEntity">
+        <id column="id" property="id" />
+        <result column="sku_code" property="skuCode" />
+        <result column="sku_type" property="skuType" />
+        <result column="spu_code" property="spuCode" />
+        <result column="del_flag" property="delFlag" />
+        <result column="version" property="version" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="changed_at" property="changedAt" />
+        <result column="changed_by" property="changedBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, sku_code, sku_type, spu_code, del_flag, version, created_at, created_by, changed_at, changed_by
+    </sql>
+
+</mapper>

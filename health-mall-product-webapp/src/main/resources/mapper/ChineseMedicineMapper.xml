@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace= "com.drstrong.health.product.dao.chineseMedicine.ChineseMedicineMapper">
+<mapper namespace= "com.drstrong.health.product.dao.chinese.ChineseMedicineMapper">
 
-<!--    <resultMap id="ChineseMedicineInfoMap" type="com.drstrong.health.product.model.response.chineseMedicine.ChineseMedicineVO">-->
+<!--    <resultMap id="ChineseMedicineInfoMap" type="com.drstrong.health.product.model.response.chinese.ChineseMedicineVO">-->
 <!--        <result column="id" property="id"/>-->
 <!--        <result column="version" property="version"/>-->
 <!--        <result column="created_at" property="createdAt"/>-->
@@ -13,7 +13,7 @@
 <!--        <result column="del_flag" property="delFlag"/>-->
 <!--        <collection property="aliNameList" resultMap="medicineAliasResultMap"/>-->
 <!--    </resultMap>-->
-<!--    <resultMap id="medicineAliasResultMap" type="com.drstrong.health.product.model.entity.ChineseMedicine.ChineseMedicineAliasEntity">-->
+<!--    <resultMap id="medicineAliasResultMap" type="com.drstrong.health.product.model.entity.chinese.ChineseMedicineAliasEntity">-->
 <!--        <id column="id" property="id"/>-->
 <!--        <result column="medicine_id" property="medicineId"/>-->
 <!--        <result column="del_flag" property="delFlag"/>-->
