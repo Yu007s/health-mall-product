@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.model.entity.category.BaseEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -22,6 +21,9 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("pms_spu_info")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class SpuInfoEntity extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,9 +37,9 @@ public class SpuInfoEntity extends BaseEntity implements Serializable {
     private String spuCode;
 
     /**
-     * spu类型。1-中药，2-西药，3-健康用品
+     * spu类型。0-商品，1-药品，2-中药
      */
-    private Boolean spuType;
+    private Integer spuType;
 
     /**
      * 版本号

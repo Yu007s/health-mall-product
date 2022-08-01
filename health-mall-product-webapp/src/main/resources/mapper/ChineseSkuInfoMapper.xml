@@ -25,4 +25,32 @@
         id, sku_code, sku_name, old_medicine_id, medicineCode, store_id, price, sku_state, version, del_flag, created_by, created_at, changed_by, changed_at
     </sql>
 
+    <select id="pageQuerySkuByRequest"
+            resultType="com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity">
+        SELECT
+            sku.*
+        FROM
+            pms_chinese_sku_info sku,
+            pms_chinese_sku_supplier_relevance r
+        WHERE
+        sku.sku_code = r.sku_code
+        and sku.del_flag = 0
+        and r.del_flag = 0
+        <if test="queryParam.skuName != null and queryParam.skuName != ''">
+            and sku.sku_name = #{queryParam.skuName}
+        </if>
+        <if test="queryParam.skuCode != null and queryParam.skuCode != ''">
+            and sku.sku_code = #{queryParam.skuCode}
+        </if>
+        <if test="queryParam.skuState != null and queryParam.skuState != ''">
+            and sku.sku_state = #{queryParam.skuState}
+        </if
+        <if test="queryParam.supplierId != null and queryParam.supplierId != ''">
+            and r.supplier_id = #{queryParam.supplierId}
+        </if>
+        <if test="queryParam.storeId != null and queryParam.storeId != ''">
+            and sku.store_id = #{queryParam.storeId}
+        </if>
+    </select>
+
 </mapper>

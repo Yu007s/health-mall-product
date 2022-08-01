@@ -1,5 +1,6 @@
 package com.drstrong.health.product.controller.chinese;
 
+import com.drstrong.health.product.facade.ChineseManagerFacade;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
@@ -12,11 +13,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Set;
 
 /**
- *
  * @author liuqiuyi
  * @date 2022/8/1 11:04
  */
@@ -26,19 +27,18 @@ import java.util.Set;
 @Slf4j
 @Api(tags = {"cms-中药管理页面远程接口"})
 public class ChineseManagerController implements ChineseManagerRemoteApi {
+    @Resource
+    ChineseManagerFacade chineseManagerFacade;
+
     @Override
     public ResultVO<PageVO<ChineseManagerSkuVO>> pageChineseManagerSku(ChineseManagerSkuRequest skuRequest) {
-        return null;
+        return ResultVO.success(chineseManagerFacade.pageChineseManagerSku(skuRequest));
     }
 
     @Override
-    public ResultVO<List<ChineseManagerSkuVO>> exportChineseManagerSku(ChineseManagerSkuRequest skuRequest) {
-        return null;
-    }
-
-    @Override
-    public ResultVO<Object> saveSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO) {
-        return null;
+    public ResultVO<Object> saveOrUpdateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO) {
+        chineseManagerFacade.saveOrUpdateSku(saveOrUpdateSkuVO);
+        return ResultVO.success();
     }
 
     @Override

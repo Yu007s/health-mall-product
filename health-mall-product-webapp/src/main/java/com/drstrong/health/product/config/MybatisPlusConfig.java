@@ -18,7 +18,10 @@ public class MybatisPlusConfig {
 	 */
 	@Bean
 	public PaginationInterceptor paginationInterceptor() {
-		return new PaginationInterceptor();
+		PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
+		// 设置最大数据为500条，避免全表扫描
+		paginationInterceptor.setLimit(500L);
+		return paginationInterceptor;
 	}
 
 	/**

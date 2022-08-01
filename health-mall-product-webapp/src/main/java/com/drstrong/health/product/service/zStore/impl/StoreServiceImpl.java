@@ -13,9 +13,11 @@ import com.drstrong.health.product.service.zStore.AgencyService;
 import com.drstrong.health.product.service.zStore.StoreService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +30,7 @@ public class StoreServiceImpl extends ServiceImpl<ZstoreMapper, StoreEntity> imp
     ZstoreMapper zstoreMapper;
     @Resource
     AgencyService agencyService;
+
     @Override
     @Transactional(readOnly = true)
     public void save(StoreInfoDetailVO store, String userId) {
@@ -66,5 +69,24 @@ public class StoreServiceImpl extends ServiceImpl<ZstoreMapper, StoreEntity> imp
     @Override
     public StoreInfoDetailVO queryById(Long storeId) {
         return null;
+    }
+
+    /**
+     * 根据店铺id集合查询店铺信息
+     *
+     * @param storeIds 店铺id集合
+     * @return 店铺信息集合
+     * @author liuqiuyi
+     * @date 2022/8/1 15:26
+     */
+    @Override
+    public List<StoreEntity> listByIds(Set<Long> storeIds) {
+        if (CollectionUtils.isEmpty(storeIds)) {
+            return null;
+        }
+        LambdaQueryWrapper<StoreEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(StoreEntity::getId, storeIds);
+        return list(queryWrapper);
     }
 }

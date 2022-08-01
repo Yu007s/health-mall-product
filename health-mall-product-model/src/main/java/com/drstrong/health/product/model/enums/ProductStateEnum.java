@@ -1,5 +1,7 @@
 package com.drstrong.health.product.model.enums;
 
+import java.util.Objects;
+
 /**
  * 删除状态的枚举
  *
@@ -22,6 +24,16 @@ public enum ProductStateEnum {
 		this.code = code;
 		this.value = value;
 	}
+
+    public static String getValueByCode(Integer code) {
+        for (ProductStateEnum productStateEnum : ProductStateEnum.values()) {
+            if (Objects.equals(productStateEnum.getCode(), code)) {
+                return productStateEnum.getValue();
+            }
+
+        }
+        return "";
+    }
 
 	public Integer getCode() {
 		return code;

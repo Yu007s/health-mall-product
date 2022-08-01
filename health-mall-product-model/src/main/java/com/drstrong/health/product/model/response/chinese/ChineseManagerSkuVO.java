@@ -3,11 +3,15 @@ package com.drstrong.health.product.model.response.chinese;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author liuqiuyi
@@ -16,14 +20,11 @@ import java.util.List;
 @Data
 @ApiModel("中药管理页面返回值")
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChineseManagerSkuVO implements Serializable {
     private static final long serialVersionUID = 3740737744156485985L;
-
-    @ApiModelProperty("id")
-    private Long id;
-
-    @ApiModelProperty("spu 编码")
-    private String spuCode;
 
     @ApiModelProperty("sku 编码")
     private String skuCode;
@@ -38,7 +39,7 @@ public class ChineseManagerSkuVO implements Serializable {
     private String storeName;
 
     @ApiModelProperty("供应商id集合")
-    private List<Long> supplierIdList;
+    private Set<Long> supplierIdList;
 
     @ApiModelProperty("供应商名称")
     private List<String> supplierName;
@@ -48,4 +49,7 @@ public class ChineseManagerSkuVO implements Serializable {
 
     @ApiModelProperty("sku状态，0-未上架，1-已上架")
     private Integer skuState;
+
+    @ApiModelProperty("sku状态名称")
+    private String skuStateName;
 }

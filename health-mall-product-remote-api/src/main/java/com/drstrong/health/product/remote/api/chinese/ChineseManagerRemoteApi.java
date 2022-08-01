@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
@@ -32,13 +33,9 @@ public interface ChineseManagerRemoteApi {
     @PostMapping("/page/sku/info")
     ResultVO<PageVO<ChineseManagerSkuVO>> pageChineseManagerSku(@RequestBody ChineseManagerSkuRequest skuRequest);
 
-    @ApiOperation("中药管理页面，列表查询后导出")
-    @PostMapping("/sku/info/export")
-    ResultVO<List<ChineseManagerSkuVO>> exportChineseManagerSku(@RequestBody ChineseManagerSkuRequest skuRequest);
-
     @ApiOperation("中药管理页面，保存sku")
     @PostMapping("/sku/save")
-    ResultVO<Object> saveSku(@RequestBody SaveOrUpdateSkuVO saveOrUpdateSkuVO);
+    ResultVO<Object> saveOrUpdateSku(@RequestBody @Valid SaveOrUpdateSkuVO saveOrUpdateSkuVO);
 
     @ApiOperation("中药管理页面，根据skuCode获取sku详情")
     @ApiImplicitParams({

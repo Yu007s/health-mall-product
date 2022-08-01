@@ -9,8 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 
 import com.drstrong.health.product.model.entity.category.BaseEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 /**
@@ -25,6 +24,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("pms_chinese_spu_info")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ChineseSpuInfoEntity extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID=1L;

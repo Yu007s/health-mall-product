@@ -1,11 +1,12 @@
 package com.drstrong.health.product.service.zStore;
 
+import com.drstrong.health.product.model.entity.zStore.StoreEntity;
 import com.drstrong.health.product.model.request.zStore.StoreRequest;
 import com.drstrong.health.product.model.response.zStore.StoreInfoDetailVO;
 import com.drstrong.health.product.model.response.zStore.StoreInfoResponse;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author xieYueFeng
@@ -36,4 +37,14 @@ public interface StoreService {
      * @return 店铺详情（带有发票信息详情页面）
      */
     StoreInfoDetailVO queryById(Long storeId);
+
+    /**
+     * 根据店铺id集合查询店铺信息
+     *
+     * @param storeIds 店铺id集合
+     * @return 店铺信息集合
+     * @author liuqiuyi
+     * @date 2022/8/1 15:26
+     */
+    List<StoreEntity> listByIds(Set<Long> storeIds);
 }
