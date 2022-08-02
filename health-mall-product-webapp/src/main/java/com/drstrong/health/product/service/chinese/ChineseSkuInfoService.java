@@ -30,6 +30,16 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
     Page<ChineseSkuInfoEntity> pageQuerySkuByRequest(ChineseManagerSkuRequest queryParam);
 
     /**
+     * 根据条件查询 sku 信息，供导出使用
+     *
+     * @param queryParam 查询的条件
+     * @return sku 信息
+     * @author liuqiuyi
+     * @date 2022/8/1 14:20
+     */
+    List<ChineseSkuInfoEntity> listQuerySkuByRequest(ChineseManagerSkuRequest queryParam);
+
+    /**
      * 根据店铺id和药材code获取sku信息
      *
      * @param medicineCode 药材 code

@@ -70,6 +70,19 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
     }
 
     /**
+     * 根据条件查询 sku 信息，供导出使用
+     *
+     * @param queryParam 查询的条件
+     * @return sku 信息
+     * @author liuqiuyi
+     * @date 2022/8/1 14:20
+     */
+    @Override
+    public List<ChineseSkuInfoEntity> listQuerySkuByRequest(ChineseManagerSkuRequest queryParam) {
+        return chineseSkuInfoMapper.listQuerySkuByRequest(queryParam);
+    }
+
+    /**
      * 根据店铺id和药材code获取sku信息
      *
      * @param medicineCode 药材 code

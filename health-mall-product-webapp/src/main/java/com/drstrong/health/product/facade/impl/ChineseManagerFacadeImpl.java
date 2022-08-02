@@ -64,6 +64,32 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         if (CollectionUtils.isEmpty(skuInfoEntityList)) {
             return PageVO.buildPageVO();
         }
+        // 2.组装返回值
+        List<ChineseManagerSkuVO> managerSkuVOList = buildChineseManagerSku(skuInfoEntityList);
+        return PageVO.buildPageVO(skuRequest.getPageNo(), skuRequest.getPageSize(), infoEntityPage.getTotal(), managerSkuVOList);
+    }
+
+    /**
+     * 中药管理页面，列表查询，导出数据使用
+     *
+     * @param skuRequest 分页查询的入参
+     * @return 中药管理列表
+     * @author liuqiuyi
+     * @date 2022/8/1 11:16
+     */
+    @Override
+    public List<ChineseManagerSkuVO> listChineseManagerSkuExport(ChineseManagerSkuRequest skuRequest) {
+        log.info("invoke listChineseManagerSkuExport() param:{}", JSON.toJSONString(skuRequest));
+        // 1。根据条件查询 sku 信息
+        List<ChineseSkuInfoEntity> infoEntityList = chineseSkuInfoService.listQuerySkuByRequest(skuRequest);
+        if (CollectionUtils.isEmpty(infoEntityList)) {
+            return Lists.newArrayList();
+        }
+        // 2.组装返回值
+        return buildChineseManagerSku(infoEntityList);
+    }
+
+    private List<ChineseManagerSkuVO> buildChineseManagerSku(List<ChineseSkuInfoEntity> skuInfoEntityList) {
         Set<String> skuCodes = Sets.newHashSetWithExpectedSize(skuInfoEntityList.size());
         Set<Long> storeIds = Sets.newHashSetWithExpectedSize(skuInfoEntityList.size());
         skuInfoEntityList.forEach(chineseSkuInfoEntity -> {
@@ -80,8 +106,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         // 4.获取供应商名称
         // TODO liuqiuyi 调用供应商接口
         // 5.组装返回值
-        List<ChineseManagerSkuVO> managerSkuVOList = buildChineseManagerSkuResponse(skuInfoEntityList, skuCodeSupplierIdsMap, storeIdNameMap);
-        return PageVO.buildPageVO(skuRequest.getPageNo(), skuRequest.getPageSize(), infoEntityPage.getTotal(), managerSkuVOList);
+        return buildChineseManagerSkuResponse(skuInfoEntityList, skuCodeSupplierIdsMap, storeIdNameMap);
     }
 
     /**
@@ -202,6 +227,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
             Set<Long> supplierIds = skuCodeSupplierIdsMap.get(chineseSkuInfoEntity.getSkuCode());
 
             ChineseManagerSkuVO chineseManagerSkuVO = ChineseManagerSkuVO.builder()
+                    .medicineCode(chineseSkuInfoEntity.getMedicineCode())
                     .skuCode(chineseSkuInfoEntity.getSkuCode())
                     .skuName(chineseSkuInfoEntity.getSkuName())
                     .storeId(chineseSkuInfoEntity.getStoreId())

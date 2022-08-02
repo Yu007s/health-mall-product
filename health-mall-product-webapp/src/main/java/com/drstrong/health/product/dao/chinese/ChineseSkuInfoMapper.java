@@ -7,6 +7,8 @@ import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuReques
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * <p>
  * 中药 sku 信息表 Mapper 接口
@@ -24,4 +26,12 @@ public interface ChineseSkuInfoMapper extends CustomBaseMapper<ChineseSkuInfoEnt
      * @date 2022/8/1 14:19
      */
     Page<ChineseSkuInfoEntity> pageQuerySkuByRequest(Page<ChineseSkuInfoEntity> page, @Param("queryParam") ChineseManagerSkuRequest queryParam);
+
+    /**
+     * 根据查询条件，查询 sku 信息，供导出使用
+     *
+     * @author liuqiuyi
+     * @date 2022/8/1 14:19
+     */
+    List<ChineseSkuInfoEntity> listQuerySkuByRequest(@Param("queryParam") ChineseManagerSkuRequest queryParam);
 }
