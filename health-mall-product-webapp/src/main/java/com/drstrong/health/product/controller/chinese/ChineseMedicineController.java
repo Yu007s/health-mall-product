@@ -27,25 +27,14 @@ public class ChineseMedicineController implements ChineseMedicineFacade {
     ChineseMedicineService  chineseMedicineService;
 
     /**
-     * 新建药材  药材名字不允许重复  不允许店铺名字重复
+     * 新建、编辑药材  药材名字不允许重复
      *
      * @param chineseMedicineVO 药材相关信息
      * @return 相应信息（成功、失败）
      */
-    @ApiOperation("新建药材")
-    @PostMapping("/add")
+    @ApiOperation("新建/编辑药材")
+    @PostMapping("/save")
     ResultVO<String> addMedicine(@RequestBody @Valid ChineseMedicineVO chineseMedicineVO){
-        return null;
-    }
-    /**
-     * 编辑药材
-     *
-     * @param chineseMedicineVO 药材相关信息
-     * @return 相应信息（成功、失败）
-     */
-    @ApiOperation("编辑药材")
-    @PostMapping("/update")
-    ResultVO<String> updateMedicine(@RequestBody @Valid ChineseMedicineVO chineseMedicineVO) {
         return null;
     }
 
@@ -69,7 +58,7 @@ public class ChineseMedicineController implements ChineseMedicineFacade {
      */
     @ApiOperation("药材信息分页展示")
     @GetMapping("/queryPage")
-    public ResultVO<List<ChineseMedicineVO>> queryMedicinePage(@RequestBody ChineseMedicineRequest chineseMedicineRequest) {
+    public ResultVO<List<ChineseMedicineVO>> queryMedicinePage(@RequestParam ChineseMedicineRequest chineseMedicineRequest) {
         List<ChineseMedicineVO> chineseMedicineVOList = chineseMedicineService.queryPage(chineseMedicineRequest);
         return ResultVO.success(chineseMedicineVOList);
     }

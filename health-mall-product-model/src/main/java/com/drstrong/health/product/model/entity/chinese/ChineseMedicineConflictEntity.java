@@ -24,16 +24,24 @@ public class ChineseMedicineConflictEntity extends BaseEntity implements Seriali
 
     private static final long serialVersionUID = 4535146937887478478L;
 
-   /**主键**/
+    /**
+     * 主键
+     **/
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-   /**中药材ID**/
-    private Long chineseMedicineId;
+    /**
+     * 中药材ID
+     **/
+    private Long chineseMedicineCode;
 
-   /**中药材冲反ID**/
-    private Long chineseMedicineConflictId;
+    /**
+     * 中药材冲反ID
+     **/
+    private Long chineseMedicineConflictCode;
 
-   /**乐观锁**/
+    /**
+     * 乐观锁
+     **/
     private Integer version;
 }

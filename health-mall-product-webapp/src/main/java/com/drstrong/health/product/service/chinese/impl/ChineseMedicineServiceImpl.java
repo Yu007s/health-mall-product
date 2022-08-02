@@ -46,7 +46,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
     @Transactional(rollbackFor = Exception.class)
     public boolean save(ChineseMedicineVO chineseMedicineVO) {
         ChineseMedicineEntity chineseMedicineEntity = new ChineseMedicineEntity();
-        chineseMedicineEntity.setName(chineseMedicineVO.getName());
+        chineseMedicineEntity.setMedicineName(chineseMedicineVO.getName());
         chineseMedicineEntity.setMaxDosage(chineseMedicineVO.getMaxDosage());
         //将名字转化为拼音  暂未实现
         chineseMedicineEntity.setPinyin(null);
@@ -54,13 +54,13 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         if (!save) {
             return false;
         }
-        Long medicineId = chineseMedicineEntity.getId();
+        Long medicineCode = chineseMedicineEntity.getMedicineCode();
         //更新相反药材表
         List<Long> medicineConflictIds = chineseMedicineVO.getMedicineConflictIds();
         List<ChineseMedicineConflictEntity> conflictList = medicineConflictIds.stream().map(conflictId -> {
             ChineseMedicineConflictEntity chineseMedicineConflictEntity = new ChineseMedicineConflictEntity();
-            chineseMedicineConflictEntity.setChineseMedicineId(medicineId);
-            chineseMedicineConflictEntity.setChineseMedicineConflictId(conflictId);
+            chineseMedicineConflictEntity.setChineseMedicineCode(medicineCode);
+            chineseMedicineConflictEntity.setChineseMedicineConflictCode(conflictId);
             return chineseMedicineConflictEntity;
         }).collect(Collectors.toList());
         chineseMedicineConflictService.saveBatch(conflictList);
@@ -68,8 +68,8 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         List<String> aliName = chineseMedicineVO.getAliName();
         List<ChineseMedicineAliasEntity> aliasList = aliName.stream().map(name -> {
             ChineseMedicineAliasEntity chineseMedicineAliasEntity = new ChineseMedicineAliasEntity();
-            chineseMedicineAliasEntity.setMedicineId(medicineId);
-            chineseMedicineAliasEntity.setName(name);
+            chineseMedicineAliasEntity.setMedicineId(medicineCode);
+            chineseMedicineAliasEntity.setAliasName(name);
             return chineseMedicineAliasEntity;
         }).collect(Collectors.toList());
         chineseMedicineAliasService.saveBatch(aliasList);
@@ -85,7 +85,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         updateById(chineseMedicineEntity);
         //逻辑删除相反药材
         LambdaUpdateWrapper<ChineseMedicineConflictEntity> conflictUpdateWrapper = new LambdaUpdateWrapper<>();
-        conflictUpdateWrapper.eq(ChineseMedicineConflictEntity::getChineseMedicineId, medicineId).set(true, ChineseMedicineConflictEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+        conflictUpdateWrapper.eq(ChineseMedicineConflictEntity::getId, medicineId).set(true, ChineseMedicineConflictEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         chineseMedicineConflictService.update(conflictUpdateWrapper);
         LambdaUpdateWrapper<ChineseMedicineAliasEntity> aliasUpdateWrapper = new LambdaUpdateWrapper<>();
         aliasUpdateWrapper.eq(ChineseMedicineAliasEntity::getMedicineId, medicineId).set(true, ChineseMedicineAliasEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
@@ -109,7 +109,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         return  records.stream().map( chineseMedicineEntity -> {
             ChineseMedicineVO ChineseMedicineVO = new ChineseMedicineVO();
             ChineseMedicineVO.setId(chineseMedicineEntity.getId());
-            ChineseMedicineVO.setName(chineseMedicineEntity.getName());
+            ChineseMedicineVO.setName(chineseMedicineEntity.getMedicineName());
             ChineseMedicineVO.setAliName(alisName);
             ChineseMedicineVO.setMaxDosage(chineseMedicineEntity.getMaxDosage());
             return ChineseMedicineVO;

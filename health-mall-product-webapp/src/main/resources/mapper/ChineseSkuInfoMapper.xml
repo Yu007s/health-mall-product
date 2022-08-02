@@ -44,7 +44,7 @@
         </if>
         <if test="queryParam.skuState != null and queryParam.skuState != ''">
             and sku.sku_state = #{queryParam.skuState}
-        </if
+        </if>
         <if test="queryParam.supplierId != null and queryParam.supplierId != ''">
             and r.supplier_id = #{queryParam.supplierId}
         </if>

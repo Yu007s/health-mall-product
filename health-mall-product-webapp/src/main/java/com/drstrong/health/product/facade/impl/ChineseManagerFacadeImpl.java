@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.facade.ChineseManagerFacade;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierRelevanceEntity;
-import com.drstrong.health.product.model.entity.zStore.StoreEntity;
+import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
@@ -15,13 +15,12 @@ import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
-import com.drstrong.health.product.service.zStore.StoreService;
+import com.drstrong.health.product.service.store.StoreService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -45,7 +44,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
     @Resource
     ChineseSkuSupplierRelevanceService chineseSkuSupplierRelevanceService;
 
-    @Resource(name = "zStoreService")
+    @Resource
     StoreService storeService;
 
     /**
@@ -77,7 +76,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
                 .collect(groupingBy(ChineseSkuSupplierRelevanceEntity::getSkuCode, mapping(ChineseSkuSupplierRelevanceEntity::getSupplierId, toSet())));
         // 3.获取店铺名称
         List<StoreEntity> storeEntityList = storeService.listByIds(storeIds);
-        Map<Long, String> storeIdNameMap = storeEntityList.stream().collect(toMap(StoreEntity::getId, StoreEntity::getName, (v1, v2) -> v1));
+        Map<Long, String> storeIdNameMap = storeEntityList.stream().collect(toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
         // 4.获取供应商名称
         // TODO liuqiuyi 调用供应商接口
         // 5.组装返回值

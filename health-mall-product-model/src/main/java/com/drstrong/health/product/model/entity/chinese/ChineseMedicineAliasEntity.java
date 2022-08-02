@@ -38,7 +38,7 @@ public class ChineseMedicineAliasEntity extends BaseEntity implements Serializab
    /**
     * 别名名称
     * */
-    private String name;
+    private String aliasName;
 
    /**
     * 汉语简拼
