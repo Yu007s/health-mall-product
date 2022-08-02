@@ -1,38 +1,34 @@
 package com.drstrong.health.product.model.response.store;
 
 import com.drstrong.health.product.model.enums.StoreTypeEnum;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
 
 /**
  * @Author xieYueFeng
- * @Date 2022/07/26/10:12
+ * @Date 2022/08/02/16:11
  */
 @Data
-@ApiModel("店铺信息返回值 编辑页面详细")
-public class StoreInfoDetailVO implements Serializable {
-    private static final long serialVersionUID = 2211348485397306232L;
-
+public class StoreInfoEditResponse implements Serializable {
+    private static final long serialVersionUID = 1564875342626489461L;
     @ApiModelProperty("店铺主键id")
     private Long id;
 
-    @ApiModelProperty("店铺名称")
     @NotNull
+    @ApiModelProperty("店铺名称")
     private String name;
 
     @NotNull
-    @ApiModelProperty("关联供应商名字集合")
-    private Map<Long,String> supplierMap;
+    @ApiModelProperty("关联供应商集合")
+    private List<SupplierResponse> supplierIds;
 
     @NotNull
     @ApiModelProperty("店铺类型")
-    private StoreTypeEnum storeType;
-
+    private StoreTypeEnum storeTypeName;
 
     @ApiModelProperty("关联互联网医院的名字")
     private String agencyName;
@@ -69,5 +65,4 @@ public class StoreInfoDetailVO implements Serializable {
     @NotNull
     @ApiModelProperty("应用key")
     private String appKey;
-
 }

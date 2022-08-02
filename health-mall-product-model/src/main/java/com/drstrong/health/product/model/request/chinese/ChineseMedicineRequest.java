@@ -19,7 +19,7 @@ public class ChineseMedicineRequest extends PageRequest implements Serializable 
 
     private static final long serialVersionUID = 6346193224178357890L;
     @ApiModelProperty(value = "中药材id",required = false)
-    private String medicineId;
+    private String medicineCode;
 
     @ApiModelProperty(value = "中药材名字",required = false)
     private String medicineName;

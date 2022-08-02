@@ -16,7 +16,7 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@TableName("product_chinese_store_invoice")
+@TableName("pms_store_invoice")
 public class StoreInvoiceEntity extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 3583447778043545858L;
@@ -84,7 +84,7 @@ public class StoreInvoiceEntity extends BaseEntity implements Serializable {
     /**
      * 应用key
      * */
-    @TableField("appKey")
+    @TableField("app_key")
     private String appKey;
 
     /**

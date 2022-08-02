@@ -24,4 +24,15 @@ public class AgencyServiceImpl implements AgencyService {
         }
         return NAMES.get((int)(id-1));
     }
+
+    @Override
+    public Long name2Id(String name) {
+        for (int i = 0; i < NAMES.size(); i++) {
+            String s = NAMES.get(i);
+            if (name.equals(s)) {
+                return (long) i;
+            }
+        }
+        return -1L;
+    }
 }

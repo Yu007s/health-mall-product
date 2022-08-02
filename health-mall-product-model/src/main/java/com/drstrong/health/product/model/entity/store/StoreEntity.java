@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @since 2022-07-206 11:11:19
  */
 @Data
-@TableName("product_chinese_store")
+@TableName("pms_store")
 @EqualsAndHashCode(callSuper = true)
 public class StoreEntity extends BaseEntity implements Serializable {
 

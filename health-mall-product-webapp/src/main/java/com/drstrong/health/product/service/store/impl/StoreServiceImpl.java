@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.store.StoreMapper;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.entity.store.StoreInvoiceEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
-import com.drstrong.health.product.model.request.productstore.StoreRequest;
+import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
-import com.drstrong.health.product.model.response.store.StoreInfoDetailVO;
+import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.service.store.AgencyService;
+import com.drstrong.health.product.service.store.StoreInvoiceService;
 import com.drstrong.health.product.service.store.StoreService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,19 +33,22 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     StoreMapper storeMapper;
     @Resource
     AgencyService agencyService;
-
+    @Resource
+    StoreInvoiceService storeInvoiceService;
     @Override
-    @Transactional(readOnly = true)
-    public void save(StoreInfoDetailVO store, String userId) {
-//        StoreEntity storeEntity = BeanUtil.copyProperties(store, StoreEntity.class);
+    @Transactional(rollbackFor = Exception.class)
+    public void save(StoreInfoDetailSaveRequest store, String userId) {
         StoreEntity storeEntity = new StoreEntity();
         storeEntity.setStoreName(store.getName());
-        storeEntity.setStoreType(store.getStoreType().ordinal());
+        StoreInvoiceEntity invoice = BeanUtil.copyProperties(store, StoreInvoiceEntity.class);
         if (store.getId() == null) {
+            storeEntity.setStoreType(store.getStoreTypeName().ordinal());
             storeEntity.setCreatedBy(userId);
             storeEntity.setChangedBy(userId);
             storeMapper.insert(storeEntity);
+            storeInvoiceService.save(invoice);
         }else{
+            invoice.setStoreId(store.getId());
             storeEntity.setChangedBy(userId);
             storeMapper.updateById(storeEntity);
         }
@@ -66,11 +71,6 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         }).collect(Collectors.toList());
     }
 
-    @Override
-    public StoreInfoDetailVO queryById(Long storeId) {
-        StoreEntity storeEntity = storeMapper.selectById(storeId);;
-        return null;
-    }
 
     /**
      * 根据店铺id集合查询店铺信息
@@ -89,5 +89,21 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         queryWrapper.eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .in(StoreEntity::getId, storeIds);
         return list(queryWrapper);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public StoreInfoEditResponse queryById(Long storeId) {
+        StoreEntity storeEntity = storeMapper.selectById(storeId);
+        Long storeEntityId = storeEntity.getId();
+        //根据店铺id 查询发票信息  组合后返回
+        StoreInvoiceEntity invoice = storeInvoiceService.getByStoreId(storeEntityId);
+        return buildStoreInfoResponse(invoice, storeEntity);
+    }
+
+    private StoreInfoEditResponse buildStoreInfoResponse(StoreInvoiceEntity storeInvoiceEntity,StoreEntity storeEntity){
+        StoreInfoEditResponse storeInfoEditResponse = BeanUtil.copyProperties(storeInvoiceEntity, StoreInfoEditResponse.class);
+        BeanUtil.copyProperties(storeEntity,storeInfoEditResponse);
+        return storeInfoEditResponse;
     }
 }

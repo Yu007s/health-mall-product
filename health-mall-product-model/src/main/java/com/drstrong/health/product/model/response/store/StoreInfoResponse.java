@@ -24,7 +24,7 @@ public class StoreInfoResponse implements Serializable {
     private String name;
 
     @ApiModelProperty("店铺类型")
-    private StoreTypeEnum storeType;
+    private String storeTypeName;
 
     @ApiModelProperty("关联互联网医院名字")
     private String agencyName;

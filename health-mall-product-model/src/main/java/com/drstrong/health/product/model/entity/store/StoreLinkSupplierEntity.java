@@ -15,7 +15,7 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@TableName("product_chinese_store_link_supplier")
+@TableName("pms_store_link_supplier")
 public class StoreLinkSupplierEntity extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1515483874456584741L;

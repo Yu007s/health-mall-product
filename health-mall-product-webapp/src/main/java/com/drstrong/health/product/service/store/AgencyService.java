@@ -13,4 +13,11 @@ public interface AgencyService {
      * @return 互联网医院名字
      */
     String  id2name(Long id);
+
+    /**
+     * 根据name转换为互联医院id
+     * @param name 互联网医院名字
+     * @return 互联网医院id
+     */
+    Long name2Id(String name);
 }

@@ -40,18 +40,29 @@ public class ChineseMedicineEntity extends BaseEntity implements Serializable {
     private String medicineName;
 
     /**
-     * 药材名称
+     * 药材编码
      */
     @TableField("medicine_code")
-    private Long medicineCode;
+    private String medicineCode;
 
 
     /**
-     * 汉语简拼
+     * 药材名字汉语拼音
      */
     @TableField("pinyin")
     private String pinyin;
 
+    /**
+     * 药材别名汉语拼音
+     */
+    @TableField("alias_pinyin")
+    private String aliasPinyin;
+
+    /**
+     * 汉语别名拼音，以“,”隔开
+     */
+    @TableField("medicine_alias")
+    private String medicineAlias;
 
     /**
      * 最大剂量

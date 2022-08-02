@@ -33,7 +33,7 @@ public class ChineseMedicineConflictEntity extends BaseEntity implements Seriali
     /**
      * 中药材ID
      **/
-    private Long chineseMedicineCode;
+    private String chineseMedicineCode;
 
     /**
      * 中药材冲反ID

@@ -17,7 +17,7 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@TableName("product_product_store")
+@TableName("product_store")
 public class StoreEntity extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 8498028506851891110L;
 

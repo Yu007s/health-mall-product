@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Author xieYueFeng
@@ -30,18 +29,18 @@ public class SaveDeliveryRequest implements Serializable {
     private Long storeId;
 
     /**
-     * 默认供应商优先级
+     * 默认供应商优先级列表 id列表
      */
     private List<Long> defaultDeliveries;
 
     /**
-     * 分市区优先级列表  第0个为默认优先级
+     * 默认供应商优先级列表 名字列表
      */
-    private List<AreaDeliveryPriority> deliveryPriorities;
+    private List<String> supplierNames;
 
     /**
-     * 供应商id与供应商名字对应map
+     * 分区域供应商优先级   显示所有被设置过的区域设置
      */
-    private Map<Long, String> supplierIdNameMap;
+    private List<AreaDeliveryPriority> deliveryPriorities;
 
 }

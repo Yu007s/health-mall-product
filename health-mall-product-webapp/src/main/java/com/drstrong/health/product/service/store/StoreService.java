@@ -1,8 +1,9 @@
 package com.drstrong.health.product.service.store;
 
 import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
-import com.drstrong.health.product.model.response.store.StoreInfoDetailVO;
+import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface StoreService {
      * @param store  店铺信息
      * @param userId 当前操作用户id
      */
-    void save(StoreInfoDetailVO store, String userId);
+    void save(StoreInfoDetailSaveRequest store, String userId);
 
     /**
      * 店铺展示 当查询条件都为空  返回所有店铺
@@ -36,7 +37,7 @@ public interface StoreService {
      * @param storeId 店铺id
      * @return 店铺详情（带有发票信息详情页面）
      */
-    StoreInfoDetailVO queryById(Long storeId);
+    StoreInfoEditResponse queryById(Long storeId);
 
     /**
      * 根据店铺id集合查询店铺信息
