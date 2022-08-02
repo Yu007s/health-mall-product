@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.response.chinese;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -18,6 +19,7 @@ import java.util.List;
  * @date 2022/7/25 17:21
  */
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 @ApiModel("保存/更新中药sku的入参")
 public class SaveOrUpdateSkuVO implements Serializable{
     private static final long serialVersionUID = -1921937978175838893L;
@@ -57,8 +59,8 @@ public class SaveOrUpdateSkuVO implements Serializable{
     @Valid
     private List<SupplierInfo> supplierInfoList;
 
-    @ApiModelProperty(value = "创建人", hidden = true)
-    private String createdBy;
+    @ApiModelProperty(value = "操作人", hidden = true)
+    private String operatorId;
 
     @Data
     @ApiModel("供应商信息")

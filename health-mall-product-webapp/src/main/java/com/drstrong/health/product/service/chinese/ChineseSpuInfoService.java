@@ -32,4 +32,14 @@ public interface ChineseSpuInfoService extends IService<ChineseSpuInfoEntity> {
      * @date 2022/8/1 22:12
      */
     String saveChineseSpu(String medicineCode, String name, String createdBy);
+
+    /**
+     * 更新中药材code
+     *
+     * @param spuCode    spu编码
+     * @param operatorId 操作人id
+     * @author liuqiuyi
+     * @date 2022/8/2 11:36
+     */
+    void updateMedicineCodeBySpuCode(String spuCode, String medicineCode, String operatorId);
 }

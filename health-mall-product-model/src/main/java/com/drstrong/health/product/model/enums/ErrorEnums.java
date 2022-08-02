@@ -43,7 +43,7 @@ public enum ErrorEnums implements IBaseResult {
 	PRICE_IS_ERROR("11106", "商品金额必须大于 1"),
 	CATEGORY_LEVEL_IS_ERROR("11107", "商品必须关联最小子分类"),
 	CHINESE_IS_REPEAT("11108", "同一店铺下相同药材不能重复添加"),
-	SKU_IS_NULL("11109", "sku不存在"),
+	SKU_IS_NULL("11109", "sku不存在或已下架"),
 
 	STORE_NAME_LENGTH("17000", "店铺名称长度不正确"),
 	STORE_NAME_REPEAT("17100", "店铺名称已存在"),

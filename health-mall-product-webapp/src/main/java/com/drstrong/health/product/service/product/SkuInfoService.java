@@ -12,5 +12,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2022-08-01
  */
 public interface SkuInfoService extends IService<SkuInfoEntity> {
-
+    /**
+     * 根据 skuCode 获取sku主表信息
+     *
+     * @param skuCode sku 编码
+     * @return sku 信息
+     * @author liuqiuyi
+     * @date 2022/8/2 11:29
+     */
+    SkuInfoEntity getBySkuCode(String skuCode);
 }

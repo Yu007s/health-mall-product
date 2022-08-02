@@ -4,7 +4,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
+import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -47,14 +51,23 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
     ChineseSkuInfoEntity getBySkuCode(String skuCode);
 
     /**
+     * 根据 skuCode 集合查询 sku 信息
+     *
+     * @param skuCodes sku 编码
+     * @return sku 信息
+     * @author liuqiuyi
+     * @date 2022/8/1 16:15
+     */
+    List<ChineseSkuInfoEntity> listBySkuCode(Set<String> skuCodes);
+
+    /**
      * 更新sku信息
      *
-     * @param id 主键id
      * @param saveOrUpdateSkuVO 接口入参
      * @author liuqiuyi
      * @date 2022/8/1 15:44
      */
-    void updateSku(Long id, SaveOrUpdateSkuVO saveOrUpdateSkuVO);
+    void updateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO);
 
     /**
      * 保存sku信息
@@ -64,4 +77,23 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
      * @date 2022/8/1 15:44
      */
     void saveSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO);
+
+    /**
+     * 根据 skuCode 批量更新sku状态
+     *
+     * @param updateSkuStateRequest 参数
+     * @author liuqiuyi
+     * @date 2022/8/2 14:41
+     */
+    void updateSkuStatue(UpdateSkuStateRequest updateSkuStateRequest);
+
+    /**
+     * 根据药材code判断是否有关联某个sku
+     *
+     * @param medicineCode 药材编码
+     * @return boolean 类型，true-存在，false-不存在
+     * @author liuqiuyi
+     * @date 2022/8/2 14:48
+     */
+    Boolean checkHasChineseByMedicineCode(String medicineCode);
 }

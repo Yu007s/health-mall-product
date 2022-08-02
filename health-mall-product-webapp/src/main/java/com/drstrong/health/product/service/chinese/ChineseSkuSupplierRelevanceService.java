@@ -24,4 +24,14 @@ public interface ChineseSkuSupplierRelevanceService extends IService<ChineseSkuS
      * @date 2022/8/1 14:39
      */
     List<ChineseSkuSupplierRelevanceEntity> listQueryBySkuCodeList(Set<String> skuCodes);
+
+    /**
+     * 根据 skuCode 删除关联关系
+     *
+     * @param skuCode    sku 编码
+     * @param operatorId 操作人id
+     * @author liuqiuyi
+     * @date 2022/8/2 11:06
+     */
+    void deleteBySkuCode(String skuCode, String operatorId);
 }

@@ -1,6 +1,7 @@
 package com.drstrong.health.product.model.request.chinese;
 
 import com.drstrong.health.product.model.request.PageRequest;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,6 +18,7 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 @ApiModel("中药管理页面请求入参")
 public class ChineseManagerSkuRequest extends PageRequest implements Serializable {
     private static final long serialVersionUID = 3476606891336123039L;

@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.model.entity.category.BaseEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -22,6 +21,9 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("pms_chinese_sku_supplier_relevance")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ChineseSkuSupplierRelevanceEntity extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -37,7 +39,7 @@ public class ChineseSkuSupplierRelevanceEntity extends BaseEntity implements Ser
     /**
      * 店铺id
      */
-    private Long stroeId;
+    private Long storeId;
 
     /**
      * 供应商id

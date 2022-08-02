@@ -2,6 +2,7 @@ package com.drstrong.health.product.controller.chinese;
 
 import com.drstrong.health.product.facade.ChineseManagerFacade;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
+import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
@@ -14,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author liuqiuyi
@@ -43,11 +42,12 @@ public class ChineseManagerController implements ChineseManagerRemoteApi {
 
     @Override
     public ResultVO<SaveOrUpdateSkuVO> getSkuByCode(String skuCode) {
-        return null;
+        return ResultVO.success(chineseManagerFacade.getSkuByCode(skuCode));
     }
 
     @Override
-    public ResultVO<Object> listUpdateSkuState(Set<String> skuCodeList) {
-        return null;
+    public ResultVO<Object> listUpdateSkuState(UpdateSkuStateRequest updateSkuStateRequest) {
+        chineseManagerFacade.listUpdateSkuState(updateSkuStateRequest);
+        return ResultVO.success();
     }
 }

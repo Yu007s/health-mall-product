@@ -1,6 +1,7 @@
 package com.drstrong.health.product.facade;
 
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
+import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
@@ -30,4 +31,23 @@ public interface ChineseManagerFacade {
      * @date 2022/8/1 15:44
      */
     void saveOrUpdateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO);
+
+    /**
+     * 根据 skuCode 获取详情
+     *
+     * @param skuCode sku 编码
+     * @return sku 详细信息，包含供应商等信息
+     * @author liuqiuyi
+     * @date 2022/8/2 11:50
+     */
+    SaveOrUpdateSkuVO getSkuByCode(String skuCode);
+
+    /**
+     * 批量更新sku上下架状态
+     *
+     * @param updateSkuStateRequest 入参
+     * @author liuqiuyi
+     * @date 2022/8/2 14:21
+     */
+    void listUpdateSkuState(UpdateSkuStateRequest updateSkuStateRequest);
 }

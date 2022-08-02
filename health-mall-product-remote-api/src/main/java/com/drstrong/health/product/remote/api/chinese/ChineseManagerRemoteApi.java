@@ -1,6 +1,7 @@
 package com.drstrong.health.product.remote.api.chinese;
 
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
+import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
@@ -46,5 +47,5 @@ public interface ChineseManagerRemoteApi {
 
     @ApiOperation("中药管理页面，sku批量上下架")
     @PostMapping("/update/sku/state")
-    ResultVO<Object> listUpdateSkuState(@RequestBody Set<String> skuCodeList);
+    ResultVO<Object> listUpdateSkuState(@RequestBody UpdateSkuStateRequest updateSkuStateRequest);
 }

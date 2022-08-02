@@ -9,6 +9,7 @@ import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
+import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
@@ -21,13 +22,12 @@ import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -93,8 +93,94 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
      */
     @Override
     public void saveOrUpdateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO) {
-        // 1.如果skuCode不为空，校验skuCode是否存在，为空则校验重复添加
-        if (StringUtils.isNotBlank(saveOrUpdateSkuVO.getSkuCode())) {
+        log.info("invoke saveOrUpdateSku() param：{}", JSON.toJSONString(saveOrUpdateSkuVO));
+        boolean updateFlag = StringUtils.isNotBlank(saveOrUpdateSkuVO.getSkuCode());
+        // 校验请求入参
+        checkSaveOrUpdateSkuParam(saveOrUpdateSkuVO, updateFlag);
+        // 保存或者更新
+        if (updateFlag) {
+            chineseSkuInfoService.updateSku(saveOrUpdateSkuVO);
+        } else {
+            chineseSkuInfoService.saveSku(saveOrUpdateSkuVO);
+        }
+    }
+
+    /**
+     * 根据 skuCode 获取详情
+     *
+     * @param skuCode sku 编码
+     * @return sku 详细信息，包含供应商等信息
+     * @author liuqiuyi
+     * @date 2022/8/2 11:50
+     */
+    @Override
+    public SaveOrUpdateSkuVO getSkuByCode(String skuCode) {
+        ChineseSkuInfoEntity skuInfoEntity = chineseSkuInfoService.getBySkuCode(skuCode);
+        if (Objects.isNull(skuInfoEntity)) {
+            throw new BusinessException(ErrorEnums.SKU_IS_NULL);
+        }
+        SaveOrUpdateSkuVO response = new SaveOrUpdateSkuVO();
+        response.setSkuCode(skuInfoEntity.getSkuCode());
+        response.setMedicineId(skuInfoEntity.getOldMedicineId());
+        response.setMedicineCode(skuInfoEntity.getMedicineCode());
+        response.setSkuName(skuInfoEntity.getSkuName());
+        response.setPrice(skuInfoEntity.getPrice());
+        response.setStoreId(skuInfoEntity.getStoreId());
+        // 1、根据店铺id获取店铺名称
+        List<StoreEntity> storeEntityList = storeService.listByIds(Sets.newHashSet(skuInfoEntity.getStoreId()));
+        if (!CollectionUtils.isEmpty(storeEntityList)) {
+            String storeName = Optional.ofNullable(storeEntityList.get(0)).map(StoreEntity::getStoreName).orElse("");
+            response.setStoreName(storeName);
+        }
+        // 2.根据药材code获取药材名称
+
+        // 3.调用供应商接口，获取供应商的信息
+
+        // 4.组装数据
+
+        return null;
+    }
+
+    /**
+     * 批量更新sku上下架状态
+     *
+     * @param updateSkuStateRequest 入参
+     * @author liuqiuyi
+     * @date 2022/8/2 14:21
+     */
+    @Override
+    public void listUpdateSkuState(UpdateSkuStateRequest updateSkuStateRequest) {
+        Set<String> skuCodeList = updateSkuStateRequest.getSkuCodeList();
+        // 1.校验sku是否存在
+        List<ChineseSkuInfoEntity> chineseSkuInfoEntityList = chineseSkuInfoService.listBySkuCode(skuCodeList);
+        if (CollectionUtils.isEmpty(chineseSkuInfoEntityList) || !Objects.equals(chineseSkuInfoEntityList.size(), skuCodeList.size())) {
+            throw new BusinessException(ErrorEnums.SKU_IS_NULL);
+        }
+        // 2.校验所属的店铺是否存在
+        Set<Long> storeIds = chineseSkuInfoEntityList.stream().map(ChineseSkuInfoEntity::getStoreId).collect(toSet());
+        List<StoreEntity> storeEntities = storeService.listByIds(storeIds);
+        if (CollectionUtils.isEmpty(storeEntities) || !Objects.equals(storeEntities.size(), storeIds.size())) {
+            throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
+        }
+        // 3.更新
+        chineseSkuInfoService.updateSkuStatue(updateSkuStateRequest);
+    }
+
+    private void checkSaveOrUpdateSkuParam(SaveOrUpdateSkuVO saveOrUpdateSkuVO, boolean updateFlag) {
+        // 1.根据药材code校验编码是否存在
+        // TODO liuqiuyi
+
+        // 2.校验店铺是否存在
+        List<StoreEntity> storeEntityList = storeService.listByIds(Sets.newHashSet(saveOrUpdateSkuVO.getStoreId()));
+        if (CollectionUtils.isEmpty(storeEntityList)) {
+            throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
+        }
+        // 3.校验供应商是否存在
+        // TODO liuqiuyi 调用供应商接口
+
+
+        // 4.如果是更新sku，校验skuCode是否存在，否则校验重复添加
+        if (updateFlag) {
             ChineseSkuInfoEntity skuInfoEntity = chineseSkuInfoService.getBySkuCode(saveOrUpdateSkuVO.getSkuCode());
             if (Objects.isNull(skuInfoEntity)) {
                 throw new BusinessException(ErrorEnums.SKU_IS_NULL);
@@ -106,19 +192,6 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
                 throw new BusinessException(ErrorEnums.CHINESE_IS_REPEAT);
             }
         }
-        // 2.根据药材code校验编码是否存在
-        // TODO liuqiuyi
-
-        // 3.校验店铺是否存在
-        List<StoreEntity> storeEntityList = storeService.listByIds(Sets.newHashSet(saveOrUpdateSkuVO.getStoreId()));
-        if (CollectionUtils.isEmpty(storeEntityList)) {
-            throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
-        }
-        // 4.校验供应商是否存在
-        // TODO liuqiuyi 调用供应商接口
-
-        // 5.保存或更新 sku
-//        chineseSkuInfoService.saveOrUpdateSku(saveOrUpdateSkuVO);
     }
 
     private List<ChineseManagerSkuVO> buildChineseManagerSkuResponse(List<ChineseSkuInfoEntity> skuInfoEntityList,

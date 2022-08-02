@@ -1,14 +1,18 @@
 package com.drstrong.health.product.service.chinese.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierRelevanceEntity;
-import com.drstrong.health.product.dao.chinese.ChineseSkuSupplierRelevanceMapper;
-import com.drstrong.health.product.model.enums.DelFlagEnum;
-import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
 import cn.strong.mybatis.plus.extend.CustomServiceImpl;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.drstrong.health.product.dao.chinese.ChineseSkuSupplierRelevanceMapper;
+import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierRelevanceEntity;
+import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -44,5 +48,26 @@ public class ChineseSkuSupplierRelevanceServiceImpl extends CustomServiceImpl<Ch
                 .eq(ChineseSkuSupplierRelevanceEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .in(ChineseSkuSupplierRelevanceEntity::getSkuCode, skuCodes);
         return list(queryWrapper);
+    }
+
+    /**
+     * 根据 skuCode 删除关联关系
+     *
+     * @param skuCode sku 编码
+     * @author liuqiuyi
+     * @date 2022/8/2 11:06
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBySkuCode(String skuCode, String operatorId) {
+        if (StringUtils.isBlank(skuCode) || StringUtils.isBlank(operatorId)) {
+            throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
+        }
+        lambdaUpdate()
+                .eq(ChineseSkuSupplierRelevanceEntity::getSkuCode, skuCode)
+                .eq(ChineseSkuSupplierRelevanceEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .set(ChineseSkuSupplierRelevanceEntity::getDelFlag, DelFlagEnum.IS_DELETED.getCode())
+                .set(ChineseSkuSupplierRelevanceEntity::getChangedBy, operatorId)
+                .update();
     }
 }
