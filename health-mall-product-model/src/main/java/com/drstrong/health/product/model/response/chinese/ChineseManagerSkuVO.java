@@ -26,6 +26,9 @@ import java.util.Set;
 public class ChineseManagerSkuVO implements Serializable {
     private static final long serialVersionUID = 3740737744156485985L;
 
+    @ApiModelProperty("中药材编码")
+    private String medicineCode;
+
     @ApiModelProperty("sku 编码")
     private String skuCode;
 

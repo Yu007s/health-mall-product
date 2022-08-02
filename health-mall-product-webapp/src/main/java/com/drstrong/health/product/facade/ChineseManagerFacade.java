@@ -6,6 +6,8 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
 
+import java.util.List;
+
 /**
  * 中药管理门面层，用于组合所有的业务操作
  *
@@ -22,6 +24,17 @@ public interface ChineseManagerFacade {
      * @date 2022/8/1 11:16
      */
     PageVO<ChineseManagerSkuVO> pageChineseManagerSku(ChineseManagerSkuRequest skuRequest);
+
+
+    /**
+     * 中药管理页面，列表查询，导出数据使用
+     *
+     * @param skuRequest 分页查询的入参
+     * @return 中药管理列表
+     * @author liuqiuyi
+     * @date 2022/8/1 11:16
+     */
+    List<ChineseManagerSkuVO> listChineseManagerSkuExport(ChineseManagerSkuRequest skuRequest);
 
     /**
      * 保存sku信息

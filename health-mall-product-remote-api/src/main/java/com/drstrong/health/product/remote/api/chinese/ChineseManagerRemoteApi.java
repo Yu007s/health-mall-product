@@ -34,6 +34,10 @@ public interface ChineseManagerRemoteApi {
     @PostMapping("/page/sku/info")
     ResultVO<PageVO<ChineseManagerSkuVO>> pageChineseManagerSku(@RequestBody ChineseManagerSkuRequest skuRequest);
 
+    @ApiOperation("中药管理页面，列表查询并导出")
+    @PostMapping("/sku/info/export")
+    ResultVO<List<ChineseManagerSkuVO>> listChineseManagerSkuExport(@RequestBody ChineseManagerSkuRequest skuRequest);
+
     @ApiOperation("中药管理页面，保存sku")
     @PostMapping("/sku/save")
     ResultVO<Object> saveOrUpdateSku(@RequestBody @Valid SaveOrUpdateSkuVO saveOrUpdateSkuVO);

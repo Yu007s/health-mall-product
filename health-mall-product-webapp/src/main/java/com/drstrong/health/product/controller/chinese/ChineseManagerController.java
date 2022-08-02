@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author liuqiuyi
@@ -32,6 +33,11 @@ public class ChineseManagerController implements ChineseManagerRemoteApi {
     @Override
     public ResultVO<PageVO<ChineseManagerSkuVO>> pageChineseManagerSku(ChineseManagerSkuRequest skuRequest) {
         return ResultVO.success(chineseManagerFacade.pageChineseManagerSku(skuRequest));
+    }
+
+    @Override
+    public ResultVO<List<ChineseManagerSkuVO>> listChineseManagerSkuExport(ChineseManagerSkuRequest skuRequest) {
+        return ResultVO.success(chineseManagerFacade.listChineseManagerSkuExport(skuRequest));
     }
 
     @Override
