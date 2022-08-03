@@ -18,11 +18,12 @@ public interface ChineseSpuInfoService extends IService<ChineseSpuInfoEntity> {
      * 根据药材 Code 获取 spu 信息
      *
      * @param medicineCode 药材code
+     * @param storeId 店铺 id
      * @return 中药的 spu 信息
      * @author liuqiuyi
      * @date 2022/8/1 22:07
      */
-    ChineseSpuInfoEntity getByMedicineCode(String medicineCode);
+    ChineseSpuInfoEntity getByMedicineCode(String medicineCode, Long storeId);
 
     /**
      * 生成中药的 spu 信息

@@ -50,6 +50,17 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
      */
     ChineseSkuInfoEntity getByMedicineCodeAndStoreId(String medicineCode, Long storeId);
 
+	/**
+	 * 根据药材 code 集合和店铺id，获取中药信息
+	 *
+	 * @param medicineCodes 中药编码集合
+	 * @param storeId       店铺 id
+	 * @return 中药材信息集合
+	 * @author liuqiuyi
+	 * @date 2022/8/3 19:39
+	 */
+	List<ChineseSkuInfoEntity> listByMedicineCodeAndStoreId(Set<String> medicineCodes, Long storeId);
+
     /**
      * 根据 skuCode 查询 sku 信息
      *

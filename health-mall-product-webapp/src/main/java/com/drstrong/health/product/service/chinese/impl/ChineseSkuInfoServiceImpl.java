@@ -102,6 +102,29 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
     }
 
     /**
+     * 根据药材 code 集合和店铺id，获取中药信息
+     * <p> 获取的是已经上架的 </>
+     *
+     * @param medicineCodes 中药编码集合
+     * @param storeId       店铺 id
+     * @return 中药材信息集合
+     * @author liuqiuyi
+     * @date 2022/8/3 19:39
+     */
+    @Override
+    public List<ChineseSkuInfoEntity> listByMedicineCodeAndStoreId(Set<String> medicineCodes, Long storeId) {
+        if (CollectionUtils.isEmpty(medicineCodes) || Objects.isNull(storeId)) {
+            return Lists.newArrayList();
+        }
+        LambdaQueryWrapper<ChineseSkuInfoEntity> queryWrapper = Wrappers.<ChineseSkuInfoEntity>lambdaQuery()
+                .eq(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(ChineseSkuInfoEntity::getMedicineCode, medicineCodes)
+                .eq(ChineseSkuInfoEntity::getStoreId, storeId)
+                .eq(ChineseSkuInfoEntity::getSkuStatus, ProductStateEnum.HAS_PUT.getCode());
+        return list(queryWrapper);
+    }
+
+    /**
      * 根据 skuCode 查询 sku 信息
      *
      * @param skuCode sku 编码
@@ -151,7 +174,7 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
     @Transactional(rollbackFor = Exception.class)
     public void saveSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO){
         // 1.校验 spu 是否存在，如果不存在，生成 spu 信息
-        ChineseSpuInfoEntity spuInfoEntity = chineseSpuInfoService.getByMedicineCode(saveOrUpdateSkuVO.getMedicineCode());
+        ChineseSpuInfoEntity spuInfoEntity = chineseSpuInfoService.getByMedicineCode(saveOrUpdateSkuVO.getMedicineCode(), saveOrUpdateSkuVO.getStoreId());
         String spuCode;
         if (Objects.isNull(spuInfoEntity)) {
             spuCode = chineseSpuInfoService.saveChineseSpu(saveOrUpdateSkuVO);

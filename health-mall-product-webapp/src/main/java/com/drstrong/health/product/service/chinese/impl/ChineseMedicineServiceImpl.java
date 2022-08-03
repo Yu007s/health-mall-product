@@ -19,6 +19,7 @@ import com.drstrong.health.product.service.chinese.ChineseMedicineConflictServic
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,9 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
 
     @Resource
     ChineseSkuInfoService chineseSkuInfoService;
+
+    @Resource
+    ChineseMedicineMapper chineseMedicineMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -184,5 +188,24 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
                 .eq(ChineseMedicineEntity::getMedicineCode, medicineCode)
                 .last("limit 1");
         return getOne(queryWrapper);
+    }
+
+    /**
+     * 根据关键字模糊搜索
+     * <p>
+     * 支持药材名称、药材编码、别名、药材拼音、别名拼音  搜索
+     * </>
+     *
+     * @param keyword 关键字
+     * @return 搜索结果
+     * @author liuqiuyi
+     * @date 2022/8/3 20:47
+     */
+    @Override
+    public List<ChineseMedicineEntity> likeQueryByKeyword(String keyword) {
+        if (StringUtils.isBlank(keyword)) {
+            return Lists.newArrayList();
+        }
+        return chineseMedicineMapper.likeQueryByKeyword(keyword);
     }
 }

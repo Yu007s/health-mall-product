@@ -3,6 +3,9 @@ package com.drstrong.health.product.dao.chinese;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -15,4 +18,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ChineseMedicineMapper extends BaseMapper<ChineseMedicineEntity> {
 
+	List<ChineseMedicineEntity> likeQueryByKeyword(@Param("keyword") String keyword);
 }

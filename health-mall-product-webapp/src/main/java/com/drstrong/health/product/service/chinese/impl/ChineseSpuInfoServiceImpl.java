@@ -43,13 +43,14 @@ public class ChineseSpuInfoServiceImpl extends CustomServiceImpl<ChineseSpuInfoM
      * @date 2022/8/1 22:07
      */
     @Override
-    public ChineseSpuInfoEntity getByMedicineCode(String medicineCode) {
-        if (StringUtils.isBlank(medicineCode)) {
+    public ChineseSpuInfoEntity getByMedicineCode(String medicineCode, Long storeId) {
+        if (StringUtils.isBlank(medicineCode) || Objects.isNull(storeId)) {
             throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
         }
         LambdaQueryWrapper<ChineseSpuInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ChineseSpuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(ChineseSpuInfoEntity::getMedicineCode, medicineCode)
+                .eq(ChineseSpuInfoEntity::getStoreId, storeId)
                 .last("limit 1");
         return getOne(queryWrapper);
     }

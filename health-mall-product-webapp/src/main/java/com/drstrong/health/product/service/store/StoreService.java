@@ -48,4 +48,24 @@ public interface StoreService {
      * @date 2022/8/1 15:26
      */
     List<StoreEntity> listByIds(Set<Long> storeIds);
+
+	/**
+	 * 根据店铺id集合查询店铺信息
+	 *
+	 * @param storeId 店铺id
+	 * @return 店铺信息集合
+	 * @author liuqiuyi
+	 * @date 2022/8/1 15:26
+	 */
+    StoreEntity getById(Long storeId);
+
+	/**
+	 * 根据互联网医院 id，获取店铺信息
+	 *
+	 * @param agencyId 互联网医院 id
+	 * @return 店铺信息
+	 * @author liuqiuyi
+	 * @date 2022/8/3 19:47
+	 */
+	StoreEntity getStoreByAgencyId(Long agencyId);
 }

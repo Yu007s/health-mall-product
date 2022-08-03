@@ -60,4 +60,17 @@ public interface ChineseMedicineService {
      * @date 2022/8/2 21:38
      */
     ChineseMedicineEntity getByMedicineCode(String medicineCode);
+
+	/**
+	 * 根据关键字模糊搜索
+	 * <p>
+	 * 支持药材名称、别名、药材拼音、别名拼音  搜索
+	 * </>
+	 *
+	 * @param keyword 关键字
+	 * @return 搜索结果
+	 * @author liuqiuyi
+	 * @date 2022/8/3 20:47
+	 */
+	List<ChineseMedicineEntity> likeQueryByKeyword(String keyword);
 }
