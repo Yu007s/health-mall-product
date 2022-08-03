@@ -38,9 +38,9 @@ public interface ChineseSpuInfoService extends IService<ChineseSpuInfoEntity> {
      * 更新中药材code
      *
      * @param spuCode    spu编码
-     * @param operatorId 操作人id
+     * @param saveOrUpdateSkuVO 入参
      * @author liuqiuyi
      * @date 2022/8/2 11:36
      */
-    void updateMedicineCodeBySpuCode(String spuCode, String medicineCode, Long operatorId);
+    void updateMedicineCodeBySpuCode(String spuCode, SaveOrUpdateSkuVO saveOrUpdateSkuVO);
 }

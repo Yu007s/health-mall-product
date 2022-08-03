@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 /**
  * mybatis plus 插件配置
@@ -30,5 +31,14 @@ public class MybatisPlusConfig {
 	@Bean
 	public OptimisticLockerInterceptor optimisticLockerInterceptor() {
 		return new OptimisticLockerInterceptor();
+	}
+
+	/**
+	 * 创建时间和修改时间自动插入的组件
+	 */
+	@Bean
+	@Primary
+	public CustomizeMetaObjectHandler customizeMetaObjectHandler(){
+		return new CustomizeMetaObjectHandler();
 	}
 }

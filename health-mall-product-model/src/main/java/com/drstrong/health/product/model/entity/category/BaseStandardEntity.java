@@ -44,11 +44,13 @@ public class BaseStandardEntity implements Serializable {
     /**
      * 版本号
      */
+    @TableField(fill = FieldFill.INSERT)
     private Integer version;
 
     /**
      * 是否删除 0：正常 1：删除
      */
     @TableLogic
+    @TableField(fill = FieldFill.INSERT)
     private Integer delFlag;
 }

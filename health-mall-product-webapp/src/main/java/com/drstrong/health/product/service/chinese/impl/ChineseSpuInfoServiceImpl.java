@@ -83,19 +83,18 @@ public class ChineseSpuInfoServiceImpl extends CustomServiceImpl<ChineseSpuInfoM
      * 更新中药材code
      *
      * @param spuCode    spu编码
-     * @param operatorId 操作人id
+     * @param saveOrUpdateSkuVO 入参
      * @author liuqiuyi
      * @date 2022/8/2 11:36
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateMedicineCodeBySpuCode(String spuCode, String medicineCode, Long operatorId) {
-        if (StringUtils.isBlank(spuCode) || StringUtils.isBlank(medicineCode) || Objects.isNull(operatorId)) {
-            throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
-        }
+    public void updateMedicineCodeBySpuCode(String spuCode, SaveOrUpdateSkuVO saveOrUpdateSkuVO) {
         lambdaUpdate()
                 .eq(ChineseSpuInfoEntity::getSpuCode, spuCode)
                 .eq(ChineseSpuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .set(ChineseSpuInfoEntity::getMedicineCode, medicineCode).update();
+                .set(ChineseSpuInfoEntity::getMedicineCode, saveOrUpdateSkuVO.getMedicineCode())
+                .set(ChineseSpuInfoEntity::getSpuName,saveOrUpdateSkuVO.getMedicineName())
+                .update();
     }
 }

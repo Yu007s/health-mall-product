@@ -111,6 +111,9 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
      */
     @Override
     public ChineseSkuInfoEntity getBySkuCode(String skuCode) {
+        if (StringUtils.isBlank(skuCode)) {
+            throw new BusinessException(ErrorEnums.CHINESE_MEDICINE_IS_NULL);
+        }
         LambdaQueryWrapper<ChineseSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(StringUtils.isNoneBlank(skuCode), ChineseSkuInfoEntity::getSkuCode, skuCode)
@@ -218,7 +221,7 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
         chineseSkuSupplierRelevanceService.saveBatch(relevanceEntityList);
         // 3.将中药的 spu 中的药材 code 进行更新
         SkuInfoEntity skuInfoEntity = skuInfoService.getBySkuCode(skuCode);
-        chineseSpuInfoService.updateMedicineCodeBySpuCode(skuInfoEntity.getSpuCode(), saveOrUpdateSkuVO.getMedicineCode(), saveOrUpdateSkuVO.getOperatorId());
+        chineseSpuInfoService.updateMedicineCodeBySpuCode(skuInfoEntity.getSpuCode(), saveOrUpdateSkuVO);
         // TODO 调用世轩的供应商接口，如果远程接口报错，抛出异常
     }
 

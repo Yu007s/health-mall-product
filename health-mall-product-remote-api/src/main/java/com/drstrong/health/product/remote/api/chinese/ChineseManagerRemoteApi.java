@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -46,9 +47,9 @@ public interface ChineseManagerRemoteApi {
             @ApiImplicitParam(name = "skuCode", value = "sku编码", dataType = "String", paramType = "query", required = true)
     })
     @GetMapping("/get/sku")
-    ResultVO<SaveOrUpdateSkuVO> getSkuByCode(@RequestParam("skuCode") String skuCode);
+    ResultVO<SaveOrUpdateSkuVO> getSkuByCode(@RequestParam("skuCode") @NotBlank(message = "入参不能为空") String skuCode);
 
     @ApiOperation("中药管理页面，sku批量上下架")
     @PostMapping("/update/sku/state")
-    ResultVO<Object> listUpdateSkuState(@RequestBody UpdateSkuStateRequest updateSkuStateRequest);
+    ResultVO<Object> listUpdateSkuState(@RequestBody @Valid UpdateSkuStateRequest updateSkuStateRequest);
 }
