@@ -1,10 +1,9 @@
 package com.drstrong.health.product.model.entity.chinese;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.drstrong.health.product.model.entity.category.BaseEntity;
+import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -26,7 +25,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ChineseSkuInfoEntity extends BaseEntity implements Serializable {
+public class ChineseSkuInfoEntity extends BaseStandardEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -51,7 +50,6 @@ public class ChineseSkuInfoEntity extends BaseEntity implements Serializable {
     /**
      * 药材库code
      */
-    @TableField("medicineCode")
     private String medicineCode;
 
     /**
@@ -67,10 +65,5 @@ public class ChineseSkuInfoEntity extends BaseEntity implements Serializable {
     /**
      * sku上下架状态；0-未上架，1-已上架
      */
-    private Integer skuState;
-
-    /**
-     * 版本号
-     */
-    private Integer version;
+    private Integer skuStatus;
 }

@@ -37,7 +37,7 @@ public class SpuInfoServiceImpl extends CustomServiceImpl<SpuInfoMapper, SpuInfo
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveSpuInfo(String spuCode, ProductTypeEnum productTypeEnum, String createdBy) {
+    public void saveSpuInfo(String spuCode, ProductTypeEnum productTypeEnum, Long createdBy) {
         if (StringUtils.isBlank(spuCode) || Objects.isNull(productTypeEnum) || Objects.isNull(createdBy)) {
             throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
         }

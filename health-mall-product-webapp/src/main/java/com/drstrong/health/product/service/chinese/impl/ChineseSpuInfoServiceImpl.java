@@ -7,6 +7,7 @@ import com.drstrong.health.product.model.entity.chinese.ChineseSpuInfoEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
+import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.chinese.ChineseSpuInfoService;
 import com.drstrong.health.product.service.product.SpuInfoService;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * <p>
@@ -55,25 +57,23 @@ public class ChineseSpuInfoServiceImpl extends CustomServiceImpl<ChineseSpuInfoM
     /**
      * 生成中药的 spu 信息
      *
-     * @param medicineCode 中药材code
+     * @param saveOrUpdateSkuVO 保存的入参
      * @return spuCode
      * @author liuqiuyi
      * @date 2022/8/1 22:12
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String saveChineseSpu(String medicineCode, String name, String createdBy) {
-        if (StringUtils.isBlank(medicineCode)) {
-            throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
-        }
+    public String saveChineseSpu(SaveOrUpdateSkuVO saveOrUpdateSkuVO) {
         String spuCode = UniqueCodeUtils.getNextSpuCode(ProductTypeEnum.CHINESE);
         ChineseSpuInfoEntity chineseSpuInfoEntity = ChineseSpuInfoEntity.builder()
                 .spuCode(spuCode)
-                .spuName(name)
-                .medicineCode(medicineCode)
+                .spuName(saveOrUpdateSkuVO.getMedicineName())
+                .medicineCode(saveOrUpdateSkuVO.getMedicineCode())
+                .storeId(saveOrUpdateSkuVO.getStoreId())
                 .build();
         // 保存 spu 主表信息
-        spuInfoService.saveSpuInfo(spuCode, ProductTypeEnum.CHINESE, createdBy);
+        spuInfoService.saveSpuInfo(spuCode, ProductTypeEnum.CHINESE, saveOrUpdateSkuVO.getOperatorId());
         // 保存中药的 spu 信息
         save(chineseSpuInfoEntity);
         return spuCode;
@@ -89,8 +89,8 @@ public class ChineseSpuInfoServiceImpl extends CustomServiceImpl<ChineseSpuInfoM
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateMedicineCodeBySpuCode(String spuCode, String medicineCode, String operatorId) {
-        if (StringUtils.isBlank(spuCode) || StringUtils.isBlank(medicineCode) || StringUtils.isBlank(operatorId)) {
+    public void updateMedicineCodeBySpuCode(String spuCode, String medicineCode, Long operatorId) {
+        if (StringUtils.isBlank(spuCode) || StringUtils.isBlank(medicineCode) || Objects.isNull(operatorId)) {
             throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
         }
         lambdaUpdate()

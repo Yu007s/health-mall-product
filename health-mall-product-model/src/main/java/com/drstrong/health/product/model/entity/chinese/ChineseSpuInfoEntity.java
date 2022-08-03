@@ -1,16 +1,13 @@
 package com.drstrong.health.product.model.entity.chinese;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import cn.strong.mybatis.model.MyBatisPlusBaseModel;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
-
-import com.drstrong.health.product.model.entity.category.BaseEntity;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -27,9 +24,9 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ChineseSpuInfoEntity extends BaseEntity implements Serializable {
+public class ChineseSpuInfoEntity extends BaseStandardEntity implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
@@ -47,11 +44,10 @@ public class ChineseSpuInfoEntity extends BaseEntity implements Serializable {
     /**
      * 药材库code
      */
-    @TableField("medicineCode")
     private String medicineCode;
 
     /**
-     * 版本号
+     * 店铺id
      */
-    private Integer version;
+    private Long storeId;
 }

@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.chinese;
 
+import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.request.chinese.ChineseMedicineRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
@@ -38,4 +39,12 @@ public interface ChineseMedicineService {
      * @return 条件查询所有的药材信息
      */
     List<ChineseMedicineInfoResponse> queryAll(ChineseMedicineRequest chineseMedicineRequest);
+    /**
+     * 根据药材code获取中药材信息
+     *
+     * @param medicineCode 药材code
+     * @author liuqiuyi
+     * @date 2022/8/2 21:38
+     */
+    ChineseMedicineEntity getByMedicineCode(String medicineCode);
 }

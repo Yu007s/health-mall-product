@@ -32,5 +32,5 @@ public class UpdateSkuStateRequest implements Serializable {
     private Integer skuState;
 
     @ApiModelProperty(value = "操作人id", hidden = true)
-    private String operatorId;
+    private Long operatorId;
 }

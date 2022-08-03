@@ -2,6 +2,7 @@ package com.drstrong.health.product.service.chinese.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.chinese.ChineseMedicineMapper;
@@ -15,6 +16,7 @@ import com.drstrong.health.product.service.chinese.ChineseMedicineConflictServic
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,5 +96,24 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
             chineseMedicineVO.setMaxDosage(chineseMedicineEntity.getMaxDosage());
             return chineseMedicineVO;
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据药材code获取中药材信息
+     *
+     * @param medicineCode 药材code
+     * @author liuqiuyi
+     * @date 2022/8/2 21:38
+     */
+    @Override
+    public ChineseMedicineEntity getByMedicineCode(String medicineCode) {
+        if (StringUtils.isBlank(medicineCode)) {
+            return null;
+        }
+        LambdaQueryWrapper<ChineseMedicineEntity> queryWrapper = Wrappers.<ChineseMedicineEntity>lambdaQuery()
+                .eq(ChineseMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .eq(ChineseMedicineEntity::getMedicineCode, medicineCode)
+                .last("limit 1");
+        return getOne(queryWrapper);
     }
 }

@@ -2,6 +2,7 @@ package com.drstrong.health.product.service.chinese;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.chinese.ChineseSpuInfoEntity;
+import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
 
 /**
  * <p>
@@ -26,12 +27,12 @@ public interface ChineseSpuInfoService extends IService<ChineseSpuInfoEntity> {
     /**
      * 生成中药的 spu 信息
      *
-     * @param medicineCode 中药材code
+     * @param saveOrUpdateSkuVO 保存的入参
      * @return spuCode
      * @author liuqiuyi
      * @date 2022/8/1 22:12
      */
-    String saveChineseSpu(String medicineCode, String name, String createdBy);
+    String saveChineseSpu(SaveOrUpdateSkuVO saveOrUpdateSkuVO);
 
     /**
      * 更新中药材code
@@ -41,5 +42,5 @@ public interface ChineseSpuInfoService extends IService<ChineseSpuInfoEntity> {
      * @author liuqiuyi
      * @date 2022/8/2 11:36
      */
-    void updateMedicineCodeBySpuCode(String spuCode, String medicineCode, String operatorId);
+    void updateMedicineCodeBySpuCode(String spuCode, String medicineCode, Long operatorId);
 }

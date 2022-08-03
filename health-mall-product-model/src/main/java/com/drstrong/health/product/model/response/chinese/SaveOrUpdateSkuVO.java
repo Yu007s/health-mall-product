@@ -60,7 +60,7 @@ public class SaveOrUpdateSkuVO implements Serializable{
     private List<SupplierInfo> supplierInfoList;
 
     @ApiModelProperty(value = "操作人", hidden = true)
-    private String operatorId;
+    private Long operatorId;
 
     @Data
     @ApiModel("供应商信息")

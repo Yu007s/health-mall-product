@@ -1,7 +1,8 @@
 package com.drstrong.health.product.service.product.impl;
 
 import cn.strong.mybatis.plus.extend.CustomServiceImpl;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.drstrong.health.product.dao.product.SkuInfoMapper;
 import com.drstrong.health.product.model.entity.product.SkuInfoEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
@@ -37,10 +38,10 @@ public class SkuInfoServiceImpl extends CustomServiceImpl<SkuInfoMapper, SkuInfo
         if (StringUtils.isBlank(skuCode)) {
             throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
         }
-        LambdaQueryChainWrapper<SkuInfoEntity> queryChainWrapper = lambdaQuery()
+        LambdaQueryWrapper<SkuInfoEntity> queryWrapper = Wrappers.<SkuInfoEntity>lambdaQuery()
                 .ge(SkuInfoEntity::getSkuCode, skuCode)
                 .ge(SkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .last("limit 1");
-        return getOne(queryChainWrapper);
+        return getOne(queryWrapper);
     }
 }

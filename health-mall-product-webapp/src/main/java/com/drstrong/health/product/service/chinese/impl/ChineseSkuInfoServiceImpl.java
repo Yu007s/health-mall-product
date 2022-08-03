@@ -2,7 +2,7 @@ package com.drstrong.health.product.service.chinese.impl;
 
 import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.dao.chinese.ChineseSkuInfoMapper;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
@@ -151,7 +151,7 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
         ChineseSpuInfoEntity spuInfoEntity = chineseSpuInfoService.getByMedicineCode(saveOrUpdateSkuVO.getMedicineCode());
         String spuCode;
         if (Objects.isNull(spuInfoEntity)) {
-            spuCode = chineseSpuInfoService.saveChineseSpu(saveOrUpdateSkuVO.getMedicineCode(), saveOrUpdateSkuVO.getMedicineName(), saveOrUpdateSkuVO.getOperatorId());
+            spuCode = chineseSpuInfoService.saveChineseSpu(saveOrUpdateSkuVO);
         } else {
             spuCode = UniqueCodeUtils.getNextSpuCode(ProductTypeEnum.CHINESE);
         }
@@ -164,7 +164,7 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
                 .medicineCode(saveOrUpdateSkuVO.getMedicineCode())
                 .storeId(saveOrUpdateSkuVO.getStoreId())
                 .price(saveOrUpdateSkuVO.getPrice())
-                .skuState(ProductStateEnum.UN_PUT.getCode())
+                .skuStatus(ProductStateEnum.UN_PUT.getCode())
                 .build();
         chineseSkuInfoEntity.setCreatedBy(saveOrUpdateSkuVO.getOperatorId());
         chineseSkuInfoEntity.setChangedBy(saveOrUpdateSkuVO.getOperatorId());
@@ -235,7 +235,7 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
         lambdaUpdate()
                 .in(ChineseSkuInfoEntity::getSkuCode, updateSkuStateRequest.getSkuCodeList())
                 .eq(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .set(ChineseSkuInfoEntity::getSkuState, updateSkuStateRequest.getSkuState())
+                .set(ChineseSkuInfoEntity::getSkuStatus, updateSkuStateRequest.getSkuState())
                 .set(ChineseSkuInfoEntity::getChangedBy, updateSkuStateRequest.getOperatorId())
                 .update();
     }
@@ -253,12 +253,12 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
         if (StringUtils.isBlank(medicineCode)) {
             throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
         }
-        LambdaQueryChainWrapper<ChineseSkuInfoEntity> chainWrapper = lambdaQuery()
+        LambdaQueryWrapper<ChineseSkuInfoEntity> queryWrapper = Wrappers.<ChineseSkuInfoEntity>lambdaQuery()
                 .eq(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(ChineseSkuInfoEntity::getMedicineCode, medicineCode)
                 .last("limit 1");
 
-        return Objects.nonNull(getOne(chainWrapper));
+        return Objects.nonNull(getOne(queryWrapper));
     }
 
     private List<ChineseSkuSupplierRelevanceEntity> buildChineseSkuSupplierRelevanceList(SaveOrUpdateSkuVO saveOrUpdateSkuVO, String skuCode) {

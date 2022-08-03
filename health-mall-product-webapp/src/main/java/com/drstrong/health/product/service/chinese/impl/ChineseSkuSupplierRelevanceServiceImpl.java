@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -59,8 +60,8 @@ public class ChineseSkuSupplierRelevanceServiceImpl extends CustomServiceImpl<Ch
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteBySkuCode(String skuCode, String operatorId) {
-        if (StringUtils.isBlank(skuCode) || StringUtils.isBlank(operatorId)) {
+    public void deleteBySkuCode(String skuCode, Long operatorId) {
+        if (StringUtils.isBlank(skuCode) || Objects.isNull(operatorId)) {
             throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
         }
         lambdaUpdate()

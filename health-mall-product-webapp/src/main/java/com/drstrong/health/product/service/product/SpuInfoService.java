@@ -22,5 +22,5 @@ public interface SpuInfoService extends IService<SpuInfoEntity> {
      * @author liuqiuyi
      * @date 2022/8/1 22:17
      */
-    void saveSpuInfo(String spuCode, ProductTypeEnum productTypeEnum, String createdBy);
+    void saveSpuInfo(String spuCode, ProductTypeEnum productTypeEnum, Long createdBy);
 }

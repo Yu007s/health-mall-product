@@ -3,6 +3,7 @@ package com.drstrong.health.product.facade.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.facade.ChineseManagerFacade;
+import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierRelevanceEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
@@ -14,6 +15,7 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
 import com.drstrong.health.product.service.store.StoreService;
@@ -22,12 +24,10 @@ import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -46,6 +46,9 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 
     @Resource
     StoreService storeService;
+
+    @Resource
+    ChineseMedicineService chineseMedicineService;
 
     /**
      * 中药管理页面，列表查询
@@ -158,12 +161,16 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
             response.setStoreName(storeName);
         }
         // 2.根据药材code获取药材名称
+        ChineseMedicineEntity chineseMedicineEntity = chineseMedicineService.getByMedicineCode(skuInfoEntity.getMedicineCode());
+        if (Objects.nonNull(chineseMedicineEntity)) {
+            response.setMedicineName(chineseMedicineEntity.getMedicineName());
+        }
 
         // 3.调用供应商接口，获取供应商的信息
 
         // 4.组装数据
 
-        return null;
+        return response;
     }
 
     /**
@@ -193,7 +200,12 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 
     private void checkSaveOrUpdateSkuParam(SaveOrUpdateSkuVO saveOrUpdateSkuVO, boolean updateFlag) {
         // 1.根据药材code校验编码是否存在
-        // TODO liuqiuyi
+        ChineseMedicineEntity chineseMedicineEntity = chineseMedicineService.getByMedicineCode(saveOrUpdateSkuVO.getMedicineCode());
+        if (Objects.isNull(chineseMedicineEntity)) {
+            throw new BusinessException(ErrorEnums.CHINESE_MEDICINE_IS_NULL);
+        }
+        saveOrUpdateSkuVO.setMedicineId(chineseMedicineEntity.getId());
+        saveOrUpdateSkuVO.setMedicineName(chineseMedicineEntity.getMedicineName());
 
         // 2.校验店铺是否存在
         List<StoreEntity> storeEntityList = storeService.listByIds(Sets.newHashSet(saveOrUpdateSkuVO.getStoreId()));
@@ -236,8 +248,8 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
                     // TODO
 //                    .supplierName()
                     .price(chineseSkuInfoEntity.getPrice())
-                    .skuState(chineseSkuInfoEntity.getSkuState())
-                    .skuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuState()))
+                    .skuState(chineseSkuInfoEntity.getSkuStatus())
+                    .skuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()))
                     .build();
 
             managerSkuVOList.add(chineseManagerSkuVO);

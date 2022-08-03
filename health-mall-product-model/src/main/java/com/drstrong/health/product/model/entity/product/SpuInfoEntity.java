@@ -3,7 +3,7 @@ package com.drstrong.health.product.model.entity.product;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.drstrong.health.product.model.entity.category.BaseEntity;
+import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -24,7 +24,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SpuInfoEntity extends BaseEntity implements Serializable {
+public class SpuInfoEntity extends BaseStandardEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -40,9 +40,4 @@ public class SpuInfoEntity extends BaseEntity implements Serializable {
      * spu类型。0-商品，1-药品，2-中药
      */
     private Integer spuType;
-
-    /**
-     * 版本号
-     */
-    private Integer version;
 }

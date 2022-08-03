@@ -33,5 +33,5 @@ public interface ChineseSkuSupplierRelevanceService extends IService<ChineseSkuS
      * @author liuqiuyi
      * @date 2022/8/2 11:06
      */
-    void deleteBySkuCode(String skuCode, String operatorId);
+    void deleteBySkuCode(String skuCode, Long operatorId);
 }
