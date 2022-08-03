@@ -65,7 +65,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
             chineseMedicineEntity.setMedicineCode(chineseMedicineVO.getMedicineCode());
         }
         else{
-            //检验药材是否重名
+            //新增药材  检验药材是否重名
             LambdaQueryWrapper<ChineseMedicineEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
             lambdaQueryWrapper.eq(ChineseMedicineEntity::getMedicineName,chineseMedicineVO.getName());
             ChineseMedicineEntity one = getOne(lambdaQueryWrapper);
@@ -74,6 +74,8 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
             }
             //新增药材
             String nextMedicineCode = UniqueCodeUtils.getNextMedicineCode(chineseMedicineVO.getName());
+            medicineCode = nextMedicineCode;
+            chineseMedicineEntity.setCreatedBy(userId);
             chineseMedicineEntity.setMedicineCode(nextMedicineCode);
         }
         chineseMedicineEntity.setMedicineName(chineseMedicineVO.getName());
@@ -98,7 +100,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         conflictMedicineCodes.forEach( conflictMedicineCode -> stringBuilder.append(conflictMedicineCode).append(","));
         chineseMedicineConflictEntity.setMedicineCode(medicineCode);
         chineseMedicineConflictEntity.setMedicineConflictCodes(stringBuilder.toString());
-        chineseMedicineConflictService.saveUpdate(chineseMedicineConflictEntity,userId);
+        chineseMedicineConflictService.saveOrUpdate(chineseMedicineConflictEntity,userId);
         return super.saveOrUpdate(chineseMedicineEntity);
     }
 
@@ -113,12 +115,11 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         lambdaQueryWrapper.eq(ChineseMedicineEntity::getMedicineCode, medicineCode)
                 .set(ChineseMedicineEntity::getDelFlag, DelFlagEnum.IS_DELETED.getCode())
                 .set(ChineseMedicineEntity::getChangedBy,userId);
+        super.update(lambdaQueryWrapper);
         //逻辑删除相反药材
-        LambdaUpdateWrapper<ChineseMedicineConflictEntity> conflictUpdateWrapper = new LambdaUpdateWrapper<>();
-        conflictUpdateWrapper.eq(ChineseMedicineConflictEntity::getMedicineCode, medicineCode)
-                .set(true, ChineseMedicineConflictEntity::getDelFlag, DelFlagEnum.IS_DELETED.getCode())
-                .set(ChineseMedicineConflictEntity::getChangedBy,userId);
-        chineseMedicineConflictService.update(conflictUpdateWrapper);
+        ChineseMedicineConflictEntity chineseMedicineConflictEntity = new ChineseMedicineConflictEntity();
+        chineseMedicineConflictEntity.setMedicineCode(medicineCode);
+        chineseMedicineConflictService.delete(chineseMedicineConflictEntity,userId);
         return true;
     }
 

@@ -20,6 +20,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
+ * 备忘  店铺id  与名字  对应  存在redis中
  * @Author xieYueFeng
  * @Date 2022/07/30/14:14
  */

@@ -22,6 +22,14 @@ public interface ChineseMedicineConflictService extends IService<ChineseMedicine
     /**
      * 更新中药材相反表一条记录
      * @param conflictEntity 中药材相反实体类
+     * @param userId 当前操作用户id
      */
-    void saveUpdate(ChineseMedicineConflictEntity conflictEntity,Long userId);
+    void saveOrUpdate(ChineseMedicineConflictEntity conflictEntity, Long userId);
+
+    /**
+     * 逻辑删除某药材相反药材
+     * @param conflictEntity 此次操作的行
+     * @param userId 操作的用户id
+     */
+    void delete(ChineseMedicineConflictEntity conflictEntity, Long userId);
 }
