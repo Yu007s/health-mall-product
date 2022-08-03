@@ -21,7 +21,7 @@ public interface StoreService {
      * @param store  店铺信息
      * @param userId 当前操作用户id
      */
-    void save(StoreInfoDetailSaveRequest store, String userId);
+    void save(StoreInfoDetailSaveRequest store, Long userId);
 
     /**
      * 店铺展示 当查询条件都为空  返回所有店铺

@@ -42,7 +42,7 @@ public class StoreController implements StoreFacade {
      */
     @ApiOperation("新增/修改店铺信息")
     @PostMapping("/save")
-    public ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store, @RequestParam String userId) {
+    public ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store, @RequestParam Long userId) {
         storeService.save(store, userId);
         String msg;
         if (store.getId() == null) {

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.model.entity.category.BaseEntity;
+import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -22,7 +23,7 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("product_chinese_medicine")
-public class ChineseMedicineEntity extends BaseEntity implements Serializable {
+public class ChineseMedicineEntity extends BaseStandardEntity implements Serializable {
 
     private static final long serialVersionUID = 1458548948245945617L;
 
@@ -49,8 +50,8 @@ public class ChineseMedicineEntity extends BaseEntity implements Serializable {
     /**
      * 药材名字汉语拼音
      */
-    @TableField("pinyin")
-    private String pinyin;
+    @TableField("medicine_pinyin")
+    private String medicinePinyin;
 
     /**
      * 药材别名汉语拼音
@@ -59,7 +60,7 @@ public class ChineseMedicineEntity extends BaseEntity implements Serializable {
     private String aliasPinyin;
 
     /**
-     * 汉语别名拼音，以“,”隔开
+     * 汉语别名以“,”隔开
      */
     @TableField("medicine_alias")
     private String medicineAlias;
@@ -75,6 +76,5 @@ public class ChineseMedicineEntity extends BaseEntity implements Serializable {
      */
     @TableField("version")
     private Integer version;
-
 
 }

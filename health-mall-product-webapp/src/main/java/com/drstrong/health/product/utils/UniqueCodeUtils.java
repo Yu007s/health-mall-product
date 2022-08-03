@@ -1,5 +1,6 @@
 package com.drstrong.health.product.utils;
 
+import cn.hutool.extra.pinyin.PinyinUtil;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.response.result.BusinessException;
@@ -54,5 +55,16 @@ public class UniqueCodeUtils {
         IRedisService redisService = ApplicationContextHolder.getInstance().getBean(IRedisService.class);
         long serialNumber = redisService.incr(RedisKeyUtils.getSkuNum(productId));
         return spuCode + "-" + serialNumber;
+    }
+
+    public static String getNextMedicineCode(String medicineName){
+        String firstLetter = PinyinUtil.getFirstLetter(medicineName.substring(0,Math.min(2,medicineName.length())), "");
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(firstLetter);
+        stringBuilder.append(DateUtil.formatDate(new Date(), "MMddyy"));
+        IRedisService redisService = ApplicationContextHolder.getInstance().getBean(IRedisService.class);
+        long serialNumber = redisService.incr(RedisKeyUtils.getMedicineCodeNum());
+        stringBuilder.append(String.format("%05d", serialNumber));
+        return stringBuilder.toString();
     }
 }

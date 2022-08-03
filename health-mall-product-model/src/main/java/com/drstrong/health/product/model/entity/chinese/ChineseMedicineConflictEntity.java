@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.model.entity.category.BaseEntity;
+import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,8 +20,8 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("chinese_medicine_conflict")
-public class ChineseMedicineConflictEntity extends BaseEntity implements Serializable {
+@TableName("product_chinese_medicine_conflict")
+public class ChineseMedicineConflictEntity extends BaseStandardEntity implements Serializable {
 
     private static final long serialVersionUID = 4535146937887478478L;
 
@@ -31,14 +32,14 @@ public class ChineseMedicineConflictEntity extends BaseEntity implements Seriali
     private Long id;
 
     /**
-     * 中药材ID
+     * 中药材code
      **/
-    private String chineseMedicineCode;
+    private String medicineCode;
 
     /**
-     * 中药材冲反ID
+     * 中药材相反药材code，以”,“分开
      **/
-    private Long chineseMedicineConflictCode;
+    private String medicineConflictCodes;
 
     /**
      * 乐观锁

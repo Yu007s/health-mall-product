@@ -37,7 +37,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     StoreInvoiceService storeInvoiceService;
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(StoreInfoDetailSaveRequest store, String userId) {
+    public void save(StoreInfoDetailSaveRequest store, Long userId) {
         StoreEntity storeEntity = new StoreEntity();
         storeEntity.setStoreName(store.getName());
         StoreInvoiceEntity invoice = BeanUtil.copyProperties(store, StoreInvoiceEntity.class);

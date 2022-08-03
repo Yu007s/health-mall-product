@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.model.entity.category.BaseEntity;
+import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,7 +17,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("pms_store_link_supplier")
-public class StoreLinkSupplierEntity extends BaseEntity implements Serializable {
+public class StoreLinkSupplierEntity extends BaseStandardEntity implements Serializable {
 
     private static final long serialVersionUID = 1515483874456584741L;
 

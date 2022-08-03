@@ -3,6 +3,7 @@ package com.drstrong.health.product.service.chinese;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.request.chinese.ChineseMedicineRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
+import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
 
 import java.util.List;
@@ -15,23 +16,35 @@ public interface ChineseMedicineService {
     /**
      * 新增中药材
      * @param chineseMedicineVO 中药材提交的相应信息
+     * @param userId 用户id
      * @return 成功与否
+     * @throws Exception 失败返回相应异常信息
      */
-    boolean save(ChineseMedicineVO chineseMedicineVO) ;
+    boolean save(ChineseMedicineVO chineseMedicineVO,Long userId) throws Exception;
 
     /**
      * 查询中药材分页展示
      * @param chineseMedicineRequest  查询请求信息
      * @return 查询所得列表
      */
-    List<ChineseMedicineVO> queryPage(ChineseMedicineRequest chineseMedicineRequest);
+    List<ChineseMedicineResponse> queryPage(ChineseMedicineRequest chineseMedicineRequest);
+
+    /**
+     * 查询中药材分页展示  根据药材编码列表查找  带分页参数
+     * @param medicineCodes 药材编码列表
+     * @param pageNo 分页起始页
+     * @param pageSize 每页大小
+     * @return 查询所得中药材列表
+     */
+    List<ChineseMedicineResponse> queryPage(List<String> medicineCodes,Integer pageNo,Integer pageSize);
 
     /**
      * 逻辑删除药材
      * @param medicineCode 药材编码
+     * @param userId 当前操作用户id
      * @return 是否成功删除
      */
-    public boolean removeByCode(String medicineCode) ;
+     boolean removeByCode(String medicineCode,Long userId) ;
 
     /**
      * 条件查询所有的药材信息
