@@ -4,6 +4,7 @@ import cn.hutool.extra.pinyin.PinyinUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -29,6 +30,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -211,6 +213,25 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
                 .eq(ChineseMedicineEntity::getMedicineCode, medicineCode)
                 .last("limit 1");
         return getOne(queryWrapper);
+    }
+
+    /**
+     * 根据药材code获取中药材信息
+     *
+     * @param medicineCodes 药材code
+     * @return 药材信息
+     * @author liuqiuyi
+     * @date 2022/8/4 15:32
+     */
+    @Override
+    public List<ChineseMedicineEntity> getByMedicineCode(Set<String> medicineCodes) {
+        if (CollectionUtils.isEmpty(medicineCodes)) {
+            return Lists.newArrayList();
+        }
+        LambdaQueryWrapper<ChineseMedicineEntity> queryWrapper = Wrappers.<ChineseMedicineEntity>lambdaQuery()
+                .eq(ChineseMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(ChineseMedicineEntity::getMedicineCode, medicineCodes);
+        return list(queryWrapper);
     }
 
     /**

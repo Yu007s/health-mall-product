@@ -7,6 +7,7 @@ import com.drstrong.health.product.model.response.chinese.ChineseMedicineRespons
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author xieYueFeng
@@ -61,6 +62,16 @@ public interface ChineseMedicineService {
      * @date 2022/8/2 21:38
      */
     ChineseMedicineEntity getByMedicineCode(String medicineCode);
+
+	/**
+	 * 根据药材code获取中药材信息
+	 *
+	 * @param medicineCodes 药材code
+	 * @return 药材信息
+	 * @author liuqiuyi
+	 * @date 2022/8/4 15:32
+	 */
+	List<ChineseMedicineEntity> getByMedicineCode(Set<String> medicineCodes);
 
 	/**
 	 * 根据关键字模糊搜索

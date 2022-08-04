@@ -117,4 +117,17 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
      * @date 2022/8/2 14:48
      */
     Boolean checkHasChineseByMedicineCode(String medicineCode);
+
+	/**
+	 * 根据 skuCode 或者 药材 id,查询中药 sku 信息
+	 * <p> 仅支持查询同一店铺的 sku 信息 </>
+	 *
+	 * @param skuCodeList sku编码信息
+	 * @param medicineIdList 药材 id
+	 * @param storeId 店铺 id
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2022/8/4 14:42
+	 */
+	List<ChineseSkuInfoEntity> queryStoreSkuByCodesOrMedicineIds(Set<String> skuCodeList, Set<Long> medicineIdList, Long storeId);
 }
