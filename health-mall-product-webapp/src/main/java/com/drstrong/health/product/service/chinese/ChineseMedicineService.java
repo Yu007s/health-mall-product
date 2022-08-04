@@ -31,12 +31,12 @@ public interface ChineseMedicineService {
 
     /**
      * 查询中药材分页展示  根据药材编码列表查找  带分页参数
-     * @param medicineCodes 药材编码列表
+     * @param medicineCode 药材编码  根据此编码查询相反药材列表
      * @param pageNo 分页起始页
      * @param pageSize 每页大小
      * @return 查询所得中药材列表
      */
-    List<ChineseMedicineResponse> queryPage(List<String> medicineCodes,Integer pageNo,Integer pageSize);
+    List<ChineseMedicineResponse> queryPageForConflict(String medicineCode, Integer pageNo, Integer pageSize);
 
     /**
      * 逻辑删除药材
@@ -48,10 +48,11 @@ public interface ChineseMedicineService {
 
     /**
      * 条件查询所有的药材信息
-     * @param chineseMedicineRequest 查询信息
+     * @param medicineName 药材名字
+     * @param medicineCode 药材编码
      * @return 条件查询所有的药材信息
      */
-    List<ChineseMedicineInfoResponse> queryAll(ChineseMedicineRequest chineseMedicineRequest);
+    List<ChineseMedicineInfoResponse> queryAll(String medicineName,String medicineCode);
     /**
      * 根据药材code获取中药材信息
      *

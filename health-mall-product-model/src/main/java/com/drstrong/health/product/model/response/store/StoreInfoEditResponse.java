@@ -1,6 +1,5 @@
 package com.drstrong.health.product.model.response.store;
 
-import com.drstrong.health.product.model.enums.StoreTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -20,15 +19,15 @@ public class StoreInfoEditResponse implements Serializable {
 
     @NotNull
     @ApiModelProperty("店铺名称")
-    private String name;
+    private String storeName;
 
     @NotNull
     @ApiModelProperty("关联供应商集合")
-    private List<SupplierResponse> supplierIds;
+    private List<SupplierResponse> suppliers;
 
     @NotNull
     @ApiModelProperty("店铺类型")
-    private StoreTypeEnum storeTypeName;
+    private String storeTypeName;
 
     @ApiModelProperty("关联互联网医院的名字")
     private String agencyName;

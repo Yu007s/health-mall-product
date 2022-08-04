@@ -3,6 +3,7 @@ package com.drstrong.health.product.service.store;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
+import com.drstrong.health.product.model.response.store.StoreAddResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 
@@ -16,12 +17,19 @@ import java.util.Set;
 public interface StoreService {
 
     /**
-     * 更新/保存店铺信息
+     * 保存店铺信息
      *
      * @param store  店铺信息
      * @param userId 当前操作用户id
      */
-    void save(StoreInfoDetailSaveRequest store, Long userId);
+    void save(StoreInfoDetailSaveRequest store, Long userId) throws Exception;
+	/**
+	 * 保存店铺信息
+	 *
+	 * @param store  店铺信息
+	 * @param userId 当前操作用户id
+	 */
+	void update(StoreInfoDetailSaveRequest store, Long userId) throws Exception;
 
     /**
      * 店铺展示 当查询条件都为空  返回所有店铺
@@ -68,4 +76,12 @@ public interface StoreService {
 	 * @date 2022/8/3 19:47
 	 */
 	StoreEntity getStoreByAgencyId(Long agencyId);
+
+	/**
+	 * 增加店铺时提供相应的信息
+	 * @return 提供的供应商信息、互联网医院信息
+	 */
+	StoreAddResponse queryStoreCloseInfo();
+
+
 }

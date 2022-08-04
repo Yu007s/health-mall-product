@@ -39,8 +39,4 @@ public class StoreInvoiceServiceImpl extends ServiceImpl<StoreInvoiceMapper, Sto
         update(lambdaQueryWrapper);
     }
 
-    @Override
-    public boolean save(StoreInvoiceEntity entity) {
-        return super.save(entity);
-    }
 }

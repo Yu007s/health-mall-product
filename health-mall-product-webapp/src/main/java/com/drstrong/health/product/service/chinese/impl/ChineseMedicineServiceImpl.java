@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,11 +58,10 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         if (StringUtils.isNotBlank(medicineCode)) {
             //编辑药材
             ChineseMedicineEntity byMedicineCode = getByMedicineCode(medicineCode);
-            Long medicineId = byMedicineCode.getId();
-            if (medicineId ==  null) {
+            if (byMedicineCode== null || byMedicineCode.getId() ==  null) {
                 throw new Exception("编辑药材失败，未找到该药材");
             }
-            chineseMedicineEntity.setId(medicineId);
+            chineseMedicineEntity.setId( byMedicineCode.getId());
             chineseMedicineEntity.setMedicineCode(chineseMedicineVO.getMedicineCode());
         }
         else{
@@ -95,12 +95,14 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         chineseMedicineEntity.setChangedBy(userId);
         //更新相反药材名表
         List<String> conflictMedicineCodes = chineseMedicineVO.getConflictMedicineCodes();
-        ChineseMedicineConflictEntity chineseMedicineConflictEntity = new ChineseMedicineConflictEntity();
-        StringBuilder stringBuilder = new StringBuilder();
-        conflictMedicineCodes.forEach( conflictMedicineCode -> stringBuilder.append(conflictMedicineCode).append(","));
-        chineseMedicineConflictEntity.setMedicineCode(medicineCode);
-        chineseMedicineConflictEntity.setMedicineConflictCodes(stringBuilder.toString());
-        chineseMedicineConflictService.saveOrUpdate(chineseMedicineConflictEntity,userId);
+        if (conflictMedicineCodes != null && conflictMedicineCodes.size() != 0) {
+            ChineseMedicineConflictEntity chineseMedicineConflictEntity = new ChineseMedicineConflictEntity();
+            StringBuilder stringBuilder = new StringBuilder();
+            conflictMedicineCodes.forEach( conflictMedicineCode -> stringBuilder.append(conflictMedicineCode).append(","));
+            chineseMedicineConflictEntity.setMedicineCode(medicineCode);
+            chineseMedicineConflictEntity.setMedicineConflictCodes(stringBuilder.toString());
+            chineseMedicineConflictService.saveOrUpdate(chineseMedicineConflictEntity,userId);
+        }
         return super.saveOrUpdate(chineseMedicineEntity);
     }
 
@@ -124,41 +126,61 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
     }
 
     @Override
-    public List<ChineseMedicineInfoResponse> queryAll(ChineseMedicineRequest chineseMedicineRequest) {
-        return null;
+    public List<ChineseMedicineInfoResponse> queryAll(String medicineName,String medicineCode) {
+        LambdaQueryWrapper<ChineseMedicineEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName);
+        if(StringUtils.isNotBlank(medicineName)){
+            queryWrapper.like(ChineseMedicineEntity::getMedicineName,medicineName);
+        }
+        if(StringUtils.isNotBlank(medicineCode)){
+            queryWrapper.eq(ChineseMedicineEntity::getMedicineCode,medicineCode);
+        }
+        queryWrapper.last("limit 50");
+        List<ChineseMedicineEntity> list = super.list(queryWrapper);
+        return list.stream().map(chineseMedicineEntity -> {
+            ChineseMedicineInfoResponse chineseMedicineInfoResponse = new ChineseMedicineInfoResponse();
+            chineseMedicineInfoResponse.setMedicineCode(chineseMedicineEntity.getMedicineCode());
+            chineseMedicineInfoResponse.setMedicineName(chineseMedicineEntity.getMedicineName());
+            return chineseMedicineInfoResponse;
+        }).collect(Collectors.toList());
     }
 
     @Override
     public List<ChineseMedicineResponse> queryPage(ChineseMedicineRequest chineseMedicineRequest) {
-        QueryWrapper<ChineseMedicineEntity> wrapper = new QueryWrapper<>();
-        wrapper.lambda().select(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName,
+        LambdaQueryWrapper<ChineseMedicineEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName,
                 ChineseMedicineEntity::getMedicineAlias, ChineseMedicineEntity::getMaxDosage);
-//        medicineWrapper.eq(ChineseMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         if (StringUtils.isNotBlank(chineseMedicineRequest.getMedicineCode())) {
-            wrapper.lambda().eq(ChineseMedicineEntity::getMedicineCode, chineseMedicineRequest.getMedicineCode());
+            wrapper.eq(ChineseMedicineEntity::getMedicineCode, chineseMedicineRequest.getMedicineCode());
         }
         if (StringUtils.isNotBlank(chineseMedicineRequest.getMedicineName()) ) {
-            wrapper.lambda().like(ChineseMedicineEntity::getMedicineName, chineseMedicineRequest.getMedicineName());
+            wrapper.like(ChineseMedicineEntity::getMedicineName, chineseMedicineRequest.getMedicineName());
         }
+        wrapper.orderByDesc(ChineseMedicineEntity::getCreatedAt);
         Page<ChineseMedicineEntity> page = new Page<>(chineseMedicineRequest.getPageNo(), chineseMedicineRequest.getPageSize());
         List<ChineseMedicineEntity> records = page(page, wrapper).getRecords();
         return buildChineseMedicineResponse(records);
     }
 
     @Override
-    public List<ChineseMedicineResponse> queryPage(List<String> medicineCodes, Integer pageNo, Integer pageSize) {
+    @Transactional(readOnly = true)
+    public List<ChineseMedicineResponse> queryPageForConflict(String medicineCode, Integer pageNo, Integer pageSize) {
+        ChineseMedicineConflictEntity chineseMedicineConflictEntity = chineseMedicineConflictService.getByMedicineCode(medicineCode);
+        if (chineseMedicineConflictEntity == null || chineseMedicineConflictEntity.getMedicineConflictCodes() == null) {
+            return new ArrayList<>(1);
+        }
+        List<String> conflictCodes = Arrays.asList(chineseMedicineConflictEntity.getMedicineConflictCodes().split(","));
         LambdaQueryWrapper<ChineseMedicineEntity> medicineWrapper = new LambdaQueryWrapper<>();
         medicineWrapper.select(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName,
-                        ChineseMedicineEntity::getMedicineAlias, ChineseMedicineEntity::getMaxDosage)
-//                .in(ChineseMedicineEntity::getMedicineCode,medicineCodes)
-                .eq(ChineseMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+                ChineseMedicineEntity::getMedicineAlias, ChineseMedicineEntity::getMaxDosage);
         medicineWrapper.and((wrapper) -> {
-            wrapper.in(ChineseMedicineEntity::getMedicineCode, medicineCodes);
+            wrapper.in(ChineseMedicineEntity::getMedicineCode, conflictCodes);
         });
         Page<ChineseMedicineEntity> page = new Page<>(pageNo, pageSize);
         List<ChineseMedicineEntity> records = page(page, medicineWrapper).getRecords();
         return buildChineseMedicineResponse(records);
     }
+
 
     private List<ChineseMedicineResponse> buildChineseMedicineResponse(List<ChineseMedicineEntity> chineseMedicineEntities) {
         return chineseMedicineEntities.stream().map(chineseMedicineEntity -> {

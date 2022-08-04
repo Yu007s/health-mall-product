@@ -4,9 +4,11 @@ import com.drstrong.health.product.service.store.AgencyService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
+ * 互联网医院服务实现 id从1开始
  * @Author xieYueFeng
  * @Date 2022/08/01/9:23
  */
@@ -34,5 +36,10 @@ public class AgencyServiceImpl implements AgencyService {
             }
         }
         return -1L;
+    }
+
+    @Override
+    public List<String> getAllName() {
+        return Collections.unmodifiableList(NAMES);
     }
 }

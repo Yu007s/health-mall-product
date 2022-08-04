@@ -25,7 +25,7 @@ import java.util.List;
  * @Date 2022/07/30/14:14
  */
 @RestController
-@RequestMapping("/product/chineseStore")
+@RequestMapping("/product/chinese/store")
 public class StoreController implements StoreFacade {
 
     @Resource
@@ -43,12 +43,13 @@ public class StoreController implements StoreFacade {
      */
     @ApiOperation("新增/修改店铺信息")
     @PostMapping("/save")
-    public ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store, @RequestParam Long userId) {
-        storeService.save(store, userId);
+    public ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store, @RequestParam Long userId) throws Exception {
         String msg;
-        if (store.getId() == null) {
+        if (store.getStoreId() == null) {
+            storeService.save(store, userId);
             msg = "新增店铺成功";
         } else {
+            storeService.update(store,userId);
             msg = "修改店铺成功";
         }
         return ResultVO.success(msg);
@@ -62,7 +63,7 @@ public class StoreController implements StoreFacade {
      */
     @ApiOperation("获取符合条件的店铺基本信息列表")
     @GetMapping("/query")
-    public ResultVO<List<StoreInfoResponse>> queryStore(@RequestBody StoreSearchRequest storeSearchRequest) {
+    public ResultVO<List<StoreInfoResponse>> queryStore(StoreSearchRequest storeSearchRequest) {
         List<StoreInfoResponse> query = storeService.query(storeSearchRequest);
         return ResultVO.success(query);
     }
@@ -91,7 +92,16 @@ public class StoreController implements StoreFacade {
     public ResultVO<DeliveryPriorityVO> queryStoreDelivery(@RequestParam String storeId) {
         return null;
     }
-
+    /**
+     * 店铺新增页面  查询所有需要信息
+     * @return 所有需要信息的集合
+     */
+    @ApiOperation("增加店铺时查找相应的信息")
+    @GetMapping("/queryInfo")
+    public ResultVO<StoreAddResponse> queryStoreInfo() {
+        StoreAddResponse storeAddResponse = storeService.queryStoreCloseInfo();
+        return ResultVO.success(storeAddResponse);
+    }
     /**
      * 保存配送优先级信息
      *
@@ -118,7 +128,6 @@ public class StoreController implements StoreFacade {
 
     /**
      * 根据区域id查询具体的区域信息
-     *
      * @return 所有的省份信息
      */
     @ApiOperation("查询具体的区域信息")
@@ -127,5 +136,14 @@ public class StoreController implements StoreFacade {
        return null;
     }
 
+    /**
+     * 根据区域id查询具体的区域信息
+     * @return 所有的省份信息
+     */
+    @ApiOperation("查询具体的区域信息")
+    @GetMapping("/serachStore")
+    public List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam Long supllierId) {
+        return null;
+    }
 
 }

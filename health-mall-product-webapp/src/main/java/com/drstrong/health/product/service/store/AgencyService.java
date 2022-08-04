@@ -1,5 +1,7 @@
 package com.drstrong.health.product.service.store;
 
+import java.util.List;
+
 /**
  * 关联互联网医院id 名字映射
  * @Author xieYueFeng
@@ -20,4 +22,6 @@ public interface AgencyService {
      * @return 互联网医院id
      */
     Long name2Id(String name);
+
+    List<String> getAllName();
 }

@@ -11,13 +11,13 @@ import java.io.Serializable;
 @Data
 public class SupplierResponse implements Serializable {
 
-    private static Long serialVersionUID = 1518489121731961744L;
+    private static long serialVersionUID = 1518489121731961744L;
     /**
      * 供应商id
      */
-    Long supplierId;
+    private Long supplierId;
     /**
      * 供应商名字
      */
-    String supplierName;
+    private String supplierName;
 }

@@ -60,6 +60,7 @@ public class UniqueCodeUtils {
     public static String getNextMedicineCode(String medicineName){
         String firstLetter = PinyinUtil.getFirstLetter(medicineName.substring(0,Math.min(2,medicineName.length())), "");
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Z");
         stringBuilder.append(firstLetter);
         stringBuilder.append(DateUtil.formatDate(new Date(), "MMddyy"));
         IRedisService redisService = ApplicationContextHolder.getInstance().getBean(IRedisService.class);

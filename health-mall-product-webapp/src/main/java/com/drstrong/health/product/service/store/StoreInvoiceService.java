@@ -10,5 +10,5 @@ public interface
 StoreInvoiceService {
     StoreInvoiceEntity getByStoreId(Long storeId);
     void removeByStoreId(Long storeId);
-    boolean save(StoreInvoiceEntity storeInvoiceEntity);
+
 }

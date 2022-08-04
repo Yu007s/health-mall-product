@@ -18,11 +18,14 @@ import java.util.List;
 public class StoreInfoDetailSaveRequest implements Serializable {
     private static final long serialVersionUID = 2211348485397306232L;
     @ApiModelProperty("店铺主键id")
-    private Long id;
+    private Long storeId;
 
     @NotNull
     @ApiModelProperty("店铺名称")
-    private String name;
+    private String storeName;
+
+    @ApiModelProperty("店铺描述")
+    private String storeDes;
 
     @NotNull
     @ApiModelProperty("关联供应商id集合")
@@ -30,10 +33,13 @@ public class StoreInfoDetailSaveRequest implements Serializable {
 
     @NotNull
     @ApiModelProperty("店铺类型")
-    private StoreTypeEnum storeTypeName;
+    private String storeTypeName;
 
-    @ApiModelProperty("关联互联网医院的名字")
-    private String agencyName;
+    @ApiModelProperty("关联互联网医院的id")
+    private Long agencyId;
+
+    @ApiModelProperty("关联互联网医院名字")
+    private Long agencyName;
 
     @NotNull
     @ApiModelProperty("企业税号  最长50位  只有英文、数字")
@@ -54,9 +60,11 @@ public class StoreInfoDetailSaveRequest implements Serializable {
     @ApiModelProperty("开票员")
     private String drawer;
 
+    @NotNull
     @ApiModelProperty("收款人")
     private String payee;
 
+    @NotNull
     @ApiModelProperty("复核人")
     private String checker;
 

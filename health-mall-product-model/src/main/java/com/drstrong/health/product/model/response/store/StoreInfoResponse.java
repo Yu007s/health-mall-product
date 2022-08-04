@@ -1,6 +1,5 @@
 package com.drstrong.health.product.model.response.store;
 
-import com.drstrong.health.product.model.enums.StoreTypeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,7 +20,7 @@ public class StoreInfoResponse implements Serializable {
     private Long id;
 
     @ApiModelProperty("店铺名称")
-    private String name;
+    private String storeName;
 
     @ApiModelProperty("店铺类型")
     private String storeTypeName;

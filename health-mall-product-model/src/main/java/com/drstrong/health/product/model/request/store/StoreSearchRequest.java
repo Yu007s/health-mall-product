@@ -26,6 +26,6 @@ public class StoreSearchRequest implements Serializable {
     private Long agencyId;
 
     @ApiModelProperty("店铺类型")
-    private StoreTypeEnum storeType;
+    private String storeTypeName;
 
 }

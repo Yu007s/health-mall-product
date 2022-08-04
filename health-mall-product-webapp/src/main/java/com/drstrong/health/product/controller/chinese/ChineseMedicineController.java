@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @Author xieYueFeng
@@ -32,8 +30,6 @@ import java.util.stream.Collectors;
 public class ChineseMedicineController implements ChineseMedicineFacade {
     @Resource
     ChineseMedicineService chineseMedicineService;
-    @Resource
-    ChineseMedicineConflictService chineseMedicineConflictService;
 
     /**
      * 新建、编辑药材  药材名字不允许重复
@@ -43,8 +39,8 @@ public class ChineseMedicineController implements ChineseMedicineFacade {
      */
     @ApiOperation("新建/编辑药材")
     @PostMapping("/save")
-    ResultVO<String> addMedicine(@RequestBody @Valid ChineseMedicineVO chineseMedicineVO,@RequestParam Long userId) throws Exception {
-        chineseMedicineService.save(chineseMedicineVO,userId);
+    ResultVO<String> addMedicine(@RequestBody @Valid ChineseMedicineVO chineseMedicineVO, @RequestParam Long userId) throws Exception {
+        chineseMedicineService.save(chineseMedicineVO, userId);
         return ResultVO.success("成功");
     }
 
@@ -56,9 +52,9 @@ public class ChineseMedicineController implements ChineseMedicineFacade {
      */
     @ApiOperation("删除药材")
     @DeleteMapping("/delete")
-    ResultVO<String> deleteMedicine(@RequestParam String medicineCode,@RequestParam Long userId) {
+    ResultVO<String> deleteMedicine(@RequestParam String medicineCode, @RequestParam Long userId) {
         String msg = "当前中药材已关联SKU或者不存在";
-        boolean b = chineseMedicineService.removeByCode(medicineCode,userId);
+        boolean b = chineseMedicineService.removeByCode(medicineCode, userId);
         if (b) {
             msg = "删除中药材成功";
         }
@@ -83,8 +79,8 @@ public class ChineseMedicineController implements ChineseMedicineFacade {
      */
     @ApiOperation("所有药材查询")
     @GetMapping("/searchAll")
-    public ResultVO<List<ChineseMedicineInfoResponse>> queryMedicineAll(@RequestParam ChineseMedicineRequest chineseMedicineRequest) {
-        List<ChineseMedicineInfoResponse> chineseMedicineInfoList = chineseMedicineService.queryAll(chineseMedicineRequest);
+    public ResultVO<List<ChineseMedicineInfoResponse>> queryMedicineAll(String medicineName,String medicineCode) {
+        List<ChineseMedicineInfoResponse> chineseMedicineInfoList = chineseMedicineService.queryAll(medicineName,medicineCode);
         return ResultVO.success(chineseMedicineInfoList);
     }
 
@@ -93,11 +89,8 @@ public class ChineseMedicineController implements ChineseMedicineFacade {
      */
     @ApiOperation("相反药材信息分页展示")
     @GetMapping("/conflictList")
-    public ResultVO<List<ChineseMedicineResponse>> queryConflictMedicine(ChineseMedicineRequest chineseMedicineRequest) {
-        ChineseMedicineConflictEntity chineseMedicineConflictEntity = chineseMedicineConflictService.getByMedicineCode(chineseMedicineRequest.getMedicineCode());
-        List<String> collect = Arrays.asList(chineseMedicineConflictEntity.getMedicineConflictCodes().split(","));
-        List<ChineseMedicineResponse> chineseMedicineResponses = chineseMedicineService.queryPage(collect,
-                chineseMedicineRequest.getPageNo(),chineseMedicineRequest.getPageSize());
+    public ResultVO<List<ChineseMedicineResponse>> queryConflictMedicine(@RequestParam String medicineCode, @RequestParam Integer pageNo, @RequestParam Integer pageSize) {
+        List<ChineseMedicineResponse> chineseMedicineResponses = chineseMedicineService.queryPageForConflict(medicineCode, pageNo, pageSize);
         return ResultVO.success(chineseMedicineResponses);
     }
 }

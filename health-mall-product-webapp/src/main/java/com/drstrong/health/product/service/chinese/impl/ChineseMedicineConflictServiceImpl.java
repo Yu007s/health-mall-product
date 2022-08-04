@@ -24,15 +24,14 @@ public class ChineseMedicineConflictServiceImpl extends CustomServiceImpl<Chines
     public ChineseMedicineConflictEntity getByMedicineCode(String medicineCode) {
         LambdaQueryWrapper<ChineseMedicineConflictEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.select(ChineseMedicineConflictEntity::getMedicineConflictCodes)
-                .eq(ChineseMedicineConflictEntity::getMedicineCode, medicineCode)
-                .eq(ChineseMedicineConflictEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+                .eq(ChineseMedicineConflictEntity::getMedicineCode, medicineCode);
         return getOne(lambdaQueryWrapper);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdate(ChineseMedicineConflictEntity conflictEntity, Long userId) {
-        if (conflictEntity == null || conflictEntity.getMedicineCode() == null) {
+        if (conflictEntity == null || conflictEntity.getMedicineCode() == null || conflictEntity.getMedicineCode().isEmpty()) {
             return;
         }
         LambdaQueryWrapper<ChineseMedicineConflictEntity> queryWrapper = new LambdaQueryWrapper<>();
