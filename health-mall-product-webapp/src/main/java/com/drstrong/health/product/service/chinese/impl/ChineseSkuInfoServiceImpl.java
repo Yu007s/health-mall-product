@@ -287,6 +287,34 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
         return Objects.nonNull(getOne(queryWrapper));
     }
 
+    /**
+     * 根据 skuCode 或者 药材 id,查询中药 sku 信息
+     * <p> 仅支持查询同一店铺的 sku 信息 </>
+     *
+     * @param skuCodeList    sku编码信息
+     * @param medicineIdList 药材 id
+     * @param storeId        店铺 id
+     * @return sku 信息
+     * @author liuqiuyi
+     * @date 2022/8/4 14:42
+     */
+    @Override
+    public List<ChineseSkuInfoEntity> queryStoreSkuByCodesOrMedicineIds(Set<String> skuCodeList, Set<Long> medicineIdList, Long storeId) {
+        if ((CollectionUtils.isEmpty(skuCodeList) && (CollectionUtils.isEmpty(medicineIdList)) || Objects.isNull(storeId))) {
+            return Lists.newArrayList();
+        }
+        LambdaQueryWrapper<ChineseSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .eq(ChineseSkuInfoEntity::getSkuStatus, ProductStateEnum.HAS_PUT.getCode())
+                .eq(ChineseSkuInfoEntity::getStoreId, storeId);
+        if (!CollectionUtils.isEmpty(skuCodeList)) {
+            queryWrapper.in(ChineseSkuInfoEntity::getSkuCode, skuCodeList);
+        } else {
+            queryWrapper.in(ChineseSkuInfoEntity::getOldMedicineId, medicineIdList);
+        }
+        return list(queryWrapper);
+    }
+
     private List<ChineseSkuSupplierRelevanceEntity> buildChineseSkuSupplierRelevanceList(SaveOrUpdateSkuVO saveOrUpdateSkuVO, String skuCode) {
         List<ChineseSkuSupplierRelevanceEntity> relevanceEntityList = Lists.newArrayListWithCapacity(saveOrUpdateSkuVO.getSupplierInfoList().size());
         saveOrUpdateSkuVO.getSupplierInfoList().forEach(supplierInfo -> {

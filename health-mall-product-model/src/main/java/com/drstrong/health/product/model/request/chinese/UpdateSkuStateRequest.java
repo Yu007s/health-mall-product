@@ -17,7 +17,7 @@ import java.util.Set;
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel("保存/更新中药sku的入参")
+@ApiModel("中药sku上下架入参")
 public class UpdateSkuStateRequest implements Serializable {
     private static final long serialVersionUID = -6964632529439063141L;
 

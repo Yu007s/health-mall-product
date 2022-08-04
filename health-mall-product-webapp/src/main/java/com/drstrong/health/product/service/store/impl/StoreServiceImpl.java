@@ -114,7 +114,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     }
 
     /**
-     * 根据互联网医院 id，获取店铺信息
+     * 根据互联网医院 id 或店铺 id，获取店铺信息
      *
      * @param agencyId 互联网医院 id
      * @return 店铺信息
@@ -122,16 +122,22 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
      * @date 2022/8/3 19:47
      */
     @Override
-    public StoreEntity getStoreByAgencyId(Long agencyId) {
-        if (Objects.isNull(agencyId)) {
+    public StoreEntity getStoreByAgencyIdOrStoreId(Long agencyId, Long storeId) {
+        if (Objects.isNull(agencyId) && Objects.isNull(storeId)) {
             return null;
         }
-        LambdaQueryWrapper<StoreEntity> queryWrapper = Wrappers.<StoreEntity>lambdaQuery()
-                .eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .eq(StoreEntity::getStoreType, 0)
-                .eq(StoreEntity::getAgencyId, agencyId)
-                .last("limit 1");
-        return getOne(queryWrapper);
+        StoreEntity storeEntity;
+        if (Objects.nonNull(storeId)) {
+            storeEntity = getById(storeId);
+        } else {
+            LambdaQueryWrapper<StoreEntity> queryWrapper = Wrappers.<StoreEntity>lambdaQuery()
+                    .eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                    .eq(StoreEntity::getStoreType, 0)
+                    .eq(StoreEntity::getAgencyId, agencyId)
+                    .last("limit 1");
+            storeEntity = getOne(queryWrapper);
+        }
+        return storeEntity;
     }
 
     @Override

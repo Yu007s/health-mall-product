@@ -1,5 +1,7 @@
 package com.drstrong.health.product.facade;
 
+import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
+import com.drstrong.health.product.model.response.chinese.ChineseSkuExtendVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 
 import java.util.List;
@@ -23,4 +25,15 @@ public interface ChineseRemoteFacade {
 	 * @date 2022/8/3 19:34
 	 */
 	List<ChineseSkuInfoVO> keywordSearch(String keyword, Long agencyId, Long storeId);
+
+	/**
+	 * 根据条件查询 sku 信息
+	 * <p> 仅支持查询同一店铺的 sku 信息 </>
+	 *
+	 * @param chineseSkuRequest 查询条件
+	 * @return 查询结果
+	 * @author liuqiuyi
+	 * @date 2022/8/4 14:19
+	 */
+	List<ChineseSkuExtendVO> queryStoreSku(QueryChineseSkuRequest chineseSkuRequest);
 }

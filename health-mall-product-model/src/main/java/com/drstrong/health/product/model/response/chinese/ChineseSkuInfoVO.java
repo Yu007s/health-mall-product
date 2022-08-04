@@ -26,8 +26,11 @@ import java.math.BigDecimal;
 public class ChineseSkuInfoVO implements Serializable {
 	private static final long serialVersionUID = 250240804033119353L;
 
-	@ApiModelProperty("商品类型")
+	@ApiModelProperty("商品类型。0-商品，1-药品，2-中药")
 	private Integer productType;
+
+	@ApiModelProperty("商品类型名称")
+	private String productTypeName;
 
 	@ApiModelProperty("sku 编码")
 	private String skuCode;
@@ -40,6 +43,9 @@ public class ChineseSkuInfoVO implements Serializable {
 
 	@ApiModelProperty("药材code")
 	private String medicineCode;
+
+	@ApiModelProperty("药材名称")
+	private String medicineName;
 
 	@ApiModelProperty("店铺id")
 	private Long storeId;
