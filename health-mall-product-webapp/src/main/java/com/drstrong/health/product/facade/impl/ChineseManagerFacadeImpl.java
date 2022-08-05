@@ -17,10 +17,12 @@ import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
 import com.drstrong.health.product.model.response.chinese.SupplierChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
 import com.drstrong.health.product.service.store.StoreService;
+import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +54,9 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 
     @Resource
     ChineseMedicineService chineseMedicineService;
+
+    @Resource
+    SupplierRemoteProService supplierRemoteProService;
 
     /**
      * 中药管理页面，列表查询
@@ -110,9 +115,10 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         List<StoreEntity> storeEntityList = storeService.listByIds(storeIds);
         Map<Long, String> storeIdNameMap = storeEntityList.stream().collect(toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
         // 4.获取供应商名称
-        // TODO liuqiuyi 调用供应商接口
+        List<Long> supplierIds = skuCodeSupplierIdsMap.values().stream().flatMap(Collection::stream).distinct().collect(toList());
+        Map<Long, String> supplierIdNameMap = supplierRemoteProService.getSupplierNameToMap(supplierIds);
         // 5.组装返回值
-        return buildChineseManagerSkuResponse(skuInfoEntityList, skuCodeSupplierIdsMap, storeIdNameMap);
+        return buildChineseManagerSkuResponse(skuInfoEntityList, skuCodeSupplierIdsMap, storeIdNameMap, supplierIdNameMap);
     }
 
     /**
@@ -170,6 +176,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         }
 
         // 3.调用供应商接口，获取供应商的信息
+        // TODO liuqiuyi
 
         // 4.组装数据
 
@@ -249,16 +256,17 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         }
         saveOrUpdateSkuVO.setMedicineId(chineseMedicineEntity.getId());
         saveOrUpdateSkuVO.setMedicineName(chineseMedicineEntity.getMedicineName());
-
         // 2.校验店铺是否存在
         List<StoreEntity> storeEntityList = storeService.listByIds(Sets.newHashSet(saveOrUpdateSkuVO.getStoreId()));
         if (CollectionUtils.isEmpty(storeEntityList)) {
             throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
         }
         // 3.校验供应商是否存在
-        // TODO liuqiuyi 调用供应商接口
-
-
+        List<Long> supplierIds = saveOrUpdateSkuVO.getSupplierInfoList().stream().map(SaveOrUpdateSkuVO.SupplierInfo::getSupplierId).collect(toList());
+        List<SupplierInfoDTO> supplierInfoDTOList = supplierRemoteProService.getSupplierNameByIds(supplierIds);
+        if (CollectionUtils.isEmpty(storeEntityList) || !Objects.equals(supplierInfoDTOList.size(), supplierIds.size())) {
+            throw new BusinessException(ErrorEnums.SUPPLIER_IS_NULL);
+        }
         // 4.如果是更新sku，校验skuCode是否存在，否则校验重复添加
         if (updateFlag) {
             ChineseSkuInfoEntity skuInfoEntity = chineseSkuInfoService.getBySkuCode(saveOrUpdateSkuVO.getSkuCode());
@@ -276,7 +284,8 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 
     private List<ChineseManagerSkuVO> buildChineseManagerSkuResponse(List<ChineseSkuInfoEntity> skuInfoEntityList,
                                                                      Map<String, Set<Long>> skuCodeSupplierIdsMap,
-                                                                     Map<Long, String> storeIdNameMap) {
+                                                                     Map<Long, String> storeIdNameMap,
+                                                                     Map<Long, String> supplierIdNameMap) {
         List<ChineseManagerSkuVO> managerSkuVOList = Lists.newArrayListWithCapacity(skuInfoEntityList.size());
         for (ChineseSkuInfoEntity chineseSkuInfoEntity : skuInfoEntityList) {
             Set<Long> supplierIds = skuCodeSupplierIdsMap.get(chineseSkuInfoEntity.getSkuCode());
@@ -288,12 +297,14 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
                     .storeId(chineseSkuInfoEntity.getStoreId())
                     .storeName(storeIdNameMap.get(chineseSkuInfoEntity.getStoreId()))
                     .supplierIdList(supplierIds)
-                    // TODO
-//                    .supplierName()
                     .price(chineseSkuInfoEntity.getPrice())
                     .skuState(chineseSkuInfoEntity.getSkuStatus())
                     .skuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()))
                     .build();
+            // 设值供应商名称
+            List<String> supplierNames = Lists.newArrayListWithCapacity(supplierIds.size());
+            chineseManagerSkuVO.getSupplierIdList().forEach(id -> supplierNames.add(supplierIdNameMap.getOrDefault(id, "")));
+            chineseManagerSkuVO.setSupplierName(supplierNames);
 
             managerSkuVOList.add(chineseManagerSkuVO);
         }
