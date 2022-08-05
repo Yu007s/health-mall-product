@@ -2,6 +2,7 @@ package com.drstrong.health.product.service.chinese;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.drstrong.health.product.model.dto.SupplierChineseSkuDTO;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
@@ -130,4 +131,20 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
 	 * @date 2022/8/4 14:42
 	 */
 	List<ChineseSkuInfoEntity> queryStoreSkuByCodesOrMedicineIds(Set<String> skuCodeList, Set<Long> medicineIdList, Long storeId);
+
+	/**
+	 * 供应商中药库存页面，列表查询接口,提供给供应商远程调用
+	 *
+	 * @author liuqiuyi
+	 * @date 2022/8/5 10:25
+	 */
+	Page<SupplierChineseSkuDTO> pageSupplierChineseManagerSku(ChineseManagerSkuRequest queryParam);
+
+	/**
+	 * 供应商中药库存页面，列表导出接口,提供给供应商远程调用
+	 *
+	 * @author liuqiuyi
+	 * @date 2022/8/5 10:40
+	 */
+	List<SupplierChineseSkuDTO> listSupplierChineseManagerSkuExport(ChineseManagerSkuRequest queryParam);
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.dao.chinese.ChineseSkuInfoMapper;
+import com.drstrong.health.product.model.dto.SupplierChineseSkuDTO;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierRelevanceEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSpuInfoEntity;
@@ -313,6 +314,31 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
             queryWrapper.in(ChineseSkuInfoEntity::getOldMedicineId, medicineIdList);
         }
         return list(queryWrapper);
+    }
+
+    /**
+     * 供应商中药库存页面，列表查询接口,提供给供应商远程调用
+     *
+     * @param queryParam 参数
+     * @author liuqiuyi
+     * @date 2022/8/5 10:25
+     */
+    @Override
+    public Page<SupplierChineseSkuDTO> pageSupplierChineseManagerSku(ChineseManagerSkuRequest queryParam) {
+        Page<ChineseSkuInfoEntity> entityPage = new Page<>(queryParam.getPageNo(), queryParam.getPageSize());
+        return chineseSkuInfoMapper.pageSupplierChineseManagerSku(entityPage, queryParam);
+    }
+
+    /**
+     * 供应商中药库存页面，列表导出接口,提供给供应商远程调用
+     *
+     * @param queryParam
+     * @author liuqiuyi
+     * @date 2022/8/5 10:40
+     */
+    @Override
+    public List<SupplierChineseSkuDTO> listSupplierChineseManagerSkuExport(ChineseManagerSkuRequest queryParam) {
+        return chineseSkuInfoMapper.listSupplierChineseManagerSkuExport(queryParam);
     }
 
     private List<ChineseSkuSupplierRelevanceEntity> buildChineseSkuSupplierRelevanceList(SaveOrUpdateSkuVO saveOrUpdateSkuVO, String skuCode) {

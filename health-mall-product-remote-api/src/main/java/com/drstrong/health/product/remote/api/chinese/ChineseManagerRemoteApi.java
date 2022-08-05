@@ -5,6 +5,7 @@ import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
+import com.drstrong.health.product.model.response.chinese.SupplierChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -52,4 +53,12 @@ public interface ChineseManagerRemoteApi {
     @ApiOperation("中药管理页面，sku批量上下架")
     @PostMapping("/update/sku/state")
     ResultVO<Object> listUpdateSkuState(@RequestBody @Valid UpdateSkuStateRequest updateSkuStateRequest);
+
+    @ApiOperation("供应商中药库存页面，列表查询接口,提供给供应商远程调用")
+    @PostMapping("/supplier/page/sku")
+    ResultVO<PageVO<SupplierChineseManagerSkuVO>> pageSupplierChineseManagerSku(@RequestBody ChineseManagerSkuRequest skuRequest);
+
+    @ApiOperation("供应商中药库存页面，列表查询并导出,提供给供应商远程调用")
+    @PostMapping("/supplier/sku/export")
+    ResultVO<List<SupplierChineseManagerSkuVO>> listSupplierChineseManagerSkuExport(@RequestBody ChineseManagerSkuRequest skuRequest);
 }
