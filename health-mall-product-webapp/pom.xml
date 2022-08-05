@@ -168,11 +168,15 @@
         <dependency>
             <groupId>com.drstrong.health</groupId>
             <artifactId>health-common</artifactId>
-            <version>${health-common.version}</version>
+            <version>TEST1-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.springfox</groupId>
                     <artifactId>springfox-swagger2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>health-sleuth-spring-boot-starter</artifactId>
+                    <groupId>com.drstrong.health</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
