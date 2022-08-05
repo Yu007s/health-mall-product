@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
+import com.drstrong.health.product.model.response.chinese.SupplierChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.chinese.ChineseManagerRemoteApi;
 import io.swagger.annotations.Api;
@@ -55,5 +56,15 @@ public class ChineseManagerController implements ChineseManagerRemoteApi {
     public ResultVO<Object> listUpdateSkuState(UpdateSkuStateRequest updateSkuStateRequest) {
         chineseManagerFacade.listUpdateSkuState(updateSkuStateRequest);
         return ResultVO.success();
+    }
+
+    @Override
+    public ResultVO<PageVO<SupplierChineseManagerSkuVO>> pageSupplierChineseManagerSku(ChineseManagerSkuRequest skuRequest) {
+        return ResultVO.success(chineseManagerFacade.pageSupplierChineseManagerSku(skuRequest));
+    }
+
+    @Override
+    public ResultVO<List<SupplierChineseManagerSkuVO>> listSupplierChineseManagerSkuExport(ChineseManagerSkuRequest skuRequest) {
+        return ResultVO.success(chineseManagerFacade.listSupplierChineseManagerSkuExport(skuRequest));
     }
 }

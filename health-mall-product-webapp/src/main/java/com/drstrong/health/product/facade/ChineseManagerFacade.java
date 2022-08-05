@@ -5,6 +5,7 @@ import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
+import com.drstrong.health.product.model.response.chinese.SupplierChineseManagerSkuVO;
 
 import java.util.List;
 
@@ -63,4 +64,20 @@ public interface ChineseManagerFacade {
      * @date 2022/8/2 14:21
      */
     void listUpdateSkuState(UpdateSkuStateRequest updateSkuStateRequest);
+
+    /**
+     * 供应商中药库存页面，列表查询接口,提供给供应商远程调用
+     *
+     * @author liuqiuyi
+     * @date 2022/8/5 10:17
+     */
+    PageVO<SupplierChineseManagerSkuVO> pageSupplierChineseManagerSku(ChineseManagerSkuRequest skuRequest);
+
+    /**
+     * 供应商中药库存页面，列表查询导出,提供给供应商远程调用
+     *
+     * @author liuqiuyi
+     * @date 2022/8/5 10:17
+     */
+    List<SupplierChineseManagerSkuVO> listSupplierChineseManagerSkuExport(ChineseManagerSkuRequest skuRequest);
 }
