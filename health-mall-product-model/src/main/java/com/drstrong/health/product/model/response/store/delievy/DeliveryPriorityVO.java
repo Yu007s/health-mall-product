@@ -28,7 +28,7 @@ public class DeliveryPriorityVO implements Serializable {
     private List<Long> defaultDeliveries;
 
     /**
-     * 分市区优先级列表  第0个为默认优先级
+     * 分市区优先级列表
      */
     private List<DeliveryPriResponse> deliveryPriorities;
 

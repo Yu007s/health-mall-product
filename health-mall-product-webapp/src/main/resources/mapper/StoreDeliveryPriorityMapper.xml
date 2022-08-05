@@ -20,5 +20,8 @@
     <sql id="Base_Column_List">
         id, store_id, area_id, area_name, priorities, created_at, created_by, changed_at, changed_by, version, del_flag
     </sql>
+    <update id="updateBatch">
+        update pms_store_delivery_priority set priorities =#{priorities} where store_id=#{store_id} and area_id=#{area_id} and del_flag=0
+    </update>
 
 </mapper>

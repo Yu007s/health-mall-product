@@ -58,6 +58,15 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         StoreEntity storeEntity = new StoreEntity();
         buildEntityForSaveOrUpdate(storeRequest,storeEntity,storeLinkSuppliers,invoice,userId);
         checkStore(storeEntity);
+        if (storeEntity.getAgencyId() != null) {
+            //校验将要关联的互联网医院是否已经关联了店铺
+            LambdaQueryWrapper<StoreEntity> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(StoreEntity::getAgencyId, storeEntity.getAgencyId()).eq(StoreEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode()).last("limit 1");
+            StoreEntity one = super.getOne(queryWrapper);
+            if(one != null){
+                throw new Exception("该互联网医院已经关联了店铺");
+            }
+        }
         storeEntity.setCreatedBy(userId);
         super.save(storeEntity);
         Long storeId = storeEntity.getId();
@@ -251,7 +260,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         String storeTypeName = storeRequest.getStoreTypeName();
         Integer integer = StoreTypeEnum.nameToCode(storeTypeName);
         if (integer == null) {
-            throw new Exception("错误的店铺名称");
+            throw new Exception("错误的店铺类型名称");
         }
         storeEntity.setStoreType(integer);
         storeEntity.setId(storeRequest.getStoreId());

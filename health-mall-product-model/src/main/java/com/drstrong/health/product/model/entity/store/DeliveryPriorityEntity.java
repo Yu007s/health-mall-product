@@ -25,6 +25,7 @@ import java.io.Serializable;
 public class DeliveryPriorityEntity extends BaseStandardEntity  implements Serializable  {
 
     private static final long serialVersionUID= 1548474653267452161L;
+    public static final long DEFAULT_AREA_ID = 0L;
 
     /**
      * 主键id
@@ -41,11 +42,6 @@ public class DeliveryPriorityEntity extends BaseStandardEntity  implements Seria
      * 区域id 
      */
     private Long areaId;
-
-    /**
-     * 区域名字
-     */
-    private String areaName;
 
     /**
      * 该店铺下该地区所有供应商优先级设置  以“,”号隔开,前面的优先级更小

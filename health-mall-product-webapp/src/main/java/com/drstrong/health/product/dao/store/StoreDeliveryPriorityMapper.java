@@ -4,6 +4,8 @@ import com.drstrong.health.product.model.entity.store.DeliveryPriorityEntity;
 import cn.strong.mybatis.plus.extend.CustomBaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * <p>
  *  Mapper 接口
@@ -14,5 +16,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface StoreDeliveryPriorityMapper extends CustomBaseMapper<DeliveryPriorityEntity> {
+    void updateBatch(List<DeliveryPriorityEntity> entityList);
 
 }
