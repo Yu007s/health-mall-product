@@ -181,3 +181,39 @@ prod:
   only:
     - release
     - /^hotfix-.*/
+
+
+prod-v1:
+  stage: deploy to prod
+  variables:
+    K8S_CLUSTER: '$CCE2'
+    ENV_NAME: 'prod-v1'
+    APP_CONFIG: '${JVM_OPTS_PROD}'
+    ARGO_PROJ: '${BUSINESS_NAME}-prod'
+    CD_GIT_PATH: 'prod'
+    DNS: '$DNS_PROD'
+    # nacos
+    NACOS_IP: '$NACOS_IP_PROD'
+    NACOS_NS: '$NACOS_NS_PROD'
+  extends: .deploy
+  only:
+    - release
+    - /^hotfix-.*/
+
+
+prod-v2:
+  stage: deploy to prod
+  variables:
+    K8S_CLUSTER: '$CCE2'
+    ENV_NAME: 'prod-v2'
+    APP_CONFIG: '${JVM_OPTS_PROD}'
+    ARGO_PROJ: '${BUSINESS_NAME}-prod'
+    CD_GIT_PATH: 'prod'
+    DNS: '$DNS_PROD'
+    # nacos
+    NACOS_IP: '$NACOS_IP_PROD'
+    NACOS_NS: '$NACOS_NS_PROD'
+  extends: .deploy
+  only:
+    - release
+    - /^hotfix-.*/
