@@ -1,12 +1,15 @@
 package com.drstrong.health.product.facade.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.drstrong.health.product.dao.chinese.OldChineseMedicineMapper;
 import com.drstrong.health.product.facade.ChineseManagerFacade;
 import com.drstrong.health.product.model.dto.SupplierChineseSkuDTO;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierRelevanceEntity;
+import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
@@ -57,6 +60,9 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 
     @Resource
     SupplierRemoteProService supplierRemoteProService;
+
+    @Resource
+    OldChineseMedicineMapper oldChineseMedicineMapper;
 
     /**
      * 中药管理页面，列表查询
@@ -246,6 +252,19 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         }
         // 2.组装返回值
         return buildSupplierChineseManagerSku(infoEntityList);
+    }
+
+    /**
+     * 店铺数据初始化,将中药材默认上架到所有店铺,关联天江供应商
+     *
+     * @param supplierId 供应商 id
+     * @author liuqiuyi
+     * @date 2022/8/5 14:23
+     */
+    @Override
+    public void storeDataInitialize(Long supplierId) {
+//        Wrappers.<OldChineseMedicine>lambdaQuery()
+//        oldChineseMedicineMapper.selectList()
     }
 
     private void checkSaveOrUpdateSkuParam(SaveOrUpdateSkuVO saveOrUpdateSkuVO, boolean updateFlag) {

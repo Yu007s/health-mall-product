@@ -80,4 +80,13 @@ public interface ChineseManagerFacade {
      * @date 2022/8/5 10:17
      */
     List<SupplierChineseManagerSkuVO> listSupplierChineseManagerSkuExport(ChineseManagerSkuRequest skuRequest);
+
+    /**
+     * 店铺数据初始化,将中药材默认上架到所有店铺,关联天江供应商
+     *
+     * @param supplierId 供应商 id
+     * @author liuqiuyi
+     * @date 2022/8/5 14:23
+     */
+    void storeDataInitialize(Long supplierId);
 }

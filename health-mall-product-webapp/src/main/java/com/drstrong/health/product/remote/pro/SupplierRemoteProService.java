@@ -6,10 +6,10 @@ import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.drstrong.health.ware.remote.api.SupplierManageRemoteApi;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @date 2022/8/5 11:25
  */
 @Slf4j
-@Size
+@Service
 public class SupplierRemoteProService {
 	@Resource
 	SupplierManageRemoteApi supplierManageRemoteApi;
