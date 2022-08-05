@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.drstrong.health.product.dao.store.StorePostageAreaMapper">
 
-    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.store.StorePostageAreaEntity">
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.productstore.StorePostageAreaEntity">
         <result column="id" property="id"/>
         <result column="store_id" property="storeId"/>
         <result column="area_id" property="areaId"/>

@@ -11,8 +11,8 @@ public enum ProductTypeEnum {
 	 *
 	 */
 	PRODUCT(0, "商品","P"),
-
 	MEDICINE(1, "药品","M"),
+	CHINESE(2, "中药","Z"),
 	;
 
 	private Integer code;

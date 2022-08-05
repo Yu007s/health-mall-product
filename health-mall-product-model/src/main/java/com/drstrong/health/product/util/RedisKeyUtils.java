@@ -18,6 +18,8 @@ public class RedisKeyUtils {
 
 	private static final String SKU_SERIAL_NUMBER = "product_sku_serial_number_";
 
+	private static final String MEDICINE_NUMBER = "product_medicine_serial_number_";
+
 	private static final String STORE_CHANGE = "store_change";
 
 	/**
@@ -50,5 +52,13 @@ public class RedisKeyUtils {
 	 */
 	public static String getStoreChangeKey(Long storeId) {
 		return PRODUCT_PREFIX + COLON + STORE_CHANGE + COLON + storeId;
+	}
+
+	/**
+	 * 为药材编码获取自增的序列值
+	 * @return 获得序列值
+	 */
+	public static String getMedicineCodeNum(){
+		return PREFIX + MEDICINE_NUMBER;
 	}
 }

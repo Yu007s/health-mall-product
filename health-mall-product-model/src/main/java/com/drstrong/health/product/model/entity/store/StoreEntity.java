@@ -1,79 +1,54 @@
 package com.drstrong.health.product.model.entity.store;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.model.entity.category.BaseEntity;
+import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
 /**
- * @author lsx
- * @projectName health-mall-product
- * @desc 商品店铺
- * @createTime 2021/12/13 10:37
+ * @author xieYueFeng
+ * @since 2022-07-206 11:11:19
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-@TableName("product_store")
-public class StoreEntity extends BaseEntity implements Serializable {
-    private static final long serialVersionUID = 8498028506851891110L;
+@TableName("pms_store")
+@EqualsAndHashCode(callSuper = true)
+public class StoreEntity extends BaseStandardEntity implements Serializable {
+
+    private static final long serialVersionUID = 4221654848942976232L;
 
     /**
-     * 自增主键
+     * 主键id  自增
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
      * 店铺名称
      */
-    private String name;
+    @TableField("store_name")
+    private String storeName;
 
     /**
-     * 店铺类型(0-自营,1-其它)
+     * 店铺类型： 0 互联网医院 1 其它
      */
+    @TableField("store_type")
     private Integer storeType;
 
     /**
-     * 店铺编码
+     * 关联互联网医院的id
      */
-    private String code;
+    @TableField("agency_id")
+    private Long agencyId;
 
     /**
-     * 联系人名称
+     * 乐观锁
      */
-    private String contactName;
+    private Integer version;
 
-    /**
-     * 联系人号码
-     */
-    private String contactMobile;
-
-    /**
-     * 商品数量
-     */
-    private Integer productCount;
-
-    /**
-     * 药品数量
-     */
-    private Integer medicineCount;
-
-    /**
-     * 是否设置了邮费，0-未设置，1-已设置
-     */
-    private Integer setPostage;
-
-    /**
-     * 满多少包邮(分)，默认为0
-     */
-    private Integer freePostage;
-
-    /**
-     * 0-启用,1-未启用
-     */
-    private Integer storeStatus;
 }

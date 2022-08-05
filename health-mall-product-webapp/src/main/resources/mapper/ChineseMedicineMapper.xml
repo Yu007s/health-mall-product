@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace= "com.drstrong.health.product.dao.chinese.ChineseMedicineMapper">
+
+<!--    <resultMap id="ChineseMedicineInfoMap" type="com.drstrong.health.product.model.response.chinese.ChineseMedicineVO">-->
+<!--        <result column="id" property="id"/>-->
+<!--        <result column="version" property="version"/>-->
+<!--        <result column="created_at" property="createdAt"/>-->
+<!--        <result column="created_by" property="createdBy"/>-->
+<!--        <result column="changed_at" property="changedAt"/>-->
+<!--        <result column="changed_by" property="changedBy"/>-->
+<!--        <result column="del_flag" property="delFlag"/>-->
+<!--        <collection property="aliNameList" resultMap="medicineAliasResultMap"/>-->
+<!--    </resultMap>-->
+<!--    <resultMap id="medicineAliasResultMap" type="com.drstrong.health.product.model.entity.chinese.ChineseMedicineAliasEntity">-->
+<!--        <id column="id" property="id"/>-->
+<!--        <result column="medicine_id" property="medicineId"/>-->
+<!--        <result column="del_flag" property="delFlag"/>-->
+<!--    </resultMap>-->
+<!--    <select id="queryPage" resultMap="ChineseMedicineInfoMap"-->
+<!--            parameterType="com.drstrong.health.product.model.request.category.CategoryQueryRequest">-->
+<!--        SELECT-->
+<!--        <include refid="Base_Column_List"/>-->
+<!--        FROM pms_product_front_category-->
+<!--        <where>-->
+<!--            del_flag = 0-->
+<!--            <if test="null != medicineName and '' != categoryName">-->
+<!--                and name like "%"#{medicineName}"%"-->
+<!--            </if>-->
+<!--            <if test="null != medicineId and '' != medicineId">-->
+<!--                and medicine_id = #{medicineId}-->
+<!--            </if>-->
+<!--        </where>-->
+<!--&#45;&#45;         limit #{pageNo},-->
+<!--    </select>-->
+
+    <sql id="Base_Column_List">
+       id,medicine_name,medicine_code,medicine_pinyin,alias_pinyin,medicine_alias,max_dosage
+    </sql>
+
+    <select id="likeQueryByKeyword"
+            resultType="com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity">
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM
+            product_chinese_medicine
+        WHERE
+            del_flag = 0
+        <if test="keyword != null and keyword != ''">
+            AND medicine_name LIKE "%"#{keyword}"%"
+            OR medicine_name LIKE "%"#{keyword}"%"
+            OR medicine_code LIKE "%"#{keyword}"%"
+            OR medicine_pinyin LIKE "%"#{keyword}"%"
+            OR alias_pinyin LIKE "%"#{keyword}"%"
+            OR medicine_alias LIKE "%"#{keyword}"%"
+        </if>
+        limit 20
+    </select>
+</mapper>

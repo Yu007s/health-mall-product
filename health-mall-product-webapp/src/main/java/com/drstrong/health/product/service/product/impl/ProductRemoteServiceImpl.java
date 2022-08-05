@@ -19,7 +19,7 @@ import com.drstrong.health.product.remote.vo.BsUserInfoVO;
 import com.drstrong.health.product.remote.vo.SkuVO;
 import com.drstrong.health.product.service.category.BackCategoryService;
 import com.drstrong.health.product.service.product.*;
-import com.drstrong.health.product.service.store.StoreThreeRelevanceService;
+import com.drstrong.health.product.service.productstore.StoreThreeRelevanceService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

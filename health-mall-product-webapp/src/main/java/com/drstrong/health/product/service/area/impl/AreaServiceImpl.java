@@ -2,7 +2,7 @@ package com.drstrong.health.product.service.area.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.drstrong.health.product.dao.area.AreaMapper;
-import com.drstrong.health.product.model.entity.store.AreaEntity;
+import com.drstrong.health.product.model.entity.productstore.AreaEntity;
 import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.service.area.AreaService;
 import lombok.extern.slf4j.Slf4j;

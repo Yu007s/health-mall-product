@@ -1,7 +1,7 @@
 package com.drstrong.health.product.dao.area;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.drstrong.health.product.model.entity.store.AreaEntity;
+import com.drstrong.health.product.model.entity.productstore.AreaEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

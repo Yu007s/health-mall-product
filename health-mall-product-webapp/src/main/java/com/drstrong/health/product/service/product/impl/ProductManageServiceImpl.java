@@ -8,7 +8,7 @@ import com.drstrong.health.product.dao.product.ProductBasicsInfoMapper;
 import com.drstrong.health.product.model.dto.CommAttributeDTO;
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
 import com.drstrong.health.product.model.entity.product.*;
-import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.entity.productstore.StoreEntity;
 import com.drstrong.health.product.model.enums.*;
 import com.drstrong.health.product.model.request.product.QuerySpuRequest;
 import com.drstrong.health.product.model.request.product.SaveProductRequest;
@@ -23,7 +23,7 @@ import com.drstrong.health.product.service.category.BackCategoryService;
 import com.drstrong.health.product.service.category.CategoryAttributeItemService;
 import com.drstrong.health.product.service.product.*;
 import com.drstrong.health.product.service.redis.IRedisService;
-import com.drstrong.health.product.service.store.StoreService;
+import com.drstrong.health.product.service.productstore.ProductStoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.util.DateUtil;
 import com.drstrong.health.product.util.RedisKeyUtils;
@@ -78,7 +78,7 @@ public class ProductManageServiceImpl implements ProductManageService {
 	IRedisService redisService;
 
 	@Resource
-	StoreService storeService;
+    ProductStoreService storeService;
 
 	@Resource
 	CmsRemoteProService cmsRemoteProService;
