@@ -21,16 +21,14 @@ import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -251,5 +249,27 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
             return Lists.newArrayList();
         }
         return chineseMedicineMapper.likeQueryByKeyword(keyword);
+    }
+
+    /**
+     * 根据老的药材 id 获取药材 code,组成 map
+     *
+     * @param medicineIds
+     * @author liuqiuyi
+     * @date 2022/8/5 16:41
+     */
+    @Override
+    public Map<Long, String> getMedicineIdAndMedicineCodeMap(Set<Long> medicineIds) {
+        if (CollectionUtils.isEmpty(medicineIds)) {
+            return Maps.newHashMap();
+        }
+        LambdaQueryWrapper<ChineseMedicineEntity> queryWrapper = Wrappers.<ChineseMedicineEntity>lambdaQuery()
+                .eq(ChineseMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(ChineseMedicineEntity::getId, medicineIds);
+        List<ChineseMedicineEntity> chineseMedicineEntityList = list(queryWrapper);
+        if (CollectionUtils.isEmpty(chineseMedicineEntityList)) {
+            return Maps.newHashMap();
+        }
+        return chineseMedicineEntityList.stream().collect(Collectors.toMap(ChineseMedicineEntity::getId, ChineseMedicineEntity::getMedicineCode, (v1, v2) -> v1));
     }
 }

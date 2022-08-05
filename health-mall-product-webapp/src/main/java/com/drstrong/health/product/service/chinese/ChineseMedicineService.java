@@ -7,6 +7,7 @@ import com.drstrong.health.product.model.response.chinese.ChineseMedicineRespons
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -85,4 +86,12 @@ public interface ChineseMedicineService {
 	 * @date 2022/8/3 20:47
 	 */
 	List<ChineseMedicineEntity> likeQueryByKeyword(String keyword);
+
+	/**
+	 * 根据老的药材 id 获取药材 code,组成 map
+	 *
+	 * @author liuqiuyi
+	 * @date 2022/8/5 16:41
+	 */
+	Map<Long, String> getMedicineIdAndMedicineCodeMap(Set<Long> medicineIds);
 }

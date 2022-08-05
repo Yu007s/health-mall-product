@@ -47,6 +47,9 @@ public class ChineseSkuInfoVO implements Serializable {
 	@ApiModelProperty("药材名称")
 	private String medicineName;
 
+	@ApiModelProperty("最大剂量值")
+	private BigDecimal maxDosage;
+
 	@ApiModelProperty("店铺id")
 	private Long storeId;
 

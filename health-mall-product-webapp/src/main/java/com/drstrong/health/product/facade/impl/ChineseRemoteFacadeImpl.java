@@ -16,12 +16,14 @@ import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -69,14 +71,19 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 		if (CollectionUtils.isEmpty(chineseMedicineEntityList)) {
 			return Lists.newArrayList();
 		}
-		Map<String, String> medicineCodeAndNameMap = chineseMedicineEntityList.stream().collect(Collectors.toMap(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName, (v1, v2) -> v1));
+		Map<String, String> medicineCodeAndNameMap = Maps.newHashMapWithExpectedSize(chineseMedicineEntityList.size());
+		Map<String, BigDecimal> medicineCodeAndMaxDosageMap = Maps.newHashMapWithExpectedSize(chineseMedicineEntityList.size());
+		chineseMedicineEntityList.forEach(chineseMedicineEntity -> {
+			medicineCodeAndNameMap.put(chineseMedicineEntity.getMedicineCode(), chineseMedicineEntity.getMedicineName());
+			medicineCodeAndMaxDosageMap.put(chineseMedicineEntity.getMedicineCode(), chineseMedicineEntity.getMaxDosage());
+		});
 		// 3.根据药材 code 和 店铺 id，获取 sku 信息
 		List<ChineseSkuInfoEntity> skuInfoEntityList = chineseSkuInfoService.listByMedicineCodeAndStoreId(medicineCodeAndNameMap.keySet(), storeEntity.getId());
 		if (CollectionUtils.isEmpty(skuInfoEntityList)) {
 			return Lists.newArrayList();
 		}
 		// 4.组装数据返回
-		return buildChineseSkuInfoVOList(storeEntity.getStoreName(), skuInfoEntityList, medicineCodeAndNameMap);
+		return buildChineseSkuInfoVOList(storeEntity.getStoreName(), skuInfoEntityList, medicineCodeAndNameMap, medicineCodeAndMaxDosageMap);
 	}
 
 	/**
@@ -134,7 +141,10 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 		return chineseSkuExtendVOList;
 	}
 
-	private List<ChineseSkuInfoVO> buildChineseSkuInfoVOList(String storeName, List<ChineseSkuInfoEntity> skuInfoEntityList, Map<String, String> medicineCodeAndNameMap) {
+	private List<ChineseSkuInfoVO> buildChineseSkuInfoVOList(String storeName,
+															 List<ChineseSkuInfoEntity> skuInfoEntityList,
+															 Map<String, String> medicineCodeAndNameMap,
+															 Map<String, BigDecimal> medicineCodeAndMaxDosageMap) {
 		List<ChineseSkuInfoVO> chineseSkuInfoVOList = Lists.newArrayListWithCapacity(skuInfoEntityList.size());
 		skuInfoEntityList.forEach(chineseSkuInfoEntity -> {
 			ChineseSkuInfoVO chineseSkuInfoVO = ChineseSkuInfoVO.builder()
@@ -145,6 +155,7 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 					.medicineId(chineseSkuInfoEntity.getOldMedicineId())
 					.medicineCode(chineseSkuInfoEntity.getMedicineCode())
 					.medicineName(medicineCodeAndNameMap.get(chineseSkuInfoEntity.getMedicineCode()))
+					.maxDosage(medicineCodeAndMaxDosageMap.get(chineseSkuInfoEntity.getMedicineCode()))
 					.storeId(chineseSkuInfoEntity.getStoreId())
 					.storeName(storeName)
 					.price(chineseSkuInfoEntity.getPrice())

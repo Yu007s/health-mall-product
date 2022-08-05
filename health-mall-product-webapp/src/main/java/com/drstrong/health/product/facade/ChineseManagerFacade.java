@@ -1,6 +1,7 @@
 package com.drstrong.health.product.facade;
 
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
+import com.drstrong.health.product.model.request.chinese.StoreDataInitializeRequest;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
@@ -84,9 +85,9 @@ public interface ChineseManagerFacade {
     /**
      * 店铺数据初始化,将中药材默认上架到所有店铺,关联天江供应商
      *
-     * @param supplierId 供应商 id
+     * @param initializeRequest   初始化入参信息
      * @author liuqiuyi
      * @date 2022/8/5 14:23
      */
-    void storeDataInitialize(Long supplierId);
+    List<StoreDataInitializeRequest.CompensateInfo> storeDataInitialize(StoreDataInitializeRequest initializeRequest);
 }
