@@ -1,8 +1,8 @@
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-spring:
-  cloud:
-    nacos:
-      discovery:
-        register-enabled: false
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#spring:
+#  cloud:
+#    nacos:
+#      discovery:
+#        register-enabled: false
