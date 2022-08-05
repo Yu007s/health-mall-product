@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.area.AreaMapper">
+
+<!--    <resultMap id="storeIdNameResponse" type="com.drstrong.health.product.model.entity.productstore.AreaEntity">-->
+<!--        <result column="id" property="id"/>-->
+<!--        <result column="store_name" property="storeName"/>-->
+<!--    </resultMap>-->
+<!--    <select id="findStoreBySupplierId" resultType="com.drstrong.health.product.model.entity.productstore.AreaEntity">-->
+<!--        select st.id , st.store_name-->
+<!--        from pms_store as st left join pms_store_link_supplier as su-->
+<!--        on su.store_id = st.id where su.supplier_id=#{supplierId} and su.del_flag=0-->
+<!--    </select>-->
+
+
+</mapper>

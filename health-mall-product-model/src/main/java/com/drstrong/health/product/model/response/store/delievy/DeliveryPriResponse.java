@@ -1,4 +1,4 @@
-package com.drstrong.health.product.model.response.store;
+package com.drstrong.health.product.model.response.store.delievy;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,8 +12,8 @@ import java.util.List;
  * @Date 2022/07/26/11:06
  */
 @Data
-@ApiModel("配送优先级返回 市区对应优先级返回信息")
-public class DeliveryPriorityResponse implements Serializable {
+@ApiModel("配送优先级返回 某区域对应优先级返回信息")
+public class DeliveryPriResponse implements Serializable {
     private static final long serialVersionUID = -1568485241564168748L;
 
     @ApiModelProperty("区域id")

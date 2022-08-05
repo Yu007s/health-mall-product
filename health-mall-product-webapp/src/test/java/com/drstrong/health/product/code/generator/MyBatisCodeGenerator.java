@@ -29,7 +29,7 @@ public class MyBatisCodeGenerator extends AbstractMyBatisCodeGenerator {
     public void generateModule1Tables() {
         //TODO 替换为真实的表名
 //        String[] tables = {"prefix_table3", "prefix_table4"};
-        String[] tables = {"pms_spu_info", "pms_chinese_spu_info", "pms_sku_info", "pms_chinese_sku_info", "pms_chinese_sku_supplier_relevance"};
+        String[] tables = {"pms_store_delivery_priority"};
         PackageConfig pc = new PackageConfig();
         pc.setParent("com.drstrong.health.product");
 

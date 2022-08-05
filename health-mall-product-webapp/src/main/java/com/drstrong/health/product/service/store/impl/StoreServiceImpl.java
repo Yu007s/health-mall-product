@@ -41,8 +41,6 @@ import java.util.stream.Collectors;
 @Service
 public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> implements StoreService {
     @Resource
-    StoreMapper storeMapper;
-    @Resource
     AgencyService agencyService;
     @Resource
     StoreInvoiceService storeInvoiceService;
@@ -55,17 +53,11 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void save(StoreInfoDetailSaveRequest storeRequest, Long userId) throws Exception {
-        String storeName = storeRequest.getStoreName();
-        LambdaQueryWrapper<StoreEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(StoreEntity::getStoreName,storeName).eq(StoreEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode()).last("limit 1");
-        StoreEntity one = super.getOne(queryWrapper);
-        if(one != null){
-            throw new Exception("已经存在同名店铺");
-        }
         StoreInvoiceEntity invoice = BeanUtil.copyProperties(storeRequest, StoreInvoiceEntity.class);
         List<StoreLinkSupplierEntity> storeLinkSuppliers = new ArrayList<>(storeRequest.getSupplierIds().size());
         StoreEntity storeEntity = new StoreEntity();
         buildEntityForSaveOrUpdate(storeRequest,storeEntity,storeLinkSuppliers,invoice,userId);
+        checkStore(storeEntity);
         storeEntity.setCreatedBy(userId);
         super.save(storeEntity);
         Long storeId = storeEntity.getId();
@@ -218,8 +210,6 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         return storeAddResponse;
     }
 
-
-
     @Override
     @Transactional(readOnly = true)
     public StoreInfoEditResponse queryById(Long storeId) {
@@ -279,5 +269,19 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
             storeLinkSupplierEntity.setChangedBy(userId);
             linkSupplierEntities.add(storeLinkSupplierEntity);
         });
+    }
+
+    /**
+     * 检验店铺相关信息是否合法
+     * @param store 店铺
+     * @throws Exception 不合法抛出相关异常
+     */
+    private void checkStore(StoreEntity store) throws Exception {
+        LambdaQueryWrapper<StoreEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(StoreEntity::getStoreName,store.getStoreName()).eq(StoreEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode()).last("limit 1");
+        StoreEntity one = super.getOne(queryWrapper);
+        if(one != null){
+            throw new Exception("已经存在同名店铺");
+        }
     }
 }
