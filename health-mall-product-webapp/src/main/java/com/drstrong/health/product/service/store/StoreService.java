@@ -71,17 +71,13 @@ public interface StoreService {
 	 * 根据互联网医院 id，获取店铺信息
 	 *
 	 * @param agencyId 互联网医院 id
+	 * @param storeId 店铺 id
 	 * @return 店铺信息
 	 * @author liuqiuyi
 	 * @date 2022/8/3 19:47
 	 */
-	StoreEntity getStoreByAgencyId(Long agencyId);
-
-	/**
-	 * 增加店铺时提供相应的信息
-	 * @return 提供的供应商信息、互联网医院信息
-	 */
-	StoreAddResponse queryStoreCloseInfo();
+	StoreEntity getStoreByAgencyIdOrStoreId(Long agencyId, Long storeId);
 
 
+	 StoreAddResponse queryStoreCloseInfo();
 }
