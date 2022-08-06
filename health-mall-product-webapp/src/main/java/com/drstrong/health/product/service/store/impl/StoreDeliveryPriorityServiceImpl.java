@@ -9,9 +9,7 @@ import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.store.DeliveryPriRequest;
 import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
-import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.store.SupplierResponse;
-import com.drstrong.health.product.model.response.store.delievy.AreaInfoDelResponse;
 import com.drstrong.health.product.model.response.store.delievy.DeliveryPriResponse;
 import com.drstrong.health.product.model.response.store.delievy.DeliveryPriorityVO;
 import com.drstrong.health.product.service.area.AreaService;
@@ -24,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,7 +75,7 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
 
     @Override
     @Transactional(readOnly = true)
-    public List<DeliveryPriResponse> queryByStoreIdAndArea(Long storeId, Long areaId) {
+    public List<Long> queryByStoreIdAndArea(Long storeId, Long areaId) {
         List<AreaEntity> areaInfoResponses = areaService.queryFatherAreaById(areaId);
         List<Long> collect = areaInfoResponses.stream().map(AreaEntity::getId).collect(Collectors.toList());
         collect.forEach(System.out::println);
@@ -88,8 +85,15 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
                 .eq(DeliveryPriorityEntity::getStoreId,storeId)
                 .eq(DeliveryPriorityEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         List<DeliveryPriorityEntity> list = list(lambdaQueryWrapper);
+        //按照市级省级国家级排好序
         list.sort((a,b) -> b.getAreaType() - a.getAreaType());
-        return list.stream().map(this::buildDeliveryResponse).collect(Collectors.toList());
+        DeliveryPriorityEntity deliveryPriorityEntity = list.get(0);
+        String priorities = deliveryPriorityEntity.getPriorities();
+        if (priorities == null) {
+            return new ArrayList<>(0);
+        }
+        String[] split = priorities.split(",");
+        return Arrays.stream(split).map(Long::valueOf).collect(Collectors.toList());
     }
     @Override
     @Transactional(rollbackFor = Exception.class)

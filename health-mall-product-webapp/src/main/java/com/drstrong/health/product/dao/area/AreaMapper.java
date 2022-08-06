@@ -16,7 +16,7 @@ import java.util.List;
 @Mapper
 public interface AreaMapper extends BaseMapper<AreaEntity> {
     /**
-     * 根据区域id 查询父级的区域id  一定会查出全国的id
+     * 根据区域id 查询父级的区域id
      * @param areaId 区域id
      * @return 查询所得区域
      */

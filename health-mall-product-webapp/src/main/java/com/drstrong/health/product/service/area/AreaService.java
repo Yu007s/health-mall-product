@@ -20,6 +20,11 @@ public interface AreaService {
 
     AreaInfoResponse querySingle(Long areaId);
 
+    /**
+     * 根据区域id 查询其父级区域id
+     * @param areaId 区域id
+     * @return  查询所得国家、省、市级区域id
+     */
     List<AreaEntity> queryFatherAreaById(Long areaId);
 
 }

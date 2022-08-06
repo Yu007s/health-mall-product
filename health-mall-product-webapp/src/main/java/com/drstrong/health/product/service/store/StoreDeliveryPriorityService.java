@@ -27,7 +27,7 @@ public interface StoreDeliveryPriorityService extends IService<DeliveryPriorityE
      * @param areaId 区域id
      * @return 供应商配送优先级
      */
-    List<DeliveryPriResponse>  queryByStoreIdAndArea(Long storeId,Long areaId);
+    List<Long>  queryByStoreIdAndArea(Long storeId,Long areaId);
 
     void save(SaveDeliveryRequest saveDeliveryRequest,Long userId);
 

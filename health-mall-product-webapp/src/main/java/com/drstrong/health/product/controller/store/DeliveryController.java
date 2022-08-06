@@ -25,7 +25,7 @@ public class DeliveryController {
         return ResultVO.success(deliveryPriorityVO);
     }
     @GetMapping ("queryByAreaId")
-    public List<DeliveryPriResponse> getDeliveryInfoByArea(@RequestParam Long storeId,@RequestParam Long areaId) {
+    public List<Long> getDeliveryInfoByArea(@RequestParam Long storeId,@RequestParam Long areaId) {
         return storeDeliveryPriorityService.queryByStoreIdAndArea(storeId, areaId);
     }
 
