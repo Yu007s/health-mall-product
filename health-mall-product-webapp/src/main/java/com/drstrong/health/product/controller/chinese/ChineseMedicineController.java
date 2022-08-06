@@ -1,13 +1,11 @@
 package com.drstrong.health.product.controller.chinese;
 
-import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
-import com.drstrong.health.product.model.request.chinese.ChineseMedicineRequest;
+
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.chinese.ChineseMedicineFacade;
-import com.drstrong.health.product.service.chinese.ChineseMedicineConflictService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Arrays;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -29,7 +28,7 @@ import java.util.List;
 @RequestMapping("/product/chinese/medicine")
 public class ChineseMedicineController implements ChineseMedicineFacade {
     @Resource
-    ChineseMedicineService chineseMedicineService;
+    private ChineseMedicineService chineseMedicineService;
 
     /**
      * 新建、编辑药材  药材名字不允许重复
@@ -39,8 +38,12 @@ public class ChineseMedicineController implements ChineseMedicineFacade {
      */
     @ApiOperation("新建/编辑药材")
     @PostMapping("/save")
-    ResultVO<String> addMedicine(@RequestBody @Valid ChineseMedicineVO chineseMedicineVO, @RequestParam Long userId) throws Exception {
-        chineseMedicineService.save(chineseMedicineVO, userId);
+    public ResultVO<String> addMedicine(@RequestBody @Valid ChineseMedicineVO chineseMedicineVO, @RequestParam(value = "userId") @NotNull(message = "用户id不能为空") Long userId)  {
+        try {
+            chineseMedicineService.save(chineseMedicineVO, userId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return ResultVO.success("成功");
     }
 
@@ -52,7 +55,8 @@ public class ChineseMedicineController implements ChineseMedicineFacade {
      */
     @ApiOperation("删除药材")
     @DeleteMapping("/delete")
-    ResultVO<String> deleteMedicine(@RequestParam String medicineCode, @RequestParam Long userId) {
+    public ResultVO<String> deleteMedicine(@RequestParam("medicineCode") @NotBlank(message = "药材编码不能为空")String medicineCode,
+                                    @RequestParam(value = "userId") @NotNull(message = "用户id不能为空") Long userId) {
         String msg = "当前中药材已关联SKU或者不存在";
         boolean b = chineseMedicineService.removeByCode(medicineCode, userId);
         if (b) {
@@ -61,16 +65,20 @@ public class ChineseMedicineController implements ChineseMedicineFacade {
         return ResultVO.success(msg);
     }
 
+
     /**
-     * 药材信息展示分页
      *
-     * @param chineseMedicineRequest 分页查询请求参数
-     * @return 药材信息列表
+     * @param medicineCode
+     * @param medicineName
+     * @param pageNo
+     * @param pageSize
+     * @return
      */
     @ApiOperation("药材信息分页展示")
     @GetMapping("/searchList")
-    public ResultVO<List<ChineseMedicineResponse>> queryMedicinePage(ChineseMedicineRequest chineseMedicineRequest) {
-        List<ChineseMedicineResponse> chineseMedicineVOList = chineseMedicineService.queryPage(chineseMedicineRequest);
+    public ResultVO<List<ChineseMedicineResponse>> queryMedicinePage(@RequestParam(value = "medicineCode",required = false) String medicineCode,@RequestParam(value = "medicineName",required = false)String medicineName,
+                                                                     @RequestParam(value = "pageNo")Integer pageNo,@RequestParam(value = "pageSize") Integer pageSize) {
+        List<ChineseMedicineResponse> chineseMedicineVOList = chineseMedicineService.queryPage(medicineCode,medicineName,pageNo,pageSize);
         return ResultVO.success(chineseMedicineVOList);
     }
 
@@ -79,7 +87,8 @@ public class ChineseMedicineController implements ChineseMedicineFacade {
      */
     @ApiOperation("所有药材查询")
     @GetMapping("/searchAll")
-    public ResultVO<List<ChineseMedicineInfoResponse>> queryMedicineAll(String medicineName,String medicineCode) {
+    public ResultVO<List<ChineseMedicineInfoResponse>> queryMedicineAll(@RequestParam(value = "medicineName" ,required = false) String medicineName,
+                                                                        @RequestParam(value = "medicineCode" ,required = false) String medicineCode) {
         List<ChineseMedicineInfoResponse> chineseMedicineInfoList = chineseMedicineService.queryAll(medicineName,medicineCode);
         return ResultVO.success(chineseMedicineInfoList);
     }
@@ -89,7 +98,9 @@ public class ChineseMedicineController implements ChineseMedicineFacade {
      */
     @ApiOperation("相反药材信息分页展示")
     @GetMapping("/conflictList")
-    public ResultVO<List<ChineseMedicineResponse>> queryConflictMedicine(@RequestParam String medicineCode, @RequestParam Integer pageNo, @RequestParam Integer pageSize) {
+    public ResultVO<List<ChineseMedicineResponse>> queryConflictMedicine(@RequestParam("medicineCode") @NotBlank(message="药材编码不能为空") String medicineCode,
+                                                                         @RequestParam(value = "pageNo",required = false) Integer pageNo,
+                                                                         @RequestParam(value = "pageSize",required = false) Integer pageSize) {
         List<ChineseMedicineResponse> chineseMedicineResponses = chineseMedicineService.queryPageForConflict(medicineCode, pageNo, pageSize);
         return ResultVO.success(chineseMedicineResponses);
     }

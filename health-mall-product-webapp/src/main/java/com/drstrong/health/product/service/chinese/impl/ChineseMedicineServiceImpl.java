@@ -22,6 +22,7 @@ import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -146,18 +147,18 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
     }
 
     @Override
-    public List<ChineseMedicineResponse> queryPage(ChineseMedicineRequest chineseMedicineRequest) {
+    public List<ChineseMedicineResponse> queryPage(String medicineCode, String medicineName, Integer pageNo, Integer pageSize) {
         LambdaQueryWrapper<ChineseMedicineEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName,
                 ChineseMedicineEntity::getMedicineAlias, ChineseMedicineEntity::getMaxDosage);
-        if (StringUtils.isNotBlank(chineseMedicineRequest.getMedicineCode())) {
-            wrapper.eq(ChineseMedicineEntity::getMedicineCode, chineseMedicineRequest.getMedicineCode());
+        if (StringUtils.isNotBlank(medicineCode)) {
+            wrapper.eq(ChineseMedicineEntity::getMedicineCode, medicineCode);
         }
-        if (StringUtils.isNotBlank(chineseMedicineRequest.getMedicineName()) ) {
-            wrapper.like(ChineseMedicineEntity::getMedicineName, chineseMedicineRequest.getMedicineName());
+        if (StringUtils.isNotBlank(medicineName) ) {
+            wrapper.like(ChineseMedicineEntity::getMedicineName, medicineName);
         }
         wrapper.orderByDesc(ChineseMedicineEntity::getCreatedAt);
-        Page<ChineseMedicineEntity> page = new Page<>(chineseMedicineRequest.getPageNo(), chineseMedicineRequest.getPageSize());
+        Page<ChineseMedicineEntity> page = new Page<>(pageNo, pageSize);
         List<ChineseMedicineEntity> records = page(page, wrapper).getRecords();
         return buildChineseMedicineResponse(records);
     }
@@ -176,8 +177,14 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         medicineWrapper.and((wrapper) -> {
             wrapper.in(ChineseMedicineEntity::getMedicineCode, conflictCodes);
         });
-        Page<ChineseMedicineEntity> page = new Page<>(pageNo, pageSize);
-        List<ChineseMedicineEntity> records = page(page, medicineWrapper).getRecords();
+        List<ChineseMedicineEntity> records;
+        if(pageNo != null  && pageSize != null){
+            Page<ChineseMedicineEntity> page = new Page<>(pageNo, pageSize);
+            records = page(page, medicineWrapper).getRecords();
+        }
+        else {
+             records = list(medicineWrapper);
+        }
         return buildChineseMedicineResponse(records);
     }
 
