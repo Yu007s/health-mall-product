@@ -46,6 +46,7 @@ public enum ErrorEnums implements IBaseResult {
 	SKU_IS_NULL("11109", "sku不存在或已下架"),
 	CHINESE_MEDICINE_IS_NULL("11110", "中药材不存在"),
 	SUPPLIER_IS_NULL("11111", "供应商不存在"),
+	SAVE_IS_NULL("11112", "保存数据失败"),
 
 	STORE_NAME_LENGTH("17000", "店铺名称长度不正确"),
 	STORE_NAME_REPEAT("17100", "店铺名称已存在"),

@@ -23,11 +23,13 @@ import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
 import com.drstrong.health.product.model.response.chinese.SupplierChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
 import com.drstrong.health.product.service.store.StoreService;
+import com.drstrong.health.ware.model.response.SkuStockResponse;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -66,6 +68,9 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 
     @Resource
     OldChineseMedicineMapper oldChineseMedicineMapper;
+
+	@Resource
+	StockRemoteProService stockRemoteProService;
 
     /**
      * 中药管理页面，列表查询
@@ -183,12 +188,17 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         if (Objects.nonNull(chineseMedicineEntity)) {
             response.setMedicineName(chineseMedicineEntity.getMedicineName());
         }
-
         // 3.调用供应商接口，获取供应商的信息
-        // TODO liuqiuyi
-
-        // 4.组装数据
-
+		List<SkuStockResponse> skuStockResponseList = stockRemoteProService.getSkuInfoBySkuCode(skuInfoEntity.getSkuCode());
+		if (!CollectionUtils.isEmpty(skuStockResponseList)) {
+			List<SaveOrUpdateSkuVO.SupplierInfo> supplierInfoList = Lists.newArrayListWithCapacity(skuStockResponseList.size());
+			skuStockResponseList.forEach(skuStockResponse -> {
+				SaveOrUpdateSkuVO.SupplierInfo supplierInfo = new SaveOrUpdateSkuVO.SupplierInfo();
+				BeanUtils.copyProperties(skuStockResponse, supplierInfo);
+				supplierInfoList.add(supplierInfo);
+			});
+			response.setSupplierInfoList(supplierInfoList);
+		}
         return response;
     }
 

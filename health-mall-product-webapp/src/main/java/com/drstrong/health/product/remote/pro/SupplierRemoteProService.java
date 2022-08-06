@@ -1,8 +1,8 @@
 package com.drstrong.health.product.remote.pro;
 
 import com.alibaba.fastjson.JSON;
-import com.drstrong.health.common.model.Result;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
+import com.drstrong.health.ware.model.result.ResultVO;
 import com.drstrong.health.ware.remote.api.SupplierManageRemoteApi;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ public class SupplierRemoteProService {
 		}
 		log.info("invoke supplierManageRemoteApi.queryBySupplierIds() param:{}", JSON.toJSONString(supplierIds));
 		try {
-			Result<List<SupplierInfoDTO>> listResult = supplierManageRemoteApi.queryBySupplierIds(supplierIds);
+			ResultVO<List<SupplierInfoDTO>> listResult = supplierManageRemoteApi.queryBySupplierIds(supplierIds);
 			if (Objects.isNull(listResult) || !listResult.isSuccess()) {
 				log.error("invoke supplierManageRemoteApi.queryBySupplierIds() result is error! result:{}", JSON.toJSONString(listResult));
 				return Lists.newArrayList();
