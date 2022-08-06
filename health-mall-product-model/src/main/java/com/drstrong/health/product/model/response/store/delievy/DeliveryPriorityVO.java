@@ -1,5 +1,6 @@
-package com.drstrong.health.product.model.response.store;
+package com.drstrong.health.product.model.response.store.delievy;
 
+import com.drstrong.health.product.model.response.store.SupplierResponse;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
@@ -22,17 +23,15 @@ public class DeliveryPriorityVO implements Serializable {
     private Long storeId;
 
     /**
-     * 默认供应商优先级map
+     * 默认供应商优先级
      */
     private List<Long> defaultDeliveries;
 
     /**
-     * 分市区优先级列表  第0个为默认优先级
+     * 分市区优先级列表
      */
-    private List<DeliveryPriorityResponse> deliveryPriorities;
+    private List<DeliveryPriResponse> deliveryPriorities;
 
-    /**
-     * 供应商id与供应商名字对应map
-     */
-    private Map<Long, String> supplierIdNameMap;
+    private List<SupplierResponse> supplierResponses;
+
 }

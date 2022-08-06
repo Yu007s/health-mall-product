@@ -1,11 +1,11 @@
 package com.drstrong.health.product.controller.store;
 
-import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
+import com.drstrong.health.product.dao.store.StoreLinkSupplierMapper;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
-import com.drstrong.health.product.model.response.area.AreaInfoResponse;
+import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
 import com.drstrong.health.product.model.response.result.ResultVO;
-import com.drstrong.health.product.model.response.store.DeliveryPriorityVO;
+import com.drstrong.health.product.model.response.store.StoreQueryResponse;
 import com.drstrong.health.product.model.response.store.StoreAddResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
@@ -21,6 +21,7 @@ import java.util.List;
 
 /**
  * 备忘  店铺id  与名字  对应  存在redis中
+ *
  * @Author xieYueFeng
  * @Date 2022/07/30/14:14
  */
@@ -30,6 +31,8 @@ public class StoreController implements StoreFacade {
 
     @Resource
     private StoreService storeService;
+    @Resource
+    StoreLinkSupplierMapper storeLinkSupplierMapper;
 
     @Resource
     private AreaService areaService;
@@ -49,7 +52,7 @@ public class StoreController implements StoreFacade {
             storeService.save(store, userId);
             msg = "新增店铺成功";
         } else {
-            storeService.update(store,userId);
+            storeService.update(store, userId);
             msg = "修改店铺成功";
         }
         return ResultVO.success(msg);
@@ -82,68 +85,47 @@ public class StoreController implements StoreFacade {
     }
 
     /**
-     * 配送优先级页面根据店铺id查询所有的供应商
-     *
-     * @param storeId 店铺id
-     * @return 供应商列表
-     */
-    @ApiOperation("根据店铺id查询所有的供应商")
-    @GetMapping("/querySupplier")
-    public ResultVO<DeliveryPriorityVO> queryStoreDelivery(@RequestParam String storeId) {
-        return null;
-    }
-    /**
      * 店铺新增页面  查询所有需要信息
+     *
+     * @return 所有需要信息的集合
+     */
+    @ApiOperation("增加店铺时查找相应的信息")
+    @GetMapping("/queryAddInfo")
+    public ResultVO<StoreAddResponse> queryAddStoreInfo() {
+        StoreAddResponse storeAddResponse = storeService.queryStoreAddInfo();
+        return ResultVO.success(storeAddResponse);
+    }
+
+    /**
+     * 店铺查询页面  查询所有需要信息
+     *
      * @return 所有需要信息的集合
      */
     @ApiOperation("增加店铺时查找相应的信息")
     @GetMapping("/queryInfo")
-    public ResultVO<StoreAddResponse> queryStoreInfo() {
-        StoreAddResponse storeAddResponse = storeService.queryStoreCloseInfo();
-        return ResultVO.success(storeAddResponse);
+    public ResultVO<StoreQueryResponse> queryStoreInfo() {
+        StoreQueryResponse storeQueryResponse = storeService.queryStoreConInfo();
+        return ResultVO.success(storeQueryResponse);
     }
+
     /**
-     * 保存配送优先级信息
+     * 查询所有的省市信息
      *
-     * @param storeId 店铺id
-     * @return 供应商列表
+     * @return 所有的省市级信息
      */
-    @ApiOperation("保存配送优先级信息")
-    @GetMapping("/saveDelivery")
-    public ResultVO<String> saveDelivery(@RequestBody SaveDeliveryRequest storeId) {
-        return null;
+    @ApiOperation("查询所有的城市")
+    @GetMapping("/queryAll")
+    public ResultVO<List<ProvinceAreaInfo>> queryAll() {
+        List<ProvinceAreaInfo> lists = areaService.queryAll();
+        return ResultVO.success(lists);
     }
 
-    /**
-     * 查询所有的省份信息
-     *
-     * @return 所有的省份信息
-     */
-    @ApiOperation("查询所有的省份信息")
-    @GetMapping("/queryAllProvince")
-    public ResultVO<List<AreaInfoResponse>> queryProvince() {
-        List<AreaInfoResponse> areaInfoResponses = areaService.queryAllProvince();
-        return ResultVO.success(areaInfoResponses);
-    }
 
-    /**
-     * 根据区域id查询具体的区域信息
-     * @return 所有的省份信息
-     */
-    @ApiOperation("查询具体的区域信息")
-    @GetMapping("/queryCities")
-    public ResultVO<List<AreaInfoResponse>> queryCity(Long areaId) {
-       return null;
-    }
-
-    /**
-     * 根据区域id查询具体的区域信息
-     * @return 所有的省份信息
-     */
-    @ApiOperation("查询具体的区域信息")
-    @GetMapping("/serachStore")
-    public List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam Long supllierId) {
-        return null;
+    @Override
+    @ApiOperation("根据供应商id查询关联的店铺信息")
+    @GetMapping("/searchStore")
+    public List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam Long supplierId) {
+        return storeLinkSupplierMapper.findStoreBySupplierId(supplierId);
     }
 
 }

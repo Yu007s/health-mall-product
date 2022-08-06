@@ -9,7 +9,9 @@ import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.service.store.StoreLinkSupplierService;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Author xieYueFeng
@@ -17,6 +19,8 @@ import java.util.List;
  */
 @Service
 public class StoreLinkSupplierServiceImpl extends ServiceImpl<StoreLinkSupplierMapper, StoreLinkSupplierEntity> implements StoreLinkSupplierService {
+    @Resource
+    StoreLinkSupplierMapper storeLinkSupplierMapper;
 
     @Override
     public void saveBatch(List<StoreLinkSupplierEntity> linkSupplierEntities) {
@@ -33,15 +37,7 @@ public class StoreLinkSupplierServiceImpl extends ServiceImpl<StoreLinkSupplierM
 
     @Override
     public List<StoreInfoResponse> queryBySupplierId(Long supplierId) {
-        LambdaQueryWrapper<StoreLinkSupplierEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.select(StoreLinkSupplierEntity::getStoreId,StoreLinkSupplierEntity::getSupplierId)
-                .eq(StoreLinkSupplierEntity::getSupplierId,supplierId)
-                .eq(StoreLinkSupplierEntity::getDelFlag, DelFlagEnum.UN_DELETED).groupBy(StoreLinkSupplierEntity::getStoreId);
-        List<StoreLinkSupplierEntity> list = super.list(queryWrapper);
-//        list.stream().map( storeLinkSupplierEntity -> {
-//
-//        })
-        return null;
+        return storeLinkSupplierMapper.findStoreBySupplierId(supplierId);
     }
 
 }

@@ -1,26 +1,34 @@
 package com.drstrong.health.product.facade.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.drstrong.health.product.dao.chinese.OldChineseMedicineMapper;
 import com.drstrong.health.product.facade.ChineseManagerFacade;
 import com.drstrong.health.product.model.dto.SupplierChineseSkuDTO;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierRelevanceEntity;
+import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
+import com.drstrong.health.product.model.request.chinese.StoreDataInitializeRequest;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
 import com.drstrong.health.product.model.response.chinese.SupplierChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
 import com.drstrong.health.product.service.store.StoreService;
+import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +60,12 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 
     @Resource
     ChineseMedicineService chineseMedicineService;
+
+    @Resource
+    SupplierRemoteProService supplierRemoteProService;
+
+    @Resource
+    OldChineseMedicineMapper oldChineseMedicineMapper;
 
     /**
      * 中药管理页面，列表查询
@@ -110,9 +124,10 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         List<StoreEntity> storeEntityList = storeService.listByIds(storeIds);
         Map<Long, String> storeIdNameMap = storeEntityList.stream().collect(toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
         // 4.获取供应商名称
-        // TODO liuqiuyi 调用供应商接口
+        List<Long> supplierIds = skuCodeSupplierIdsMap.values().stream().flatMap(Collection::stream).distinct().collect(toList());
+        Map<Long, String> supplierIdNameMap = supplierRemoteProService.getSupplierNameToMap(supplierIds);
         // 5.组装返回值
-        return buildChineseManagerSkuResponse(skuInfoEntityList, skuCodeSupplierIdsMap, storeIdNameMap);
+        return buildChineseManagerSkuResponse(skuInfoEntityList, skuCodeSupplierIdsMap, storeIdNameMap, supplierIdNameMap);
     }
 
     /**
@@ -170,6 +185,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         }
 
         // 3.调用供应商接口，获取供应商的信息
+        // TODO liuqiuyi
 
         // 4.组装数据
 
@@ -241,7 +257,129 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         return buildSupplierChineseManagerSku(infoEntityList);
     }
 
-    private void checkSaveOrUpdateSkuParam(SaveOrUpdateSkuVO saveOrUpdateSkuVO, boolean updateFlag) {
+    /**
+     * 店铺数据初始化,将中药材默认上架到所有店铺,关联天江供应商
+	 * <p> 仅用于一期上线时数据初始化,不要用于其它用途 </>
+     *
+     * @param initializeRequest   初始化入参信息
+     * @author liuqiuyi
+     * @date 2022/8/5 14:23
+     */
+    @Override
+	@Deprecated
+    public List<StoreDataInitializeRequest.CompensateInfo> storeDataInitialize(StoreDataInitializeRequest initializeRequest) {
+		if (!CollectionUtils.isEmpty(initializeRequest.getStoreIds()) && CollectionUtils.isEmpty(initializeRequest.getCompensateInfoList())) {
+			return initSaveSku(initializeRequest);
+		} else if (!CollectionUtils.isEmpty(initializeRequest.getCompensateInfoList())) {
+			return compensateSaveSku(initializeRequest);
+		} else {
+			throw new BusinessException("未执行任何初始化操作,请检查传参!");
+		}
+	}
+
+	@Deprecated
+	private List<StoreDataInitializeRequest.CompensateInfo> compensateSaveSku(StoreDataInitializeRequest initializeRequest) {
+		List<StoreDataInitializeRequest.CompensateInfo> resultList = Lists.newArrayList();
+
+		List<StoreDataInitializeRequest.CompensateInfo> compensateInfoList = initializeRequest.getCompensateInfoList();
+		Set<Long> medicineIds = compensateInfoList.stream().map(StoreDataInitializeRequest.CompensateInfo::getMedicineId).collect(toSet());
+
+		// 1.获取需要补偿的老药材
+		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery()
+				.eq(OldChineseMedicine::getInvalid, DelFlagEnum.UN_DELETED.getCode())
+				.in(OldChineseMedicine::getId, medicineIds);
+		List<OldChineseMedicine> oldChineseMedicineList = oldChineseMedicineMapper.selectList(queryWrapper);
+		if (CollectionUtils.isEmpty(oldChineseMedicineList)) {
+			return resultList;
+		}
+		Map<Long, OldChineseMedicine> idAndOldChineseMedicineMap = oldChineseMedicineList.stream().collect(toMap(OldChineseMedicine::getId, dto -> dto, (v1, v2) -> v1));
+
+		// 2.获取本期生成的药材 code
+		Map<Long, String> medicineIdAndMedicineCodeMap = chineseMedicineService.getMedicineIdAndMedicineCodeMap(medicineIds);
+		// 3.生成数据
+		Long supplierId = initializeRequest.getSupplierId();
+		for (StoreDataInitializeRequest.CompensateInfo compensateInfo : compensateInfoList) {
+			Long medicineId = compensateInfo.getMedicineId();
+			Long storeId = compensateInfo.getStoreId();
+			try {
+				OldChineseMedicine oldChineseMedicine = idAndOldChineseMedicineMap.get(medicineId);
+
+				SaveOrUpdateSkuVO saveOrUpdateSkuVO = new SaveOrUpdateSkuVO();
+				saveOrUpdateSkuVO.setMedicineId(medicineId);
+				saveOrUpdateSkuVO.setMedicineCode(medicineIdAndMedicineCodeMap.get(medicineId));
+				saveOrUpdateSkuVO.setMedicineName(oldChineseMedicine.getName());
+				saveOrUpdateSkuVO.setSkuName(oldChineseMedicine.getName());
+				saveOrUpdateSkuVO.setPrice(oldChineseMedicine.getGramPrice());
+				saveOrUpdateSkuVO.setStoreId(storeId);
+				// 库存信息,初始化时默认为天江供应商,且无限库存
+				SaveOrUpdateSkuVO.SupplierInfo supplierInfo = new SaveOrUpdateSkuVO.SupplierInfo();
+				supplierInfo.setSupplierId(supplierId);
+				supplierInfo.setStockType(1);
+
+				saveOrUpdateSkuVO.setSupplierInfoList(Lists.newArrayList(supplierInfo));
+				saveOrUpdateSkuVO.setOperatorId(0L);
+
+
+				chineseSkuInfoService.saveSku(saveOrUpdateSkuVO);
+			} catch (Throwable e) {
+				log.error("初始化数据失败,异常信息为:", e);
+				StoreDataInitializeRequest.CompensateInfo info = new StoreDataInitializeRequest.CompensateInfo();
+				info.setMedicineId(medicineId);
+				info.setStoreId(storeId);
+				resultList.add(info);
+			}
+		}
+		return resultList;
+	}
+
+	@Deprecated
+	private List<StoreDataInitializeRequest.CompensateInfo> initSaveSku(StoreDataInitializeRequest initializeRequest) {
+		List<StoreDataInitializeRequest.CompensateInfo> resultList = Lists.newArrayList();
+		// 1.获取所有的老药材
+		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery().eq(OldChineseMedicine::getInvalid, DelFlagEnum.UN_DELETED.getCode());
+		List<OldChineseMedicine> oldChineseMedicineList = oldChineseMedicineMapper.selectList(queryWrapper);
+		if (CollectionUtils.isEmpty(oldChineseMedicineList)) {
+			return resultList;
+		}
+		// 2.获取本期生成的药材 code
+		Set<Long> medicineIds = oldChineseMedicineList.stream().map(OldChineseMedicine::getId).collect(toSet());
+		Map<Long, String> medicineIdAndMedicineCodeMap = chineseMedicineService.getMedicineIdAndMedicineCodeMap(medicineIds);
+
+		// 3.循环生成店铺的药材信息
+		List<Long> storeIds = initializeRequest.getStoreIds();
+		Long supplierId = initializeRequest.getSupplierId();
+		for (Long storeId : storeIds) {
+            oldChineseMedicineList.forEach(oldChineseMedicine -> {
+				try {
+					SaveOrUpdateSkuVO saveOrUpdateSkuVO = new SaveOrUpdateSkuVO();
+					saveOrUpdateSkuVO.setMedicineId(oldChineseMedicine.getId());
+					saveOrUpdateSkuVO.setMedicineCode(medicineIdAndMedicineCodeMap.get(oldChineseMedicine.getId()));
+					saveOrUpdateSkuVO.setMedicineName(oldChineseMedicine.getName());
+					saveOrUpdateSkuVO.setSkuName(oldChineseMedicine.getName());
+					saveOrUpdateSkuVO.setPrice(oldChineseMedicine.getGramPrice());
+					saveOrUpdateSkuVO.setStoreId(storeId);
+					// 库存信息,初始化时默认为天江供应商,且无限库存
+					SaveOrUpdateSkuVO.SupplierInfo supplierInfo = new SaveOrUpdateSkuVO.SupplierInfo();
+					supplierInfo.setSupplierId(supplierId);
+					supplierInfo.setStockType(1);
+
+					saveOrUpdateSkuVO.setSupplierInfoList(Lists.newArrayList(supplierInfo));
+					saveOrUpdateSkuVO.setOperatorId(0L);
+
+					chineseSkuInfoService.saveSku(saveOrUpdateSkuVO);
+				} catch (Throwable e) {
+					log.error("初始化数据失败,异常信息为:", e);
+					StoreDataInitializeRequest.CompensateInfo info = new StoreDataInitializeRequest.CompensateInfo();
+					info.setMedicineId(oldChineseMedicine.getId());
+					info.setStoreId(storeId);
+					resultList.add(info);
+				}
+            });
+        }
+		return resultList;
+	}
+
+	private void checkSaveOrUpdateSkuParam(SaveOrUpdateSkuVO saveOrUpdateSkuVO, boolean updateFlag) {
         // 1.根据药材code校验编码是否存在
         ChineseMedicineEntity chineseMedicineEntity = chineseMedicineService.getByMedicineCode(saveOrUpdateSkuVO.getMedicineCode());
         if (Objects.isNull(chineseMedicineEntity)) {
@@ -249,16 +387,17 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         }
         saveOrUpdateSkuVO.setMedicineId(chineseMedicineEntity.getId());
         saveOrUpdateSkuVO.setMedicineName(chineseMedicineEntity.getMedicineName());
-
         // 2.校验店铺是否存在
         List<StoreEntity> storeEntityList = storeService.listByIds(Sets.newHashSet(saveOrUpdateSkuVO.getStoreId()));
         if (CollectionUtils.isEmpty(storeEntityList)) {
             throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
         }
         // 3.校验供应商是否存在
-        // TODO liuqiuyi 调用供应商接口
-
-
+        List<Long> supplierIds = saveOrUpdateSkuVO.getSupplierInfoList().stream().map(SaveOrUpdateSkuVO.SupplierInfo::getSupplierId).collect(toList());
+        List<SupplierInfoDTO> supplierInfoDTOList = supplierRemoteProService.getSupplierNameByIds(supplierIds);
+        if (CollectionUtils.isEmpty(storeEntityList) || !Objects.equals(supplierInfoDTOList.size(), supplierIds.size())) {
+            throw new BusinessException(ErrorEnums.SUPPLIER_IS_NULL);
+        }
         // 4.如果是更新sku，校验skuCode是否存在，否则校验重复添加
         if (updateFlag) {
             ChineseSkuInfoEntity skuInfoEntity = chineseSkuInfoService.getBySkuCode(saveOrUpdateSkuVO.getSkuCode());
@@ -276,7 +415,8 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 
     private List<ChineseManagerSkuVO> buildChineseManagerSkuResponse(List<ChineseSkuInfoEntity> skuInfoEntityList,
                                                                      Map<String, Set<Long>> skuCodeSupplierIdsMap,
-                                                                     Map<Long, String> storeIdNameMap) {
+                                                                     Map<Long, String> storeIdNameMap,
+                                                                     Map<Long, String> supplierIdNameMap) {
         List<ChineseManagerSkuVO> managerSkuVOList = Lists.newArrayListWithCapacity(skuInfoEntityList.size());
         for (ChineseSkuInfoEntity chineseSkuInfoEntity : skuInfoEntityList) {
             Set<Long> supplierIds = skuCodeSupplierIdsMap.get(chineseSkuInfoEntity.getSkuCode());
@@ -288,12 +428,14 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
                     .storeId(chineseSkuInfoEntity.getStoreId())
                     .storeName(storeIdNameMap.get(chineseSkuInfoEntity.getStoreId()))
                     .supplierIdList(supplierIds)
-                    // TODO
-//                    .supplierName()
                     .price(chineseSkuInfoEntity.getPrice())
                     .skuState(chineseSkuInfoEntity.getSkuStatus())
                     .skuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()))
                     .build();
+            // 设值供应商名称
+            List<String> supplierNames = Lists.newArrayListWithCapacity(supplierIds.size());
+            chineseManagerSkuVO.getSupplierIdList().forEach(id -> supplierNames.add(supplierIdNameMap.getOrDefault(id, "")));
+            chineseManagerSkuVO.setSupplierName(supplierNames);
 
             managerSkuVOList.add(chineseManagerSkuVO);
         }

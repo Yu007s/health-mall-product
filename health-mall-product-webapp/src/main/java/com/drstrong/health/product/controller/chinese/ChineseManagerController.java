@@ -2,6 +2,7 @@ package com.drstrong.health.product.controller.chinese;
 
 import com.drstrong.health.product.facade.ChineseManagerFacade;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
+import com.drstrong.health.product.model.request.chinese.StoreDataInitializeRequest;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
@@ -12,10 +13,13 @@ import com.drstrong.health.product.remote.api.chinese.ChineseManagerRemoteApi;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -66,5 +70,18 @@ public class ChineseManagerController implements ChineseManagerRemoteApi {
     @Override
     public ResultVO<List<SupplierChineseManagerSkuVO>> listSupplierChineseManagerSkuExport(ChineseManagerSkuRequest skuRequest) {
         return ResultVO.success(chineseManagerFacade.listSupplierChineseManagerSkuExport(skuRequest));
+    }
+
+    /**
+     * 店铺数据初始化的接口
+     * <p> 仅用于一期上线时数据初始化,不要用于其它用途 </>
+     *
+     * @author liuqiuyi
+     * @date 2022/8/5 14:21
+     */
+    @PostMapping("/store/data/init")
+    public ResultVO<Object> storeDataInitialize(@RequestBody @Valid StoreDataInitializeRequest initializeRequest) {
+        List<StoreDataInitializeRequest.CompensateInfo> compensateInfoList = chineseManagerFacade.storeDataInitialize(initializeRequest);
+        return ResultVO.success(compensateInfoList);
     }
 }
