@@ -13,10 +13,7 @@ import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.StoreTypeEnum;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
-import com.drstrong.health.product.model.response.store.StoreAddResponse;
-import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
-import com.drstrong.health.product.model.response.store.StoreInfoResponse;
-import com.drstrong.health.product.model.response.store.SupplierResponse;
+import com.drstrong.health.product.model.response.store.*;
 import com.drstrong.health.product.service.store.AgencyService;
 import com.drstrong.health.product.service.store.StoreInvoiceService;
 import com.drstrong.health.product.service.store.StoreLinkSupplierService;
@@ -193,30 +190,47 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     }
 
     @Override
-    public StoreAddResponse queryStoreCloseInfo() {
-        //查询所有店铺类型
+    public StoreAddResponse queryStoreAddInfo() {
+        //所有店铺类型
         List<String> storeTypeNames = new ArrayList<>(StoreTypeEnum.values().length);
-        for (StoreTypeEnum value : StoreTypeEnum.values()) {
-             storeTypeNames.add(value.getValue());
-        }
+        //所有互联网医院
+        List<StoreAddResponse.AgencyIdAndName> agencyIdAndNames = new ArrayList<>();
+        buildStoreConnectInfo(storeTypeNames,agencyIdAndNames);
         //查询所有供应商
         List<SupplierResponse> supplierResponses = new ArrayList<>();
         SupplierResponse supplierResponse = new SupplierResponse();
         supplierResponse.setSupplierId(1024L);
         supplierResponse.setSupplierName("我是测试供应商名字");
         supplierResponses.add(supplierResponse);
-        //查询所有互联网医院
-        List<String> allName = agencyService.getAllName();
         StoreAddResponse storeAddResponse = new StoreAddResponse();
         storeAddResponse.setStoreTypeNames(storeTypeNames);
         storeAddResponse.setSuppliers(supplierResponses);
+        storeAddResponse.setAgencyIdAndNames(agencyIdAndNames);
+        return storeAddResponse;
+    }
+
+    @Override
+    public StoreQueryResponse queryStoreConInfo() {
+        //所有店铺类型
+        List<String> storeTypeNames = new ArrayList<>(StoreTypeEnum.values().length);
+        //所有互联网医院
         List<StoreAddResponse.AgencyIdAndName> agencyIdAndNames = new ArrayList<>();
+        buildStoreConnectInfo(storeTypeNames,agencyIdAndNames);
+        StoreQueryResponse storeQueryResponse = new StoreQueryResponse();
+        storeQueryResponse.setStoreTypeNames(storeTypeNames);
+        storeQueryResponse.setAgencyIdAndNames(agencyIdAndNames);
+        return storeQueryResponse;
+    }
+
+    private void buildStoreConnectInfo(List<String> storeTypeNames,List<StoreAddResponse.AgencyIdAndName> agencyIdAndNames ){
+        for (StoreTypeEnum value : StoreTypeEnum.values()) {
+            storeTypeNames.add(value.getValue());
+        }
+        List<String> allName = agencyService.getAllName();
         for (int i = 0; i < allName.size(); i++) {
             StoreAddResponse.AgencyIdAndName agencyIdAndName = new StoreAddResponse.AgencyIdAndName((long) i + 1, allName.get(i));
             agencyIdAndNames.add(agencyIdAndName);
         }
-        storeAddResponse.setAgencyIdAndNames(agencyIdAndNames);
-        return storeAddResponse;
     }
 
     @Override

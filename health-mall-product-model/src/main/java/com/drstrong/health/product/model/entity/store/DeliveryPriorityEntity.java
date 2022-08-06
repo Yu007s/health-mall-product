@@ -13,7 +13,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author mybatis plus generator
@@ -22,11 +22,12 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("pms_store_delivery_priority")
-public class DeliveryPriorityEntity extends BaseStandardEntity  implements Serializable  {
+public class DeliveryPriorityEntity extends BaseStandardEntity implements Serializable {
 
-    private static final long serialVersionUID= 1548474653267452161L;
-    public static final long DEFAULT_AREA_ID = 0L;
-
+    private static final long serialVersionUID = 1548474653267452161L;
+    public static final Integer CHINA = 0;
+    public static final Integer PROVINCE = 1;
+    public static final Integer CITY = 2;
     /**
      * 主键id
      */
@@ -39,9 +40,13 @@ public class DeliveryPriorityEntity extends BaseStandardEntity  implements Seria
     private Long storeId;
 
     /**
-     * 区域id 
+     * 区域id
      */
     private Long areaId;
+    /**
+     * 区域类型 0：全国  1：省级 2：市级
+     */
+    private Integer areaType;
 
     /**
      * 该店铺下该地区所有供应商优先级设置  以“,”号隔开,前面的优先级更小

@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.drstrong.health.product.model.entity.productstore.AreaEntity;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * @author lsx
  * @projectName health-mall-product
@@ -13,5 +15,11 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface AreaMapper extends BaseMapper<AreaEntity> {
+    /**
+     * 根据区域id 查询父级的区域id  一定会查出全国的id
+     * @param areaId 区域id
+     * @return 查询所得区域
+     */
+    List<AreaEntity> queryFatherAreaById(Long areaId);
     
 }

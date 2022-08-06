@@ -7,6 +7,7 @@ import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
 import com.drstrong.health.product.model.response.result.ResultVO;
+import com.drstrong.health.product.model.response.store.StoreQueryResponse;
 import com.drstrong.health.product.model.response.store.delievy.DeliveryPriorityVO;
 import com.drstrong.health.product.model.response.store.StoreAddResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
@@ -105,10 +106,22 @@ public class StoreController implements StoreFacade {
      * @return 所有需要信息的集合
      */
     @ApiOperation("增加店铺时查找相应的信息")
-    @GetMapping("/queryInfo")
-    public ResultVO<StoreAddResponse> queryStoreInfo() {
-        StoreAddResponse storeAddResponse = storeService.queryStoreCloseInfo();
+    @GetMapping("/queryAddInfo")
+    public ResultVO<StoreAddResponse> queryAddStoreInfo() {
+        StoreAddResponse storeAddResponse = storeService.queryStoreAddInfo();
         return ResultVO.success(storeAddResponse);
+    }
+
+    /**
+     * 店铺查询页面  查询所有需要信息
+     *
+     * @return 所有需要信息的集合
+     */
+    @ApiOperation("增加店铺时查找相应的信息")
+    @GetMapping("/queryInfo")
+    public ResultVO<StoreQueryResponse> queryStoreInfo() {
+        StoreQueryResponse storeQueryResponse = storeService.queryStoreConInfo();
+        return ResultVO.success(storeQueryResponse);
     }
 
     /**

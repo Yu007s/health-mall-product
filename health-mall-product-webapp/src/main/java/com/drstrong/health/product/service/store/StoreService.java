@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.store.StoreAddResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
+import com.drstrong.health.product.model.response.store.StoreQueryResponse;
 
 import java.util.List;
 import java.util.Set;
@@ -78,6 +79,15 @@ public interface StoreService {
 	 */
 	StoreEntity getStoreByAgencyIdOrStoreId(Long agencyId, Long storeId);
 
+	/**
+	 * 店铺新增页面查询相关信息  互联网医院 店铺 供应商
+	 * @return StoreAddResponse
+	 */
+	 StoreAddResponse queryStoreAddInfo();
 
-	 StoreAddResponse queryStoreCloseInfo();
+	/**
+	 * 店铺查询页面返回相应信息
+	 * @return  互联网医院 名字 id 店铺类型名字
+	 */
+	 StoreQueryResponse queryStoreConInfo();
 }

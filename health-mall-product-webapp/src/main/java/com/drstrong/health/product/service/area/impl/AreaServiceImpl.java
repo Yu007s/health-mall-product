@@ -95,8 +95,8 @@ public class AreaServiceImpl implements AreaService {
     }
 
     @Override
-    public List<AreaInfoResponse> queryFatherAreaById(Long areaId) {
-        return null;
+    public List<AreaEntity> queryFatherAreaById(Long areaId) {
+        return areaMapper.queryFatherAreaById(areaId);
     }
 
 

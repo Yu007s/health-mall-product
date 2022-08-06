@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.area;
 
+import com.drstrong.health.product.model.entity.productstore.AreaEntity;
 import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
 
@@ -19,6 +20,6 @@ public interface AreaService {
 
     AreaInfoResponse querySingle(Long areaId);
 
-    List<AreaInfoResponse> queryFatherAreaById(Long areaId);
+    List<AreaEntity> queryFatherAreaById(Long areaId);
 
 }
