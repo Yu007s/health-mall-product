@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -46,7 +47,7 @@ public class StoreController implements StoreFacade {
      */
     @ApiOperation("新增/修改店铺信息")
     @PostMapping("/save")
-    public ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store, @RequestParam Long userId) throws Exception {
+    public ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store, @RequestParam("userId") @NotBlank(message = "用户id不能为空") Long userId) throws Exception {
         String msg;
         if (store.getStoreId() == null) {
             storeService.save(store, userId);
@@ -66,7 +67,7 @@ public class StoreController implements StoreFacade {
      */
     @ApiOperation("获取符合条件的店铺基本信息列表")
     @GetMapping("/query")
-    public ResultVO<List<StoreInfoResponse>> queryStore(StoreSearchRequest storeSearchRequest) {
+    public ResultVO<List<StoreInfoResponse>> queryStore(@RequestBody StoreSearchRequest storeSearchRequest) {
         List<StoreInfoResponse> query = storeService.query(storeSearchRequest);
         return ResultVO.success(query);
     }
@@ -79,7 +80,7 @@ public class StoreController implements StoreFacade {
      */
     @ApiOperation("获取店铺详细信息")
     @GetMapping("/queryById")
-    public ResultVO<StoreInfoEditResponse> queryStoreDetail(@RequestParam Long storeId) {
+    public ResultVO<StoreInfoEditResponse> queryStoreDetail(@RequestParam("storeId") @NotBlank(message = "店铺id不能为空") Long storeId) {
         StoreInfoEditResponse storeInfoEditResponse = storeService.queryById(storeId);
         return ResultVO.success(storeInfoEditResponse);
     }
@@ -124,7 +125,7 @@ public class StoreController implements StoreFacade {
     @Override
     @ApiOperation("根据供应商id查询关联的店铺信息")
     @GetMapping("/searchStore")
-    public List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam Long supplierId) {
+    public List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam("supplierId") @NotBlank(message = "供应商id不能为空") Long supplierId) {
         return storeLinkSupplierMapper.findStoreBySupplierId(supplierId);
     }
 

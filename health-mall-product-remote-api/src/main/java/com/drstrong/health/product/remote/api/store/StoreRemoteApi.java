@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -27,17 +28,17 @@ import java.util.List;
 public interface StoreRemoteApi {
     @ApiOperation("新增/修改店铺信息")
     @PostMapping("/save")
-    ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store, @RequestParam Long userId) throws Exception ;
+    ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store, @RequestParam("userId") @NotBlank(message = "用户id不能为空") Long userId) throws Exception ;
 
 
     @ApiOperation("获取符合条件的店铺基本信息列表")
     @GetMapping("/query")
-    ResultVO<List<StoreInfoResponse>> queryStore(StoreSearchRequest storeSearchRequest) ;
+    ResultVO<List<StoreInfoResponse>> queryStore(@RequestBody StoreSearchRequest storeSearchRequest) ;
 
 
     @ApiOperation("获取店铺详细信息")
     @GetMapping("/queryById")
-    ResultVO<StoreInfoEditResponse> queryStoreDetail(@RequestParam Long storeId) ;
+    ResultVO<StoreInfoEditResponse> queryStoreDetail(@RequestParam("storeId") @NotBlank(message = "店铺id不能为空") Long storeId) ;
 
 
     @ApiOperation("增加店铺时查找相应的信息")
@@ -57,5 +58,5 @@ public interface StoreRemoteApi {
 
     @ApiOperation("根据供应商id查询关联的店铺信息")
     @GetMapping("/searchStore")
-    List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam Long supplierId);
+    List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam("supplierId") @NotBlank(message = "供应商id不能为空") Long supplierId);
 }

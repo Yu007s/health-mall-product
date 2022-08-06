@@ -5,6 +5,7 @@ import com.drstrong.health.product.model.request.chinese.ChineseMedicineRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
+import io.swagger.models.auth.In;
 
 import java.util.List;
 import java.util.Map;
@@ -24,12 +25,16 @@ public interface ChineseMedicineService {
      */
     boolean save(ChineseMedicineVO chineseMedicineVO,Long userId) throws Exception;
 
-    /**
-     * 查询中药材分页展示
-     * @param chineseMedicineRequest  查询请求信息
-     * @return 查询所得列表
-     */
-    List<ChineseMedicineResponse> queryPage(ChineseMedicineRequest chineseMedicineRequest);
+
+	/**
+	 *      * 查询中药材分页展示
+	 * @param medicineCode
+	 * @param medicineName
+	 * @param pageNo
+	 * @param pageSize
+	 * @return 查询所得列表
+	 */
+    List<ChineseMedicineResponse> queryPage(String medicineCode, String medicineName, Integer pageNo,Integer pageSize);
 
     /**
      * 查询中药材分页展示  根据药材编码列表查找  带分页参数
