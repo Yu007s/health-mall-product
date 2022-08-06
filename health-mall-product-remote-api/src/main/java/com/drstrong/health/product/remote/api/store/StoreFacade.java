@@ -7,6 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
@@ -23,5 +24,5 @@ public interface StoreFacade {
      */
     @ApiOperation("根据供应商id查询关联的店铺信息")
     @GetMapping("/searchStore")
-    List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam Long supplierId) ;
+    List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam("supplierId") @NotNull(message = "供应商id不能为null") Long supplierId) ;
 }

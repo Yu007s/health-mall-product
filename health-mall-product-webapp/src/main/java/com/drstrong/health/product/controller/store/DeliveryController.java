@@ -20,17 +20,17 @@ import java.util.List;
 public class DeliveryController {
     @Resource
     private StoreDeliveryPriorityService storeDeliveryPriorityService;
-    @GetMapping ("query")
+    @GetMapping ("/query")
     public ResultVO<DeliveryPriorityVO> getDeliveryInfo(@RequestParam("storeId") @NotNull(message = "店铺id不能为空") Long storeId) {
         DeliveryPriorityVO deliveryPriorityVO = storeDeliveryPriorityService.queryByStoreId(storeId);
         return ResultVO.success(deliveryPriorityVO);
     }
-    @GetMapping ("queryByAreaId")
+    @GetMapping ("/queryByAreaId")
     public List<Long> getDeliveryInfoByArea(@RequestParam("storeId") @NotNull(message = "店铺id不能为空") Long storeId,@RequestParam("areaId") @NotNull(message = "区域id不能为空")  Long areaId) {
         return storeDeliveryPriorityService.queryByStoreIdAndArea(storeId, areaId);
     }
 
-    @PostMapping("save")
+    @PostMapping("/save")
     public ResultVO<String> saveDeliveryInfo(@RequestBody SaveDeliveryRequest saveDeliveryRequest, @RequestParam("userId") @NotNull(message = "店铺id不能为空")  Long userId){
         storeDeliveryPriorityService.save(saveDeliveryRequest,userId);
         return ResultVO.success();
