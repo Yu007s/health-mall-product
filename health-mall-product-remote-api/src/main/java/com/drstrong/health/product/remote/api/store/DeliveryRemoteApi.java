@@ -21,14 +21,14 @@ import java.util.List;
 @FeignClient(value = "health-mall-product", path = "/product/chinese/store/delivery")
 public interface DeliveryRemoteApi {
 
-    @GetMapping("query")
+    @GetMapping("/query")
     ResultVO<DeliveryPriorityVO> getDeliveryInfo(@RequestParam("storeId") @NotNull(message = "店铺id不能为空") Long storeId);
 
-    @GetMapping("queryByAreaId")
+    @GetMapping("/queryByAreaId")
     List<Long> getDeliveryInfoByArea(@RequestParam("storeId") @NotNull(message = "店铺id不能为空") Long storeId,
                                      @RequestParam("areaId") @NotNull(message = "区域id不能为空") Long areaId);
 
 
-    @PostMapping("save")
+    @PostMapping("/save")
     ResultVO<String> saveDeliveryInfo(@RequestBody SaveDeliveryRequest saveDeliveryRequest, @RequestParam("userId") @NotNull(message = "店铺id不能为空") Long userId);
 }
