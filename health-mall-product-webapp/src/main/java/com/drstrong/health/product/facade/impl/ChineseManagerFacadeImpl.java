@@ -259,23 +259,25 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 
     /**
      * 店铺数据初始化,将中药材默认上架到所有店铺,关联天江供应商
+	 * <p> 仅用于一期上线时数据初始化,不要用于其它用途 </>
      *
      * @param initializeRequest   初始化入参信息
      * @author liuqiuyi
      * @date 2022/8/5 14:23
      */
     @Override
+	@Deprecated
     public List<StoreDataInitializeRequest.CompensateInfo> storeDataInitialize(StoreDataInitializeRequest initializeRequest) {
 		if (!CollectionUtils.isEmpty(initializeRequest.getStoreIds()) && CollectionUtils.isEmpty(initializeRequest.getCompensateInfoList())) {
 			return initSaveSku(initializeRequest);
 		} else if (!CollectionUtils.isEmpty(initializeRequest.getCompensateInfoList())) {
 			return compensateSaveSku(initializeRequest);
 		} else {
-			log.info("未执行任何初始化操作,请检查传参!");
-			return null;
+			throw new BusinessException("未执行任何初始化操作,请检查传参!");
 		}
 	}
 
+	@Deprecated
 	private List<StoreDataInitializeRequest.CompensateInfo> compensateSaveSku(StoreDataInitializeRequest initializeRequest) {
 		List<StoreDataInitializeRequest.CompensateInfo> resultList = Lists.newArrayList();
 
@@ -330,6 +332,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 		return resultList;
 	}
 
+	@Deprecated
 	private List<StoreDataInitializeRequest.CompensateInfo> initSaveSku(StoreDataInitializeRequest initializeRequest) {
 		List<StoreDataInitializeRequest.CompensateInfo> resultList = Lists.newArrayList();
 		// 1.获取所有的老药材

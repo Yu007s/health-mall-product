@@ -84,10 +84,12 @@ public interface ChineseManagerFacade {
 
     /**
      * 店铺数据初始化,将中药材默认上架到所有店铺,关联天江供应商
+     * <p> 仅用于一期上线时数据初始化,不要用于其它用途 </>
      *
-     * @param initializeRequest   初始化入参信息
+     * @param initializeRequest 初始化入参信息
      * @author liuqiuyi
      * @date 2022/8/5 14:23
      */
+    @Deprecated
     List<StoreDataInitializeRequest.CompensateInfo> storeDataInitialize(StoreDataInitializeRequest initializeRequest);
 }

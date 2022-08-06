@@ -74,13 +74,14 @@ public class ChineseManagerController implements ChineseManagerRemoteApi {
 
     /**
      * 店铺数据初始化的接口
+     * <p> 仅用于一期上线时数据初始化,不要用于其它用途 </>
      *
      * @author liuqiuyi
      * @date 2022/8/5 14:21
      */
     @PostMapping("/store/data/init")
     public ResultVO<Object> storeDataInitialize(@RequestBody @Valid StoreDataInitializeRequest initializeRequest) {
-        chineseManagerFacade.storeDataInitialize(initializeRequest);
-        return ResultVO.success();
+        List<StoreDataInitializeRequest.CompensateInfo> compensateInfoList = chineseManagerFacade.storeDataInitialize(initializeRequest);
+        return ResultVO.success(compensateInfoList);
     }
 }
