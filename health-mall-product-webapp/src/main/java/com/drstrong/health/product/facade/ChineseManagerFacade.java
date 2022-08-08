@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
+import com.drstrong.health.product.model.response.chinese.SupplierBaseInfoVO;
 import com.drstrong.health.product.model.response.chinese.SupplierChineseManagerSkuVO;
 
 import java.util.List;
@@ -81,6 +82,16 @@ public interface ChineseManagerFacade {
      * @date 2022/8/5 10:17
      */
     List<SupplierChineseManagerSkuVO> listSupplierChineseManagerSkuExport(ChineseManagerSkuRequest skuRequest);
+
+	/**
+	 * 根据店铺 id 获取店铺的供应商信息
+	 *
+	 * @param storeId 店铺 id
+	 * @return 供应商集合
+	 * @author liuqiuyi
+	 * @date 2022/8/8 14:53
+	 */
+	List<SupplierBaseInfoVO> getStoreSupplierInfo(Long storeId);
 
     /**
      * 店铺数据初始化,将中药材默认上架到所有店铺,关联天江供应商

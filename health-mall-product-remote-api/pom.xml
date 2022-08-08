@@ -34,8 +34,17 @@
         </dependency>
     </dependencies>
 
-    <!-- deploy 时请使用下面的配置文件,注意 version 版本号 -->
-<!--    <modelVersion>4.0.0</modelVersion>
+    <!--
+        deploy 时请使用下面的配置文件,注意 version 版本号:
+        test1 环境: TEST1-SNAPSHOT
+        test2 环境: TEST2-SNAPSHOT
+        test3 环境: TEST3-SNAPSHOT
+        test4 环境: TEST4-SNAPSHOT
+        pre 和 prod 环境: RELEASE-SNAPSHOT
+    -->
+
+<!--
+   <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.drstrong.health</groupId>
     <version>1.0-SNAPSHOT</version>
@@ -78,6 +87,7 @@
             <name>Team Nexus Release Repository</name>
             <url>http://192.168.21.125:8081/repository/maven-snapshots/</url>
         </repository>
-    </distributionManagement>-->
+    </distributionManagement>
+-->
 
 </project>

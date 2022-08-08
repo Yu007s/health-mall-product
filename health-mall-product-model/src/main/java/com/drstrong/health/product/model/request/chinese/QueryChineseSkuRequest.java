@@ -38,6 +38,9 @@ public class QueryChineseSkuRequest implements Serializable {
 	@ApiModelProperty("是否需要查询库存")
 	private Boolean needQueryStock;
 
-	@ApiModelProperty("是否需要查询供应商配送优先级")
+	@ApiModelProperty("是否需要查询店铺的配送优先级,需要配合 areaId 使用")
 	private Boolean needQueryPriority;
+
+	@ApiModelProperty("区域 id,查询店铺配送优先级时需要,配合 needQueryPriority 字段使用")
+	private Long areaId;
 }
