@@ -12,7 +12,8 @@ import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.StoreTypeEnum;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
-import com.drstrong.health.product.model.request.store.StoreSearchRequest;
+import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.model.response.store.*;
 import com.drstrong.health.product.service.store.AgencyService;
 import com.drstrong.health.product.service.store.StoreInvoiceService;
@@ -20,6 +21,7 @@ import com.drstrong.health.product.service.store.StoreLinkSupplierService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -49,7 +51,8 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(StoreInfoDetailSaveRequest storeRequest, Long userId) throws Exception {
+    public void save(StoreInfoDetailSaveRequest storeRequest)  {
+        Long userId = storeRequest.getUserId();
         StoreInvoiceEntity invoice = BeanUtil.copyProperties(storeRequest, StoreInvoiceEntity.class);
         List<StoreLinkSupplierEntity> storeLinkSuppliers = new ArrayList<>(storeRequest.getSupplierIds().size());
         StoreEntity storeEntity = new StoreEntity();
@@ -61,7 +64,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
             queryWrapper.eq(StoreEntity::getAgencyId, storeEntity.getAgencyId()).eq(StoreEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode()).last("limit 1");
             StoreEntity one = super.getOne(queryWrapper);
             if(one != null){
-                throw new Exception("该互联网医院已经关联了店铺");
+                throw new BusinessException("该互联网医院已经关联了店铺");
             }
         }
         storeEntity.setCreatedBy(userId);
@@ -81,10 +84,11 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(StoreInfoDetailSaveRequest storeRequest, Long userId) throws Exception {
+    public void update(StoreInfoDetailSaveRequest storeRequest)  {
         StoreInvoiceEntity invoice = BeanUtil.copyProperties(storeRequest, StoreInvoiceEntity.class);
         List<StoreLinkSupplierEntity> storeLinkSuppliers = new ArrayList<>(storeRequest.getSupplierIds().size());
         StoreEntity storeEntity = new StoreEntity();
+        Long userId = storeRequest.getUserId();
         buildEntityForSaveOrUpdate(storeRequest,storeEntity,storeLinkSuppliers,invoice,userId);
         Long storeId = storeEntity.getId();
         //禁止更新字段设置为null
@@ -101,18 +105,17 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
 
 
     @Override
-    public List<StoreInfoResponse> query(StoreSearchRequest storeSearchRequest) {
+    public List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, String storeTypeName) {
         LambdaQueryWrapper<StoreEntity> storeEntityQueryWrapper = new LambdaQueryWrapper<>();
-        String storeTypeName = storeSearchRequest.getStoreTypeName();
         Integer storeType = null;
-        if (storeTypeName != null) {
+        if (StringUtils.isNotBlank(storeTypeName)) {
             storeType = StoreTypeEnum.nameToCode(storeTypeName);
         }
         storeEntityQueryWrapper.select(StoreEntity::getStoreName,StoreEntity::getId,StoreEntity::getStoreType,StoreEntity::getAgencyId)
-                .eq(storeSearchRequest.getStoreId() != null, StoreEntity::getId, storeSearchRequest.getStoreId())
-                .like(storeSearchRequest.getStoreName() != null, StoreEntity::getStoreName, storeSearchRequest.getStoreName())
+                .eq(storeId != null, StoreEntity::getId, storeId)
+                .like(StringUtils.isNotBlank(storeName), StoreEntity::getStoreName, storeName)
                 .eq(storeType != null, StoreEntity::getStoreType, storeType)
-                .eq(storeSearchRequest.getAgencyId() != null, StoreEntity::getAgencyId, storeSearchRequest.getAgencyId())
+                .eq(agencyId != null, StoreEntity::getAgencyId, agencyId)
                 .eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         List<StoreEntity> storeEntities = list(storeEntityQueryWrapper);
         return storeEntities.stream().map(storeEntity -> {
@@ -267,17 +270,24 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     }
 
     private void buildEntityForSaveOrUpdate(StoreInfoDetailSaveRequest storeRequest,StoreEntity storeEntity,
-                                            List<StoreLinkSupplierEntity> linkSupplierEntities,StoreInvoiceEntity storeInvoiceEntity,Long userId) throws Exception {
+                                            List<StoreLinkSupplierEntity> linkSupplierEntities,StoreInvoiceEntity storeInvoiceEntity,Long userId) {
         //组装店铺实体
         storeEntity.setChangedBy(userId);
         storeEntity.setStoreName(storeRequest.getStoreName());
         String storeTypeName = storeRequest.getStoreTypeName();
         Integer integer = StoreTypeEnum.nameToCode(storeTypeName);
         if (integer == null) {
-            throw new Exception("错误的店铺类型名称");
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"错误的店铺类型名称");
         }
         storeEntity.setStoreType(integer);
-        storeEntity.setId(storeRequest.getStoreId());
+        Long aLong = null;
+        try {
+            boolean notBlank = StringUtils.isNotBlank(storeRequest.getStoreId());
+            aLong = notBlank ? Long.valueOf(storeRequest.getStoreId()) : null;
+        } catch (NumberFormatException e) {
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"错误的店铺id,无法转换为long类型");
+        }
+        storeEntity.setId(aLong);
         if (integer.equals(StoreTypeEnum.INT_HOSPITAL.getCode())) {
             Long agencyId = storeRequest.getAgencyId();
             storeEntity.setAgencyId(agencyId);
@@ -297,14 +307,13 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     /**
      * 检验店铺相关信息是否合法
      * @param store 店铺
-     * @throws Exception 不合法抛出相关异常
      */
-    private void checkStore(StoreEntity store) throws Exception {
+    private void checkStore(StoreEntity store) {
         LambdaQueryWrapper<StoreEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(StoreEntity::getStoreName,store.getStoreName()).eq(StoreEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode()).last("limit 1");
         StoreEntity one = super.getOne(queryWrapper);
         if(one != null){
-            throw new Exception("已经存在同名店铺");
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"已经存在同名店铺");
         }
     }
 }

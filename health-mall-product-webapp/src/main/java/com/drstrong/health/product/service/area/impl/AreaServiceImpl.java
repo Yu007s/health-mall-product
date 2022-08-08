@@ -3,6 +3,8 @@ package com.drstrong.health.product.service.area.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.drstrong.health.product.dao.area.AreaMapper;
 import com.drstrong.health.product.model.entity.productstore.AreaEntity;
+import com.drstrong.health.product.model.entity.store.DeliveryPriorityEntity;
+import com.drstrong.health.product.model.enums.AreaTypeEnum;
 import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
 import com.drstrong.health.product.service.area.AreaService;
@@ -44,18 +46,17 @@ public class AreaServiceImpl implements AreaService {
         }).collect(Collectors.toList());
         return areaInfoResponses;
     }
-
     @Override
     public List<ProvinceAreaInfo> queryAll() {
         LambdaQueryWrapper<AreaEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.select(AreaEntity::getName,AreaEntity::getId,AreaEntity::getParentId).eq(AreaEntity::getAvailable,1)
-                .eq(AreaEntity::getType,1).or().eq(AreaEntity::getType,2).or().eq(AreaEntity::getType,0).orderByAsc(AreaEntity::getId);
+        queryWrapper.select(AreaEntity::getName,AreaEntity::getId,AreaEntity::getParentId,AreaEntity::getType).eq(AreaEntity::getAvailable,1)
+                .in(AreaEntity::getType, AreaTypeEnum.COUNTRY,AreaTypeEnum.PROVINCE,AreaTypeEnum.CITY).orderByAsc(AreaEntity::getId);
         //完成所有省市的嵌套
         List<AreaEntity> allAreaEntities = areaMapper.selectList(queryWrapper);
         int chinaId = -1;
         HashMap<Integer,List<AreaEntity>> areaEntityHashMap = new HashMap<>(32);
         for (AreaEntity areaEntity : allAreaEntities) {
-            if ("中国".equals(areaEntity.getName())) {
+            if ( AreaTypeEnum.COUNTRY.ordinal() == areaEntity.getType() ) {
                 chinaId = Math.toIntExact(areaEntity.getId());
             }
             Integer parentId = areaEntity.getParentId();
@@ -96,7 +97,15 @@ public class AreaServiceImpl implements AreaService {
 
     @Override
     public List<AreaEntity> queryFatherAreaById(Long areaId) {
-        return areaMapper.queryFatherAreaById(areaId);
+        LambdaQueryWrapper<AreaEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(AreaEntity::getId, areaId).eq(AreaEntity::getAvailable, 1);
+        AreaEntity areaEntity = areaMapper.selectOne(lambdaQueryWrapper);
+        Long queryId = areaId;
+        //如果是区级id  则转换为市级查询  否则直接查询
+        if (areaEntity.getType() == AreaTypeEnum.DISTRICT.ordinal()) {
+            queryId = (long)areaEntity.getParentId();
+        }
+        return areaMapper.queryFatherAreaById(queryId);
     }
 
 

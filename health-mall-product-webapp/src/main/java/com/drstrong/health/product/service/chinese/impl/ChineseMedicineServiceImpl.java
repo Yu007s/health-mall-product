@@ -15,7 +15,10 @@ import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.chinese.ChineseMedicineRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
+import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
+import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.service.chinese.ChineseMedicineConflictService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
@@ -53,14 +56,15 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean save(ChineseMedicineVO chineseMedicineVO,Long userId) throws Exception {
+    public boolean save(ChineseMedicineVO chineseMedicineVO) {
+        Long userId = chineseMedicineVO.getUserId();
         String medicineCode = chineseMedicineVO.getMedicineCode();
         ChineseMedicineEntity chineseMedicineEntity = new ChineseMedicineEntity();
         if (StringUtils.isNotBlank(medicineCode)) {
             //编辑药材
             ChineseMedicineEntity byMedicineCode = getByMedicineCode(medicineCode);
             if (byMedicineCode== null || byMedicineCode.getId() ==  null) {
-                throw new Exception("编辑药材失败，未找到该药材");
+                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"编辑药材失败，未找到该药材");
             }
             chineseMedicineEntity.setId( byMedicineCode.getId());
             chineseMedicineEntity.setMedicineCode(chineseMedicineVO.getMedicineCode());
@@ -71,7 +75,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
             lambdaQueryWrapper.eq(ChineseMedicineEntity::getMedicineName,chineseMedicineVO.getName());
             ChineseMedicineEntity one = getOne(lambdaQueryWrapper);
             if(one != null){
-                throw new Exception("新增药材失败，已有同名药材");
+                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"新增药材失败，已有同名药材");
             }
             //新增药材
             String nextMedicineCode = UniqueCodeUtils.getNextMedicineCode(chineseMedicineVO.getName());
@@ -147,7 +151,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
     }
 
     @Override
-    public List<ChineseMedicineResponse> queryPage(String medicineCode, String medicineName, Integer pageNo, Integer pageSize) {
+    public ChineseMedicineSearchVO queryPage(String medicineCode, String medicineName, Integer pageNo, Integer pageSize) {
         LambdaQueryWrapper<ChineseMedicineEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.select(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName,
                 ChineseMedicineEntity::getMedicineAlias, ChineseMedicineEntity::getMaxDosage);
@@ -160,12 +164,19 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         wrapper.orderByDesc(ChineseMedicineEntity::getCreatedAt);
         Page<ChineseMedicineEntity> page = new Page<>(pageNo, pageSize);
         List<ChineseMedicineEntity> records = page(page, wrapper).getRecords();
-        return buildChineseMedicineResponse(records);
+        long total = page.getTotal();
+        List<ChineseMedicineResponse> chineseMedicineResponses = buildChineseMedicineResponse(records);
+        ChineseMedicineSearchVO chineseMedicineSearchVO = new ChineseMedicineSearchVO();
+        chineseMedicineSearchVO.setPageNo(pageNo);
+        chineseMedicineSearchVO.setPageSize(pageSize);
+        chineseMedicineSearchVO.setTotal((int)total);
+        chineseMedicineSearchVO.setMedicineResponses(chineseMedicineResponses);
+        return chineseMedicineSearchVO;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ChineseMedicineResponse> queryPageForConflict(String medicineCode, Integer pageNo, Integer pageSize) {
+    public List<ChineseMedicineResponse> queryPageForConflict(String medicineCode) {
         ChineseMedicineConflictEntity chineseMedicineConflictEntity = chineseMedicineConflictService.getByMedicineCode(medicineCode);
         if (chineseMedicineConflictEntity == null || chineseMedicineConflictEntity.getMedicineConflictCodes() == null) {
             return new ArrayList<>(1);
@@ -178,13 +189,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
             wrapper.in(ChineseMedicineEntity::getMedicineCode, conflictCodes);
         });
         List<ChineseMedicineEntity> records;
-        if(pageNo != null  && pageSize != null){
-            Page<ChineseMedicineEntity> page = new Page<>(pageNo, pageSize);
-            records = page(page, medicineWrapper).getRecords();
-        }
-        else {
-             records = list(medicineWrapper);
-        }
+        records = list(medicineWrapper);
         return buildChineseMedicineResponse(records);
     }
 
@@ -194,8 +199,12 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
             ChineseMedicineResponse response = new ChineseMedicineResponse();
             response.setMedicineCode(chineseMedicineEntity.getMedicineCode());
             response.setName(chineseMedicineEntity.getMedicineName());
-            List<String> strings = Arrays.asList(chineseMedicineEntity.getMedicineAlias().split(","));
-            response.setAliNames(strings);
+            String medicineAlias = chineseMedicineEntity.getMedicineAlias();
+            if (StringUtils.isNotBlank(medicineAlias)) {
+                 //去除末尾","
+                 medicineAlias = medicineAlias.substring(0, medicineAlias.length() - 1);
+            }
+            response.setAliNames(medicineAlias);
             response.setMaxDosage(chineseMedicineEntity.getMaxDosage());
             return response;
         }).collect(Collectors.toList());
@@ -261,7 +270,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
     /**
      * 根据老的药材 id 获取药材 code,组成 map
      *
-     * @param medicineIds
+     * @param medicineIds  药材id
      * @author liuqiuyi
      * @date 2022/8/5 16:41
      */

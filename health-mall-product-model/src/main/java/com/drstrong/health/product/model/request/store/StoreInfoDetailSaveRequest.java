@@ -18,7 +18,7 @@ import java.util.List;
 public class StoreInfoDetailSaveRequest implements Serializable {
     private static final long serialVersionUID = 2211348485397306232L;
     @ApiModelProperty("店铺主键id")
-    private Long storeId;
+    private String storeId;
 
     @NotNull
     @ApiModelProperty("店铺名称")
@@ -75,5 +75,8 @@ public class StoreInfoDetailSaveRequest implements Serializable {
     @NotNull
     @ApiModelProperty("应用key")
     private String appKey;
+
+    @ApiModelProperty("用户id")
+    private Long userId;
 
 }

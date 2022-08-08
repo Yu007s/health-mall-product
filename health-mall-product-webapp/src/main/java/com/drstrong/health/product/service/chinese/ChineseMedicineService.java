@@ -4,6 +4,7 @@ import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.request.chinese.ChineseMedicineRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
+import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
 import io.swagger.models.auth.In;
 
@@ -19,11 +20,9 @@ public interface ChineseMedicineService {
     /**
      * 新增中药材
      * @param chineseMedicineVO 中药材提交的相应信息
-     * @param userId 用户id
      * @return 成功与否
-     * @throws Exception 失败返回相应异常信息
      */
-    boolean save(ChineseMedicineVO chineseMedicineVO,Long userId) throws Exception;
+    boolean save(ChineseMedicineVO chineseMedicineVO);
 
 
 	/**
@@ -34,16 +33,14 @@ public interface ChineseMedicineService {
 	 * @param pageSize
 	 * @return 查询所得列表
 	 */
-    List<ChineseMedicineResponse> queryPage(String medicineCode, String medicineName, Integer pageNo,Integer pageSize);
+    ChineseMedicineSearchVO queryPage(String medicineCode, String medicineName, Integer pageNo, Integer pageSize);
 
     /**
      * 查询中药材分页展示  根据药材编码列表查找  带分页参数
      * @param medicineCode 药材编码  根据此编码查询相反药材列表
-     * @param pageNo 分页起始页
-     * @param pageSize 每页大小
      * @return 查询所得中药材列表
      */
-    List<ChineseMedicineResponse> queryPageForConflict(String medicineCode, Integer pageNo, Integer pageSize);
+    List<ChineseMedicineResponse> queryPageForConflict(String medicineCode);
 
     /**
      * 逻辑删除药材

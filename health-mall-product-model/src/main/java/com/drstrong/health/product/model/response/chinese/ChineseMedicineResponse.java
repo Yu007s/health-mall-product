@@ -13,7 +13,7 @@ import java.util.List;
  * @Date 2022/08/03/9:39
  */
 @Data
-@ApiModel("中药材信息列表查询返回")
+@ApiModel("一条中药材信息")
 public class ChineseMedicineResponse implements Serializable {
     private static final long serialVersionUID = 1515648173694532564L;
 
@@ -24,7 +24,7 @@ public class ChineseMedicineResponse implements Serializable {
     private String name;
 
     @ApiModelProperty("药材别名列表")
-    private List<String> aliNames;
+    private String aliNames;
 
     @ApiModelProperty("最大剂量")
     private BigDecimal maxDosage;
