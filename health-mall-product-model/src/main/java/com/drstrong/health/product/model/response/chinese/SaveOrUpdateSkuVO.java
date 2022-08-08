@@ -41,7 +41,7 @@ public class SaveOrUpdateSkuVO implements Serializable{
     @NotBlank(message = "sku 名称不能为空")
     private String skuName;
 
-    @ApiModelProperty("价格")
+    @ApiModelProperty("价格/克,单位：元")
     @NotNull(message = "价格不能为空")
     @Min(value = 0, message = "价格不能小于0")
     @Max(value = 9999, message = "价格不能大于9999")

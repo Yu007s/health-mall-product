@@ -15,7 +15,7 @@ import java.util.List;
 public class StoreQueryResponse  implements Serializable {
     private static final long serialVersionUID = -1645849851906244565L;
     @NotNull
-    @ApiModelProperty("店铺类型")
+    @ApiModelProperty("店铺类型名字集合")
     private List<String> storeTypeNames;
 
     @ApiModelProperty("互联网医院的名字集合")

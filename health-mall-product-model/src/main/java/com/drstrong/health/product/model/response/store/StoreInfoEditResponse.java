@@ -22,8 +22,8 @@ public class StoreInfoEditResponse implements Serializable {
     private String storeName;
 
     @NotNull
-    @ApiModelProperty("关联供应商集合")
-    private List<SupplierResponse> suppliers;
+    @ApiModelProperty("关联供应商id集合")
+    private List<Long> supplierIds;
 
     @NotNull
     @ApiModelProperty("店铺类型")

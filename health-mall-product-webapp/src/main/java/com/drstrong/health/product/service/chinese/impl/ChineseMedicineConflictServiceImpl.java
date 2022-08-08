@@ -3,12 +3,15 @@ package com.drstrong.health.product.service.chinese.impl;
 import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.drstrong.health.product.dao.chinese.ChineseMedicineConflictMapper;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.service.chinese.ChineseMedicineConflictService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 /**
@@ -62,5 +65,17 @@ public class ChineseMedicineConflictServiceImpl extends CustomServiceImpl<Chines
         super.update(updateWrapper);
     }
 
-
+    /**
+     * 获取所有的相反药材
+     *
+     * @return 相反药材信息
+     * @author liuqiuyi
+     * @date 2022/8/8 11:34
+     */
+    @Override
+    public List<ChineseMedicineConflictEntity> listAllConflictEntity() {
+        LambdaQueryWrapper<ChineseMedicineConflictEntity> queryWrapper = Wrappers.<ChineseMedicineConflictEntity>lambdaQuery()
+                .eq(ChineseMedicineConflictEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+        return list(queryWrapper);
+    }
 }

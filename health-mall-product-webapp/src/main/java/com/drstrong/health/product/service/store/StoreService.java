@@ -35,10 +35,10 @@ public interface StoreService {
 	 * @param storeId 店铺id
 	 * @param storeName 店铺名字
 	 * @param agencyId 互联网医院id
-	 * @param storeTypeName 店铺类型名字
+	 * @param storeType 店铺类型id
 	 * @return 店铺信息返回值
 	 */
-    List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, String storeTypeName);
+    List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, Integer storeType);
 
     /**
      * 通过店铺id查找店铺详细信息

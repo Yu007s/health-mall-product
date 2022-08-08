@@ -12,6 +12,7 @@ import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierRelevanceEntity;
 import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
@@ -21,6 +22,7 @@ import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
+import com.drstrong.health.product.model.response.chinese.SupplierBaseInfoVO;
 import com.drstrong.health.product.model.response.chinese.SupplierChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
@@ -28,7 +30,9 @@ import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
+import com.drstrong.health.product.service.store.StoreLinkSupplierService;
 import com.drstrong.health.product.service.store.StoreService;
+import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.ware.model.response.SkuStockResponse;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.google.common.collect.Lists;
@@ -40,6 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 import static java.util.stream.Collectors.*;
@@ -71,6 +76,9 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 
 	@Resource
 	StockRemoteProService stockRemoteProService;
+
+	@Resource
+	StoreLinkSupplierService storeLinkSupplierService;
 
     /**
      * 中药管理页面，列表查询
@@ -175,7 +183,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         response.setMedicineId(skuInfoEntity.getOldMedicineId());
         response.setMedicineCode(skuInfoEntity.getMedicineCode());
         response.setSkuName(skuInfoEntity.getSkuName());
-        response.setPrice(skuInfoEntity.getPrice());
+        response.setPrice(BigDecimalUtil.F2Y(skuInfoEntity.getPrice()));
         response.setStoreId(skuInfoEntity.getStoreId());
         // 1、根据店铺id获取店铺名称
         List<StoreEntity> storeEntityList = storeService.listByIds(Sets.newHashSet(skuInfoEntity.getStoreId()));
@@ -267,7 +275,39 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         return buildSupplierChineseManagerSku(infoEntityList);
     }
 
-    /**
+	/**
+	 * 根据店铺 id 获取店铺的供应商信息
+	 *
+	 * @param storeId 店铺 id
+	 * @return 供应商集合
+	 * @author liuqiuyi
+	 * @date 2022/8/8 14:53
+	 */
+	@Override
+	public List<SupplierBaseInfoVO> getStoreSupplierInfo(Long storeId) {
+		if (Objects.isNull(storeId)) {
+			return Lists.newArrayList();
+		}
+		// 1.查询店铺关联的供应商信息
+		List<StoreLinkSupplierEntity> supplierEntityList = storeLinkSupplierService.queryByStoreId(storeId);
+		if (CollectionUtils.isEmpty(supplierEntityList)) {
+			return Lists.newArrayList();
+		}
+		List<Long> supplierIdList = supplierEntityList.stream().map(StoreLinkSupplierEntity::getSupplierId).distinct().collect(toList());
+		// 2.获取供应商名称
+		Map<Long, String> supplierNameToMap = supplierRemoteProService.getSupplierNameToMap(supplierIdList);
+		List<SupplierBaseInfoVO> supplierBaseInfoVOList = Lists.newArrayListWithCapacity(supplierEntityList.size());
+		supplierEntityList.forEach(storeLinkSupplierEntity -> {
+			Long supplierId = storeLinkSupplierEntity.getSupplierId();
+			SupplierBaseInfoVO supplierBaseInfoVO = new SupplierBaseInfoVO();
+			supplierBaseInfoVO.setSupplierId(supplierId);
+			supplierBaseInfoVO.setSupplierName(supplierNameToMap.get(supplierId));
+			supplierBaseInfoVOList.add(supplierBaseInfoVO);
+		});
+		return supplierBaseInfoVOList;
+	}
+
+	/**
      * 店铺数据初始化,将中药材默认上架到所有店铺,关联天江供应商
 	 * <p> 仅用于一期上线时数据初始化,不要用于其它用途 </>
      *
@@ -438,7 +478,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
                     .storeId(chineseSkuInfoEntity.getStoreId())
                     .storeName(storeIdNameMap.get(chineseSkuInfoEntity.getStoreId()))
                     .supplierIdList(supplierIds)
-                    .price(chineseSkuInfoEntity.getPrice())
+                    .price(BigDecimalUtil.F2Y(chineseSkuInfoEntity.getPrice()))
                     .skuState(chineseSkuInfoEntity.getSkuStatus())
                     .skuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()))
                     .build();
@@ -463,6 +503,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         skuInfoEntityList.forEach(supplierChineseSkuDTO -> {
             SupplierChineseManagerSkuVO chineseManagerSkuVO = new SupplierChineseManagerSkuVO();
             BeanUtils.copyProperties(supplierChineseSkuDTO, chineseManagerSkuVO);
+			chineseManagerSkuVO.setPrice(BigDecimalUtil.F2Y(supplierChineseSkuDTO.getPrice()));
             chineseManagerSkuVO.setSkuState(supplierChineseSkuDTO.getSkuStatus());
             chineseManagerSkuVO.setSkuStateName(ProductStateEnum.getValueByCode(supplierChineseSkuDTO.getSkuStatus()));
             chineseManagerSkuVO.setStoreName(storeIdNameMap.get(supplierChineseSkuDTO.getStoreId()));

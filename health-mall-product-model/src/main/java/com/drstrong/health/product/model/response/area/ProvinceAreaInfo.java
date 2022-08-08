@@ -17,12 +17,13 @@ public class ProvinceAreaInfo implements Serializable {
 
     private static final long serialVersionUID = -1564484874945554894L;
     @ApiModelProperty("省级地区 id")
-    private Long areaId;
+    private Long value;
 
     @ApiModelProperty("省级地区名称")
-    private String areaName;
+    private String label;
 
     @ApiModelProperty("省级下面所有市")
-    private List<AreaInfoResponse> cities;
+    private List<AreaInfoResponse> children;
+
 
 }

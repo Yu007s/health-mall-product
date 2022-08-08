@@ -2,8 +2,9 @@ package com.drstrong.health.product.controller.chinese;
 
 import com.drstrong.health.product.facade.ChineseRemoteFacade;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
-import com.drstrong.health.product.model.response.chinese.ChineseSkuExtendVO;
+import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
+import com.drstrong.health.product.model.response.product.ProductInfoVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.chinese.ChineseRemoteApi;
 import io.swagger.annotations.Api;
@@ -36,7 +37,12 @@ public class ChineseRemoteController implements ChineseRemoteApi {
 	}
 
 	@Override
-	public ResultVO<List<ChineseSkuExtendVO>> queryStoreSku(QueryChineseSkuRequest chineseSkuRequest) {
+	public ResultVO<ProductInfoVO> queryStoreSku(QueryChineseSkuRequest chineseSkuRequest) {
 		return ResultVO.success(chineseRemoteFacade.queryStoreSku(chineseSkuRequest));
+	}
+
+	@Override
+	public ResultVO<List<ChineseMedicineConflictVO>> listAllConflict() {
+		return ResultVO.success(chineseRemoteFacade.listAllConflict());
 	}
 }
