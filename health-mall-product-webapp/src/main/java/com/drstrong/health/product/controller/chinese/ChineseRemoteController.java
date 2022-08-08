@@ -2,6 +2,7 @@ package com.drstrong.health.product.controller.chinese;
 
 import com.drstrong.health.product.facade.ChineseRemoteFacade;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
+import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.product.ProductInfoVO;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 中药对外业务的远程接口
@@ -44,5 +46,10 @@ public class ChineseRemoteController implements ChineseRemoteApi {
 	@Override
 	public ResultVO<List<ChineseMedicineConflictVO>> listAllConflict() {
 		return ResultVO.success(chineseRemoteFacade.listAllConflict());
+	}
+
+	@Override
+	public ResultVO<List<AgencyStoreVO>> listStoreByAgencyIds(Set<Long> agencyIds) {
+		return ResultVO.success(chineseRemoteFacade.listStoreByAgencyIds(agencyIds));
 	}
 }

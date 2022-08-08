@@ -207,8 +207,8 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
            return Collections.emptyList();
         }
         LambdaQueryWrapper<StoreThreeRelevanceEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.in(StoreThreeRelevanceEntity::getSkuId,skuIds)
-                .eq(StoreThreeRelevanceEntity::getDelFlag,DelFlagEnum.UN_DELETED);
+        queryWrapper.in(StoreThreeRelevanceEntity::getSkuId, skuIds)
+                .eq(StoreThreeRelevanceEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         List<StoreThreeRelevanceEntity> storeThreeRelevanceEntities = storeThreeRelevanceMapper.selectList(queryWrapper);
         return storeThreeRelevanceEntities.stream().map(e -> {
             ThreeSkuInfoResponse threeSkuInfoResponse = new ThreeSkuInfoResponse();
@@ -232,7 +232,7 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
         }
         LambdaQueryWrapper<StoreThreeRelevanceEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.in(StoreThreeRelevanceEntity::getSkuId, skuIds)
-                .eq(StoreThreeRelevanceEntity::getDelFlag, DelFlagEnum.UN_DELETED);
+                .eq(StoreThreeRelevanceEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         List<StoreThreeRelevanceEntity> storeThreeRelevanceEntities = storeThreeRelevanceMapper.selectList(queryWrapper);
         return storeThreeRelevanceEntities.stream()
                 .collect(Collectors.toMap(StoreThreeRelevanceEntity::getSkuId, entity -> BigDecimalUtil.F2Y(entity.getThreePurchasePrice().longValue()), (v1, v2) -> v1));
@@ -311,8 +311,8 @@ public class StoreThreeRelevanceServiceImpl implements StoreThreeRelevanceServic
 
     private StoreThreeRelevanceEntity queryBySkuId(Long skuId) {
         LambdaQueryWrapper<StoreThreeRelevanceEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(StoreThreeRelevanceEntity::getSkuId,skuId)
-                .eq(StoreThreeRelevanceEntity::getDelFlag,DelFlagEnum.UN_DELETED);
+        queryWrapper.eq(StoreThreeRelevanceEntity::getSkuId, skuId)
+                .eq(StoreThreeRelevanceEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         return storeThreeRelevanceMapper.selectOne(queryWrapper);
     }
 }

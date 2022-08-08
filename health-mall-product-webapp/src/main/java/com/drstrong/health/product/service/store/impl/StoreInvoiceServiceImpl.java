@@ -23,8 +23,8 @@ public class StoreInvoiceServiceImpl extends ServiceImpl<StoreInvoiceMapper, Sto
             return null;
         }
         LambdaQueryWrapper<StoreInvoiceEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(StoreInvoiceEntity::getStoreId,storeId)
-                .eq(StoreInvoiceEntity::getDelFlag,DelFlagEnum.UN_DELETED);
+        lambdaQueryWrapper.eq(StoreInvoiceEntity::getStoreId, storeId)
+                .eq(StoreInvoiceEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         return getOne(lambdaQueryWrapper);
     }
 

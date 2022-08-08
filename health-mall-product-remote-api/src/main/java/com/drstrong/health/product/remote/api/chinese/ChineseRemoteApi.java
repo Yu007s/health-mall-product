@@ -1,6 +1,7 @@
 package com.drstrong.health.product.remote.api.chinese;
 
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
+import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.product.ProductInfoVO;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 中药的远程接口
@@ -37,4 +39,8 @@ public interface ChineseRemoteApi {
 	@ApiOperation("获取中药材相反信息,出参和之前保持一致,用于 app 端查询")
 	@GetMapping("/all/conflict")
 	ResultVO<List<ChineseMedicineConflictVO>> listAllConflict();
+
+	@ApiOperation("根据互联网医院 id 获取店铺 id")
+	@PostMapping("/store/agencyId")
+	ResultVO<List<AgencyStoreVO>> listStoreByAgencyIds(@RequestBody Set<Long> agencyIds);
 }

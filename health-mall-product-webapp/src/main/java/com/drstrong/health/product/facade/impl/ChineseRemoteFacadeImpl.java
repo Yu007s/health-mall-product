@@ -10,6 +10,7 @@ import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
+import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoExtendVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
@@ -120,7 +121,7 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 		// 2.根据 skuCode 或者 药材 id 获取 sku 信息
 		List<ChineseSkuInfoEntity> chineseSkuInfoEntityList = chineseSkuInfoService.queryStoreSkuByCodesOrMedicineIds(chineseSkuRequest.getSkuCodeList(), chineseSkuRequest.getMedicineIdList(), storeEntity.getId());
 		if (CollectionUtils.isEmpty(chineseSkuInfoEntityList)) {
-//			return Lists.newArrayList();
+			return productInfoVO;
 		}
 		Set<String> medicineCodes = chineseSkuInfoEntityList.stream().map(ChineseSkuInfoEntity::getMedicineCode).collect(Collectors.toSet());
 		// 3.获取药材名称
@@ -178,6 +179,28 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 			medicineConflictVoList.add(chineseMedicineConflictVO);
 		});
 		return medicineConflictVoList;
+	}
+
+	/**
+	 * 根据互联网医院 id 获取店铺信息
+	 *
+	 * @param agencyIds 互联网医院 id
+	 * @return 互联网医院 id 和店铺 id 信息
+	 * @author liuqiuyi
+	 * @date 2022/8/8 19:53
+	 */
+	@Override
+	public List<AgencyStoreVO> listStoreByAgencyIds(Set<Long> agencyIds) {
+		List<StoreEntity> storeEntityList = storeService.listByIds(agencyIds);
+		List<AgencyStoreVO> agencyStoreVOList = Lists.newArrayListWithCapacity(storeEntityList.size());
+		storeEntityList.forEach(storeEntity -> {
+			AgencyStoreVO agencyStoreVO = new AgencyStoreVO();
+			agencyStoreVO.setStoreId(storeEntity.getId());
+			agencyStoreVO.setAgencyId(storeEntity.getAgencyId());
+			agencyStoreVO.setStoreName(storeEntity.getStoreName());
+			agencyStoreVOList.add(agencyStoreVO);
+		});
+		return agencyStoreVOList;
 	}
 
 	private List<ChineseSkuInfoExtendVO> buildChineseSkuExtendVOList(String storeName, List<ChineseSkuInfoEntity> skuInfoEntityList, Map<String, String> medicineCodeAndNameMap) {

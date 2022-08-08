@@ -90,4 +90,14 @@ public interface StoreService {
 	 * @return  互联网医院 名字 id 店铺类型名字
 	 */
 	 StoreQueryResponse queryStoreConInfo();
+
+	/**
+	 * 根据互联网医院 id 获取店铺 id
+	 *
+	 * @param agencyIds 互联网医院 id
+	 * @return 店铺信息
+	 * @author liuqiuyi
+	 * @date 2022/8/8 19:57
+	 */
+	List<StoreEntity> getStoreByAgencyIds(Set<Long> agencyIds);
 }

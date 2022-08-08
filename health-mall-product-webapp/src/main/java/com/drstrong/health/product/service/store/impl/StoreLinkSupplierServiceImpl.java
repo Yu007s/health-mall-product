@@ -30,8 +30,8 @@ public class StoreLinkSupplierServiceImpl extends ServiceImpl<StoreLinkSupplierM
     @Override
     public List<StoreLinkSupplierEntity> queryByStoreId(Long storeId) {
         LambdaQueryWrapper<StoreLinkSupplierEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.select(StoreLinkSupplierEntity::getStoreId,StoreLinkSupplierEntity::getSupplierId)
-                .eq(StoreLinkSupplierEntity::getStoreId,storeId).eq(StoreLinkSupplierEntity::getDelFlag, DelFlagEnum.UN_DELETED);
+        queryWrapper.select(StoreLinkSupplierEntity::getStoreId, StoreLinkSupplierEntity::getSupplierId)
+                .eq(StoreLinkSupplierEntity::getStoreId, storeId).eq(StoreLinkSupplierEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         return super.list(queryWrapper);
     }
 

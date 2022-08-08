@@ -163,7 +163,7 @@ public class ProductSkuServiceImpl extends ServiceImpl<ProductSkuMapper, Product
 	public Map<Long, Integer> searchSkuCountMap(List<Long> storeIds) {
 		Map<Long, Integer> result = new HashMap<>();
 		LambdaQueryWrapper<ProductSkuEntity> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(ProductSkuEntity::getDelFlag, DelFlagEnum.UN_DELETED)
+		queryWrapper.eq(ProductSkuEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
 				.in(ProductSkuEntity::getSourceId, storeIds);
 		List<ProductSkuEntity> productSkuEntities = productSkuMapper.selectList(queryWrapper);
 		Map<Long, List<ProductSkuEntity>> map = productSkuEntities.stream().collect(groupingBy(ProductSkuEntity::getSourceId));

@@ -1,11 +1,13 @@
 package com.drstrong.health.product.facade;
 
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
+import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.product.ProductInfoVO;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 重要远程接口的门面层
@@ -45,4 +47,14 @@ public interface ChineseRemoteFacade {
 	 * @date 2022/8/8 11:44
 	 */
 	List<ChineseMedicineConflictVO> listAllConflict();
+
+	/**
+	 * 根据互联网医院 id 获取店铺信息
+	 *
+	 * @param agencyIds 互联网医院 id
+	 * @return 互联网医院 id 和店铺 id 信息
+	 * @author liuqiuyi
+	 * @date 2022/8/8 19:53
+	 */
+	List<AgencyStoreVO> listStoreByAgencyIds(Set<Long> agencyIds);
 }
