@@ -68,8 +68,7 @@ public class StockRemoteProService {
 		SkuStockAddOrUpdateRequest addOrUpdateRequest = new SkuStockAddOrUpdateRequest();
 		addOrUpdateRequest.setStoreId(saveOrUpdateSkuVO.getStoreId());
 		addOrUpdateRequest.setSkuCode(skuCode);
-		// TODO liuqiuyi 等待世轩重新打包
-//		addOrUpdateRequest.setProductDicCode(saveOrUpdateSkuVO.getMedicineCode());
+		addOrUpdateRequest.setProductDicCode(saveOrUpdateSkuVO.getMedicineCode());
 
 		List<SkuStockResponse> skuStockResponses = Lists.newArrayListWithCapacity(saveOrUpdateSkuVO.getSupplierInfoList().size());
 		saveOrUpdateSkuVO.getSupplierInfoList().forEach(supplierInfo -> {
