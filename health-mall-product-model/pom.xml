@@ -34,7 +34,7 @@
         <modelVersion>4.0.0</modelVersion>
 
         <groupId>com.drstrong.health</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>TEST1-SNAPSHOT</version>
         <artifactId>health-mall-product-model</artifactId>
         <packaging>jar</packaging>
 
