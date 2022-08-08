@@ -35,4 +35,7 @@ public class ChineseMedicineVO implements Serializable {
     @ApiModelProperty("最大剂量")
     private BigDecimal maxDosage;
 
+    @ApiModelProperty("用户id")
+    private Long userId;
+
 }

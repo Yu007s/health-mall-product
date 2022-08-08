@@ -21,24 +21,24 @@ public interface StoreService {
      * 保存店铺信息
      *
      * @param store  店铺信息
-     * @param userId 当前操作用户id
      */
-    void save(StoreInfoDetailSaveRequest store, Long userId) throws Exception;
+    void save(StoreInfoDetailSaveRequest store);
 	/**
 	 * 保存店铺信息
 	 *
 	 * @param store  店铺信息
-	 * @param userId 当前操作用户id
 	 */
-	void update(StoreInfoDetailSaveRequest store, Long userId) throws Exception;
+	void update(StoreInfoDetailSaveRequest store);
 
-    /**
-     * 店铺展示 当查询条件都为空  返回所有店铺
-     *
-     * @param storeSearchRequest 查询请求参数
-     * @return 店铺信息列表
-     */
-    List<StoreInfoResponse> query(StoreSearchRequest storeSearchRequest);
+	/**
+	 * 查询店铺信息
+	 * @param storeId 店铺id
+	 * @param storeName 店铺名字
+	 * @param agencyId 互联网医院id
+	 * @param storeTypeName 店铺类型名字
+	 * @return 店铺信息返回值
+	 */
+    List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, String storeTypeName);
 
     /**
      * 通过店铺id查找店铺详细信息

@@ -81,6 +81,6 @@ public class SaveOrUpdateSkuVO implements Serializable{
         private Integer stockType;
 
         @ApiModelProperty("虚拟库存数")
-        private Integer virtualQuantity;
+        private Long virtualQuantity;
     }
 }

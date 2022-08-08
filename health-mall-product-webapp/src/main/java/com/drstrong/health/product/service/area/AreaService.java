@@ -21,7 +21,7 @@ public interface AreaService {
     AreaInfoResponse querySingle(Long areaId);
 
     /**
-     * 根据区域id 查询其父级区域id
+     * 根据区域id 查询其父级区域id  只会查找市、省、国家级
      * @param areaId 区域id
      * @return  查询所得国家、省、市级区域id
      */

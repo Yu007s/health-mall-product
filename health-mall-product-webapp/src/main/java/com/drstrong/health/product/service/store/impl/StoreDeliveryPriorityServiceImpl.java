@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.entity.productstore.AreaEntity;
 import com.drstrong.health.product.model.entity.store.DeliveryPriorityEntity;
 import com.drstrong.health.product.dao.store.StoreDeliveryPriorityMapper;
 import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
+import com.drstrong.health.product.model.enums.AreaTypeEnum;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.store.DeliveryPriRequest;
 import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
@@ -52,7 +53,7 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
         DeliveryPriorityVO deliveryPriorityVO = new DeliveryPriorityVO();
         for (DeliveryPriorityEntity deliveryPriorityEntity : list) {
             DeliveryPriResponse deliveryPriResponse = buildDeliveryResponse(deliveryPriorityEntity);
-            if (DeliveryPriorityEntity.CHINA.equals(deliveryPriorityEntity.getAreaType())) {
+            if (AreaTypeEnum.COUNTRY.ordinal() == deliveryPriorityEntity.getAreaType()) {
                 deliveryPriorityVO.setDefaultDeliveries(deliveryPriResponse.getSupplierIds());
             }
             else {
@@ -76,9 +77,9 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
     @Override
     @Transactional(readOnly = true)
     public List<Long> queryByStoreIdAndArea(Long storeId, Long areaId) {
+        //根据区级查询市级id
         List<AreaEntity> areaInfoResponses = areaService.queryFatherAreaById(areaId);
         List<Long> collect = areaInfoResponses.stream().map(AreaEntity::getId).collect(Collectors.toList());
-        collect.forEach(System.out::println);
         LambdaQueryWrapper<DeliveryPriorityEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.select(DeliveryPriorityEntity::getAreaId,DeliveryPriorityEntity::getPriorities,DeliveryPriorityEntity::getAreaType)
                  .in(DeliveryPriorityEntity::getAreaId, collect)
@@ -120,11 +121,11 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
             }
             deliveryPriorityEntity.setCreatedBy(userId);
             //这里暂时没有考虑省级区域的设置
-            deliveryPriorityEntity.setAreaType(DeliveryPriorityEntity.CITY);
+            deliveryPriorityEntity.setAreaType(AreaTypeEnum.PROVINCE.ordinal());
             return deliveryPriorityEntity;
         }).collect(Collectors.toList());
         //给第一个设置为全国  默认优先级
-        collect.get(0).setAreaType(DeliveryPriorityEntity.CHINA);
+        collect.get(0).setAreaType(AreaTypeEnum.COUNTRY.ordinal());
         if (one == null) {
             //新增配送优先级
             saveBatch(collect);

@@ -25,9 +25,6 @@ import java.io.Serializable;
 public class DeliveryPriorityEntity extends BaseStandardEntity implements Serializable {
 
     private static final long serialVersionUID = 1548474653267452161L;
-    public static final Integer CHINA = 0;
-    public static final Integer PROVINCE = 1;
-    public static final Integer CITY = 2;
     /**
      * 主键id
      */
@@ -44,7 +41,7 @@ public class DeliveryPriorityEntity extends BaseStandardEntity implements Serial
      */
     private Long areaId;
     /**
-     * 区域类型 0：全国  1：省级 2：市级
+     * 区域类型 0：全国  1：省级 2：市级  3：区级
      */
     private Integer areaType;
 

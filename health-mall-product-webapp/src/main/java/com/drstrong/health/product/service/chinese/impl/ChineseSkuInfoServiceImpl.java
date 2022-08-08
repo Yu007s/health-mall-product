@@ -18,6 +18,7 @@ import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuReques
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
 import com.drstrong.health.product.service.chinese.ChineseSpuInfoService;
@@ -55,6 +56,9 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
 
     @Resource
     ChineseSkuSupplierRelevanceService chineseSkuSupplierRelevanceService;
+
+    @Resource
+    StockRemoteProService stockRemoteProService;
 
     /**
      * 根据条件分页查询 sku 信息
@@ -209,7 +213,7 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
         save(chineseSkuInfoEntity);
         skuInfoService.save(infoEntity);
         chineseSkuSupplierRelevanceService.saveBatch(relevanceEntityList);
-        // TODO 调用世轩的供应商接口，如果远程接口报错，抛出异常
+        stockRemoteProService.saveOrUpdateStockInfo(skuCode, saveOrUpdateSkuVO);
     }
 
     /**
@@ -246,7 +250,7 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
         // 3.将中药的 spu 中的药材 code 进行更新
         SkuInfoEntity skuInfoEntity = skuInfoService.getBySkuCode(skuCode);
         chineseSpuInfoService.updateMedicineCodeBySpuCode(skuInfoEntity.getSpuCode(), saveOrUpdateSkuVO);
-        // TODO 调用世轩的供应商接口，如果远程接口报错，抛出异常
+        stockRemoteProService.saveOrUpdateStockInfo(skuCode, saveOrUpdateSkuVO);
     }
 
     /**
