@@ -185,6 +185,7 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 		skuInfoEntityList.forEach(chineseSkuInfoEntity -> {
 			ChineseSkuInfoExtendVO chineseSkuInfoExtendVO = new ChineseSkuInfoExtendVO();
 			BeanUtils.copyProperties(chineseSkuInfoEntity, chineseSkuInfoExtendVO);
+			chineseSkuInfoExtendVO.setPrice(BigDecimal.valueOf(chineseSkuInfoEntity.getPrice()));
 			chineseSkuInfoExtendVO.setProductType(ProductTypeEnum.CHINESE.getCode());
 			chineseSkuInfoExtendVO.setProductTypeName(ProductTypeEnum.CHINESE.getValue());
 			chineseSkuInfoExtendVO.setMedicineId(chineseSkuInfoEntity.getOldMedicineId());
@@ -214,7 +215,7 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 					.maxDosage(medicineCodeAndMaxDosageMap.get(chineseSkuInfoEntity.getMedicineCode()))
 					.storeId(chineseSkuInfoEntity.getStoreId())
 					.storeName(storeName)
-					.price(chineseSkuInfoEntity.getPrice())
+					.price(BigDecimal.valueOf(chineseSkuInfoEntity.getPrice()))
 					.skuState(chineseSkuInfoEntity.getSkuStatus())
 					.skuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()))
 					.build();

@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * @author liuqiuyi
@@ -41,9 +40,9 @@ public class SupplierChineseSkuDTO implements Serializable {
 	private Long storeId;
 
 	/**
-	 * 价格/克
+	 * 价格/克,单位:分
 	 */
-	private BigDecimal price;
+	private Long price;
 
 	/**
 	 * sku上下架状态；0-未上架，1-已上架

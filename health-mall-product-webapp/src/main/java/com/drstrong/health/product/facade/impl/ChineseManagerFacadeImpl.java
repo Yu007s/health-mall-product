@@ -32,6 +32,7 @@ import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
 import com.drstrong.health.product.service.store.StoreLinkSupplierService;
 import com.drstrong.health.product.service.store.StoreService;
+import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.ware.model.response.SkuStockResponse;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.google.common.collect.Lists;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 import static java.util.stream.Collectors.*;
@@ -181,7 +183,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         response.setMedicineId(skuInfoEntity.getOldMedicineId());
         response.setMedicineCode(skuInfoEntity.getMedicineCode());
         response.setSkuName(skuInfoEntity.getSkuName());
-        response.setPrice(skuInfoEntity.getPrice());
+        response.setPrice(BigDecimalUtil.F2Y(skuInfoEntity.getPrice()));
         response.setStoreId(skuInfoEntity.getStoreId());
         // 1、根据店铺id获取店铺名称
         List<StoreEntity> storeEntityList = storeService.listByIds(Sets.newHashSet(skuInfoEntity.getStoreId()));
@@ -476,7 +478,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
                     .storeId(chineseSkuInfoEntity.getStoreId())
                     .storeName(storeIdNameMap.get(chineseSkuInfoEntity.getStoreId()))
                     .supplierIdList(supplierIds)
-                    .price(chineseSkuInfoEntity.getPrice())
+                    .price(BigDecimalUtil.F2Y(chineseSkuInfoEntity.getPrice()))
                     .skuState(chineseSkuInfoEntity.getSkuStatus())
                     .skuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()))
                     .build();
@@ -501,6 +503,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         skuInfoEntityList.forEach(supplierChineseSkuDTO -> {
             SupplierChineseManagerSkuVO chineseManagerSkuVO = new SupplierChineseManagerSkuVO();
             BeanUtils.copyProperties(supplierChineseSkuDTO, chineseManagerSkuVO);
+			chineseManagerSkuVO.setPrice(BigDecimalUtil.F2Y(supplierChineseSkuDTO.getPrice()));
             chineseManagerSkuVO.setSkuState(supplierChineseSkuDTO.getSkuStatus());
             chineseManagerSkuVO.setSkuStateName(ProductStateEnum.getValueByCode(supplierChineseSkuDTO.getSkuStatus()));
             chineseManagerSkuVO.setStoreName(storeIdNameMap.get(supplierChineseSkuDTO.getStoreId()));
