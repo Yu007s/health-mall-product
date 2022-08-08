@@ -2,7 +2,6 @@ package com.drstrong.health.product.service.chinese.impl;
 
 import cn.hutool.extra.pinyin.PinyinUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -12,7 +11,6 @@ import com.drstrong.health.product.dao.chinese.ChineseMedicineMapper;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
-import com.drstrong.health.product.model.request.chinese.ChineseMedicineRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchVO;
@@ -25,7 +23,6 @@ import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -85,16 +82,11 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         }
         chineseMedicineEntity.setMedicineName(chineseMedicineVO.getName());
         chineseMedicineEntity.setMaxDosage(chineseMedicineVO.getMaxDosage());
-        List<String> aliNames = chineseMedicineVO.getAliNames();
-        StringBuilder aliNameSb = new StringBuilder(),aliNamePinSb = new StringBuilder();
-        aliNames.forEach( a -> {
-            String firstLetter = PinyinUtil.getFirstLetter(a, "");
-            aliNamePinSb.append(firstLetter).append(',');
-            aliNameSb.append(a).append(',');
-        });
-        chineseMedicineEntity.setMedicineAlias(aliNameSb.toString());
+        String aliNamesString = String.join(",", chineseMedicineVO.getAliNames());
+        String aliNamePingYinS = chineseMedicineVO.getAliNames().stream().map(s -> PinyinUtil.getFirstLetter(s, "")).collect(Collectors.joining(","));
+        chineseMedicineEntity.setMedicineAlias(aliNamesString);
         //别名转换为拼音
-        chineseMedicineEntity.setAliasPinyin(aliNamePinSb.toString());
+        chineseMedicineEntity.setAliasPinyin(aliNamePingYinS);
         //将名字转化为拼音
         chineseMedicineEntity.setMedicinePinyin(PinyinUtil.getFirstLetter(chineseMedicineVO.getName(),""));
         chineseMedicineEntity.setChangedBy(userId);
@@ -200,10 +192,6 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
             response.setMedicineCode(chineseMedicineEntity.getMedicineCode());
             response.setName(chineseMedicineEntity.getMedicineName());
             String medicineAlias = chineseMedicineEntity.getMedicineAlias();
-            if (StringUtils.isNotBlank(medicineAlias)) {
-                 //去除末尾","
-                 medicineAlias = medicineAlias.substring(0, medicineAlias.length() - 1);
-            }
             response.setAliNames(medicineAlias);
             response.setMaxDosage(chineseMedicineEntity.getMaxDosage());
             return response;

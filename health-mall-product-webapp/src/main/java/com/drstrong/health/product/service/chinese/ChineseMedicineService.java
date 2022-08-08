@@ -1,7 +1,6 @@
 package com.drstrong.health.product.service.chinese;
 
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
-import com.drstrong.health.product.model.request.chinese.ChineseMedicineRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchVO;

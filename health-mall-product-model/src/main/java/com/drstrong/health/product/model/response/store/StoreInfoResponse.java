@@ -22,7 +22,10 @@ public class StoreInfoResponse implements Serializable {
     @ApiModelProperty("店铺名称")
     private String storeName;
 
-    @ApiModelProperty("店铺类型")
+    @ApiModelProperty("店铺类型id")
+    private Integer storeTypeId;
+
+    @ApiModelProperty("店铺类型名字")
     private String storeTypeName;
 
     @ApiModelProperty("关联互联网医院名字")

@@ -65,7 +65,7 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
         List<SupplierResponse> collect = linkSupplierEntities.stream().map(storeLinkSupplierEntity -> {
             SupplierResponse supplierResponse = new SupplierResponse();
             supplierResponse.setSupplierId(storeLinkSupplierEntity.getSupplierId());
-            //缺少一个调用接口
+            //测试
             supplierResponse.setSupplierName("测试中，我是供应商名字");
             return supplierResponse;
         }).collect(Collectors.toList());

@@ -53,8 +53,8 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
 
     @Override
     public ResultVO<List<StoreInfoResponse>> queryStore(@RequestParam(value = "storeId",required = false) Long storeId,@RequestParam(value = "storeName",required = false) String storeName,
-                                                        @RequestParam(value = "agencyId",required = false) Long agencyId, @RequestParam(value = "StoreTypeName",required = false) String storeTypeName) {
-        List<StoreInfoResponse> query = storeService.query(storeId,storeName,agencyId, storeTypeName);
+                                                        @RequestParam(value = "agencyId",required = false) Long agencyId, @RequestParam(value = "storeTypeId",required = false) Integer storeTypeId) {
+        List<StoreInfoResponse> query = storeService.query(storeId,storeName,agencyId, storeTypeId);
         return ResultVO.success(query);
     }
 

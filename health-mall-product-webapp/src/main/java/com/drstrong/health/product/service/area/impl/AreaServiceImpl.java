@@ -3,7 +3,6 @@ package com.drstrong.health.product.service.area.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.drstrong.health.product.dao.area.AreaMapper;
 import com.drstrong.health.product.model.entity.productstore.AreaEntity;
-import com.drstrong.health.product.model.entity.store.DeliveryPriorityEntity;
 import com.drstrong.health.product.model.enums.AreaTypeEnum;
 import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
@@ -15,7 +14,6 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -40,8 +38,8 @@ public class AreaServiceImpl implements AreaService {
         List<AreaEntity> areaEntities = areaMapper.selectList(queryWrapper);
         List<AreaInfoResponse> areaInfoResponses = areaEntities.stream().map(a -> {
             AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
-            areaInfoResponse.setAreaId(a.getId());
-            areaInfoResponse.setAreaName(a.getName());
+            areaInfoResponse.setValue(a.getId());
+            areaInfoResponse.setLabel(a.getName());
             return areaInfoResponse;
         }).collect(Collectors.toList());
         return areaInfoResponses;
@@ -50,7 +48,7 @@ public class AreaServiceImpl implements AreaService {
     public List<ProvinceAreaInfo> queryAll() {
         LambdaQueryWrapper<AreaEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(AreaEntity::getName,AreaEntity::getId,AreaEntity::getParentId,AreaEntity::getType).eq(AreaEntity::getAvailable,1)
-                .in(AreaEntity::getType, AreaTypeEnum.COUNTRY,AreaTypeEnum.PROVINCE,AreaTypeEnum.CITY).orderByAsc(AreaEntity::getId);
+                .in(AreaEntity::getType, AreaTypeEnum.COUNTRY.ordinal(),AreaTypeEnum.PROVINCE.ordinal(),AreaTypeEnum.CITY.ordinal()).orderByAsc(AreaEntity::getId);
         //完成所有省市的嵌套
         List<AreaEntity> allAreaEntities = areaMapper.selectList(queryWrapper);
         int chinaId = -1;
@@ -70,14 +68,14 @@ public class AreaServiceImpl implements AreaService {
             List<AreaEntity> areaEntities = areaEntityHashMap.get(id);
             List<AreaInfoResponse> collect = areaEntities.stream().map(areaEntity -> {
                 AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
-                areaInfoResponse.setAreaId(areaEntity.getId());
-                areaInfoResponse.setAreaName(areaEntity.getName());
+                areaInfoResponse.setValue(areaEntity.getId());
+                areaInfoResponse.setLabel(areaEntity.getName());
                 return areaInfoResponse;
             }).collect(Collectors.toList());
             ProvinceAreaInfo provinceAreaInfo = new ProvinceAreaInfo();
-            provinceAreaInfo.setAreaId(province.getId());
-            provinceAreaInfo.setAreaName(province.getName());
-            provinceAreaInfo.setCities(collect);
+            provinceAreaInfo.setValue(province.getId());
+            provinceAreaInfo.setLabel(province.getName());
+            provinceAreaInfo.setChildren(collect);
             ans.add(provinceAreaInfo);
         }
         return ans;
@@ -90,8 +88,8 @@ public class AreaServiceImpl implements AreaService {
             return null;
         }
         AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
-        areaInfoResponse.setAreaId(areaId);
-        areaInfoResponse.setAreaName(areaEntity.getName());
+        areaInfoResponse.setValue(areaId);
+        areaInfoResponse.setLabel(areaEntity.getName());
         return areaInfoResponse;
     }
 

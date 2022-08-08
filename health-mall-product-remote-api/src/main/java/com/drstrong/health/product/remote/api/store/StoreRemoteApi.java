@@ -36,20 +36,18 @@ public interface StoreRemoteApi {
     @PostMapping("/save")
     ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store);
 
-
-
     /**
      * 基于搜索条件获取店铺的基本信息
      * @param storeId 店铺id
      * @param storeName 店铺名字
      * @param agencyId 互联网医院id
-     * @param storeTypeName 店铺类型名字
+     * @param storeTypeId 店铺类型id
      * @return 符合条件的店铺基本信息列表
      */
     @ApiOperation("获取符合条件的店铺基本信息列表")
     @GetMapping("/query")
     ResultVO<List<StoreInfoResponse>> queryStore(@RequestParam(value = "storeId",required = false) Long storeId,@RequestParam(value = "storeName",required = false) String storeName,
-                                                 @RequestParam(value = "agencyId",required = false) Long agencyId, @RequestParam(value = "StoreTypeName",required = false) String storeTypeName) ;
+                                                 @RequestParam(value = "agencyId",required = false) Long agencyId, @RequestParam(value = "storeTypeId",required = false) Integer storeTypeId);
 
 
     /**
@@ -74,9 +72,9 @@ public interface StoreRemoteApi {
     /**
      * 店铺查询页面  查询所有需要信息
      *
-     * @return 所有需要信息的集合
+     * @return 互联网医院名字集合  店铺类型名字集合
      */
-    @ApiOperation("增加店铺时查找相应的信息")
+    @ApiOperation("店铺时搜索页面返回必要的信息")
     @GetMapping("/queryInfo")
     ResultVO<StoreQueryResponse> queryStoreInfo() ;
 
