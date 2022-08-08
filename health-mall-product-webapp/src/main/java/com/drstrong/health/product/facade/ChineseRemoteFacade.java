@@ -1,8 +1,9 @@
 package com.drstrong.health.product.facade;
 
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
-import com.drstrong.health.product.model.response.chinese.ChineseSkuExtendVO;
+import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
+import com.drstrong.health.product.model.response.product.ProductInfoVO;
 
 import java.util.List;
 
@@ -35,5 +36,13 @@ public interface ChineseRemoteFacade {
 	 * @author liuqiuyi
 	 * @date 2022/8/4 14:19
 	 */
-	List<ChineseSkuExtendVO> queryStoreSku(QueryChineseSkuRequest chineseSkuRequest);
+	ProductInfoVO queryStoreSku(QueryChineseSkuRequest chineseSkuRequest);
+
+	/**
+	 * 获取所有的中药相反药材,出参和之前的业务结构保持一致
+	 *
+	 * @author liuqiuyi
+	 * @date 2022/8/8 11:44
+	 */
+	List<ChineseMedicineConflictVO> listAllConflict();
 }

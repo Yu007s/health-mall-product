@@ -34,9 +34,17 @@
         </dependency>
     </dependencies>
 
-    <!-- deploy 时请使用下面的配置文件,注意 version 版本号 -->
+    <!--
+        deploy 时请使用下面的配置文件,注意 version 版本号:
+        test1 环境: TEST1-SNAPSHOT
+        test2 环境: TEST2-SNAPSHOT
+        test3 环境: TEST3-SNAPSHOT
+        test4 环境: TEST4-SNAPSHOT
+        pre 和 prod 环境: RELEASE-SNAPSHOT
+    -->
+
 <!--
-    <modelVersion>4.0.0</modelVersion>
+   <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.drstrong.health</groupId>
     <version>TEST1-SNAPSHOT</version>
@@ -57,7 +65,7 @@
         <dependency>
             <groupId>com.drstrong.health</groupId>
             <artifactId>health-mall-product-model</artifactId>
-            <version>TEST1-SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -81,6 +89,5 @@
         </repository>
     </distributionManagement>
 -->
-
 
 </project>

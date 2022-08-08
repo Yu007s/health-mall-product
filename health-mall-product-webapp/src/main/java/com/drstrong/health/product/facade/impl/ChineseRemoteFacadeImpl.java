@@ -2,6 +2,7 @@ package com.drstrong.health.product.facade.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.drstrong.health.product.facade.ChineseRemoteFacade;
+import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
@@ -9,14 +10,19 @@ import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
-import com.drstrong.health.product.model.response.chinese.ChineseSkuExtendVO;
+import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
+import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoExtendVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
+import com.drstrong.health.product.model.response.product.ProductInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.service.chinese.ChineseMedicineConflictService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
+import com.drstrong.health.product.service.store.StoreDeliveryPriorityService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -24,11 +30,9 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 中药的远程接口门面层
@@ -47,6 +51,12 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 
 	@Resource
 	ChineseMedicineService chineseMedicineService;
+
+	@Resource
+	ChineseMedicineConflictService chineseMedicineConflictService;
+
+	@Resource
+	StoreDeliveryPriorityService storeDeliveryPriorityService;
 
 	/**
 	 * 根据关键字和互联网医院 id 模糊搜索药材
@@ -96,8 +106,12 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 	 * @date 2022/8/4 14:19
 	 */
 	@Override
-	public List<ChineseSkuExtendVO> queryStoreSku(QueryChineseSkuRequest chineseSkuRequest) {
+	public ProductInfoVO queryStoreSku(QueryChineseSkuRequest chineseSkuRequest) {
 		log.info("invoke querySku() param:{}", JSON.toJSONString(chineseSkuRequest));
+
+		ProductInfoVO productInfoVO = new ProductInfoVO();
+		productInfoVO.setProductType(ProductTypeEnum.CHINESE.getCode());
+		productInfoVO.setProductTypeName(ProductTypeEnum.CHINESE.getValue());
 		// 1.先根据互联网医院 id，获取店铺信息
 		StoreEntity storeEntity = storeService.getStoreByAgencyIdOrStoreId(chineseSkuRequest.getAgencyId(), chineseSkuRequest.getStoreId());
 		if (Objects.isNull(storeEntity)) {
@@ -106,39 +120,81 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 		// 2.根据 skuCode 或者 药材 id 获取 sku 信息
 		List<ChineseSkuInfoEntity> chineseSkuInfoEntityList = chineseSkuInfoService.queryStoreSkuByCodesOrMedicineIds(chineseSkuRequest.getSkuCodeList(), chineseSkuRequest.getMedicineIdList(), storeEntity.getId());
 		if (CollectionUtils.isEmpty(chineseSkuInfoEntityList)) {
-			return Lists.newArrayList();
+//			return Lists.newArrayList();
 		}
 		Set<String> medicineCodes = chineseSkuInfoEntityList.stream().map(ChineseSkuInfoEntity::getMedicineCode).collect(Collectors.toSet());
 		// 3.获取药材名称
 		Map<String, String> medicineCodeAndNameMap = chineseMedicineService.getByMedicineCode(medicineCodes)
 				.stream().collect(Collectors.toMap(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName, (v1, v2) -> v1));
-		List<ChineseSkuExtendVO> skuExtendVOList = buildChineseSkuExtendVOList(storeEntity.getStoreName(), chineseSkuInfoEntityList, medicineCodeAndNameMap);
+		List<ChineseSkuInfoExtendVO> skuExtendVOList = buildChineseSkuExtendVOList(storeEntity.getStoreName(), chineseSkuInfoEntityList, medicineCodeAndNameMap);
 		// 3.判断是否需要查询库存信息
 		if (Objects.equals(Boolean.TRUE, chineseSkuRequest.getNeedQueryStock())) {
 			// TODO liuqiuyi
 		}
 		// 4.判断是否需要查询配送优先级
-		if (Objects.equals(Boolean.TRUE, chineseSkuRequest.getNeedQueryPriority())) {
-			// TODO liuqiuyi
+		if (Objects.equals(Boolean.TRUE, chineseSkuRequest.getNeedQueryPriority()) && Objects.nonNull(chineseSkuRequest.getAreaId())) {
+			List<Long> storeChineseDeliveryInfoList = storeDeliveryPriorityService.queryByStoreIdAndArea(storeEntity.getId(), chineseSkuRequest.getAreaId());
+			productInfoVO.setStoreChineseDeliveryInfoList(storeChineseDeliveryInfoList);
 		}
 		// 5.组装数据返回
-		return skuExtendVOList;
+		productInfoVO.setChineseSkuInfoExtendVOList(skuExtendVOList);
+		return productInfoVO;
 	}
-	private List<ChineseSkuExtendVO> buildChineseSkuExtendVOList(String storeName, List<ChineseSkuInfoEntity> skuInfoEntityList, Map<String, String> medicineCodeAndNameMap) {
-		List<ChineseSkuExtendVO> chineseSkuExtendVOList = Lists.newArrayListWithCapacity(skuInfoEntityList.size());
-		skuInfoEntityList.forEach(chineseSkuInfoEntity -> {
-			ChineseSkuExtendVO chineseSkuExtendVO = new ChineseSkuExtendVO();
-			BeanUtils.copyProperties(chineseSkuInfoEntity, chineseSkuExtendVO);
-			chineseSkuExtendVO.setProductType(ProductTypeEnum.CHINESE.getCode());
-			chineseSkuExtendVO.setProductTypeName(ProductTypeEnum.CHINESE.getValue());
-			chineseSkuExtendVO.setMedicineId(chineseSkuInfoEntity.getOldMedicineId());
-			chineseSkuExtendVO.setMedicineName(medicineCodeAndNameMap.get(chineseSkuInfoEntity.getMedicineCode()));
-			chineseSkuExtendVO.setStoreName(storeName);
-			chineseSkuExtendVO.setSkuState(chineseSkuInfoEntity.getSkuStatus());
-			chineseSkuExtendVO.setSkuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()));
-			chineseSkuExtendVOList.add(chineseSkuExtendVO);
+
+	/**
+	 * 获取所有的中药相反药材,出参和之前的业务结构保持一致
+	 *
+	 * @author liuqiuyi
+	 * @date 2022/8/8 11:44
+	 */
+	@Override
+	public List<ChineseMedicineConflictVO> listAllConflict() {
+		List<ChineseMedicineConflictEntity> conflictEntityList = chineseMedicineConflictService.listAllConflictEntity();
+		if (CollectionUtils.isEmpty(conflictEntityList)) {
+			return Lists.newArrayList();
+		}
+		// 1.获取所有的药材 code
+		Set<String> medicineCodes = Sets.newHashSetWithExpectedSize(conflictEntityList.size());
+		conflictEntityList.forEach(chineseMedicineConflictEntity -> {
+			medicineCodes.add(chineseMedicineConflictEntity.getMedicineCode());
+			medicineCodes.addAll(Sets.newHashSet(chineseMedicineConflictEntity.getMedicineConflictCodes().split(",")));
 		});
-		return chineseSkuExtendVOList;
+		// 2.根据药材 code 换取 id
+		List<ChineseMedicineEntity> chineseMedicineEntityList = chineseMedicineService.getByMedicineCode(medicineCodes);
+		if (CollectionUtils.isEmpty(chineseMedicineEntityList)) {
+			return Lists.newArrayList();
+		}
+		Map<String, Long> medicineCodeAndIdMap = chineseMedicineEntityList.stream()
+				.collect(Collectors.toMap(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getId, (v1, v2) -> v1));
+		// 3.组装数据返回
+		List<ChineseMedicineConflictVO> medicineConflictVoList = Lists.newArrayListWithCapacity(conflictEntityList.size());
+		conflictEntityList.forEach(chineseMedicineConflictEntity -> {
+			Long id = medicineCodeAndIdMap.get(chineseMedicineConflictEntity.getMedicineCode());
+			List<Long> conflictIdList = Stream.of(chineseMedicineConflictEntity.getMedicineConflictCodes().split(",")).map(medicineCodeAndIdMap::get).collect(Collectors.toList());
+
+			ChineseMedicineConflictVO chineseMedicineConflictVO = new ChineseMedicineConflictVO();
+			chineseMedicineConflictVO.setId(id);
+			chineseMedicineConflictVO.setConflictIdList(conflictIdList);
+			medicineConflictVoList.add(chineseMedicineConflictVO);
+		});
+		return medicineConflictVoList;
+	}
+
+	private List<ChineseSkuInfoExtendVO> buildChineseSkuExtendVOList(String storeName, List<ChineseSkuInfoEntity> skuInfoEntityList, Map<String, String> medicineCodeAndNameMap) {
+		List<ChineseSkuInfoExtendVO> chineseSkuInfoExtendVOList = Lists.newArrayListWithCapacity(skuInfoEntityList.size());
+		skuInfoEntityList.forEach(chineseSkuInfoEntity -> {
+			ChineseSkuInfoExtendVO chineseSkuInfoExtendVO = new ChineseSkuInfoExtendVO();
+			BeanUtils.copyProperties(chineseSkuInfoEntity, chineseSkuInfoExtendVO);
+			chineseSkuInfoExtendVO.setProductType(ProductTypeEnum.CHINESE.getCode());
+			chineseSkuInfoExtendVO.setProductTypeName(ProductTypeEnum.CHINESE.getValue());
+			chineseSkuInfoExtendVO.setMedicineId(chineseSkuInfoEntity.getOldMedicineId());
+			chineseSkuInfoExtendVO.setMedicineName(medicineCodeAndNameMap.get(chineseSkuInfoEntity.getMedicineCode()));
+			chineseSkuInfoExtendVO.setStoreName(storeName);
+			chineseSkuInfoExtendVO.setSkuState(chineseSkuInfoEntity.getSkuStatus());
+			chineseSkuInfoExtendVO.setSkuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()));
+			chineseSkuInfoExtendVOList.add(chineseSkuInfoExtendVO);
+		});
+		return chineseSkuInfoExtendVOList;
 	}
 
 	private List<ChineseSkuInfoVO> buildChineseSkuInfoVOList(String storeName,

@@ -16,14 +16,11 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @ApiModel("中药sku扩展信息")
-public class ChineseSkuExtendVO extends ChineseSkuInfoVO implements Serializable {
+public class ChineseSkuInfoExtendVO extends ChineseSkuInfoVO implements Serializable {
 	private static final long serialVersionUID = -8483976817745897650L;
 
 	@ApiModelProperty("库存信息")
 	private List<StockInfoVO> stockInfoVOList;
-
-	@ApiModelProperty("店铺的配送优先级")
-	private List<Long> storePriorityInfo;
 
 	@Data
 	@ApiModel("库存信息")

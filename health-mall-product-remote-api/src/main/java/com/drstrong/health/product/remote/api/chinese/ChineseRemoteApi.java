@@ -1,8 +1,9 @@
 package com.drstrong.health.product.remote.api.chinese;
 
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
-import com.drstrong.health.product.model.response.chinese.ChineseSkuExtendVO;
+import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
+import com.drstrong.health.product.model.response.product.ProductInfoVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,5 +32,9 @@ public interface ChineseRemoteApi {
 
 	@ApiOperation("中药 sku,查询店铺的 sku 信息")
 	@PostMapping("/sku/query")
-	ResultVO<List<ChineseSkuExtendVO>> queryStoreSku(@RequestBody @Valid QueryChineseSkuRequest chineseSkuRequest);
+	ResultVO<ProductInfoVO> queryStoreSku(@RequestBody @Valid QueryChineseSkuRequest chineseSkuRequest);
+
+	@ApiOperation("获取中药材相反信息,出参和之前保持一致,用于 app 端查询")
+	@GetMapping("/all/conflict")
+	ResultVO<List<ChineseMedicineConflictVO>> listAllConflict();
 }

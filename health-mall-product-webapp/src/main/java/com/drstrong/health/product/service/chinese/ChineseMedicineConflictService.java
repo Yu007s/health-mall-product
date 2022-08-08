@@ -3,6 +3,8 @@ package com.drstrong.health.product.service.chinese;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 
+import java.util.List;
+
 /**
  * <p>
  * 中药材别名表 服务类
@@ -32,4 +34,13 @@ public interface ChineseMedicineConflictService extends IService<ChineseMedicine
      * @param userId 操作的用户id
      */
     void delete(ChineseMedicineConflictEntity conflictEntity, Long userId);
+
+    /**
+     * 获取所有的相反药材
+     *
+     * @return 相反药材信息
+     * @author liuqiuyi
+     * @date 2022/8/8 11:34
+     */
+    List<ChineseMedicineConflictEntity> listAllConflictEntity();
 }

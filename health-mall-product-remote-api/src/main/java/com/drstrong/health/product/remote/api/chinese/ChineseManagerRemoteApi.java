@@ -5,6 +5,7 @@ import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
+import com.drstrong.health.product.model.response.chinese.SupplierBaseInfoVO;
 import com.drstrong.health.product.model.response.chinese.SupplierChineseManagerSkuVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
@@ -61,4 +62,8 @@ public interface ChineseManagerRemoteApi {
     @ApiOperation("供应商中药库存页面，列表查询并导出,提供给供应商远程调用")
     @PostMapping("/supplier/sku/export")
     ResultVO<List<SupplierChineseManagerSkuVO>> listSupplierChineseManagerSkuExport(@RequestBody ChineseManagerSkuRequest skuRequest);
+
+    @ApiOperation("查询店铺的供应商信息")
+    @GetMapping("/store/supplier")
+    ResultVO<List<SupplierBaseInfoVO>> getStoreSupplierInfo(@RequestParam("storeId") Long storeId);
 }
