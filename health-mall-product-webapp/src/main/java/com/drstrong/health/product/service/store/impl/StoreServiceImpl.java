@@ -250,7 +250,26 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         return storeQueryResponse;
     }
 
-    private void buildStoreConnectInfo(List<String> storeTypeNames,List<StoreAddResponse.AgencyIdAndName> agencyIdAndNames ){
+    /**
+     * 根据互联网医院 id 获取店铺 id
+     *
+     * @param agencyIds 互联网医院 id
+     * @return 店铺信息
+     * @author liuqiuyi
+     * @date 2022/8/8 19:57
+     */
+    @Override
+    public List<StoreEntity> getStoreByAgencyIds(Set<Long> agencyIds) {
+        if (CollectionUtils.isEmpty(agencyIds)) {
+            return Lists.newArrayList();
+        }
+        LambdaQueryWrapper<StoreEntity> queryWrapper = Wrappers.<StoreEntity>lambdaQuery()
+                .eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(StoreEntity::getAgencyId, agencyIds);
+        return list(queryWrapper);
+    }
+
+    private void buildStoreConnectInfo(List<String> storeTypeNames, List<StoreAddResponse.AgencyIdAndName> agencyIdAndNames ){
         for (StoreTypeEnum value : StoreTypeEnum.values()) {
             storeTypeNames.add(value.getValue());
         }
