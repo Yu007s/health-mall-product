@@ -47,7 +47,7 @@ public class ChineseManagerSkuVO implements Serializable {
     @ApiModelProperty("供应商名称")
     private List<String> supplierName;
 
-    @ApiModelProperty("价格")
+    @ApiModelProperty("价格/克,单位：元")
     private BigDecimal price;
 
     @ApiModelProperty("sku状态，0-未上架，1-已上架")

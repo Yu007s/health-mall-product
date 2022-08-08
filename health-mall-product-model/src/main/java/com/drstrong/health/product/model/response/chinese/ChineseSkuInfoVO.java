@@ -56,7 +56,7 @@ public class ChineseSkuInfoVO implements Serializable {
 	@ApiModelProperty("店铺名称")
 	private String storeName;
 
-	@ApiModelProperty("价格")
+	@ApiModelProperty("价格/克,单位：分")
 	private BigDecimal price;
 
 	@ApiModelProperty("sku状态")

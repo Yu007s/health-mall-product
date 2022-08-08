@@ -23,6 +23,7 @@ import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
 import com.drstrong.health.product.service.chinese.ChineseSpuInfoService;
 import com.drstrong.health.product.service.product.SkuInfoService;
+import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -194,7 +195,7 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
                 .oldMedicineId(saveOrUpdateSkuVO.getMedicineId())
                 .medicineCode(saveOrUpdateSkuVO.getMedicineCode())
                 .storeId(saveOrUpdateSkuVO.getStoreId())
-                .price(saveOrUpdateSkuVO.getPrice())
+                .price(BigDecimalUtil.Y2F(saveOrUpdateSkuVO.getPrice()))
                 .skuStatus(ProductStateEnum.UN_PUT.getCode())
                 .build();
         chineseSkuInfoEntity.setCreatedBy(saveOrUpdateSkuVO.getOperatorId());
@@ -233,7 +234,7 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
                 .oldMedicineId(saveOrUpdateSkuVO.getMedicineId())
                 .medicineCode(saveOrUpdateSkuVO.getMedicineCode())
                 .storeId(saveOrUpdateSkuVO.getStoreId())
-                .price(saveOrUpdateSkuVO.getPrice())
+                .price(BigDecimalUtil.Y2F(saveOrUpdateSkuVO.getPrice()))
                 .build();
         chineseSkuInfoEntity.setChangedBy(saveOrUpdateSkuVO.getOperatorId());
 
