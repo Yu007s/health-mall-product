@@ -15,7 +15,7 @@ public class SupplierResponse implements Serializable {
     /**
      * 供应商id
      */
-    private Long supplierId;
+    private String supplierId;
     /**
      * 供应商名字
      */

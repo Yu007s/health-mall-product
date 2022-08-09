@@ -66,7 +66,7 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
         List<StoreLinkSupplierEntity> linkSupplierEntities = storeLinkSupplierService.queryByStoreId(storeId);
         List<SupplierResponse> collect = linkSupplierEntities.stream().map(storeLinkSupplierEntity -> {
             SupplierResponse supplierResponse = new SupplierResponse();
-            supplierResponse.setSupplierId(storeLinkSupplierEntity.getSupplierId());
+            supplierResponse.setSupplierId(storeLinkSupplierEntity.getSupplierId().toString());
             //测试
             supplierResponse.setSupplierName("供应商"+storeLinkSupplierEntity.getSupplierId());
             return supplierResponse;
