@@ -2,6 +2,7 @@ package com.drstrong.health.product.controller.store;
 
 import com.drstrong.health.product.dao.store.StoreLinkSupplierMapper;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
+import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreQueryResponse;
@@ -35,8 +36,6 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     @Resource
     StoreLinkSupplierMapper storeLinkSupplierMapper;
 
-    @Resource
-    private AreaService areaService;
 
     @Override
     public ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store)  {
@@ -52,9 +51,9 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     }
 
     @Override
-    public ResultVO<List<StoreInfoResponse>> queryStore(@RequestParam(value = "storeId",required = false) Long storeId,@RequestParam(value = "storeName",required = false) String storeName,
-                                                        @RequestParam(value = "agencyId",required = false) Long agencyId, @RequestParam(value = "storeTypeId",required = false) Integer storeTypeId) {
-        List<StoreInfoResponse> query = storeService.query(storeId,storeName,agencyId, storeTypeId);
+    public ResultVO<List<StoreInfoResponse>> queryStore(@RequestBody StoreSearchRequest storeSearchRequest) {
+        List<StoreInfoResponse> query = storeService.query(storeSearchRequest.getStoreId(),storeSearchRequest.getStoreName(),
+                storeSearchRequest.getAgencyId(), storeSearchRequest.getAgencyId());
         return ResultVO.success(query);
     }
 
@@ -76,11 +75,7 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
         return ResultVO.success(storeQueryResponse);
     }
 
-    @Override
-    public ResultVO<List<ProvinceAreaInfo>> queryAll() {
-        List<ProvinceAreaInfo> lists = areaService.queryAll();
-        return ResultVO.success(lists);
-    }
+
 
 
     @Override

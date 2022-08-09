@@ -2,7 +2,6 @@ package com.drstrong.health.product.service.store;
 
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
-import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.store.StoreAddResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
@@ -38,7 +37,7 @@ public interface StoreService {
 	 * @param storeType 店铺类型id
 	 * @return 店铺信息返回值
 	 */
-    List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, Integer storeType);
+    List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, Long storeType);
 
     /**
      * 通过店铺id查找店铺详细信息

@@ -15,7 +15,7 @@ import java.util.List;
 public class StoreInfoEditResponse implements Serializable {
     private static final long serialVersionUID = 1564875342626489461L;
     @ApiModelProperty("店铺主键id")
-    private Long id;
+    private String id;
 
     @NotNull
     @ApiModelProperty("店铺名称")
@@ -23,14 +23,14 @@ public class StoreInfoEditResponse implements Serializable {
 
     @NotNull
     @ApiModelProperty("关联供应商id集合")
-    private List<Long> supplierIds;
+    private List<String> supplierIds;
 
     @NotNull
     @ApiModelProperty("店铺类型")
     private String storeTypeName;
 
-    @ApiModelProperty("关联互联网医院的名字")
-    private String agencyName;
+    @ApiModelProperty("关联互联网医院id")
+    private String agencyId;
 
     @NotNull
     @ApiModelProperty("企业税号  最长50位  只有英文、数字")

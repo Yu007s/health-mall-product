@@ -41,8 +41,4 @@ public class ChineseMedicineConflictEntity extends BaseStandardEntity implements
      **/
     private String medicineConflictCodes;
 
-    /**
-     * 乐观锁
-     **/
-    private Integer version;
 }

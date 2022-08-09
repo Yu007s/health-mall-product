@@ -105,9 +105,9 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean removeByCode(String medicineCode,Long userId) {
+    public void removeByCode(String medicineCode,Long userId) {
         if (chineseSkuInfoService.checkHasChineseByMedicineCode(medicineCode)) {
-            return false;
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"药材已经关联sku");
         }
         //逻辑删除药材
         LambdaUpdateWrapper<ChineseMedicineEntity> lambdaQueryWrapper = new LambdaUpdateWrapper<>();
@@ -119,7 +119,6 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         ChineseMedicineConflictEntity chineseMedicineConflictEntity = new ChineseMedicineConflictEntity();
         chineseMedicineConflictEntity.setMedicineCode(medicineCode);
         chineseMedicineConflictService.delete(chineseMedicineConflictEntity,userId);
-        return true;
     }
 
     @Override

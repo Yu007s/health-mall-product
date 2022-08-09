@@ -43,12 +43,8 @@ public class ChineseMedicineController implements ChineseMedicineRemoteApi {
     @ApiOperation("删除药材")
     public ResultVO<String> deleteMedicine(@RequestParam("medicineCode") @NotBlank(message = "药材编码不能为空")String medicineCode,
                                     @RequestParam(value = "userId") @NotNull(message = "用户id不能为空") Long userId) {
-        String msg = "当前中药材已关联SKU";
-        boolean b = chineseMedicineService.removeByCode(medicineCode, userId);
-        if (b) {
-            msg = "删除中药材成功";
-        }
-        return ResultVO.success(msg);
+        chineseMedicineService.removeByCode(medicineCode, userId);
+        return ResultVO.success();
     }
 
 

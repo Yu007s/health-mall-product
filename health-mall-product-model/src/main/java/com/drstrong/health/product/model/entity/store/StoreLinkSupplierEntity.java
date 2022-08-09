@@ -39,9 +39,4 @@ public class StoreLinkSupplierEntity extends BaseStandardEntity implements Seria
     @TableField("supplier_id")
     private Long supplierId;
 
-    /**
-     * 乐观锁
-     */
-    private Integer version;
-
 }

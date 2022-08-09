@@ -18,9 +18,9 @@ public class AreaInfoResponse implements Serializable {
 
 	private static final long serialVersionUID = -5888708784299486536L;
 	@ApiModelProperty("地区 id")
-	private Long value;
+	private Long areaId;
 
 	@ApiModelProperty("地区名称")
-	private String label;
+	private String areaName;
 
 }

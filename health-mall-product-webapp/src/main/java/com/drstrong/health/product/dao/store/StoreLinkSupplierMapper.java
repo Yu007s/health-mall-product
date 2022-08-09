@@ -14,5 +14,10 @@ import java.util.List;
  */
 @Mapper
 public interface StoreLinkSupplierMapper extends BaseMapper<StoreLinkSupplierEntity> {
+    /**
+     * 根据供应商id 查找关联的店铺信息
+     * @param supplierId  供应商id
+     * @return  相关店铺信息
+     */
     List<StoreInfoResponse> findStoreBySupplierId(Long supplierId);
 }

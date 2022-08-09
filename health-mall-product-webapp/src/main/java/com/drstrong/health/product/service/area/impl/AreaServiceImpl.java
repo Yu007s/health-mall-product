@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.entity.productstore.AreaEntity;
 import com.drstrong.health.product.model.enums.AreaTypeEnum;
 import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
+import com.drstrong.health.product.model.response.area.StoreAreaInfo;
 import com.drstrong.health.product.service.area.AreaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,8 +39,8 @@ public class AreaServiceImpl implements AreaService {
         List<AreaEntity> areaEntities = areaMapper.selectList(queryWrapper);
         List<AreaInfoResponse> areaInfoResponses = areaEntities.stream().map(a -> {
             AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
-            areaInfoResponse.setValue(a.getId());
-            areaInfoResponse.setLabel(a.getName());
+            areaInfoResponse.setAreaId(a.getId());
+            areaInfoResponse.setAreaName(a.getName());
             return areaInfoResponse;
         }).collect(Collectors.toList());
         return areaInfoResponses;
@@ -66,14 +67,14 @@ public class AreaServiceImpl implements AreaService {
         for (AreaEntity province : provinces) {
             int id = Math.toIntExact(province.getId());
             List<AreaEntity> areaEntities = areaEntityHashMap.get(id);
-            List<AreaInfoResponse> collect = areaEntities.stream().map(areaEntity -> {
-                AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
-                areaInfoResponse.setValue(areaEntity.getId());
-                areaInfoResponse.setLabel(areaEntity.getName());
-                return areaInfoResponse;
+            List<StoreAreaInfo> collect = areaEntities.stream().map(areaEntity -> {
+                StoreAreaInfo storeAreaInfo = new StoreAreaInfo();
+                storeAreaInfo.setValue(areaEntity.getId().toString());
+                storeAreaInfo.setLabel(areaEntity.getName());
+                return storeAreaInfo;
             }).collect(Collectors.toList());
             ProvinceAreaInfo provinceAreaInfo = new ProvinceAreaInfo();
-            provinceAreaInfo.setValue(province.getId());
+            provinceAreaInfo.setValue(province.getId().toString());
             provinceAreaInfo.setLabel(province.getName());
             provinceAreaInfo.setChildren(collect);
             ans.add(provinceAreaInfo);

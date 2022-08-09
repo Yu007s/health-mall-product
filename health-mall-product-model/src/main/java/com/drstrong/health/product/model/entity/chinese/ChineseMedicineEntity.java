@@ -71,10 +71,5 @@ public class ChineseMedicineEntity extends BaseStandardEntity implements Seriali
     @TableField("max_dosage")
     private BigDecimal maxDosage;
 
-    /**
-     * 乐观锁
-     */
-    @TableField("version")
-    private Integer version;
 
 }
