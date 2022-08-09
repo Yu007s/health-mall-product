@@ -19,7 +19,6 @@ import com.drstrong.health.product.service.store.AgencyService;
 import com.drstrong.health.product.service.store.StoreInvoiceService;
 import com.drstrong.health.product.service.store.StoreLinkSupplierService;
 import com.drstrong.health.product.service.store.StoreService;
-import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.drstrong.health.ware.model.response.SupplierInfoResponse;
 import com.drstrong.health.ware.model.result.ResultVO;
 import com.drstrong.health.ware.remote.api.SupplierManageRemoteApi;
@@ -112,7 +111,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
 
 
     @Override
-    public List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, Integer storeType) {
+    public List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, Long storeType) {
         LambdaQueryWrapper<StoreEntity> storeEntityQueryWrapper = new LambdaQueryWrapper<>();
         storeEntityQueryWrapper.select(StoreEntity::getStoreName,StoreEntity::getId,StoreEntity::getStoreType,StoreEntity::getAgencyId)
                 .eq(storeId != null, StoreEntity::getId, storeId)
@@ -287,32 +286,9 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         Long storeEntityId = storeEntity.getId();
         //根据店铺id 查询发票信息  组合后返回
         StoreInvoiceEntity invoice = storeInvoiceService.getByStoreId(storeEntityId);
+        //查询关联供应商信息
         List<StoreLinkSupplierEntity> linkSupplierEntities = storeLinkSupplierService.queryByStoreId(storeId);
         List<Long> supplierIds = linkSupplierEntities.stream().map(StoreLinkSupplierEntity::getSupplierId).collect(Collectors.toList());
-//        ResultVO<List<SupplierInfoDTO>> listResultVO = supplierManageRemoteApi.queryBySupplierIds(supplierIds);
-//        List<SupplierInfoDTO> data = listResultVO.getData();
-//        List<SupplierResponse> supplierResponses = null;
-//        if (data != null) {
-//            supplierResponses = data.stream().map(supplierInfoDTO -> {
-//                SupplierResponse supplierResponse = new SupplierResponse();
-//                supplierResponse.setSupplierName(supplierInfoDTO.getSupplierName());
-//                supplierResponse.setSupplierId(supplierInfoDTO.getSupplierId());
-//                return supplierResponse;
-//            }).collect(Collectors.toList());
-//        }
-//        List<SupplierResponse> collect = linkSupplierEntities.stream().map(supplier -> {
-//            SupplierResponse supplierResponse = new SupplierResponse();
-//            supplierResponse.setSupplierId(supplier.getSupplierId());
-//            supplierResponse.setSupplierName("测试中，未实现");
-//            return supplierResponse;
-//        }).collect(Collectors.toList());
-        {
-            //测试代码
-            supplierIds = new ArrayList<>();
-            supplierIds.add(1024L);
-            supplierIds.add(2L);
-            supplierIds.add(1L);
-        }
         return buildStoreInfoResponse(invoice, storeEntity,supplierIds);
     }
 
@@ -323,11 +299,11 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         storeInfoEditResponse.setStoreTypeName(StoreTypeEnum.values()[storeType].getValue());
         Long agencyId = storeEntity.getAgencyId();
         if (agencyId != null) {
-            String agencyName = agencyService.id2name(agencyId);
-            storeInfoEditResponse.setAgencyName(agencyName);
+            storeInfoEditResponse.setAgencyId(agencyId.toString());
         }
         storeInfoEditResponse.setStoreName(storeEntity.getStoreName());
-        storeInfoEditResponse.setSupplierIds(suppliers);
+        List<String> collect = suppliers.stream().map(Object::toString).collect(Collectors.toList());
+        storeInfoEditResponse.setSupplierIds(collect);
         return storeInfoEditResponse;
     }
 

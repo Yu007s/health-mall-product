@@ -1,9 +1,11 @@
 package com.drstrong.health.product.remote.api.store;
 
 import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
+import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.delievy.DeliveryPriorityVO;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,5 +48,15 @@ public interface DeliveryRemoteApi {
      * @return 相关信息
      */
     @PostMapping("/save")
-    ResultVO<String> saveDeliveryInfo(@RequestBody SaveDeliveryRequest saveDeliveryRequest, @RequestParam("userId") @NotNull(message = "店铺id不能为空") Long userId);
+    ResultVO<String> saveDeliveryInfo(@RequestBody SaveDeliveryRequest saveDeliveryRequest, @RequestParam("userId") @NotNull(message = "用户id不能为空") Long userId);
+
+    /**
+     * 查询所有的省市信息
+     *
+     * @return 所有的省市级信息
+     */
+    @ApiOperation("查询所有的城市")
+    @GetMapping("/queryAll")
+    ResultVO<List<ProvinceAreaInfo>> queryAll() ;
+
 }

@@ -88,9 +88,4 @@ public class StoreInvoiceEntity extends BaseStandardEntity implements Serializab
     @TableField("app_key")
     private String appKey;
 
-    /**
-     * 乐观锁
-     */
-    private Integer version;
-
 }

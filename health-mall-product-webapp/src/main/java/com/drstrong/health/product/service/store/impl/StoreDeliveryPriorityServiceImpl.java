@@ -55,13 +55,14 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
         for (DeliveryPriorityEntity deliveryPriorityEntity : list) {
             DeliveryPriResponse deliveryPriResponse = buildDeliveryResponse(deliveryPriorityEntity);
             if (AreaTypeEnum.COUNTRY.ordinal() == deliveryPriorityEntity.getAreaId()) {
-                deliveryPriorityVO.setDefaultDeliveries(deliveryPriResponse.getSupplierIds());
+                List<String> collect = deliveryPriResponse.getSupplierIds().stream().map(Object::toString).collect(Collectors.toList());
+                deliveryPriorityVO.setDefaultDeliveries(collect);
             }
             else {
                 deliveries.add(deliveryPriResponse);
             }
         }
-        deliveryPriorityVO.setStoreId(storeId);
+        deliveryPriorityVO.setStoreId(storeId.toString());
         List<StoreLinkSupplierEntity> linkSupplierEntities = storeLinkSupplierService.queryByStoreId(storeId);
         List<SupplierResponse> collect = linkSupplierEntities.stream().map(storeLinkSupplierEntity -> {
             SupplierResponse supplierResponse = new SupplierResponse();
@@ -86,10 +87,22 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
                  .in(DeliveryPriorityEntity::getAreaId, collect)
                 .eq(DeliveryPriorityEntity::getStoreId,storeId)
                 .eq(DeliveryPriorityEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
-        List<DeliveryPriorityEntity> list = list(lambdaQueryWrapper);
-        //按照市级省级国家级排好序 debug
-//        list.sort((a,b) -> b.getAreaType() - a.getAreaType());
-        DeliveryPriorityEntity deliveryPriorityEntity = list.get(0);
+        List<DeliveryPriorityEntity> deliveryPriorityEntities = list(lambdaQueryWrapper);
+        //查询不到配送优先级 该地区没有设置
+        if ( deliveryPriorityEntities==null || deliveryPriorityEntities.size() == 0) {
+            return new ArrayList<>(0);
+        }
+        List<Long> areaIdList = deliveryPriorityEntities.stream().map(DeliveryPriorityEntity::getAreaId).collect(Collectors.toList());
+        //从最小的区域开始检索 如果检索到即返回相应的下标
+        int index = 0;
+        for (AreaEntity areaInfoRe : areaInfoResponses) {
+            int i = areaIdList.indexOf(areaInfoRe.getId());
+            if (i != -1) {
+                index = i;
+                break;
+            }
+        }
+        DeliveryPriorityEntity deliveryPriorityEntity = deliveryPriorityEntities.get(index);
         String priorities = deliveryPriorityEntity.getPriorities();
         if (StringUtils.isBlank(priorities)) {
             return new ArrayList<>(0);
@@ -145,12 +158,12 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
 
     private DeliveryPriResponse buildDeliveryResponse(DeliveryPriorityEntity deliveryPriorityEntity){
         DeliveryPriResponse deliveryPriResponse = new DeliveryPriResponse();
-        deliveryPriResponse.setAreaId(deliveryPriorityEntity.getAreaId());
+        deliveryPriResponse.setAreaId(deliveryPriorityEntity.getAreaId().toString());
         String priorities = deliveryPriorityEntity.getPriorities();
         String[] split = priorities.split(",");
-        List<Long> suppliers = Arrays.stream(split).map(Long::valueOf).collect(Collectors.toList());
+        List<String> suppliers = Arrays.asList(split);
         deliveryPriResponse.setSupplierIds(suppliers);
-        deliveryPriResponse.setAreaId(deliveryPriorityEntity.getAreaId());
+        deliveryPriResponse.setAreaId(deliveryPriorityEntity.getAreaId().toString());
         return deliveryPriResponse;
     }
 }

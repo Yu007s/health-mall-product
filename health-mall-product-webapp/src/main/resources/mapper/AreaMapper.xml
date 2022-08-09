@@ -4,7 +4,8 @@
 
     <select id="queryFatherAreaById" resultType="com.drstrong.health.product.model.entity.productstore.AreaEntity">
         select distinct id,type from product_city
-                                where available=1 and id in((select parent_id from product_city where id =#{id} and available =1),#{id} ) or type =0;
+                                where available=1 and id in((select parent_id from product_city where id =#{id} and available =1),#{id} ) or type =0
+                                order by type desc ;
     </select>
 
 

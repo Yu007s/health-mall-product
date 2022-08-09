@@ -16,7 +16,7 @@ public class StoreIdNameResponse implements Serializable {
     private static final long serialVersionUID = -5456489446173665786L;
 
     @ApiModelProperty("店铺主键id")
-    private Long id;
+    private String id;
 
     @ApiModelProperty("店铺名称")
     private String storeName;

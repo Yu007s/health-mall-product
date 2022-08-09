@@ -46,9 +46,6 @@ public class StoreEntity extends BaseStandardEntity implements Serializable {
     @TableField("agency_id")
     private Long agencyId;
 
-    /**
-     * 乐观锁
-     */
-    private Integer version;
+
 
 }

@@ -1,6 +1,7 @@
 package com.drstrong.health.product.remote.api.store;
 
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
+import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreAddResponse;
@@ -39,16 +40,12 @@ public interface StoreRemoteApi {
 
     /**
      * 基于搜索条件获取店铺的基本信息
-     * @param storeId 店铺id
-     * @param storeName 店铺名字
-     * @param agencyId 互联网医院id
-     * @param storeTypeId 店铺类型id
+     * @param storeSearchRequest 店铺请求入参
      * @return 符合条件的店铺基本信息列表
      */
     @ApiOperation("获取符合条件的店铺基本信息列表")
-    @GetMapping("/query")
-    ResultVO<List<StoreInfoResponse>> queryStore(@RequestParam(value = "storeId",required = false) Long storeId,@RequestParam(value = "storeName",required = false) String storeName,
-                                                 @RequestParam(value = "agencyId",required = false) Long agencyId, @RequestParam(value = "storeTypeId",required = false) Integer storeTypeId);
+    @PostMapping("/query")
+    ResultVO<List<StoreInfoResponse>> queryStore(@RequestBody StoreSearchRequest storeSearchRequest);
 
 
     /**
@@ -80,13 +77,5 @@ public interface StoreRemoteApi {
     ResultVO<StoreQueryResponse> queryStoreInfo() ;
 
 
-    /**
-     * 查询所有的省市信息
-     *
-     * @return 所有的省市级信息
-     */
-    @ApiOperation("查询所有的城市")
-    @GetMapping("/queryAll")
-    ResultVO<List<ProvinceAreaInfo>> queryAll() ;
 
 }

@@ -45,9 +45,8 @@ public interface ChineseMedicineService {
      * 逻辑删除药材
      * @param medicineCode 药材编码
      * @param userId 当前操作用户id
-     * @return 是否成功删除
      */
-     boolean removeByCode(String medicineCode,Long userId) ;
+     void removeByCode(String medicineCode,Long userId) ;
 
     /**
      * 条件查询所有的药材信息
