@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -30,11 +31,11 @@ public class ChineseSkuInfoExtendVO extends ChineseSkuInfoVO implements Serializ
 		@ApiModelProperty("0-实物库存，1-无限库存，2-虚拟库存")
 		private Integer stockType;
 
-		@ApiModelProperty("库存数")
-		private Integer virtualQuantity;
+		@ApiModelProperty("库存数,单位:毫克")
+		private BigDecimal virtualQuantity;
 
 		@ApiModelProperty("供应商 id")
-		private String supplierId;
+		private Long supplierId;
 
 		@ApiModelProperty("供应商名称")
 		private String supplierName;

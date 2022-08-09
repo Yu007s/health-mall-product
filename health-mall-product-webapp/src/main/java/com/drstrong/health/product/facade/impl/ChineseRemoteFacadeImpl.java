@@ -123,7 +123,12 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 		if (CollectionUtils.isEmpty(chineseSkuInfoEntityList)) {
 			return productInfoVO;
 		}
-		Set<String> medicineCodes = chineseSkuInfoEntityList.stream().map(ChineseSkuInfoEntity::getMedicineCode).collect(Collectors.toSet());
+		Set<String> medicineCodes = Sets.newHashSetWithExpectedSize(chineseSkuInfoEntityList.size());
+		Set<String> skuCodes = Sets.newHashSetWithExpectedSize(chineseSkuInfoEntityList.size());
+		chineseSkuInfoEntityList.forEach(chineseSkuInfoEntity -> {
+			medicineCodes.add(chineseSkuInfoEntity.getMedicineCode());
+			skuCodes.add(chineseSkuInfoEntity.getSkuCode());
+		});
 		// 3.获取药材名称
 		Map<String, String> medicineCodeAndNameMap = chineseMedicineService.getByMedicineCode(medicineCodes)
 				.stream().collect(Collectors.toMap(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName, (v1, v2) -> v1));

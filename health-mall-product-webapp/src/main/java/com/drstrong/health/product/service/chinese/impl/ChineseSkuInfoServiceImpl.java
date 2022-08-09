@@ -311,7 +311,6 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
         }
         LambdaQueryWrapper<ChineseSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .eq(ChineseSkuInfoEntity::getSkuStatus, ProductStateEnum.HAS_PUT.getCode())
                 .eq(ChineseSkuInfoEntity::getStoreId, storeId);
         if (!CollectionUtils.isEmpty(skuCodeList)) {
             queryWrapper.in(ChineseSkuInfoEntity::getSkuCode, skuCodeList);
