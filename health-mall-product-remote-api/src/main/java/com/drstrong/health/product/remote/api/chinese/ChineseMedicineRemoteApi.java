@@ -1,5 +1,6 @@
 package com.drstrong.health.product.remote.api.chinese;
 
+import com.drstrong.health.product.model.request.chinese.ChineseMedicineSearchRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchVO;
@@ -47,28 +48,22 @@ public interface ChineseMedicineRemoteApi {
     /**
      *
      * 药材信息分页展示
-     * @param medicineCode 药材编码
-     * @param medicineName 药材名字
-     * @param pageNo 第几页
-     * @param pageSize 页面大小
+     * @param chineseMedicineSearchRequest 请求体
      * @return 返回展示页
      */
     @ApiOperation("药材信息分页展示")
-    @GetMapping("/searchList")
-    ResultVO<ChineseMedicineSearchVO> queryMedicinePage(@RequestParam(value = "medicineCode", required = false) String medicineCode, @RequestParam(value = "medicineName", required = false) String medicineName,
-                                                        @RequestParam(value = "pageNo") Integer pageNo, @RequestParam(value = "pageSize") Integer pageSize);
+    @PostMapping("/searchList")
+    ResultVO<ChineseMedicineSearchVO> queryMedicinePage(@RequestBody ChineseMedicineSearchRequest chineseMedicineSearchRequest);
 
     /**
      *
      * 所有药材查询  用于新增药材添加相反药材时检索所有药材
-     * @param medicineName 药材名字
-     * @param medicineCode 药材编码
+     * @param chineseMedicineSearchRequest 请求体
      * @return 药材名字 药材编码
      */
     @ApiOperation("所有药材查询")
-    @GetMapping("/searchAll")
-    ResultVO<List<ChineseMedicineInfoResponse>> queryMedicineAll(@RequestParam(value = "medicineName", required = false) String medicineName,
-                                                                 @RequestParam(value = "medicineCode", required = false) String medicineCode);
+    @PostMapping("/searchAll")
+    ResultVO<List<ChineseMedicineInfoResponse>> queryMedicineAll(@RequestBody ChineseMedicineSearchRequest chineseMedicineSearchRequest);
 
     /**
      * 相反药材查询

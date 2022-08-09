@@ -37,13 +37,13 @@ public class DeliveryPriorityEntity extends BaseStandardEntity implements Serial
     private Long storeId;
 
     /**
-     * 区域id
+     * 区域id  默认区域设置
      */
     private Long areaId;
-    /**
-     * 区域类型 0：全国  1：省级 2：市级  3：区级
-     */
-    private Integer areaType;
+//    /**
+//     * 区域类型 0：全国  1：省级 2：市级  3：区级
+//     */
+//    private Integer areaType;
 
     /**
      * 该店铺下该地区所有供应商优先级设置  以“,”号隔开,前面的优先级更小

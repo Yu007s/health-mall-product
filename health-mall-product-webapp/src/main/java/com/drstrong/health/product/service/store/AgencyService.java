@@ -23,5 +23,9 @@ public interface AgencyService {
      */
     Long name2Id(String name);
 
+    /**
+     * 获取所有互联网医院的名字
+     * @return 所有互联网医院的名字
+     */
     List<String> getAllName();
 }
