@@ -209,7 +209,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
             Long supplierId = supplier.getSupplierId();
             String supplierName = supplier.getSupplierName();
             SupplierResponse supplierResponse = new SupplierResponse();
-            supplierResponse.setSupplierId(supplierId);
+            supplierResponse.setSupplierId(supplierId.toString());
             supplierResponse.setSupplierName(supplierName);
             return supplierResponse;
         }).collect(Collectors.toList());
@@ -217,15 +217,15 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         {
             collect = new ArrayList<>();
             SupplierResponse supplierResponse = new SupplierResponse();
-            supplierResponse.setSupplierId(3L);
+            supplierResponse.setSupplierId("3");
             supplierResponse.setSupplierName("我是供应商3");
             collect.add(supplierResponse);
             SupplierResponse supplierResponse1 = new SupplierResponse();
-            supplierResponse1.setSupplierId(1L);
+            supplierResponse1.setSupplierId("1");
             supplierResponse1.setSupplierName("我是供应商1");
             collect.add(supplierResponse1);
             SupplierResponse supplierResponse2 = new SupplierResponse();
-            supplierResponse2.setSupplierId(2L);
+            supplierResponse2.setSupplierId("2");
             supplierResponse2.setSupplierName("我是供应商2");
             collect.add(supplierResponse2);
         }

@@ -10,6 +10,7 @@ import com.drstrong.health.product.model.enums.AreaTypeEnum;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.store.DeliveryPriRequest;
 import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
+import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.store.SupplierResponse;
 import com.drstrong.health.product.model.response.store.delievy.DeliveryPriResponse;
 import com.drstrong.health.product.model.response.store.delievy.DeliveryPriorityVO;
@@ -62,11 +63,14 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
                 deliveries.add(deliveryPriResponse);
             }
         }
+        if (deliveryPriorityVO.getDefaultDeliveries() == null) {
+            throw new BusinessException("没有默认优先级");
+        }
         deliveryPriorityVO.setStoreId(storeId.toString());
         List<StoreLinkSupplierEntity> linkSupplierEntities = storeLinkSupplierService.queryByStoreId(storeId);
         List<SupplierResponse> collect = linkSupplierEntities.stream().map(storeLinkSupplierEntity -> {
             SupplierResponse supplierResponse = new SupplierResponse();
-            supplierResponse.setSupplierId(storeLinkSupplierEntity.getSupplierId());
+            supplierResponse.setSupplierId(storeLinkSupplierEntity.getSupplierId().toString());
             //测试
             supplierResponse.setSupplierName("供应商"+storeLinkSupplierEntity.getSupplierId());
             return supplierResponse;

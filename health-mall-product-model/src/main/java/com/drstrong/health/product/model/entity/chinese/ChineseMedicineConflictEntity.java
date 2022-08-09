@@ -3,7 +3,6 @@ package com.drstrong.health.product.model.entity.chinese;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.drstrong.health.product.model.entity.category.BaseEntity;
 import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
