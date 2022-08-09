@@ -81,17 +81,7 @@ public class AreaServiceImpl implements AreaService {
         return ans;
     }
 
-    @Override
-    public AreaInfoResponse querySingle(Long areaId) {
-        AreaEntity areaEntity = areaMapper.selectById(areaId);
-        if (areaEntity.getAvailable() != 1) {
-            return null;
-        }
-        AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
-        areaInfoResponse.setValue(areaId);
-        areaInfoResponse.setLabel(areaEntity.getName());
-        return areaInfoResponse;
-    }
+
 
     @Override
     public List<AreaEntity> queryFatherAreaById(Long areaId) {

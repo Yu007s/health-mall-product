@@ -1,6 +1,7 @@
 package com.drstrong.health.product.controller.chinese;
 
 
+import com.drstrong.health.product.model.request.chinese.ChineseMedicineSearchRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchVO;
@@ -54,18 +55,17 @@ public class ChineseMedicineController implements ChineseMedicineRemoteApi {
 
     @Override
     @ApiOperation("药材信息分页展示")
-    public ResultVO<ChineseMedicineSearchVO> queryMedicinePage(@RequestParam(value = "medicineCode",required = false) String medicineCode,@RequestParam(value = "medicineName",required = false)String medicineName,
-                                                                     @RequestParam(value = "pageNo")Integer pageNo,@RequestParam(value = "pageSize") Integer pageSize) {
-        ChineseMedicineSearchVO chineseMedicineSearchVO = chineseMedicineService.queryPage(medicineCode, medicineName, pageNo, pageSize);
+    public ResultVO<ChineseMedicineSearchVO> queryMedicinePage(@RequestBody ChineseMedicineSearchRequest chineseMedicineSearchRequest) {
+        ChineseMedicineSearchVO chineseMedicineSearchVO = chineseMedicineService.queryPage(chineseMedicineSearchRequest.getMedicineCode(),
+                chineseMedicineSearchRequest.getMedicineName(), chineseMedicineSearchRequest.getPageNo(), chineseMedicineSearchRequest.getPageSize());
         return ResultVO.success(chineseMedicineSearchVO);
     }
 
 
     @ApiOperation("所有药材查询")
     @Override
-    public ResultVO<List<ChineseMedicineInfoResponse>> queryMedicineAll(@RequestParam(value = "medicineName" ,required = false) String medicineName,
-                                                                        @RequestParam(value = "medicineCode" ,required = false) String medicineCode) {
-        List<ChineseMedicineInfoResponse> chineseMedicineInfoList = chineseMedicineService.queryAll(medicineName,medicineCode);
+    public ResultVO<List<ChineseMedicineInfoResponse>> queryMedicineAll(@RequestBody ChineseMedicineSearchRequest chineseMedicineSearchRequest) {
+        List<ChineseMedicineInfoResponse> chineseMedicineInfoList = chineseMedicineService.queryAll(chineseMedicineSearchRequest.getMedicineName(),chineseMedicineSearchRequest.getMedicineCode());
         return ResultVO.success(chineseMedicineInfoList);
     }
 

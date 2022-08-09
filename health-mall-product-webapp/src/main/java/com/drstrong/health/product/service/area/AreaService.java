@@ -14,16 +14,23 @@ import java.util.List;
  */
 public interface AreaService {
 
+    /**
+     * 查询所有省份信息
+     * @return 所有省份信息
+     */
+
     List<AreaInfoResponse> queryAllProvince();
 
+    /**
+     * 查询所有省级区域以及下属市的信息
+     * @return  省级区域列表
+     */
     List<ProvinceAreaInfo> queryAll();
 
-    AreaInfoResponse querySingle(Long areaId);
-
     /**
-     * 根据区域id 查询其父级区域id  只会查找市、省、国家级
+     * 根据区域id 查询其父级区域和自身、全国
      * @param areaId 区域id
-     * @return  查询所得国家、省、市级区域id
+     * @return  查询所得区域信息
      */
     List<AreaEntity> queryFatherAreaById(Long areaId);
 

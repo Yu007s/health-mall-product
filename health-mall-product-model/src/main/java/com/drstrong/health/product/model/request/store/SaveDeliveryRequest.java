@@ -1,8 +1,6 @@
 package com.drstrong.health.product.model.request.store;
 
-import com.drstrong.health.product.model.response.store.SupplierResponse;
-import com.drstrong.health.product.model.response.store.delievy.DeliveryPriResponse;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -14,6 +12,7 @@ import java.util.List;
  * @Date 2022/08/01/14:37
  */
 @Data
+@ApiModel("配送优先级请求")
 public class SaveDeliveryRequest implements Serializable {
 
     private static final long serialVersionUID = 158724579447657578L;
@@ -28,7 +27,7 @@ public class SaveDeliveryRequest implements Serializable {
      * 默认供应商优先级
      */
     @NotNull
-    private DeliveryPriRequest defaultDelPriority;
+    private List<Long> defaultDelPriority;
 
     /**
      * 分市区优先级列表
