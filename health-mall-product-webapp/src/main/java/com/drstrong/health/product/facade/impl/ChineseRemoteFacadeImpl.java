@@ -171,12 +171,15 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 		List<ChineseMedicineConflictVO> medicineConflictVoList = Lists.newArrayListWithCapacity(conflictEntityList.size());
 		conflictEntityList.forEach(chineseMedicineConflictEntity -> {
 			Long id = medicineCodeAndIdMap.get(chineseMedicineConflictEntity.getMedicineCode());
-			List<Long> conflictIdList = Stream.of(chineseMedicineConflictEntity.getMedicineConflictCodes().split(",")).map(medicineCodeAndIdMap::get).collect(Collectors.toList());
+			List<Long> conflictIdList = Stream.of(chineseMedicineConflictEntity.getMedicineConflictCodes().split(","))
+					.map(medicineCodeAndIdMap::get).filter(Objects::nonNull).collect(Collectors.toList());
 
-			ChineseMedicineConflictVO chineseMedicineConflictVO = new ChineseMedicineConflictVO();
-			chineseMedicineConflictVO.setId(id);
-			chineseMedicineConflictVO.setConflictIdList(conflictIdList);
-			medicineConflictVoList.add(chineseMedicineConflictVO);
+			if (Objects.nonNull(id) && !CollectionUtils.isEmpty(conflictIdList)) {
+				ChineseMedicineConflictVO chineseMedicineConflictVO = new ChineseMedicineConflictVO();
+				chineseMedicineConflictVO.setId(id);
+				chineseMedicineConflictVO.setConflictIdList(conflictIdList);
+				medicineConflictVoList.add(chineseMedicineConflictVO);
+			}
 		});
 		return medicineConflictVoList;
 	}
