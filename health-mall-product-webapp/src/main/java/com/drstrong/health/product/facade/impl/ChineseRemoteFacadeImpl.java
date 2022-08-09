@@ -16,11 +16,13 @@ import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoExtendVO
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.product.ProductInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineConflictService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.store.StoreDeliveryPriorityService;
 import com.drstrong.health.product.service.store.StoreService;
+import com.drstrong.health.ware.model.response.SkuCanStockResponse;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -58,6 +60,9 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 
 	@Resource
 	StoreDeliveryPriorityService storeDeliveryPriorityService;
+
+	@Resource
+	StockRemoteProService stockRemoteProService;
 
 	/**
 	 * 根据关键字和互联网医院 id 模糊搜索药材
@@ -124,7 +129,7 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 			return productInfoVO;
 		}
 		Set<String> medicineCodes = Sets.newHashSetWithExpectedSize(chineseSkuInfoEntityList.size());
-		Set<String> skuCodes = Sets.newHashSetWithExpectedSize(chineseSkuInfoEntityList.size());
+		List<String> skuCodes = Lists.newArrayListWithCapacity(chineseSkuInfoEntityList.size());
 		chineseSkuInfoEntityList.forEach(chineseSkuInfoEntity -> {
 			medicineCodes.add(chineseSkuInfoEntity.getMedicineCode());
 			skuCodes.add(chineseSkuInfoEntity.getSkuCode());
@@ -132,10 +137,10 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 		// 3.获取药材名称
 		Map<String, String> medicineCodeAndNameMap = chineseMedicineService.getByMedicineCode(medicineCodes)
 				.stream().collect(Collectors.toMap(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName, (v1, v2) -> v1));
-		List<ChineseSkuInfoExtendVO> skuExtendVOList = buildChineseSkuExtendVOList(storeEntity.getStoreName(), chineseSkuInfoEntityList, medicineCodeAndNameMap);
 		// 3.判断是否需要查询库存信息
+		Map<String, List<SkuCanStockResponse>> skuCodeStockMap = null;
 		if (Objects.equals(Boolean.TRUE, chineseSkuRequest.getNeedQueryStock())) {
-			// TODO liuqiuyi
+			skuCodeStockMap = stockRemoteProService.getStockToMap(skuCodes);
 		}
 		// 4.判断是否需要查询配送优先级
 		if (Objects.equals(Boolean.TRUE, chineseSkuRequest.getNeedQueryPriority()) && Objects.nonNull(chineseSkuRequest.getAreaId())) {
@@ -143,6 +148,7 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 			productInfoVO.setStoreChineseDeliveryInfoList(storeChineseDeliveryInfoList);
 		}
 		// 5.组装数据返回
+		List<ChineseSkuInfoExtendVO> skuExtendVOList = buildChineseSkuExtendVOList(storeEntity.getStoreName(), chineseSkuInfoEntityList, medicineCodeAndNameMap, skuCodeStockMap);
 		productInfoVO.setChineseSkuInfoExtendVOList(skuExtendVOList);
 		return productInfoVO;
 	}
@@ -211,7 +217,8 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 		return agencyStoreVOList;
 	}
 
-	private List<ChineseSkuInfoExtendVO> buildChineseSkuExtendVOList(String storeName, List<ChineseSkuInfoEntity> skuInfoEntityList, Map<String, String> medicineCodeAndNameMap) {
+	private List<ChineseSkuInfoExtendVO> buildChineseSkuExtendVOList(String storeName, List<ChineseSkuInfoEntity> skuInfoEntityList,
+																	 Map<String, String> medicineCodeAndNameMap, Map<String, List<SkuCanStockResponse>> skuCodeStockMap) {
 		List<ChineseSkuInfoExtendVO> chineseSkuInfoExtendVOList = Lists.newArrayListWithCapacity(skuInfoEntityList.size());
 		skuInfoEntityList.forEach(chineseSkuInfoEntity -> {
 			ChineseSkuInfoExtendVO chineseSkuInfoExtendVO = new ChineseSkuInfoExtendVO();
@@ -224,6 +231,19 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 			chineseSkuInfoExtendVO.setStoreName(storeName);
 			chineseSkuInfoExtendVO.setSkuState(chineseSkuInfoEntity.getSkuStatus());
 			chineseSkuInfoExtendVO.setSkuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()));
+			// 设置库存信息
+			if (!CollectionUtils.isEmpty(skuCodeStockMap) && skuCodeStockMap.containsKey(chineseSkuInfoEntity.getSkuCode())) {
+				List<SkuCanStockResponse> stockResponseList = skuCodeStockMap.get(chineseSkuInfoEntity.getSkuCode());
+				List<ChineseSkuInfoExtendVO.StockInfoVO> stockInfoVOList = Lists.newArrayListWithCapacity(stockResponseList.size());
+				stockResponseList.forEach(skuCanStockResponse -> {
+					ChineseSkuInfoExtendVO.StockInfoVO stockInfoVO = new ChineseSkuInfoExtendVO.StockInfoVO();
+					stockInfoVO.setSupplierId(skuCanStockResponse.getSupplierId());
+					stockInfoVO.setSupplierName(skuCanStockResponse.getSupplierName());
+					stockInfoVO.setVirtualQuantity(BigDecimal.valueOf(skuCanStockResponse.getAvailableQuantity()));
+					stockInfoVOList.add(stockInfoVO);
+				});
+				chineseSkuInfoExtendVO.setStockInfoVOList(stockInfoVOList);
+			}
 			chineseSkuInfoExtendVOList.add(chineseSkuInfoExtendVO);
 		});
 		return chineseSkuInfoExtendVOList;

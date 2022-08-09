@@ -28,9 +28,6 @@ public class ChineseSkuInfoExtendVO extends ChineseSkuInfoVO implements Serializ
 	public static class StockInfoVO implements Serializable {
 		private static final long serialVersionUID = 7777626100052725022L;
 
-		@ApiModelProperty("0-实物库存，1-无限库存，2-虚拟库存")
-		private Integer stockType;
-
 		@ApiModelProperty("库存数,单位:毫克")
 		private BigDecimal virtualQuantity;
 
