@@ -46,15 +46,18 @@
         FROM
             product_chinese_medicine
         WHERE
-            del_flag = 0
-        <if test="keyword != null and keyword != ''">
-            AND medicine_name LIKE "%"#{keyword}"%"
-            OR medicine_name LIKE "%"#{keyword}"%"
-            OR medicine_code LIKE "%"#{keyword}"%"
-            OR medicine_pinyin LIKE "%"#{keyword}"%"
-            OR alias_pinyin LIKE "%"#{keyword}"%"
-            OR medicine_alias LIKE "%"#{keyword}"%"
-        </if>
+            id in (
+            select id from product_chinese_medicine
+            <where>
+                <if test="keyword != null and keyword != ''">
+                    AND medicine_name LIKE "%"#{keyword}"%"
+                    OR medicine_pinyin LIKE "%"#{keyword}"%"
+                    OR alias_pinyin LIKE "%"#{keyword}"%"
+                    OR medicine_alias LIKE "%"#{keyword}"%"
+                </if>
+            </where>
+        )
+         and del_flag = 0
         limit 20
     </select>
 </mapper>
