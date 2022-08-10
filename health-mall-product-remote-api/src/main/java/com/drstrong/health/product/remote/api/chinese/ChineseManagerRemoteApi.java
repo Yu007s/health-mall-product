@@ -1,6 +1,7 @@
 package com.drstrong.health.product.remote.api.chinese;
 
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
+import com.drstrong.health.product.model.request.chinese.QueryChineseMedicineRequest;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.*;
@@ -23,7 +24,7 @@ import java.util.List;
  * @date 2022/8/1 10:46
  */
 @Api("健康商城-商品服务-中药管理页面远程接口")
-@FeignClient(value = "health-mall-product", path = "/inner/chinese/manager")
+@FeignClient(value = "health-mall-product", path = "/inner/chinese/manage")
 public interface ChineseManagerRemoteApi {
 
     @ApiOperation("中药管理页面，列表查询")
@@ -35,8 +36,8 @@ public interface ChineseManagerRemoteApi {
     ResultVO<List<ChineseManagerSkuVO>> listChineseManagerSkuExport(@RequestBody ChineseManagerSkuRequest skuRequest);
 
     @ApiOperation("中药管理页面，关键字查询药材基础信息")
-    @GetMapping("/keyword/search")
-    ResultVO<List<ChineseMedicineResponse>> likeQueryChineseMedicine(@RequestParam("keyword") String keyword);
+    @PostMapping("/keyword/search")
+    ResultVO<List<ChineseMedicineResponse>> likeQueryChineseMedicine(@RequestBody QueryChineseMedicineRequest queryChineseMedicineRequest);
 
     @ApiOperation("中药管理页面，保存sku")
     @PostMapping("/sku/save")
