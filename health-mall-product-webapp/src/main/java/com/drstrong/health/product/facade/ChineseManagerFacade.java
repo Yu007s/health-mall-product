@@ -4,10 +4,7 @@ import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuReques
 import com.drstrong.health.product.model.request.chinese.StoreDataInitializeRequest;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
-import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
-import com.drstrong.health.product.model.response.chinese.SupplierBaseInfoVO;
-import com.drstrong.health.product.model.response.chinese.SupplierChineseManagerSkuVO;
+import com.drstrong.health.product.model.response.chinese.*;
 
 import java.util.List;
 
@@ -38,6 +35,16 @@ public interface ChineseManagerFacade {
      * @date 2022/8/1 11:16
      */
     List<ChineseManagerSkuVO> listChineseManagerSkuExport(ChineseManagerSkuRequest skuRequest);
+
+    /**
+     * 根据关键字搜索中药基础信息
+	 *
+	 * @param keyword 查询关键字
+	 * @return 中药基础信息
+     * @author liuqiuyi
+     * @date 2022/8/10 14:28
+     */
+	List<ChineseMedicineResponse> likeQueryChineseMedicine(String keyword);
 
     /**
      * 保存sku信息

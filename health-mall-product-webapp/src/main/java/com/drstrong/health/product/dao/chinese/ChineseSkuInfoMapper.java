@@ -42,7 +42,7 @@ public interface ChineseSkuInfoMapper extends CustomBaseMapper<ChineseSkuInfoEnt
 	 * @author liuqiuyi
 	 * @date 2022/8/1 14:19
 	 */
-	Page<SupplierChineseSkuDTO> pageSupplierChineseManagerSku(Page<ChineseSkuInfoEntity> entityPage, @Param("queryParam") ChineseManagerSkuRequest queryParam);
+	Page<SupplierChineseSkuDTO> pageSupplierChineseManagerSku(Page<SupplierChineseSkuDTO> entityPage, @Param("queryParam") ChineseManagerSkuRequest queryParam);
 
 	/**
 	 * 根据查询条件，查询 sku 信息,不去重
