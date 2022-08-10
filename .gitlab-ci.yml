@@ -194,7 +194,7 @@ prod-v1:
     DNS: '$DNS_PROD'
     # nacos
     NACOS_IP: '$NACOS_IP_PROD'
-    NACOS_NS: '$NACOS_NS_PROD'
+    NACOS_NS: '$NACOS_NS_PROD_V1'
   extends: .deploy
   only:
     - release
@@ -212,7 +212,7 @@ prod-v2:
     DNS: '$DNS_PROD'
     # nacos
     NACOS_IP: '$NACOS_IP_PROD'
-    NACOS_NS: '$NACOS_NS_PROD'
+    NACOS_NS: '$NACOS_NS_PROD_V2'
   extends: .deploy
   only:
     - release
