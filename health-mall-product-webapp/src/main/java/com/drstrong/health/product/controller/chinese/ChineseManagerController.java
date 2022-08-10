@@ -2,6 +2,7 @@ package com.drstrong.health.product.controller.chinese;
 
 import com.drstrong.health.product.facade.ChineseManagerFacade;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
+import com.drstrong.health.product.model.request.chinese.QueryChineseMedicineRequest;
 import com.drstrong.health.product.model.request.chinese.StoreDataInitializeRequest;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -26,7 +27,7 @@ import java.util.List;
  */
 @Validated
 @RestController
-@RequestMapping("/inner/chinese/manager")
+@RequestMapping("/inner/chinese/manage")
 @Slf4j
 @Api(tags = {"cms-中药管理页面远程接口"})
 public class ChineseManagerController implements ChineseManagerRemoteApi {
@@ -44,8 +45,8 @@ public class ChineseManagerController implements ChineseManagerRemoteApi {
     }
 
     @Override
-    public ResultVO<List<ChineseMedicineResponse>> likeQueryChineseMedicine(String keyword) {
-        return ResultVO.success(chineseManagerFacade.likeQueryChineseMedicine(keyword));
+    public ResultVO<List<ChineseMedicineResponse>> likeQueryChineseMedicine(QueryChineseMedicineRequest queryChineseMedicineRequest){
+        return ResultVO.success(chineseManagerFacade.likeQueryChineseMedicine(queryChineseMedicineRequest.getKeyword()));
     }
 
     @Override
