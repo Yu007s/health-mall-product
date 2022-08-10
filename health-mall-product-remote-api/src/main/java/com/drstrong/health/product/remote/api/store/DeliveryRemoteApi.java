@@ -1,6 +1,7 @@
 package com.drstrong.health.product.remote.api.store;
 
 import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
+import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.delievy.DeliveryPriorityVO;
@@ -59,4 +60,12 @@ public interface DeliveryRemoteApi {
     @GetMapping("/queryAll")
     ResultVO<List<ProvinceAreaInfo>> queryAll() ;
 
+    /**
+     * 根据区域id查询省id 区域id
+     * @param areaId 区域id
+     * @return  省级信息
+     */
+    @GetMapping("/queryProvince")
+    @ApiOperation("根据区域id 查询省级信息")
+    AreaInfoResponse queryProvince(@RequestParam("areaId") @NotNull(message = "区域id不能为空") Long areaId);
 }

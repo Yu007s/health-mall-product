@@ -6,7 +6,6 @@ import com.drstrong.health.product.model.entity.productstore.AreaEntity;
 import com.drstrong.health.product.model.entity.store.DeliveryPriorityEntity;
 import com.drstrong.health.product.dao.store.StoreDeliveryPriorityMapper;
 import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
-import com.drstrong.health.product.model.enums.AreaTypeEnum;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.store.DeliveryPriRequest;
 import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
