@@ -6,10 +6,10 @@ import com.drstrong.health.product.model.entity.productstore.AreaEntity;
 import com.drstrong.health.product.model.entity.store.DeliveryPriorityEntity;
 import com.drstrong.health.product.dao.store.StoreDeliveryPriorityMapper;
 import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
-import com.drstrong.health.product.model.enums.AreaTypeEnum;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.store.DeliveryPriRequest;
 import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
+import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.store.SupplierResponse;
 import com.drstrong.health.product.model.response.store.delievy.DeliveryPriResponse;
@@ -48,14 +48,16 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
     @Transactional(readOnly = true)
     public DeliveryPriorityVO queryByStoreId(Long storeId) {
         LambdaQueryWrapper<DeliveryPriorityEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.select(DeliveryPriorityEntity::getPriorities,DeliveryPriorityEntity::getAreaId)
+        lambdaQueryWrapper.select(DeliveryPriorityEntity::getPriorities,DeliveryPriorityEntity::getAreaId,DeliveryPriorityEntity::getParentAreaId)
                 .eq(DeliveryPriorityEntity::getStoreId,storeId).eq(DeliveryPriorityEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         List<DeliveryPriorityEntity> list = super.list(lambdaQueryWrapper);
         List<DeliveryPriResponse> deliveries = new ArrayList<>(list.size());
         DeliveryPriorityVO deliveryPriorityVO = new DeliveryPriorityVO();
+        List<AreaInfoResponse> areaInfoResponses = areaService.queryProvinceAndCountry();
+        Long countryId = areaInfoResponses.get(areaInfoResponses.size()-1).getAreaId();
         for (DeliveryPriorityEntity deliveryPriorityEntity : list) {
             DeliveryPriResponse deliveryPriResponse = buildDeliveryResponse(deliveryPriorityEntity);
-            if (AreaTypeEnum.COUNTRY.ordinal() == deliveryPriorityEntity.getAreaId()) {
+            if (countryId.equals(deliveryPriorityEntity.getAreaId())) {
                 List<String> collect = deliveryPriResponse.getSupplierIds().stream().map(Object::toString).collect(Collectors.toList());
                 deliveryPriorityVO.setDefaultDeliveries(collect);
             }
@@ -83,7 +85,6 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
     @Override
     @Transactional(readOnly = true)
     public List<Long> queryByStoreIdAndArea(Long storeId, Long areaId) {
-        //根据区级查询市级id
         List<AreaEntity> areaInfoResponses = areaService.queryFatherAreaById(areaId);
         List<Long> collect = areaInfoResponses.stream().map(AreaEntity::getId).collect(Collectors.toList());
         LambdaQueryWrapper<DeliveryPriorityEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -124,8 +125,10 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
         DeliveryPriorityEntity one = getOne(lambdaQueryWrapper);
         List<Long> defaultIds = saveDeliveryRequest.getDefaultDelPriority();
         DeliveryPriRequest defaultDelPriority = new DeliveryPriRequest();
-        //
-        defaultDelPriority.setAreaId((long)AreaTypeEnum.COUNTRY.ordinal());
+        //默认配送优先级设置
+        List<Long> defaultArea = new ArrayList<>(1);
+        defaultArea.add(1L);
+        defaultDelPriority.setAreaId(defaultArea);
         defaultDelPriority.setSupplierIds(defaultIds);
         List<DeliveryPriRequest> deliveryPriorities = saveDeliveryRequest.getDeliveryPriorities() == null ? new ArrayList<>() : saveDeliveryRequest.getDeliveryPriorities();
         deliveryPriorities.add(defaultDelPriority);
@@ -133,15 +136,16 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
             DeliveryPriorityEntity deliveryPriorityEntity = new DeliveryPriorityEntity();
             deliveryPriorityEntity.setStoreId(storeId);
             deliveryPriorityEntity.setCreatedBy(userId);
-            deliveryPriorityEntity.setAreaId(deliveryPriRequest.getAreaId());
-            List<Long> supplierIds = deliveryPriRequest.getSupplierIds();
-            StringBuilder stringBuilder = new StringBuilder();
-            supplierIds.forEach(id -> stringBuilder.append(id).append(","));
-            deliveryPriorityEntity.setPriorities(stringBuilder.toString());
-            if (one == null) {
-                deliveryPriorityEntity.setCreatedBy(userId);
+            deliveryPriorityEntity.setChangedBy(userId);
+            //前端返回值带省级id  最后一个才是市级id
+            List<Long> areaIds = deliveryPriRequest.getAreaId();
+            if (areaIds.size() > 1) {
+                deliveryPriorityEntity.setParentAreaId(areaIds.get(0));
             }
-            deliveryPriorityEntity.setCreatedBy(userId);
+            deliveryPriorityEntity.setAreaId(areaIds.get(areaIds.size()-1));
+            List<Long> supplierIds = deliveryPriRequest.getSupplierIds();
+            String priorities = supplierIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+            deliveryPriorityEntity.setPriorities(priorities);
             return deliveryPriorityEntity;
         }).collect(Collectors.toList());
         if (one == null) {
@@ -149,25 +153,29 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
             saveBatch(collect);
         }
         else{
+            //先删除先前的优先级设置
+            LambdaUpdateWrapper<DeliveryPriorityEntity> deleteWrapper = new LambdaUpdateWrapper<>();
+            deleteWrapper.eq(DeliveryPriorityEntity::getStoreId,storeId).
+                    eq(DeliveryPriorityEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode()).
+                    set(DeliveryPriorityEntity::getDelFlag,DelFlagEnum.IS_DELETED.getCode());
+            update(deleteWrapper);
             //编辑配送优先级
-            collect.forEach( deliveryPriorityEntity -> {
-                LambdaUpdateWrapper<DeliveryPriorityEntity> updateWrapper = new LambdaUpdateWrapper<>();
-                updateWrapper.eq(DeliveryPriorityEntity::getStoreId,storeId).
-                        eq(DeliveryPriorityEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode()).
-                        eq(DeliveryPriorityEntity::getAreaId,deliveryPriorityEntity.getAreaId());
-                update(deliveryPriorityEntity,updateWrapper);
-            });
+            saveBatch(collect);
         }
     }
 
     private DeliveryPriResponse buildDeliveryResponse(DeliveryPriorityEntity deliveryPriorityEntity){
         DeliveryPriResponse deliveryPriResponse = new DeliveryPriResponse();
-        deliveryPriResponse.setAreaId(deliveryPriorityEntity.getAreaId().toString());
+        List<String> areaIds = new ArrayList<>();
+        if (deliveryPriorityEntity.getParentAreaId() != -1) {
+            areaIds.add(deliveryPriorityEntity.getParentAreaId().toString());
+        }
+        areaIds.add(deliveryPriorityEntity.getAreaId().toString());
+        deliveryPriResponse.setAreaId(areaIds);
         String priorities = deliveryPriorityEntity.getPriorities();
         String[] split = priorities.split(",");
         List<String> suppliers = Arrays.asList(split);
         deliveryPriResponse.setSupplierIds(suppliers);
-        deliveryPriResponse.setAreaId(deliveryPriorityEntity.getAreaId().toString());
         return deliveryPriResponse;
     }
 }

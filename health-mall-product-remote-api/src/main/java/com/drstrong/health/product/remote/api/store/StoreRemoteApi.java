@@ -2,7 +2,6 @@ package com.drstrong.health.product.remote.api.store;
 
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
-import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreAddResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;

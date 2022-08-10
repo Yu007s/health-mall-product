@@ -86,15 +86,39 @@ public class AreaServiceImpl implements AreaService {
 
     @Override
     public List<AreaEntity> queryFatherAreaById(Long areaId) {
-        LambdaQueryWrapper<AreaEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(AreaEntity::getId, areaId).eq(AreaEntity::getAvailable, 1);
-        AreaEntity areaEntity = areaMapper.selectOne(lambdaQueryWrapper);
-        Long queryId = areaId;
-        //如果是区级id  则转换为市级查询  否则直接查询
-        if (areaEntity.getType() == AreaTypeEnum.DISTRICT.ordinal()) {
-            queryId = (long)areaEntity.getParentId();
+        return areaMapper.queryFatherAreaById(areaId);
+    }
+
+    @Override
+    public AreaInfoResponse queryProvinceByAreaId(Long areaId) {
+        List<AreaEntity> areaEntities = areaMapper.queryFatherAreaById(areaId);
+        AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
+        for (AreaEntity areaEntity : areaEntities) {
+            if (areaEntity.getType() == AreaTypeEnum.PROVINCE.ordinal()) {
+                 areaInfoResponse.setAreaId(areaEntity.getId());
+                 return areaInfoResponse;
+            }
         }
-        return areaMapper.queryFatherAreaById(queryId);
+        return areaInfoResponse;
+    }
+
+    @Override
+    public List<AreaInfoResponse> queryProvinceAndCountry() {
+        List<AreaInfoResponse> areaInfoResponses = new ArrayList<>();
+        List<AreaEntity> areaEntities = areaMapper.queryProvinceAndCountry();
+        AreaInfoResponse country = new AreaInfoResponse();
+        for (AreaEntity areaEntity : areaEntities) {
+            if (areaEntity.getType() == AreaTypeEnum.COUNTRY.ordinal()) {
+                country.setAreaId(areaEntity.getId());
+            } else if (areaEntity.getType() == AreaTypeEnum.PROVINCE.ordinal()) {
+                AreaInfoResponse areaInfoResponse = new AreaInfoResponse();
+                areaInfoResponse.setAreaId(areaEntity.getId());
+                areaInfoResponses.add(areaInfoResponse);
+            }
+        }
+        areaInfoResponses.add(country);
+        return areaInfoResponses;
+
     }
 
 

@@ -1,6 +1,7 @@
 package com.drstrong.health.product.controller.store;
 
 import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
+import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.delievy.DeliveryPriResponse;
@@ -46,5 +47,10 @@ public class DeliveryController implements DeliveryRemoteApi {
     public ResultVO<List<ProvinceAreaInfo>> queryAll() {
         List<ProvinceAreaInfo> lists = areaService.queryAll();
         return ResultVO.success(lists);
+    }
+
+    @Override
+    public AreaInfoResponse queryProvince(Long areaId) {
+        return areaService.queryProvinceByAreaId(areaId);
     }
 }
