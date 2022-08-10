@@ -57,4 +57,14 @@ public interface ChineseRemoteFacade {
 	 * @date 2022/8/8 19:53
 	 */
 	List<AgencyStoreVO> listStoreByAgencyIds(Set<Long> agencyIds);
+
+	/**
+	 * 根据店铺 id 获取 互联网医院 id
+	 *
+	 * @param storeIds 店铺 id
+	 * @return 互联网医院 id 和店铺 id 信息
+	 * @author liuqiuyi
+	 * @date 2022/8/10 16:05
+	 */
+	List<AgencyStoreVO> listAgencyByStoreIds(Set<Long> storeIds);
 }

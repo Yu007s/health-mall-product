@@ -52,4 +52,9 @@ public class ChineseRemoteController implements ChineseRemoteApi {
 	public ResultVO<List<AgencyStoreVO>> listStoreByAgencyIds(Set<Long> agencyIds) {
 		return ResultVO.success(chineseRemoteFacade.listStoreByAgencyIds(agencyIds));
 	}
+
+	@Override
+	public ResultVO<List<AgencyStoreVO>> listAgencyByStoreIds(Set<Long> storeIds) {
+		return ResultVO.success(chineseRemoteFacade.listAgencyByStoreIds(storeIds));
+	}
 }

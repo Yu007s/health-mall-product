@@ -265,6 +265,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         }
         LambdaQueryWrapper<StoreEntity> queryWrapper = Wrappers.<StoreEntity>lambdaQuery()
                 .eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .eq(StoreEntity::getStoreType, StoreTypeEnum.INT_HOSPITAL.getCode())
                 .in(StoreEntity::getAgencyId, agencyIds);
         return list(queryWrapper);
     }

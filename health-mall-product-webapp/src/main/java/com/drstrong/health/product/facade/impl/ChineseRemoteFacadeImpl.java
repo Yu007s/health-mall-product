@@ -205,16 +205,35 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 	 */
 	@Override
 	public List<AgencyStoreVO> listStoreByAgencyIds(Set<Long> agencyIds) {
-		List<StoreEntity> storeEntityList = storeService.listByIds(agencyIds);
+		List<StoreEntity> storeEntityList = storeService.getStoreByAgencyIds(agencyIds);
+		return buildAgencyStoreVoList(storeEntityList);
+	}
+
+	private List<AgencyStoreVO> buildAgencyStoreVoList(List<StoreEntity> storeEntityList) {
 		List<AgencyStoreVO> agencyStoreVOList = Lists.newArrayListWithCapacity(storeEntityList.size());
 		storeEntityList.forEach(storeEntity -> {
 			AgencyStoreVO agencyStoreVO = new AgencyStoreVO();
 			agencyStoreVO.setStoreId(storeEntity.getId());
 			agencyStoreVO.setAgencyId(storeEntity.getAgencyId());
 			agencyStoreVO.setStoreName(storeEntity.getStoreName());
+			agencyStoreVO.setStoreType(storeEntity.getStoreType());
 			agencyStoreVOList.add(agencyStoreVO);
 		});
 		return agencyStoreVOList;
+	}
+
+	/**
+	 * 根据店铺 id 获取 互联网医院 id
+	 *
+	 * @param storeIds 店铺 id
+	 * @return 互联网医院 id 和店铺 id 信息
+	 * @author liuqiuyi
+	 * @date 2022/8/10 16:05
+	 */
+	@Override
+	public List<AgencyStoreVO> listAgencyByStoreIds(Set<Long> storeIds) {
+		List<StoreEntity> storeEntityList = storeService.listByIds(storeIds);
+		return buildAgencyStoreVoList(storeEntityList);
 	}
 
 	private List<ChineseSkuInfoExtendVO> buildChineseSkuExtendVOList(String storeName, List<ChineseSkuInfoEntity> skuInfoEntityList,

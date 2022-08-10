@@ -23,4 +23,7 @@ public class AgencyStoreVO implements Serializable {
 
 	@ApiModelProperty("店铺名称")
 	private String storeName;
+
+	@ApiModelProperty("店铺类型：0-互联网医院 1-其它")
+	private Integer storeType;
 }
