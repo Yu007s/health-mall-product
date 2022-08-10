@@ -329,7 +329,7 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
      */
     @Override
     public Page<SupplierChineseSkuDTO> pageSupplierChineseManagerSku(ChineseManagerSkuRequest queryParam) {
-        Page<ChineseSkuInfoEntity> entityPage = new Page<>(queryParam.getPageNo(), queryParam.getPageSize());
+        Page<SupplierChineseSkuDTO> entityPage = new Page<>(queryParam.getPageNo(), queryParam.getPageSize());
         return chineseSkuInfoMapper.pageSupplierChineseManagerSku(entityPage, queryParam);
     }
 

@@ -20,10 +20,7 @@ import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuReques
 import com.drstrong.health.product.model.request.chinese.StoreDataInitializeRequest;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
-import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
-import com.drstrong.health.product.model.response.chinese.SupplierBaseInfoVO;
-import com.drstrong.health.product.model.response.chinese.SupplierChineseManagerSkuVO;
+import com.drstrong.health.product.model.response.chinese.*;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
@@ -143,7 +140,29 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         return buildChineseManagerSkuResponse(skuInfoEntityList, skuCodeSupplierIdsMap, storeIdNameMap, supplierIdNameMap);
     }
 
-    /**
+	/**
+	 * 根据关键字搜索中药基础信息
+	 *
+	 * @param keyword 查询关键字
+	 * @return 中药基础信息
+	 * @author liuqiuyi
+	 * @date 2022/8/10 14:28
+	 */
+	@Override
+	public List<ChineseMedicineResponse> likeQueryChineseMedicine(String keyword) {
+		List<ChineseMedicineEntity> chineseMedicineEntityList = chineseMedicineService.likeQueryByKeyword(keyword);
+		List<ChineseMedicineResponse> responseList = Lists.newArrayListWithCapacity(chineseMedicineEntityList.size());
+		chineseMedicineEntityList.forEach(chineseMedicineEntity -> {
+			ChineseMedicineResponse medicineResponse = new ChineseMedicineResponse();
+			medicineResponse.setMedicineId(chineseMedicineEntity.getId());
+			medicineResponse.setName(chineseMedicineEntity.getMedicineName());
+			medicineResponse.setMedicineCode(chineseMedicineEntity.getMedicineCode());
+			responseList.add(medicineResponse);
+		});
+		return responseList;
+	}
+
+	/**
      * 保存sku信息
      *
      * @param saveOrUpdateSkuVO 接口入参
