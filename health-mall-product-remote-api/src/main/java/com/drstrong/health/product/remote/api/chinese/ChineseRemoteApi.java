@@ -43,4 +43,8 @@ public interface ChineseRemoteApi {
 	@ApiOperation("根据互联网医院 id 获取店铺 id")
 	@PostMapping("/store/agencyId")
 	ResultVO<List<AgencyStoreVO>> listStoreByAgencyIds(@RequestBody Set<Long> agencyIds);
+
+	@ApiOperation("根据店铺 id 获取互联网医院 id")
+	@PostMapping("/agency/storeId")
+	ResultVO<List<AgencyStoreVO>> listAgencyByStoreIds(@RequestBody Set<Long> storeIds);
 }
