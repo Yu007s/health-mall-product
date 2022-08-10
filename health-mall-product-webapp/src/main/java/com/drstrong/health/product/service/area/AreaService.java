@@ -34,4 +34,19 @@ public interface AreaService {
      */
     List<AreaEntity> queryFatherAreaById(Long areaId);
 
+    /**
+     * 根据区域id  返回省id
+     * @param areaId 区域id
+     * @return  省份信息
+     */
+    AreaInfoResponse queryProvinceByAreaId(Long areaId);
+
+    /**
+     * 查询所有的省份信息以及国家id
+     * 国家id在列表最后
+     * @return 查询所得
+     */
+
+    List<AreaInfoResponse> queryProvinceAndCountry();
+
 }

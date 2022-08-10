@@ -21,5 +21,11 @@ public interface AreaMapper extends BaseMapper<AreaEntity> {
      * @return 查询所得区域
      */
     List<AreaEntity> queryFatherAreaById(Long areaId);
+
+    /**
+     * 查询所有省级 国家信息
+     * @return 所有省级 国家信息
+     */
+    List<AreaEntity> queryProvinceAndCountry();
     
 }

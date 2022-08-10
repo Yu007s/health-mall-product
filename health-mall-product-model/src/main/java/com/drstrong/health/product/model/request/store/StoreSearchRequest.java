@@ -25,7 +25,7 @@ public class StoreSearchRequest implements Serializable {
     @ApiModelProperty("关联互联网医院的id")
     private Long agencyId;
 
-    @ApiModelProperty("店铺类型")
+    @ApiModelProperty("店铺类型名称")
     private String storeTypeName;
 
 }

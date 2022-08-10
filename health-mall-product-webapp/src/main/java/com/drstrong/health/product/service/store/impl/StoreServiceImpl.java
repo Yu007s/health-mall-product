@@ -111,8 +111,9 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
 
 
     @Override
-    public List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, Long storeType) {
+    public List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, String storeTypeName) {
         LambdaQueryWrapper<StoreEntity> storeEntityQueryWrapper = new LambdaQueryWrapper<>();
+        Integer storeType = StoreTypeEnum.nameToCode(storeTypeName);
         storeEntityQueryWrapper.select(StoreEntity::getStoreName,StoreEntity::getId,StoreEntity::getStoreType,StoreEntity::getAgencyId)
                 .eq(storeId != null, StoreEntity::getId, storeId)
                 .like(StringUtils.isNotBlank(storeName), StoreEntity::getStoreName, storeName)

@@ -3,18 +3,19 @@ package com.drstrong.health.product.controller.store;
 import com.drstrong.health.product.dao.store.StoreLinkSupplierMapper;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
-import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
 import com.drstrong.health.product.model.response.result.ResultVO;
-import com.drstrong.health.product.model.response.store.StoreQueryResponse;
 import com.drstrong.health.product.model.response.store.StoreAddResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
+import com.drstrong.health.product.model.response.store.StoreQueryResponse;
 import com.drstrong.health.product.remote.api.store.StoreFacade;
 import com.drstrong.health.product.remote.api.store.StoreRemoteApi;
-import com.drstrong.health.product.service.area.AreaService;
 import com.drstrong.health.product.service.store.StoreService;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -53,7 +54,7 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     @Override
     public ResultVO<List<StoreInfoResponse>> queryStore(@RequestBody StoreSearchRequest storeSearchRequest) {
         List<StoreInfoResponse> query = storeService.query(storeSearchRequest.getStoreId(),storeSearchRequest.getStoreName(),
-                storeSearchRequest.getAgencyId(), storeSearchRequest.getAgencyId());
+                storeSearchRequest.getAgencyId(), storeSearchRequest.getStoreTypeName());
         return ResultVO.success(query);
     }
 

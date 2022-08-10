@@ -17,7 +17,7 @@ public class DeliveryPriRequest implements Serializable {
     private static final long serialVersionUID = -1564854894456645741L;
 
     @ApiModelProperty("区域id")
-    private Long areaId;
+    private List<Long> areaId;
 
     @ApiModelProperty("优先级药店供应商id列表  已排好序")
     private List<Long> supplierIds;
