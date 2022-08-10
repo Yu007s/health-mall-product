@@ -28,11 +28,11 @@ public interface AreaService {
     List<ProvinceAreaInfo> queryAll();
 
     /**
-     * 根据区域id 查询其父级区域和自身、全国
-     * @param areaId 区域id
+     * 根据区域id 查询其父级区域和自身、全国 id  注意返回是按照区域大小返回的  先小区域  后大区域  没有区级id
+     * @param areaId 区域id列表
      * @return  查询所得区域信息
      */
-    List<AreaEntity> queryFatherAreaById(Long areaId);
+    List<Long> queryFatherAreaById(Long areaId);
 
     /**
      * 根据区域id  返回省id
@@ -42,11 +42,9 @@ public interface AreaService {
     AreaInfoResponse queryProvinceByAreaId(Long areaId);
 
     /**
-     * 查询所有的省份信息以及国家id
-     * 国家id在列表最后
-     * @return 查询所得
+     * 查询国家id
+     * @return 查询所得国家id
      */
-
-    List<AreaInfoResponse> queryProvinceAndCountry();
+    AreaInfoResponse queryCountryId();
 
 }

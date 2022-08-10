@@ -41,7 +41,6 @@ public interface StoreDeliveryPriorityService extends IService<DeliveryPriorityE
      * @param saveDeliveryRequest 店铺配送优先级相关数据
      * @param userId 用户id
      */
-
     void save(SaveDeliveryRequest saveDeliveryRequest, Long userId);
 
 
