@@ -76,9 +76,6 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
         return ResultVO.success(storeQueryResponse);
     }
 
-
-
-
     @Override
     public List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam("supplierId") @NotBlank(message = "供应商id不能为空") Long supplierId) {
         return storeLinkSupplierMapper.findStoreBySupplierId(supplierId);
