@@ -12,6 +12,7 @@ import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
 import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
+import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoExtendVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.product.ProductInfoVO;
@@ -234,6 +235,28 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 	public List<AgencyStoreVO> listAgencyByStoreIds(Set<Long> storeIds) {
 		List<StoreEntity> storeEntityList = storeService.listByIds(storeIds);
 		return buildAgencyStoreVoList(storeEntityList);
+	}
+
+	/**
+	 * 校验是否有上架的 sku
+	 * <p> 用于供应商那边删除中药材时进行校验,如果删除的中药材关联了上架的 sku,则不允许删除 </>
+	 *
+	 * @param medicineCodes 药材 code
+	 * @author liuqiuyi
+	 * @date 2022/8/11 17:35
+	 */
+	@Override
+	public List<ChineseMedicineInfoResponse> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes) {
+		Set<String> upMedicineCodes = chineseSkuInfoService.checkHasUpChineseByMedicineCodes(medicineCodes);
+		List<ChineseMedicineEntity> chineseMedicineEntityList = chineseMedicineService.getByMedicineCode(upMedicineCodes);
+		List<ChineseMedicineInfoResponse> infoResponseList = Lists.newArrayListWithCapacity(chineseMedicineEntityList.size());
+		chineseMedicineEntityList.forEach(chineseMedicineEntity -> {
+			ChineseMedicineInfoResponse medicineInfoResponse = new ChineseMedicineInfoResponse();
+			medicineInfoResponse.setMedicineCode(chineseMedicineEntity.getMedicineCode());
+			medicineInfoResponse.setMedicineName(chineseMedicineEntity.getMedicineName());
+			infoResponseList.add(medicineInfoResponse);
+		});
+		return infoResponseList;
 	}
 
 	private List<ChineseSkuInfoExtendVO> buildChineseSkuExtendVOList(String storeName, List<ChineseSkuInfoEntity> skuInfoEntityList,

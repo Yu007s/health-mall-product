@@ -4,6 +4,7 @@ import com.drstrong.health.product.facade.ChineseRemoteFacade;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
 import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
+import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.product.ProductInfoVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -56,5 +57,10 @@ public class ChineseRemoteController implements ChineseRemoteApi {
 	@Override
 	public ResultVO<List<AgencyStoreVO>> listAgencyByStoreIds(Set<Long> storeIds) {
 		return ResultVO.success(chineseRemoteFacade.listAgencyByStoreIds(storeIds));
+	}
+
+	@Override
+	public ResultVO<List<ChineseMedicineInfoResponse>> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes) {
+		return ResultVO.success(chineseRemoteFacade.checkHasUpChineseByMedicineCodes(medicineCodes));
 	}
 }

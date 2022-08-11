@@ -57,6 +57,7 @@
         <if test="queryParam.storeId != null and queryParam.storeId != ''">
             and sku.store_id = #{queryParam.storeId}
         </if>
+        order by sku.id desc
     </sql>
 
     <select id="pageQuerySkuByRequest"
@@ -103,6 +104,7 @@
         <if test="queryParam.storeId != null and queryParam.storeId != ''">
             and sku.store_id = #{queryParam.storeId}
         </if>
+        order by sku.id desc
     </sql>
     <select id="pageSupplierChineseManagerSku"
             resultType="com.drstrong.health.product.model.dto.SupplierChineseSkuDTO">

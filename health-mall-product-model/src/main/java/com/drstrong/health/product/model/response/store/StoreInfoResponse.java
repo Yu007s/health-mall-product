@@ -17,7 +17,7 @@ public class StoreInfoResponse implements Serializable {
     private static final long serialVersionUID = 1518948751242657856L;
 
     @ApiModelProperty("店铺主键id")
-    private String id;
+    private Long id;
 
     @ApiModelProperty("店铺名称")
     private String storeName;
