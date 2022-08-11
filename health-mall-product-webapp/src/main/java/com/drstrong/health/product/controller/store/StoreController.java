@@ -1,6 +1,7 @@
 package com.drstrong.health.product.controller.store;
 
 import com.drstrong.health.product.dao.store.StoreLinkSupplierMapper;
+import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -11,6 +12,7 @@ import com.drstrong.health.product.model.response.store.StoreQueryResponse;
 import com.drstrong.health.product.remote.api.store.StoreFacade;
 import com.drstrong.health.product.remote.api.store.StoreRemoteApi;
 import com.drstrong.health.product.service.store.StoreService;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +23,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 备忘  店铺id  与名字  对应  存在redis中
@@ -81,4 +84,16 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
         return storeLinkSupplierMapper.findStoreBySupplierId(supplierId);
     }
 
+    @Override
+    public ResultVO<List<StoreInfoResponse>> queryByIds(Set<Long> storeIds) {
+        List<StoreEntity> storeEntityList = storeService.listByIds(storeIds);
+        List<StoreInfoResponse> responseList = Lists.newArrayListWithCapacity(storeEntityList.size());
+        storeEntityList.forEach(storeEntity -> {
+            StoreInfoResponse storeInfoResponse = new StoreInfoResponse();
+            storeInfoResponse.setId(storeEntity.getId());
+            storeInfoResponse.setStoreName(storeEntity.getStoreName());
+            responseList.add(storeInfoResponse);
+        });
+        return ResultVO.success(responseList);
+    }
 }

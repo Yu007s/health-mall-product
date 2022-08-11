@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author xieYueFeng
@@ -76,5 +77,7 @@ public interface StoreRemoteApi {
     ResultVO<StoreQueryResponse> queryStoreInfo() ;
 
 
-
+    @ApiOperation("根据店铺 id 集合查询店铺基本信息")
+    @PostMapping("/query/ids")
+    ResultVO<List<StoreInfoResponse>> queryByIds(@RequestBody Set<Long> storeIds);
 }
