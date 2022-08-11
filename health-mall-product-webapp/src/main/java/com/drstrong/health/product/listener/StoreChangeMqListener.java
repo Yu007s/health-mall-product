@@ -27,6 +27,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(prefix = "rocketMq", name = "enable", havingValue = "true", matchIfMissing = true)
 @RocketMQMessageListener(topic = "${store.change.topic}", selectorExpression = "${store.change.tag}", consumerGroup = "${store.change.consumer.group}")
 public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<StoreChangeEvent>> {
 
