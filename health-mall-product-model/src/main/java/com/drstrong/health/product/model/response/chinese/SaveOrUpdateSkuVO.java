@@ -6,10 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
@@ -43,8 +40,8 @@ public class SaveOrUpdateSkuVO implements Serializable{
 
     @ApiModelProperty("价格/克,单位：元")
     @NotNull(message = "价格不能为空")
-    @Min(value = 0, message = "价格不能小于0")
-    @Max(value = 10000, message = "价格不能大于9999")
+    @DecimalMin(value = "0.00", message = "价格不能小于0")
+    @DecimalMax(value = "9999.99", message = "价格不能大于9999.99")
     private BigDecimal price;
 
     @ApiModelProperty("店铺id")

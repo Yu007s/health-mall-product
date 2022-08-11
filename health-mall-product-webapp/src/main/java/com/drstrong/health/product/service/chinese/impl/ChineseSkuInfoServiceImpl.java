@@ -2,6 +2,7 @@ package com.drstrong.health.product.service.chinese.impl;
 
 import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.dao.chinese.ChineseSkuInfoMapper;
@@ -26,6 +27,7 @@ import com.drstrong.health.product.service.product.SkuInfoService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,7 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -291,6 +294,28 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
                 .last("limit 1");
 
         return Objects.nonNull(getOne(queryWrapper));
+    }
+
+    /**
+     * 校验是否有上架的 sku
+     * <p> 用于供应商那边删除中药材时进行校验,如果删除的中药材关联了上架的 sku,则不允许删除 </>
+     *
+     * @param medicineCodes 药材 code
+     * @return 已有上架sku 的  medicineCodes
+     * @author liuqiuyi
+     * @date 2022/8/11 17:18
+     */
+    @Override
+    public Set<String> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes) {
+        if (CollectionUtils.isEmpty(medicineCodes)) {
+            return Sets.newHashSet();
+        }
+        List<ChineseSkuInfoEntity> chineseSkuInfoEntityList = list(new QueryWrapper<ChineseSkuInfoEntity>().select("DISTINCT medicine_code").lambda()
+                .select(ChineseSkuInfoEntity::getMedicineCode)
+                .eq(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(ChineseSkuInfoEntity::getMedicineCode, medicineCodes)
+                .eq(ChineseSkuInfoEntity::getSkuStatus, ProductStateEnum.HAS_PUT.getCode()));
+        return chineseSkuInfoEntityList.stream().map(ChineseSkuInfoEntity::getMedicineCode).collect(Collectors.toSet());
     }
 
     /**

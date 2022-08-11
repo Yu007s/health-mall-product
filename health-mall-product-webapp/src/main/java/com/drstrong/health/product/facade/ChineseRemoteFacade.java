@@ -3,6 +3,7 @@ package com.drstrong.health.product.facade;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
 import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
+import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.product.ProductInfoVO;
 
@@ -67,4 +68,13 @@ public interface ChineseRemoteFacade {
 	 * @date 2022/8/10 16:05
 	 */
 	List<AgencyStoreVO> listAgencyByStoreIds(Set<Long> storeIds);
+
+	/**
+	 * 校验是否有上架的 sku
+	 * <p> 用于供应商那边删除中药材时进行校验,如果删除的中药材关联了上架的 sku,则不允许删除 </>
+	 *
+	 * @author liuqiuyi
+	 * @date 2022/8/11 17:35
+	 */
+	List<ChineseMedicineInfoResponse> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes);
 }

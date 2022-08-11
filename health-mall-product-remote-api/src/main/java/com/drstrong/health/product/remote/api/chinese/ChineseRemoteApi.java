@@ -3,6 +3,7 @@ package com.drstrong.health.product.remote.api.chinese;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
 import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
+import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.product.ProductInfoVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Set;
 
@@ -47,4 +50,8 @@ public interface ChineseRemoteApi {
 	@ApiOperation("根据店铺 id 获取互联网医院 id")
 	@PostMapping("/agency/storeId")
 	ResultVO<List<AgencyStoreVO>> listAgencyByStoreIds(@RequestBody Set<Long> storeIds);
+
+	@ApiOperation("根据药材编码校验是否有上架的sku,用于供应商那边删除中药材时进行校验,如果删除的中药材关联了上架的 sku,则不允许删除")
+	@PostMapping("/check/up/chinese")
+	ResultVO<List<ChineseMedicineInfoResponse>> checkHasUpChineseByMedicineCodes(@RequestBody @NotNull(message = "参数不能为空") @Size(max = 200, message = "入参不能超过200") Set<String> medicineCodes);
 }
