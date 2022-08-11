@@ -57,8 +57,8 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
         for (DeliveryPriorityEntity deliveryPriorityEntity : list) {
             DeliveryPriResponse deliveryPriResponse = buildDeliveryResponse(deliveryPriorityEntity);
             if (countryId.equals(deliveryPriorityEntity.getAreaId())) {
-                List<String> collect = deliveryPriResponse.getSupplierIds().stream().map(Object::toString).collect(Collectors.toList());
-                deliveryPriorityVO.setDefaultDeliveries(collect);
+                List<Long> supplierIds = deliveryPriResponse.getSupplierIds();
+                deliveryPriorityVO.setDefaultDeliveries(supplierIds);
             } else {
                 deliveries.add(deliveryPriResponse);
             }
@@ -67,7 +67,7 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
         List<StoreLinkSupplierEntity> linkSupplierEntities = storeLinkSupplierService.queryByStoreId(storeId);
         List<SupplierResponse> collect = linkSupplierEntities.stream().map(storeLinkSupplierEntity -> {
             SupplierResponse supplierResponse = new SupplierResponse();
-            supplierResponse.setSupplierId(storeLinkSupplierEntity.getSupplierId().toString());
+            supplierResponse.setSupplierId(storeLinkSupplierEntity.getSupplierId());
             return supplierResponse;
         }).collect(Collectors.toList());
         deliveryPriorityVO.setSupplierResponses(collect);
@@ -182,7 +182,7 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
         deliveryPriResponse.setAreaId(areaIds);
         String priorities = deliveryPriorityEntity.getPriorities();
         String[] split = priorities.split(",");
-        List<String> suppliers = Arrays.asList(split);
+        List<Long> suppliers = Arrays.stream(split).map(Long::valueOf).collect(Collectors.toList());
         deliveryPriResponse.setSupplierIds(suppliers);
         return deliveryPriResponse;
     }

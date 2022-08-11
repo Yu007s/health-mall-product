@@ -250,8 +250,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
             storeInfoEditResponse.setAgencyId(agencyId.toString());
         }
         storeInfoEditResponse.setStoreName(storeEntity.getStoreName());
-        List<String> collect = suppliers.stream().map(Object::toString).collect(Collectors.toList());
-        storeInfoEditResponse.setSupplierIds(collect);
+        storeInfoEditResponse.setSupplierIds(suppliers);
         return storeInfoEditResponse;
     }
 

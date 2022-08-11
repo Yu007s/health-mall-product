@@ -20,5 +20,5 @@ public class DeliveryPriResponse implements Serializable {
     private List<String> areaId;
 
     @ApiModelProperty("优先级药店供应商id列表  已排好序")
-    private List<String> supplierIds;
+    private List<Long> supplierIds;
 }
