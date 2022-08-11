@@ -3,7 +3,6 @@ package com.drstrong.health.product.remote.api.store;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.result.ResultVO;
-import com.drstrong.health.product.model.response.store.StoreAddResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreQueryResponse;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -55,23 +54,15 @@ public interface StoreRemoteApi {
      */
     @ApiOperation("获取店铺详细信息")
     @GetMapping("/queryById")
-    ResultVO<StoreInfoEditResponse> queryStoreDetail(@RequestParam("storeId") @NotBlank(message = "店铺id不能为空") Long storeId) ;
+    ResultVO<StoreInfoEditResponse> queryStoreDetail(@RequestParam("storeId") @NotNull(message = "店铺id不能为空") Long storeId) ;
+
 
     /**
-     * 店铺新增页面  查询所有需要信息
-     *
-     * @return 所有需要信息的集合
-     */
-    @ApiOperation("增加店铺时查找相应的信息")
-    @GetMapping("/queryAddInfo")
-    ResultVO<StoreAddResponse> queryAddStoreInfo() ;
-
-    /**
-     * 店铺查询页面  查询所有需要信息
+     * 店铺查询关联信息  查询所有需要信息
      *
      * @return 互联网医院名字集合  店铺类型名字集合
      */
-    @ApiOperation("店铺时搜索页面返回必要的信息")
+    @ApiOperation("返回店铺关联的必要信息")
     @GetMapping("/queryInfo")
     ResultVO<StoreQueryResponse> queryStoreInfo() ;
 

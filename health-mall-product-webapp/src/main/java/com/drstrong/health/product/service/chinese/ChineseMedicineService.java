@@ -26,10 +26,10 @@ public interface ChineseMedicineService {
 
 	/**
 	 *      * 查询中药材分页展示
-	 * @param medicineCode
-	 * @param medicineName
-	 * @param pageNo
-	 * @param pageSize
+	 * @param medicineCode 药材编码
+	 * @param medicineName 药材名字
+	 * @param pageNo 第几页
+	 * @param pageSize 每页大小
 	 * @return 查询所得列表
 	 */
     ChineseMedicineSearchVO queryPage(String medicineCode, String medicineName, Integer pageNo, Integer pageSize);

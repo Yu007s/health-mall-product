@@ -94,10 +94,9 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         List<String> conflictMedicineCodes = chineseMedicineVO.getConflictMedicineCodes();
         if (conflictMedicineCodes != null && conflictMedicineCodes.size() != 0) {
             ChineseMedicineConflictEntity chineseMedicineConflictEntity = new ChineseMedicineConflictEntity();
-            StringBuilder stringBuilder = new StringBuilder();
-            conflictMedicineCodes.forEach( conflictMedicineCode -> stringBuilder.append(conflictMedicineCode).append(","));
+            String collect = String.join(",", conflictMedicineCodes);
             chineseMedicineConflictEntity.setMedicineCode(medicineCode);
-            chineseMedicineConflictEntity.setMedicineConflictCodes(stringBuilder.toString());
+            chineseMedicineConflictEntity.setMedicineConflictCodes(collect);
             chineseMedicineConflictService.saveOrUpdate(chineseMedicineConflictEntity,userId);
         }
         return super.saveOrUpdate(chineseMedicineEntity);
@@ -176,9 +175,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         LambdaQueryWrapper<ChineseMedicineEntity> medicineWrapper = new LambdaQueryWrapper<>();
         medicineWrapper.select(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName,
                 ChineseMedicineEntity::getMedicineAlias, ChineseMedicineEntity::getMaxDosage);
-        medicineWrapper.and((wrapper) -> {
-            wrapper.in(ChineseMedicineEntity::getMedicineCode, conflictCodes);
-        });
+        medicineWrapper.and((wrapper) -> wrapper.in(ChineseMedicineEntity::getMedicineCode, conflictCodes));
         List<ChineseMedicineEntity> records;
         records = list(medicineWrapper);
         return buildChineseMedicineResponse(records);

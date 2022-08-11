@@ -19,9 +19,6 @@ import com.drstrong.health.product.service.store.AgencyService;
 import com.drstrong.health.product.service.store.StoreInvoiceService;
 import com.drstrong.health.product.service.store.StoreLinkSupplierService;
 import com.drstrong.health.product.service.store.StoreService;
-import com.drstrong.health.ware.model.response.SupplierInfoResponse;
-import com.drstrong.health.ware.model.result.ResultVO;
-import com.drstrong.health.ware.remote.api.SupplierManageRemoteApi;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -30,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -52,8 +46,6 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     @Resource
     StoreLinkSupplierService storeLinkSupplierService;
 
-    @Resource
-    SupplierManageRemoteApi supplierManageRemoteApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -196,54 +188,18 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         return storeEntity;
     }
 
-    @Override
-    public StoreAddResponse queryStoreAddInfo() {
-        //所有店铺类型
-        List<String> storeTypeNames = new ArrayList<>(StoreTypeEnum.values().length);
-        //所有互联网医院
-        List<StoreAddResponse.AgencyIdAndName> agencyIdAndNames = new ArrayList<>();
-        buildStoreConnectInfo(storeTypeNames,agencyIdAndNames);
-        //查询所有供应商
-        ResultVO<List<SupplierInfoResponse>> listResultVO = supplierManageRemoteApi.queryAll();
-        List<SupplierInfoResponse> supplierInfoList = listResultVO.getData();
-        List<SupplierResponse> collect = supplierInfoList == null ? null : supplierInfoList.stream().map(supplier -> {
-            Long supplierId = supplier.getSupplierId();
-            String supplierName = supplier.getSupplierName();
-            SupplierResponse supplierResponse = new SupplierResponse();
-            supplierResponse.setSupplierId(supplierId.toString());
-            supplierResponse.setSupplierName(supplierName);
-            return supplierResponse;
-        }).collect(Collectors.toList());
-        //测试代码  联调后取消
-        {
-            collect = new ArrayList<>();
-            SupplierResponse supplierResponse = new SupplierResponse();
-            supplierResponse.setSupplierId("3");
-            supplierResponse.setSupplierName("我是供应商3");
-            collect.add(supplierResponse);
-            SupplierResponse supplierResponse1 = new SupplierResponse();
-            supplierResponse1.setSupplierId("1");
-            supplierResponse1.setSupplierName("我是供应商1");
-            collect.add(supplierResponse1);
-            SupplierResponse supplierResponse2 = new SupplierResponse();
-            supplierResponse2.setSupplierId("2");
-            supplierResponse2.setSupplierName("我是供应商2");
-            collect.add(supplierResponse2);
-        }
-        StoreAddResponse storeAddResponse = new StoreAddResponse();
-        storeAddResponse.setStoreTypeNames(storeTypeNames);
-        storeAddResponse.setSuppliers(collect);
-        storeAddResponse.setAgencyIdAndNames(agencyIdAndNames);
-        return storeAddResponse;
-    }
 
     @Override
     public StoreQueryResponse queryStoreConInfo() {
         //所有店铺类型
-        List<String> storeTypeNames = new ArrayList<>(StoreTypeEnum.values().length);
+        List<StoreQueryResponse.AgencyIdAndName> agencyIdAndNames = new ArrayList<>();
+        List<String> storeTypeNames = Arrays.stream(StoreTypeEnum.values()).map(StoreTypeEnum::getValue).collect(Collectors.toList());
         //所有互联网医院
-        List<StoreAddResponse.AgencyIdAndName> agencyIdAndNames = new ArrayList<>();
-        buildStoreConnectInfo(storeTypeNames,agencyIdAndNames);
+        List<String> allName = agencyService.getAllName();
+        for (int i = 0; i < allName.size(); i++) {
+            StoreQueryResponse.AgencyIdAndName agencyIdAndName = new StoreQueryResponse.AgencyIdAndName(Long.valueOf(i+1).toString(), allName.get(i));
+            agencyIdAndNames.add(agencyIdAndName);
+        }
         StoreQueryResponse storeQueryResponse = new StoreQueryResponse();
         storeQueryResponse.setStoreTypeNames(storeTypeNames);
         storeQueryResponse.setAgencyIdAndNames(agencyIdAndNames);
@@ -270,16 +226,6 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         return list(queryWrapper);
     }
 
-    private void buildStoreConnectInfo(List<String> storeTypeNames, List<StoreAddResponse.AgencyIdAndName> agencyIdAndNames ){
-        for (StoreTypeEnum value : StoreTypeEnum.values()) {
-            storeTypeNames.add(value.getValue());
-        }
-        List<String> allName = agencyService.getAllName();
-        for (int i = 0; i < allName.size(); i++) {
-            StoreAddResponse.AgencyIdAndName agencyIdAndName = new StoreAddResponse.AgencyIdAndName((long) i + 1, allName.get(i));
-            agencyIdAndNames.add(agencyIdAndName);
-        }
-    }
 
     @Override
     @Transactional(readOnly = true)

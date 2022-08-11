@@ -2,7 +2,6 @@ package com.drstrong.health.product.service.store;
 
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
-import com.drstrong.health.product.model.response.store.StoreAddResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreQueryResponse;
@@ -78,11 +77,6 @@ public interface StoreService {
 	 */
 	StoreEntity getStoreByAgencyIdOrStoreId(Long agencyId, Long storeId);
 
-	/**
-	 * 店铺新增页面查询相关信息  互联网医院 店铺 供应商
-	 * @return StoreAddResponse
-	 */
-	 StoreAddResponse queryStoreAddInfo();
 
 	/**
 	 * 店铺查询页面返回相应信息

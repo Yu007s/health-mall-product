@@ -51,6 +51,7 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
         List<DeliveryPriorityEntity> list = super.list(lambdaQueryWrapper);
         List<DeliveryPriResponse> deliveries = new ArrayList<>(list.size());
         DeliveryPriorityVO deliveryPriorityVO = new DeliveryPriorityVO();
+        //查询国家区域id
         AreaInfoResponse areaInfoResponse = areaService.queryCountryId();
         Long countryId = areaInfoResponse.getAreaId();
         for (DeliveryPriorityEntity deliveryPriorityEntity : list) {
@@ -62,14 +63,11 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
                 deliveries.add(deliveryPriResponse);
             }
         }
-
         deliveryPriorityVO.setStoreId(storeId.toString());
         List<StoreLinkSupplierEntity> linkSupplierEntities = storeLinkSupplierService.queryByStoreId(storeId);
         List<SupplierResponse> collect = linkSupplierEntities.stream().map(storeLinkSupplierEntity -> {
             SupplierResponse supplierResponse = new SupplierResponse();
             supplierResponse.setSupplierId(storeLinkSupplierEntity.getSupplierId().toString());
-            //测试
-            supplierResponse.setSupplierName("供应商" + storeLinkSupplierEntity.getSupplierId());
             return supplierResponse;
         }).collect(Collectors.toList());
         deliveryPriorityVO.setSupplierResponses(collect);
@@ -107,7 +105,8 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
             return new ArrayList<>(0);
         }
         String[] split = priorities.split(",");
-        List<String> priStrings = Arrays.stream(split).filter(StringUtils::isNumeric).collect(Collectors.toList());
+        //这里-1是不配送的标志  写死在前端  即供应商id为-1  即不配送
+        List<String> priStrings = Arrays.stream(split).filter(StringUtils::isNumeric).filter(s -> !"-1".equals(s)).collect(Collectors.toList());
         return priStrings.stream().map(Long::valueOf).collect(Collectors.toList());
     }
 

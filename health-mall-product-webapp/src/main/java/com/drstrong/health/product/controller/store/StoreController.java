@@ -4,7 +4,6 @@ import com.drstrong.health.product.dao.store.StoreLinkSupplierMapper;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.result.ResultVO;
-import com.drstrong.health.product.model.response.store.StoreAddResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreQueryResponse;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -59,16 +58,11 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     }
 
     @Override
-    public ResultVO<StoreInfoEditResponse> queryStoreDetail(@RequestParam("storeId") @NotBlank(message = "店铺id不能为空") Long storeId) {
+    public ResultVO<StoreInfoEditResponse> queryStoreDetail(@RequestParam("storeId") @NotNull(message = "店铺id不能为空") Long storeId) {
         StoreInfoEditResponse storeInfoEditResponse = storeService.queryById(storeId);
         return ResultVO.success(storeInfoEditResponse);
     }
 
-    @Override
-    public ResultVO<StoreAddResponse> queryAddStoreInfo() {
-        StoreAddResponse storeAddResponse = storeService.queryStoreAddInfo();
-        return ResultVO.success(storeAddResponse);
-    }
 
     @Override
     public ResultVO<StoreQueryResponse> queryStoreInfo() {
@@ -77,7 +71,7 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     }
 
     @Override
-    public List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam("supplierId") @NotBlank(message = "供应商id不能为空") Long supplierId) {
+    public List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam("supplierId") @NotNull(message = "供应商id不能为空") Long supplierId) {
         return storeLinkSupplierMapper.findStoreBySupplierId(supplierId);
     }
 

@@ -1,7 +1,9 @@
 package com.drstrong.health.product.model.response.store;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -19,6 +21,14 @@ public class StoreQueryResponse  implements Serializable {
     private List<String> storeTypeNames;
 
     @ApiModelProperty("互联网医院的名字集合")
-    private List<StoreAddResponse.AgencyIdAndName> agencyIdAndNames;
+    private List<AgencyIdAndName> agencyIdAndNames;
 
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AgencyIdAndName implements Serializable {
+        private static final long serialVersionUID = -1265517096428941234L;
+        String id;
+        String name;
+    }
 }

@@ -4,7 +4,6 @@ import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
 import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.area.ProvinceAreaInfo;
 import com.drstrong.health.product.model.response.result.ResultVO;
-import com.drstrong.health.product.model.response.store.delievy.DeliveryPriResponse;
 import com.drstrong.health.product.model.response.store.delievy.DeliveryPriorityVO;
 import com.drstrong.health.product.remote.api.store.DeliveryRemoteApi;
 import com.drstrong.health.product.service.area.AreaService;
