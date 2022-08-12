@@ -11,14 +11,12 @@ import com.drstrong.health.product.model.entity.store.StoreInvoiceEntity;
 import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.StoreTypeEnum;
+import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.model.response.store.*;
-import com.drstrong.health.product.service.store.AgencyService;
-import com.drstrong.health.product.service.store.StoreInvoiceService;
-import com.drstrong.health.product.service.store.StoreLinkSupplierService;
-import com.drstrong.health.product.service.store.StoreService;
+import com.drstrong.health.product.service.store.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -40,12 +38,13 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     AgencyService agencyService;
     @Resource
     StoreInvoiceService storeInvoiceService;
-
     @Resource
     StoreInvoiceMapper storeInvoiceMapper;
     @Resource
     StoreLinkSupplierService storeLinkSupplierService;
 
+    @Resource
+    StoreDeliveryPriorityService storeDeliveryPriorityService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -78,6 +77,12 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
                 }
         );
         storeLinkSupplierService.saveBatch(storeLinkSuppliers);
+        //这里为店铺配送设置一个默认优先级
+        SaveDeliveryRequest saveDeliveryRequest = new SaveDeliveryRequest();
+        saveDeliveryRequest.setStoreId(storeId);
+        saveDeliveryRequest.setDefaultDelPriority(storeRequest.getSupplierIds());
+        saveDeliveryRequest.setDefaultDelPriority(saveDeliveryRequest.getDefaultDelPriority());
+        storeDeliveryPriorityService.save(saveDeliveryRequest,userId);
     }
 
     @Override
@@ -95,7 +100,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         storeEntity.setAgencyId(null);
         //更新店铺
         super.updateById(storeEntity);
-        //更新店铺发票  关联供应商，
+        //更新店铺发票
         LambdaQueryWrapper<StoreInvoiceEntity> lambdaQueryWrapper =  new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(StoreInvoiceEntity::getStoreId, storeId).eq(StoreInvoiceEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode());
         storeInvoiceMapper.update(invoice,lambdaQueryWrapper);
@@ -265,14 +270,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
             throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"错误的店铺类型名称");
         }
         storeEntity.setStoreType(integer);
-        Long aLong ;
-        try {
-            boolean notBlank = StringUtils.isNotBlank(storeRequest.getStoreId());
-            aLong = notBlank ? Long.valueOf(storeRequest.getStoreId()) : null;
-        } catch (NumberFormatException e) {
-            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"错误的店铺id,无法转换");
-        }
-        storeEntity.setId(aLong);
+        storeEntity.setId(storeRequest.getStoreId());
         if (integer.equals(StoreTypeEnum.INT_HOSPITAL.getCode())) {
             Long agencyId = storeRequest.getAgencyId();
             storeEntity.setAgencyId(agencyId);
