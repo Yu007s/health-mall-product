@@ -26,7 +26,7 @@ public class ChineseMedicineVO implements Serializable {
     private String name;
 
     @ApiModelProperty("药材别名列表")
-    private List<String> aliNames;
+    private String aliNames;
 
     @ApiModelProperty("药材相反药材编码列表")
     private List<String> conflictMedicineCodes;
