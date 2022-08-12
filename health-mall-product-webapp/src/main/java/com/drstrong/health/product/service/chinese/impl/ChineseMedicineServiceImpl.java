@@ -82,10 +82,11 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         }
         chineseMedicineEntity.setMedicineName(chineseMedicineVO.getName());
         chineseMedicineEntity.setMaxDosage(chineseMedicineVO.getMaxDosage());
-        String aliNamesString = String.join(",", chineseMedicineVO.getAliNames());
-        String aliNamePingYinS = chineseMedicineVO.getAliNames().stream().map(s -> PinyinUtil.getFirstLetter(s, "")).collect(Collectors.joining(","));
-        chineseMedicineEntity.setMedicineAlias(aliNamesString);
+        String aliNamesString = chineseMedicineVO.getAliNames();
+        String[] split = aliNamesString.split(",");
         //别名转换为拼音
+        String aliNamePingYinS = Arrays.stream(split).map(s -> PinyinUtil.getFirstLetter(s, "")).collect(Collectors.joining(","));
+        chineseMedicineEntity.setMedicineAlias(aliNamesString);
         chineseMedicineEntity.setAliasPinyin(aliNamePingYinS);
         //将名字转化为拼音
         chineseMedicineEntity.setMedicinePinyin(PinyinUtil.getFirstLetter(chineseMedicineVO.getName(),""));
