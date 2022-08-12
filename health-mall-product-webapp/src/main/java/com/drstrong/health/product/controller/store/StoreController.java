@@ -12,7 +12,6 @@ import com.drstrong.health.product.remote.api.store.StoreFacade;
 import com.drstrong.health.product.remote.api.store.StoreRemoteApi;
 import com.drstrong.health.product.service.store.StoreService;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,7 +42,7 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     @Override
     public ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store)  {
         String msg;
-        if (!StringUtils.isNotBlank(store.getStoreId())) {
+        if (store.getStoreId() == null) {
             storeService.save(store);
             msg = "新增店铺成功";
         } else {

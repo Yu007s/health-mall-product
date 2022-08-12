@@ -14,11 +14,11 @@ import java.util.List;
  * @Date 2022/07/26/10:12
  */
 @Data
-@ApiModel("店铺信息返回值 编辑页面详细")
+@ApiModel("店铺信息请求值 编辑页面详细")
 public class StoreInfoDetailSaveRequest implements Serializable {
     private static final long serialVersionUID = 2211348485397306232L;
     @ApiModelProperty("店铺主键id")
-    private String storeId;
+    private Long storeId;
 
     @NotNull
     @ApiModelProperty("店铺名称")
