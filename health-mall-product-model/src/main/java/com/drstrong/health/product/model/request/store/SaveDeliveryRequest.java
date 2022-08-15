@@ -20,13 +20,13 @@ public class SaveDeliveryRequest implements Serializable {
     /**
      * 店铺id
      */
-    @NotNull
+    @NotNull(message = "店铺id不能为空")
     private Long storeId;
 
     /**
      * 默认供应商优先级
      */
-    @NotNull
+    @NotNull(message = "默认供优先级不能为空")
     private List<Long> defaultDelPriority;
 
     /**
