@@ -261,16 +261,26 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
      */
     @Override
     public Map<Long, String> getMedicineIdAndMedicineCodeMap(Set<Long> medicineIds) {
+        List<ChineseMedicineEntity> chineseMedicineEntityList = listMedicineByIds(medicineIds);
+        return chineseMedicineEntityList.stream().collect(Collectors.toMap(ChineseMedicineEntity::getId, ChineseMedicineEntity::getMedicineCode, (v1, v2) -> v1));
+    }
+
+    /**
+     * 根据老的药材 id 获取药材信息
+     *
+     * @param medicineIds 老药材 id 集合
+     * @return 药材信息集合
+     * @author liuqiuyi
+     * @date 2022/8/15 10:18
+     */
+    @Override
+    public List<ChineseMedicineEntity> listMedicineByIds(Set<Long> medicineIds) {
         if (CollectionUtils.isEmpty(medicineIds)) {
-            return Maps.newHashMap();
+            return Lists.newArrayList();
         }
         LambdaQueryWrapper<ChineseMedicineEntity> queryWrapper = Wrappers.<ChineseMedicineEntity>lambdaQuery()
                 .eq(ChineseMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .in(ChineseMedicineEntity::getId, medicineIds);
-        List<ChineseMedicineEntity> chineseMedicineEntityList = list(queryWrapper);
-        if (CollectionUtils.isEmpty(chineseMedicineEntityList)) {
-            return Maps.newHashMap();
-        }
-        return chineseMedicineEntityList.stream().collect(Collectors.toMap(ChineseMedicineEntity::getId, ChineseMedicineEntity::getMedicineCode, (v1, v2) -> v1));
+        return list(queryWrapper);
     }
 }
