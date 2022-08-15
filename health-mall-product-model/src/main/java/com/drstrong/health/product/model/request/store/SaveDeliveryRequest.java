@@ -26,7 +26,7 @@ public class SaveDeliveryRequest implements Serializable {
     /**
      * 默认供应商优先级
      */
-    @NotNull(message = "默认供优先级不能为空")
+    @NotNull(message = "默认优先级不能为空")
     private List<Long> defaultDelPriority;
 
     /**

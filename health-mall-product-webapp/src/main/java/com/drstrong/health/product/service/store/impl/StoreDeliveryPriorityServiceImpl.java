@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.store.impl;
 
+import cn.hutool.core.stream.CollectorUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.drstrong.health.product.model.entity.store.DeliveryPriorityEntity;
@@ -24,6 +25,7 @@ import com.drstrong.health.ware.remote.api.SupplierManageRemoteApi;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -74,6 +76,9 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
         List<Long> supplierIds = linkSupplierEntities.stream().map(StoreLinkSupplierEntity::getSupplierId).collect(Collectors.toList());
         ResultVO<List<SupplierInfoDTO>> listResultVO = supplierManageRemoteApi.queryBySupplierIds(supplierIds);
         List<SupplierInfoDTO> data = listResultVO.getData();
+        if (CollectionUtils.isEmpty(data)) {
+            throw new BusinessException(ResultStatus.FAIL.getCode(), "查询供应商信息失败");
+        }
         List<SupplierResponse> supplierResponses = data.stream().map(supplierInfoDTO -> {
             SupplierResponse supplierResponse = new SupplierResponse();
             supplierResponse.setSupplierName(supplierInfoDTO.getSupplierName());
