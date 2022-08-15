@@ -5,6 +5,7 @@ import com.drstrong.health.product.facade.ChineseRemoteFacade;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
+import com.drstrong.health.product.model.entity.product.SkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
@@ -21,6 +22,7 @@ import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineConflictService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
+import com.drstrong.health.product.service.product.SkuInfoService;
 import com.drstrong.health.product.service.store.StoreDeliveryPriorityService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.ware.model.response.SkuCanStockResponse;
@@ -64,6 +66,9 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 
 	@Resource
 	StockRemoteProService stockRemoteProService;
+
+	@Resource
+	SkuInfoService skuInfoService;
 
 	/**
 	 * 根据关键字和互联网医院 id 模糊搜索药材
@@ -138,18 +143,20 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 		// 3.获取药材名称
 		Map<String, String> medicineCodeAndNameMap = chineseMedicineService.getByMedicineCode(medicineCodes)
 				.stream().collect(Collectors.toMap(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName, (v1, v2) -> v1));
-		// 3.判断是否需要查询库存信息
+		// 4.获取 spu 信息
+		Map<String, SkuInfoEntity> skuCodeSkuInfoMap = skuInfoService.getBySkuCodesToMap(skuCodes);
+		// 5.判断是否需要查询库存信息
 		Map<String, List<SkuCanStockResponse>> skuCodeStockMap = null;
 		if (Objects.equals(Boolean.TRUE, chineseSkuRequest.getNeedQueryStock())) {
 			skuCodeStockMap = stockRemoteProService.getStockToMap(skuCodes);
 		}
-		// 4.判断是否需要查询配送优先级
+		// 6.判断是否需要查询配送优先级
 		if (Objects.equals(Boolean.TRUE, chineseSkuRequest.getNeedQueryPriority()) && Objects.nonNull(chineseSkuRequest.getAreaId())) {
 			List<Long> storeChineseDeliveryInfoList = storeDeliveryPriorityService.queryByStoreIdAndArea(storeEntity.getId(), chineseSkuRequest.getAreaId());
 			productInfoVO.setStoreChineseDeliveryInfoList(storeChineseDeliveryInfoList);
 		}
-		// 5.组装数据返回
-		List<ChineseSkuInfoExtendVO> skuExtendVOList = buildChineseSkuExtendVOList(storeEntity.getStoreName(), chineseSkuInfoEntityList, medicineCodeAndNameMap, skuCodeStockMap);
+		// 7.组装数据返回
+		List<ChineseSkuInfoExtendVO> skuExtendVOList = buildChineseSkuExtendVOList(storeEntity.getStoreName(), chineseSkuInfoEntityList, medicineCodeAndNameMap, skuCodeStockMap, skuCodeSkuInfoMap);
 		productInfoVO.setChineseSkuInfoExtendVOList(skuExtendVOList);
 		return productInfoVO;
 	}
@@ -262,11 +269,15 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 	}
 
 	private List<ChineseSkuInfoExtendVO> buildChineseSkuExtendVOList(String storeName, List<ChineseSkuInfoEntity> skuInfoEntityList,
-																	 Map<String, String> medicineCodeAndNameMap, Map<String, List<SkuCanStockResponse>> skuCodeStockMap) {
+																	 Map<String, String> medicineCodeAndNameMap, Map<String, List<SkuCanStockResponse>> skuCodeStockMap,
+																	 Map<String, SkuInfoEntity> skuCodeSkuInfoMap) {
 		List<ChineseSkuInfoExtendVO> chineseSkuInfoExtendVOList = Lists.newArrayListWithCapacity(skuInfoEntityList.size());
 		skuInfoEntityList.forEach(chineseSkuInfoEntity -> {
 			ChineseSkuInfoExtendVO chineseSkuInfoExtendVO = new ChineseSkuInfoExtendVO();
 			BeanUtils.copyProperties(chineseSkuInfoEntity, chineseSkuInfoExtendVO);
+			chineseSkuInfoExtendVO.setSkuId(chineseSkuInfoEntity.getId());
+			String spuCode = Optional.ofNullable(skuCodeSkuInfoMap.get(chineseSkuInfoEntity.getSkuCode())).map(SkuInfoEntity::getSpuCode).orElse("");
+			chineseSkuInfoExtendVO.setSpuCode(spuCode);
 			chineseSkuInfoExtendVO.setPrice(BigDecimal.valueOf(chineseSkuInfoEntity.getPrice()));
 			chineseSkuInfoExtendVO.setProductType(ProductTypeEnum.CHINESE.getCode());
 			chineseSkuInfoExtendVO.setProductTypeName(ProductTypeEnum.CHINESE.getValue());
