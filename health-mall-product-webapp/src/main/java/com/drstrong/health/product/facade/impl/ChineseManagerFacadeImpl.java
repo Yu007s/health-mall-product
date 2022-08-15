@@ -41,7 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.stream.Collectors.*;
@@ -421,12 +421,30 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 	@Deprecated
 	public List<StoreDataInitializeRequest.CompensateInfo> storeDataInitialize(StoreDataInitializeRequest initializeRequest) {
 		if (!CollectionUtils.isEmpty(initializeRequest.getStoreIds()) && CollectionUtils.isEmpty(initializeRequest.getCompensateInfoList())) {
-			return initSaveSku(initializeRequest);
+			// 数据修复,获取结果
+			List<StoreDataInitializeRequest.CompensateInfo> compensateInfoList = initSaveSku(initializeRequest);
+			// 更新上架状态
+			updateStatue(initializeRequest.getStoreIds());
+			return compensateInfoList;
 		} else if (!CollectionUtils.isEmpty(initializeRequest.getCompensateInfoList())) {
-			return compensateSaveSku(initializeRequest);
+			// 数据修复,获取结果
+			List<StoreDataInitializeRequest.CompensateInfo> compensateInfos = compensateSaveSku(initializeRequest);
+			List<Long> storeIds = initializeRequest.getCompensateInfoList().stream().map(StoreDataInitializeRequest.CompensateInfo::getStoreId).distinct().collect(toList());
+			// 更新上架状态
+			updateStatue(storeIds);
+			return compensateInfos;
 		} else {
 			throw new BusinessException("未执行任何初始化操作,请检查传参!");
 		}
+	}
+
+	private void updateStatue(List<Long> storeIds){
+		// 将商品修改为上架状态
+		ChineseSkuInfoEntity chineseSkuInfoEntity = ChineseSkuInfoEntity.builder().build();
+		chineseSkuInfoEntity.setSkuStatus(ProductStateEnum.HAS_PUT.getCode());
+		chineseSkuInfoEntity.setChangedAt(LocalDateTime.now());
+		LambdaQueryWrapper<ChineseSkuInfoEntity> updateWrapper = Wrappers.<ChineseSkuInfoEntity>lambdaQuery().in(ChineseSkuInfoEntity::getStoreId, storeIds);
+		chineseSkuInfoService.update(chineseSkuInfoEntity, updateWrapper);
 	}
 
 	@Deprecated
