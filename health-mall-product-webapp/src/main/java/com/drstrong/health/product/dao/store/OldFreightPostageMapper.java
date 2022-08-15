@@ -1,6 +1,8 @@
 package com.drstrong.health.product.dao.store;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.drstrong.health.product.constants.DsName;
 import com.drstrong.health.product.model.entity.store.OldAreaFreight;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -8,9 +10,10 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 /**
- * @Author xieYueFeng
+ * @Author lsx
  * @Date 2022/07/26/9:26
  */
+@DS(DsName.SLAVE_I)
 @Mapper
 public interface OldFreightPostageMapper extends BaseMapper<OldAreaFreight> {
 
