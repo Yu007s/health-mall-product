@@ -57,22 +57,25 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         Long userId = chineseMedicineVO.getUserId();
         String medicineCode = chineseMedicineVO.getMedicineCode();
         ChineseMedicineEntity chineseMedicineEntity = new ChineseMedicineEntity();
+        LambdaQueryWrapper<ChineseMedicineEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(ChineseMedicineEntity::getMedicineName,
+                chineseMedicineVO.getName()).eq(ChineseMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+        ChineseMedicineEntity getOneByName = getOne(lambdaQueryWrapper);
         if (StringUtils.isNotBlank(medicineCode)) {
             //编辑药材
             ChineseMedicineEntity byMedicineCode = getByMedicineCode(medicineCode);
-            if (byMedicineCode== null || byMedicineCode.getId() ==  null) {
-                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"编辑药材失败，未找到该药材");
+            if (byMedicineCode == null || byMedicineCode.getId() == null) {
+                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "编辑药材失败，未找到该药材");
             }
-            chineseMedicineEntity.setId( byMedicineCode.getId());
+            if (getOneByName != null && !getOneByName.getMedicineCode().equals(medicineCode)) {
+                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "编辑药材失败，此药材名已经被使用");
+            }
+            chineseMedicineEntity.setId(byMedicineCode.getId());
             chineseMedicineEntity.setMedicineCode(chineseMedicineVO.getMedicineCode());
-        }
-        else{
+        } else {
             //新增药材  检验药材是否重名
-            LambdaQueryWrapper<ChineseMedicineEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-            lambdaQueryWrapper.eq(ChineseMedicineEntity::getMedicineName,chineseMedicineVO.getName());
-            ChineseMedicineEntity one = getOne(lambdaQueryWrapper);
-            if(one != null){
-                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"新增药材失败，已有同名药材");
+            if (getOneByName != null) {
+                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "新增药材失败，已有同名药材");
             }
             //新增药材
             String nextMedicineCode = UniqueCodeUtils.getNextMedicineCode(chineseMedicineVO.getName());
@@ -89,47 +92,60 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         chineseMedicineEntity.setMedicineAlias(aliNamesString);
         chineseMedicineEntity.setAliasPinyin(aliNamePingYinS);
         //将名字转化为拼音
-        chineseMedicineEntity.setMedicinePinyin(PinyinUtil.getFirstLetter(chineseMedicineVO.getName(),""));
+        chineseMedicineEntity.setMedicinePinyin(PinyinUtil.getFirstLetter(chineseMedicineVO.getName(), ""));
         chineseMedicineEntity.setChangedBy(userId);
         //更新相反药材名表
         List<String> conflictMedicineCodes = chineseMedicineVO.getConflictMedicineCodes();
         if (conflictMedicineCodes != null && conflictMedicineCodes.size() != 0) {
+            Set<String> medicineSet = new HashSet<>(conflictMedicineCodes);
+            if (medicineSet.size() != conflictMedicineCodes.size()) {
+                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "重复的相反药材");
+            }
+            if (StringUtils.isNotBlank(chineseMedicineVO.getMedicineCode())) {
+                if (medicineSet.contains(chineseMedicineVO.getMedicineCode())) {
+                    throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "药材相反药材不能与自己相同");
+                }
+            }
+            List<ChineseMedicineEntity> byMedicineCode = this.getByMedicineCode(medicineSet);
+            if (byMedicineCode.size() != medicineSet.size()) {
+                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "相反药材中有不存在的中药材");
+            }
             ChineseMedicineConflictEntity chineseMedicineConflictEntity = new ChineseMedicineConflictEntity();
             String collect = String.join(",", conflictMedicineCodes);
             chineseMedicineConflictEntity.setMedicineCode(medicineCode);
             chineseMedicineConflictEntity.setMedicineConflictCodes(collect);
-            chineseMedicineConflictService.saveOrUpdate(chineseMedicineConflictEntity,userId);
+            chineseMedicineConflictService.saveOrUpdate(chineseMedicineConflictEntity, userId);
         }
         return super.saveOrUpdate(chineseMedicineEntity);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void removeByCode(String medicineCode,Long userId) {
+    public void removeByCode(String medicineCode, Long userId) {
         if (chineseSkuInfoService.checkHasChineseByMedicineCode(medicineCode)) {
-            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"药材已经关联sku");
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "药材已经关联sku");
         }
         //逻辑删除药材
         LambdaUpdateWrapper<ChineseMedicineEntity> lambdaQueryWrapper = new LambdaUpdateWrapper<>();
         lambdaQueryWrapper.eq(ChineseMedicineEntity::getMedicineCode, medicineCode)
                 .set(ChineseMedicineEntity::getDelFlag, DelFlagEnum.IS_DELETED.getCode())
-                .set(ChineseMedicineEntity::getChangedBy,userId);
+                .set(ChineseMedicineEntity::getChangedBy, userId);
         super.update(lambdaQueryWrapper);
         //逻辑删除相反药材
         ChineseMedicineConflictEntity chineseMedicineConflictEntity = new ChineseMedicineConflictEntity();
         chineseMedicineConflictEntity.setMedicineCode(medicineCode);
-        chineseMedicineConflictService.delete(chineseMedicineConflictEntity,userId);
+        chineseMedicineConflictService.delete(chineseMedicineConflictEntity, userId);
     }
 
     @Override
-    public List<ChineseMedicineInfoResponse> queryAll(String medicineName,String medicineCode) {
+    public List<ChineseMedicineInfoResponse> queryAll(String medicineName, String medicineCode) {
         LambdaQueryWrapper<ChineseMedicineEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName);
-        if(StringUtils.isNotBlank(medicineName)){
-            queryWrapper.like(ChineseMedicineEntity::getMedicineName,medicineName);
+        if (StringUtils.isNotBlank(medicineName)) {
+            queryWrapper.like(ChineseMedicineEntity::getMedicineName, medicineName);
         }
-        if(StringUtils.isNotBlank(medicineCode)){
-            queryWrapper.eq(ChineseMedicineEntity::getMedicineCode,medicineCode);
+        if (StringUtils.isNotBlank(medicineCode)) {
+            queryWrapper.eq(ChineseMedicineEntity::getMedicineCode, medicineCode);
         }
         queryWrapper.last("limit 50");
         List<ChineseMedicineEntity> list = super.list(queryWrapper);
@@ -149,7 +165,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         if (StringUtils.isNotBlank(medicineCode)) {
             wrapper.eq(ChineseMedicineEntity::getMedicineCode, medicineCode);
         }
-        if (StringUtils.isNotBlank(medicineName) ) {
+        if (StringUtils.isNotBlank(medicineName)) {
             wrapper.like(ChineseMedicineEntity::getMedicineName, medicineName);
         }
         wrapper.orderByDesc(ChineseMedicineEntity::getCreatedAt);
@@ -160,7 +176,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         ChineseMedicineSearchVO chineseMedicineSearchVO = new ChineseMedicineSearchVO();
         chineseMedicineSearchVO.setPageNo(pageNo);
         chineseMedicineSearchVO.setPageSize(pageSize);
-        chineseMedicineSearchVO.setTotal((int)total);
+        chineseMedicineSearchVO.setTotal((int) total);
         chineseMedicineSearchVO.setMedicineResponses(chineseMedicineResponses);
         return chineseMedicineSearchVO;
     }
@@ -255,7 +271,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
     /**
      * 根据老的药材 id 获取药材 code,组成 map
      *
-     * @param medicineIds  药材id
+     * @param medicineIds 药材id
      * @author liuqiuyi
      * @date 2022/8/5 16:41
      */
