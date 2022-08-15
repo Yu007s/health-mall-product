@@ -16,8 +16,8 @@ import java.util.List;
 public class AgencyServiceImpl implements AgencyService {
     private static final List<String> NAMES = new ArrayList<>(2);
     static {
-        NAMES.add("桐庐互联网医院");
         NAMES.add("海南互联网医院");
+        NAMES.add("桐庐互联网医院");
     }
     @Override
     public String id2name(Long id) {
