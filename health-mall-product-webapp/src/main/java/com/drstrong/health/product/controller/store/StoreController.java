@@ -1,6 +1,8 @@
 package com.drstrong.health.product.controller.store;
 
+import com.drstrong.health.product.dao.store.OldFreightPostageMapper;
 import com.drstrong.health.product.dao.store.StoreLinkSupplierMapper;
+import com.drstrong.health.product.model.entity.store.OldAreaFreight;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
@@ -37,6 +39,8 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     private StoreService storeService;
     @Resource
     StoreLinkSupplierMapper storeLinkSupplierMapper;
+    @Resource
+    private OldFreightPostageMapper oldFreightPostageMapper;
 
 
     @Override
@@ -75,6 +79,11 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     @Override
     public List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam("supplierId") @NotNull(message = "供应商id不能为空") Long supplierId) {
         return storeLinkSupplierMapper.findStoreBySupplierId(supplierId);
+    }
+
+    @Override
+    public List<OldAreaFreight> searchOldTLPostage() {
+        return oldFreightPostageMapper.searchOldTLPostage();
     }
 
     @Override

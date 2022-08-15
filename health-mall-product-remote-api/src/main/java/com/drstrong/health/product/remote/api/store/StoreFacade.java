@@ -1,6 +1,7 @@
 package com.drstrong.health.product.remote.api.store;
 
 
+import com.drstrong.health.product.model.entity.store.OldAreaFreight;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -25,4 +26,8 @@ public interface StoreFacade {
     @ApiOperation("根据供应商id查询关联的店铺信息")
     @GetMapping("/searchStore")
     List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam("supplierId") @NotNull(message = "供应商id不能为null") Long supplierId) ;
+
+    @ApiOperation("查询老的桐庐邮费设置信息")
+    @GetMapping("/searchOldTLPostage")
+    List<OldAreaFreight> searchOldTLPostage() ;
 }
