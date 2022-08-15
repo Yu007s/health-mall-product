@@ -1,11 +1,9 @@
 package com.drstrong.health.product.controller.store;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.drstrong.health.product.dao.store.OldFreightPostageMapper;
 import com.drstrong.health.product.dao.store.StoreLinkSupplierMapper;
 import com.drstrong.health.product.model.entity.store.OldAreaFreight;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
-import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -84,11 +82,8 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     }
 
     @Override
-    public List<OldAreaFreight> searchOldPostage() {
-        LambdaQueryWrapper<OldAreaFreight> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(OldAreaFreight::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .eq(OldAreaFreight::getWarehouseId,91L);
-        return oldFreightPostageMapper.selectList(queryWrapper);
+    public List<OldAreaFreight> searchOldTLPostage() {
+        return oldFreightPostageMapper.searchOldTLPostage();
     }
 
     @Override

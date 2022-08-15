@@ -28,6 +28,6 @@ public interface StoreFacade {
     List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam("supplierId") @NotNull(message = "供应商id不能为null") Long supplierId) ;
 
     @ApiOperation("查询老的桐庐邮费设置信息")
-    @GetMapping("/searchOldPostage")
-    List<OldAreaFreight> searchOldPostage() ;
+    @GetMapping("/searchOldTLPostage")
+    List<OldAreaFreight> searchOldTLPostage() ;
 }
