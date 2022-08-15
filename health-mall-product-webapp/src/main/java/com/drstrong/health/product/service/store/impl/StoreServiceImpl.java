@@ -236,6 +236,9 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     @Transactional(readOnly = true)
     public StoreInfoEditResponse queryById(Long storeId) {
         StoreEntity storeEntity = super.getById(storeId);
+        if (storeEntity == null) {
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"不存在的店铺");
+        }
         Long storeEntityId = storeEntity.getId();
         //根据店铺id 查询发票信息  组合后返回
         StoreInvoiceEntity invoice = storeInvoiceService.getByStoreId(storeEntityId);

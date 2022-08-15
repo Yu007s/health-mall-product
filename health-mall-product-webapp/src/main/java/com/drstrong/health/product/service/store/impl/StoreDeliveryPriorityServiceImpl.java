@@ -18,6 +18,9 @@ import com.drstrong.health.product.service.area.AreaService;
 import com.drstrong.health.product.service.store.StoreDeliveryPriorityService;
 import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.drstrong.health.product.service.store.StoreLinkSupplierService;
+import com.drstrong.health.ware.model.response.SupplierInfoDTO;
+import com.drstrong.health.ware.model.result.ResultVO;
+import com.drstrong.health.ware.remote.api.SupplierManageRemoteApi;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +45,9 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
     @Resource
     AreaService areaService;
 
+    @Resource
+    SupplierManageRemoteApi supplierManageRemoteApi;
+
     @Override
     @Transactional(readOnly = true)
     public DeliveryPriorityVO queryByStoreId(Long storeId) {
@@ -65,12 +71,16 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
         }
         deliveryPriorityVO.setStoreId(storeId.toString());
         List<StoreLinkSupplierEntity> linkSupplierEntities = storeLinkSupplierService.queryByStoreId(storeId);
-        List<SupplierResponse> collect = linkSupplierEntities.stream().map(storeLinkSupplierEntity -> {
+        List<Long> supplierIds = linkSupplierEntities.stream().map(StoreLinkSupplierEntity::getSupplierId).collect(Collectors.toList());
+        ResultVO<List<SupplierInfoDTO>> listResultVO = supplierManageRemoteApi.queryBySupplierIds(supplierIds);
+        List<SupplierInfoDTO> data = listResultVO.getData();
+        List<SupplierResponse> supplierResponses = data.stream().map(supplierInfoDTO -> {
             SupplierResponse supplierResponse = new SupplierResponse();
-            supplierResponse.setSupplierId(storeLinkSupplierEntity.getSupplierId());
+            supplierResponse.setSupplierName(supplierInfoDTO.getSupplierName());
+            supplierResponse.setSupplierId(supplierInfoDTO.getSupplierId());
             return supplierResponse;
         }).collect(Collectors.toList());
-        deliveryPriorityVO.setSupplierResponses(collect);
+        deliveryPriorityVO.setSupplierResponses(supplierResponses);
         deliveryPriorityVO.setDeliveryPriorities(deliveries);
         return deliveryPriorityVO;
     }
