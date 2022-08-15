@@ -39,6 +39,11 @@ public class OldAreaFreight implements Serializable {
 	private Integer areaId;
 
 	/**
+	 * 邮费区域名称
+	 */
+	private String areaName;
+
+	/**
 	 * 地区邮费（分）
 	 */
 	private Integer freightPrice;
