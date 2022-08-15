@@ -326,128 +326,6 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 		return supplierBaseInfoVOList;
 	}
 
-	/**
-     * 店铺数据初始化,将中药材默认上架到所有店铺,关联天江供应商
-	 * <p> 仅用于一期上线时数据初始化,不要用于其它用途 </>
-     *
-     * @param initializeRequest   初始化入参信息
-     * @author liuqiuyi
-     * @date 2022/8/5 14:23
-     */
-    @Override
-	@Deprecated
-    public List<StoreDataInitializeRequest.CompensateInfo> storeDataInitialize(StoreDataInitializeRequest initializeRequest) {
-		if (!CollectionUtils.isEmpty(initializeRequest.getStoreIds()) && CollectionUtils.isEmpty(initializeRequest.getCompensateInfoList())) {
-			return initSaveSku(initializeRequest);
-		} else if (!CollectionUtils.isEmpty(initializeRequest.getCompensateInfoList())) {
-			return compensateSaveSku(initializeRequest);
-		} else {
-			throw new BusinessException("未执行任何初始化操作,请检查传参!");
-		}
-	}
-
-	@Deprecated
-	private List<StoreDataInitializeRequest.CompensateInfo> compensateSaveSku(StoreDataInitializeRequest initializeRequest) {
-		List<StoreDataInitializeRequest.CompensateInfo> resultList = Lists.newArrayList();
-
-		List<StoreDataInitializeRequest.CompensateInfo> compensateInfoList = initializeRequest.getCompensateInfoList();
-		Set<Long> medicineIds = compensateInfoList.stream().map(StoreDataInitializeRequest.CompensateInfo::getMedicineId).collect(toSet());
-
-		// 1.获取需要补偿的老药材
-		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery()
-				.eq(OldChineseMedicine::getInvalid, DelFlagEnum.UN_DELETED.getCode())
-				.in(OldChineseMedicine::getId, medicineIds);
-		List<OldChineseMedicine> oldChineseMedicineList = oldChineseMedicineMapper.selectList(queryWrapper);
-		if (CollectionUtils.isEmpty(oldChineseMedicineList)) {
-			return resultList;
-		}
-		Map<Long, OldChineseMedicine> idAndOldChineseMedicineMap = oldChineseMedicineList.stream().collect(toMap(OldChineseMedicine::getId, dto -> dto, (v1, v2) -> v1));
-
-		// 2.获取本期生成的药材 code
-		Map<Long, String> medicineIdAndMedicineCodeMap = chineseMedicineService.getMedicineIdAndMedicineCodeMap(medicineIds);
-		// 3.生成数据
-		Long supplierId = initializeRequest.getSupplierId();
-		for (StoreDataInitializeRequest.CompensateInfo compensateInfo : compensateInfoList) {
-			Long medicineId = compensateInfo.getMedicineId();
-			Long storeId = compensateInfo.getStoreId();
-			try {
-				OldChineseMedicine oldChineseMedicine = idAndOldChineseMedicineMap.get(medicineId);
-
-				SaveOrUpdateSkuVO saveOrUpdateSkuVO = new SaveOrUpdateSkuVO();
-				saveOrUpdateSkuVO.setMedicineId(medicineId);
-				saveOrUpdateSkuVO.setMedicineCode(medicineIdAndMedicineCodeMap.get(medicineId));
-				saveOrUpdateSkuVO.setMedicineName(oldChineseMedicine.getName());
-				saveOrUpdateSkuVO.setSkuName(oldChineseMedicine.getName());
-				saveOrUpdateSkuVO.setPrice(oldChineseMedicine.getGramPrice());
-				saveOrUpdateSkuVO.setStoreId(storeId);
-				// 库存信息,初始化时默认为天江供应商,且无限库存
-				SaveOrUpdateSkuVO.SupplierInfo supplierInfo = new SaveOrUpdateSkuVO.SupplierInfo();
-				supplierInfo.setSupplierId(supplierId);
-				supplierInfo.setStockType(1);
-
-				saveOrUpdateSkuVO.setSupplierInfoList(Lists.newArrayList(supplierInfo));
-				saveOrUpdateSkuVO.setOperatorId(0L);
-
-
-				chineseSkuInfoService.saveSku(saveOrUpdateSkuVO);
-			} catch (Throwable e) {
-				log.error("初始化数据失败,异常信息为:", e);
-				StoreDataInitializeRequest.CompensateInfo info = new StoreDataInitializeRequest.CompensateInfo();
-				info.setMedicineId(medicineId);
-				info.setStoreId(storeId);
-				resultList.add(info);
-			}
-		}
-		return resultList;
-	}
-
-	@Deprecated
-	private List<StoreDataInitializeRequest.CompensateInfo> initSaveSku(StoreDataInitializeRequest initializeRequest) {
-		List<StoreDataInitializeRequest.CompensateInfo> resultList = Lists.newArrayList();
-		// 1.获取所有的老药材
-		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery().eq(OldChineseMedicine::getInvalid, DelFlagEnum.UN_DELETED.getCode());
-		List<OldChineseMedicine> oldChineseMedicineList = oldChineseMedicineMapper.selectList(queryWrapper);
-		if (CollectionUtils.isEmpty(oldChineseMedicineList)) {
-			return resultList;
-		}
-		// 2.获取本期生成的药材 code
-		Set<Long> medicineIds = oldChineseMedicineList.stream().map(OldChineseMedicine::getId).collect(toSet());
-		Map<Long, String> medicineIdAndMedicineCodeMap = chineseMedicineService.getMedicineIdAndMedicineCodeMap(medicineIds);
-
-		// 3.循环生成店铺的药材信息
-		List<Long> storeIds = initializeRequest.getStoreIds();
-		Long supplierId = initializeRequest.getSupplierId();
-		for (Long storeId : storeIds) {
-            oldChineseMedicineList.forEach(oldChineseMedicine -> {
-				try {
-					SaveOrUpdateSkuVO saveOrUpdateSkuVO = new SaveOrUpdateSkuVO();
-					saveOrUpdateSkuVO.setMedicineId(oldChineseMedicine.getId());
-					saveOrUpdateSkuVO.setMedicineCode(medicineIdAndMedicineCodeMap.get(oldChineseMedicine.getId()));
-					saveOrUpdateSkuVO.setMedicineName(oldChineseMedicine.getName());
-					saveOrUpdateSkuVO.setSkuName(oldChineseMedicine.getName());
-					saveOrUpdateSkuVO.setPrice(oldChineseMedicine.getGramPrice());
-					saveOrUpdateSkuVO.setStoreId(storeId);
-					// 库存信息,初始化时默认为天江供应商,且无限库存
-					SaveOrUpdateSkuVO.SupplierInfo supplierInfo = new SaveOrUpdateSkuVO.SupplierInfo();
-					supplierInfo.setSupplierId(supplierId);
-					supplierInfo.setStockType(1);
-
-					saveOrUpdateSkuVO.setSupplierInfoList(Lists.newArrayList(supplierInfo));
-					saveOrUpdateSkuVO.setOperatorId(0L);
-
-					chineseSkuInfoService.saveSku(saveOrUpdateSkuVO);
-				} catch (Throwable e) {
-					log.error("初始化数据失败,异常信息为:", e);
-					StoreDataInitializeRequest.CompensateInfo info = new StoreDataInitializeRequest.CompensateInfo();
-					info.setMedicineId(oldChineseMedicine.getId());
-					info.setStoreId(storeId);
-					resultList.add(info);
-				}
-            });
-        }
-		return resultList;
-	}
-
 	private void checkSaveOrUpdateSkuParam(SaveOrUpdateSkuVO saveOrUpdateSkuVO, boolean updateFlag) {
         // 1.根据药材code校验编码是否存在
         ChineseMedicineEntity chineseMedicineEntity = chineseMedicineService.getByMedicineCode(saveOrUpdateSkuVO.getMedicineCode());
@@ -530,4 +408,152 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         });
         return chineseManagerSkuVOList;
     }
+
+	/**
+	 * 店铺数据初始化,将中药材默认上架到所有店铺,关联天江供应商
+	 * <p> 仅用于一期上线时数据初始化,不要用于其它用途 </>
+	 *
+	 * @param initializeRequest   初始化入参信息
+	 * @author liuqiuyi
+	 * @date 2022/8/5 14:23
+	 */
+	@Override
+	@Deprecated
+	public List<StoreDataInitializeRequest.CompensateInfo> storeDataInitialize(StoreDataInitializeRequest initializeRequest) {
+		if (!CollectionUtils.isEmpty(initializeRequest.getStoreIds()) && CollectionUtils.isEmpty(initializeRequest.getCompensateInfoList())) {
+			return initSaveSku(initializeRequest);
+		} else if (!CollectionUtils.isEmpty(initializeRequest.getCompensateInfoList())) {
+			return compensateSaveSku(initializeRequest);
+		} else {
+			throw new BusinessException("未执行任何初始化操作,请检查传参!");
+		}
+	}
+
+	@Deprecated
+	private List<StoreDataInitializeRequest.CompensateInfo> compensateSaveSku(StoreDataInitializeRequest initializeRequest) {
+		List<StoreDataInitializeRequest.CompensateInfo> resultList = Lists.newArrayList();
+
+		List<StoreDataInitializeRequest.CompensateInfo> compensateInfoList = initializeRequest.getCompensateInfoList();
+		Set<Long> medicineIds = compensateInfoList.stream().map(StoreDataInitializeRequest.CompensateInfo::getMedicineId).collect(toSet());
+
+		// 1.获取需要补偿的老药材
+		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery()
+				.eq(OldChineseMedicine::getInvalid, DelFlagEnum.UN_DELETED.getCode())
+				.in(OldChineseMedicine::getId, medicineIds);
+		List<OldChineseMedicine> oldChineseMedicineList = oldChineseMedicineMapper.selectList(queryWrapper);
+		if (CollectionUtils.isEmpty(oldChineseMedicineList)) {
+			return resultList;
+		}
+		Map<Long, OldChineseMedicine> idAndOldChineseMedicineMap = oldChineseMedicineList.stream().collect(toMap(OldChineseMedicine::getId, dto -> dto, (v1, v2) -> v1));
+
+		// 2.获取本期生成的药材 code
+		Map<Long, String> medicineIdAndMedicineCodeMap = chineseMedicineService.getMedicineIdAndMedicineCodeMap(medicineIds);
+		// 3.生成数据
+		Long supplierId = initializeRequest.getSupplierId();
+		for (StoreDataInitializeRequest.CompensateInfo compensateInfo : compensateInfoList) {
+			Long medicineId = compensateInfo.getMedicineId();
+			Long storeId = compensateInfo.getStoreId();
+			try {
+				OldChineseMedicine oldChineseMedicine = idAndOldChineseMedicineMap.get(medicineId);
+
+				SaveOrUpdateSkuVO saveOrUpdateSkuVO = new SaveOrUpdateSkuVO();
+				saveOrUpdateSkuVO.setMedicineId(medicineId);
+				saveOrUpdateSkuVO.setMedicineCode(medicineIdAndMedicineCodeMap.get(medicineId));
+				saveOrUpdateSkuVO.setMedicineName(oldChineseMedicine.getName());
+				saveOrUpdateSkuVO.setSkuName(oldChineseMedicine.getName());
+				saveOrUpdateSkuVO.setPrice(oldChineseMedicine.getGramPrice());
+				saveOrUpdateSkuVO.setStoreId(storeId);
+				// 库存信息,初始化时默认为天江供应商,且无限库存
+				SaveOrUpdateSkuVO.SupplierInfo supplierInfo = new SaveOrUpdateSkuVO.SupplierInfo();
+				supplierInfo.setSupplierId(supplierId);
+				supplierInfo.setStockType(1);
+
+				saveOrUpdateSkuVO.setSupplierInfoList(Lists.newArrayList(supplierInfo));
+				saveOrUpdateSkuVO.setOperatorId(0L);
+
+
+				chineseSkuInfoService.saveSku(saveOrUpdateSkuVO);
+			} catch (Throwable e) {
+				log.error("初始化数据失败,异常信息为:", e);
+				StoreDataInitializeRequest.CompensateInfo info = new StoreDataInitializeRequest.CompensateInfo();
+				info.setMedicineId(medicineId);
+				info.setStoreId(storeId);
+				resultList.add(info);
+			}
+		}
+		return resultList;
+	}
+
+	@Deprecated
+	private List<StoreDataInitializeRequest.CompensateInfo> initSaveSku(StoreDataInitializeRequest initializeRequest) {
+		List<StoreDataInitializeRequest.CompensateInfo> resultList = Lists.newArrayList();
+		// 1.获取所有的老药材
+		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery().eq(OldChineseMedicine::getInvalid, DelFlagEnum.UN_DELETED.getCode());
+		List<OldChineseMedicine> oldChineseMedicineList = oldChineseMedicineMapper.selectList(queryWrapper);
+		if (CollectionUtils.isEmpty(oldChineseMedicineList)) {
+			return resultList;
+		}
+		// 2.获取本期生成的药材 code
+		Set<Long> medicineIds = oldChineseMedicineList.stream().map(OldChineseMedicine::getId).collect(toSet());
+		Map<Long, String> medicineIdAndMedicineCodeMap = chineseMedicineService.getMedicineIdAndMedicineCodeMap(medicineIds);
+
+		// 3.循环生成店铺的药材信息
+		List<Long> storeIds = initializeRequest.getStoreIds();
+		Long supplierId = initializeRequest.getSupplierId();
+		for (Long storeId : storeIds) {
+			oldChineseMedicineList.forEach(oldChineseMedicine -> {
+				try {
+					SaveOrUpdateSkuVO saveOrUpdateSkuVO = new SaveOrUpdateSkuVO();
+					saveOrUpdateSkuVO.setMedicineId(oldChineseMedicine.getId());
+					saveOrUpdateSkuVO.setMedicineCode(medicineIdAndMedicineCodeMap.get(oldChineseMedicine.getId()));
+					saveOrUpdateSkuVO.setMedicineName(oldChineseMedicine.getName());
+					saveOrUpdateSkuVO.setSkuName(oldChineseMedicine.getName());
+					saveOrUpdateSkuVO.setPrice(oldChineseMedicine.getGramPrice());
+					saveOrUpdateSkuVO.setStoreId(storeId);
+					// 库存信息,初始化时默认为天江供应商,且无限库存
+					SaveOrUpdateSkuVO.SupplierInfo supplierInfo = new SaveOrUpdateSkuVO.SupplierInfo();
+					supplierInfo.setSupplierId(supplierId);
+					supplierInfo.setStockType(1);
+
+					saveOrUpdateSkuVO.setSupplierInfoList(Lists.newArrayList(supplierInfo));
+					saveOrUpdateSkuVO.setOperatorId(0L);
+
+					chineseSkuInfoService.saveSku(saveOrUpdateSkuVO);
+				} catch (Throwable e) {
+					log.error("初始化数据失败,异常信息为:", e);
+					StoreDataInitializeRequest.CompensateInfo info = new StoreDataInitializeRequest.CompensateInfo();
+					info.setMedicineId(oldChineseMedicine.getId());
+					info.setStoreId(storeId);
+					resultList.add(info);
+				}
+			});
+		}
+		return resultList;
+	}
+
+	/**
+	 * 用于老数据修复功能,业务上不要使用
+	 *
+	 * @author liuqiuyi
+	 * @date 2022/8/15 10:10
+	 */
+	@Override
+	@Deprecated
+	public List<OldChineseMedicine> listOldChineseMedicine() {
+		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery().eq(OldChineseMedicine::getInvalid, DelFlagEnum.UN_DELETED.getCode());
+		return oldChineseMedicineMapper.selectList(queryWrapper);
+	}
+
+	/**
+	 * 用于老数据修复功能,业务上不要使用
+	 *
+	 * @param medicineIds
+	 * @author liuqiuyi
+	 * @date 2022/8/15 10:15
+	 */
+	@Override
+	@Deprecated
+	public List<ChineseMedicineEntity> listNewChineseMedicineByIds(Set<Long> medicineIds) {
+		return chineseMedicineService.listMedicineByIds(medicineIds);
+	}
 }

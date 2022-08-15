@@ -1,6 +1,8 @@
 package com.drstrong.health.product.controller.chinese;
 
 import com.drstrong.health.product.facade.ChineseManagerFacade;
+import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
+import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
 import com.drstrong.health.product.model.request.chinese.QueryChineseMedicineRequest;
 import com.drstrong.health.product.model.request.chinese.StoreDataInitializeRequest;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author liuqiuyi
@@ -79,6 +82,16 @@ public class ChineseManagerController implements ChineseManagerRemoteApi {
     @Override
     public ResultVO<List<SupplierBaseInfoVO>> getStoreSupplierInfo(Long storeId) {
         return ResultVO.success(chineseManagerFacade.getStoreSupplierInfo(storeId));
+    }
+
+    @Override
+    public ResultVO<List<OldChineseMedicine>> listOldChineseMedicine() {
+        return ResultVO.success(chineseManagerFacade.listOldChineseMedicine());
+    }
+
+    @Override
+    public ResultVO<List<ChineseMedicineEntity>> listNewChineseMedicineByIds(Set<Long> medicineIds) {
+        return ResultVO.success(chineseManagerFacade.listNewChineseMedicineByIds(medicineIds));
     }
 
     /**

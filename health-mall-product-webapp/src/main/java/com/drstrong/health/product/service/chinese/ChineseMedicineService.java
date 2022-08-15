@@ -94,4 +94,14 @@ public interface ChineseMedicineService {
 	 * @date 2022/8/5 16:41
 	 */
 	Map<Long, String> getMedicineIdAndMedicineCodeMap(Set<Long> medicineIds);
+
+	/**
+	 * 根据老的药材 id 获取药材信息
+	 *
+	 * @param medicineIds 老药材 id 集合
+	 * @return 药材信息集合
+	 * @author liuqiuyi
+	 * @date 2022/8/15 10:18
+	 */
+	List<ChineseMedicineEntity> listMedicineByIds(Set<Long> medicineIds);
 }

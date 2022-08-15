@@ -1,5 +1,7 @@
 package com.drstrong.health.product.remote.api.chinese;
 
+import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
+import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
 import com.drstrong.health.product.model.request.chinese.QueryChineseMedicineRequest;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 健康商城-商品服务-中药管理页面远程接口
@@ -65,4 +68,12 @@ public interface ChineseManagerRemoteApi {
     @ApiOperation("查询店铺的供应商信息")
     @GetMapping("/store/supplier")
     ResultVO<List<SupplierBaseInfoVO>> getStoreSupplierInfo(@RequestParam("storeId") Long storeId);
+
+    @ApiOperation("数据修复接口-获取所有的老表的中药材信息")
+    @GetMapping("/list/oldChineseMedicine")
+    ResultVO<List<OldChineseMedicine>> listOldChineseMedicine();
+
+    @ApiOperation("数据修复接口-根据老的中药材 id 获取中药材信息")
+    @PostMapping("/list/newChineseMedicine/ids")
+    ResultVO<List<ChineseMedicineEntity>> listNewChineseMedicineByIds(@RequestBody Set<Long> medicineIds);
 }

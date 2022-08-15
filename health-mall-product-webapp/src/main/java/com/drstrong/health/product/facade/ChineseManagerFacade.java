@@ -1,5 +1,7 @@
 package com.drstrong.health.product.facade;
 
+import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
+import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
 import com.drstrong.health.product.model.request.chinese.StoreDataInitializeRequest;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
@@ -7,6 +9,7 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.chinese.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 中药管理门面层，用于组合所有的业务操作
@@ -110,4 +113,22 @@ public interface ChineseManagerFacade {
      */
     @Deprecated
     List<StoreDataInitializeRequest.CompensateInfo> storeDataInitialize(StoreDataInitializeRequest initializeRequest);
+
+    /**
+     * 用于老数据修复功能,业务上不要使用
+	 *
+     * @author liuqiuyi
+     * @date 2022/8/15 10:10
+     */
+	@Deprecated
+	List<OldChineseMedicine> listOldChineseMedicine();
+
+	/**
+	 * 用于老数据修复功能,业务上不要使用
+	 *
+	 * @author liuqiuyi
+	 * @date 2022/8/15 10:15
+	 */
+	@Deprecated
+	List<ChineseMedicineEntity> listNewChineseMedicineByIds(Set<Long> medicineIds);
 }
