@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -21,7 +22,7 @@ public class ChineseMedicineVO implements Serializable {
     @ApiModelProperty("中药材编码")
     private String medicineCode;
 
-    @NotNull
+    @NotBlank(message = "药材名称不能为空")
     @ApiModelProperty("药材名称")
     private String name;
 
@@ -31,7 +32,7 @@ public class ChineseMedicineVO implements Serializable {
     @ApiModelProperty("药材相反药材编码列表")
     private List<String> conflictMedicineCodes;
 
-    @NotNull
+    @NotNull(message = "最大剂量不为空")
     @ApiModelProperty("最大剂量")
     private BigDecimal maxDosage;
 

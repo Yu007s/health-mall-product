@@ -1,6 +1,7 @@
 package com.drstrong.health.product.model.request.chinese;
 
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,8 +13,16 @@ import java.io.Serializable;
 @Data
 public class ChineseMedicineSearchRequest implements Serializable {
     private final static long serialVersionUID = 1231894214894213213L;
+
+    @ApiModelProperty("中药材名称")
     private String medicineName;
+
+    @ApiModelProperty("中药材编码")
     private String medicineCode;
+
+    @ApiModelProperty("第几页")
     private Integer pageNo;
+
+    @ApiModelProperty("页条数")
     private Integer pageSize;
 }
