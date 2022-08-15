@@ -181,16 +181,18 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 				.collect(Collectors.toMap(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getId, (v1, v2) -> v1));
 		// 3.组装数据返回
 		List<ChineseMedicineConflictVO> medicineConflictVoList = Lists.newArrayListWithCapacity(conflictEntityList.size());
+		Set<Long> deduplicationIds = Sets.newHashSetWithExpectedSize(conflictEntityList.size());
 		conflictEntityList.forEach(chineseMedicineConflictEntity -> {
 			Long id = medicineCodeAndIdMap.get(chineseMedicineConflictEntity.getMedicineCode());
 			List<Long> conflictIdList = Stream.of(chineseMedicineConflictEntity.getMedicineConflictCodes().split(","))
 					.map(medicineCodeAndIdMap::get).filter(Objects::nonNull).collect(Collectors.toList());
 
-			if (Objects.nonNull(id) && !CollectionUtils.isEmpty(conflictIdList)) {
+			if (Objects.nonNull(id) && !CollectionUtils.isEmpty(conflictIdList) && !deduplicationIds.contains(id)) {
 				ChineseMedicineConflictVO chineseMedicineConflictVO = new ChineseMedicineConflictVO();
 				chineseMedicineConflictVO.setId(id);
 				chineseMedicineConflictVO.setConflictIdList(conflictIdList);
 				medicineConflictVoList.add(chineseMedicineConflictVO);
+				deduplicationIds.add(id);
 			}
 		});
 		return medicineConflictVoList;
