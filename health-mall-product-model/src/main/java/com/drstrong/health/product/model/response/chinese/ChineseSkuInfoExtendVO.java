@@ -20,6 +20,12 @@ import java.util.List;
 public class ChineseSkuInfoExtendVO extends ChineseSkuInfoVO implements Serializable {
 	private static final long serialVersionUID = -8483976817745897650L;
 
+	@ApiModelProperty("skuId")
+	private Long skuId;
+
+	@ApiModelProperty("spu 编码")
+	private String spuCode;
+
 	@ApiModelProperty("库存信息")
 	private List<StockInfoVO> stockInfoVOList;
 
