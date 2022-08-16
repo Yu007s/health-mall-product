@@ -48,7 +48,7 @@
         <if test="queryParam.skuCode != null and queryParam.skuCode != ''">
             and sku.sku_code = #{queryParam.skuCode}
         </if>
-        <if test="queryParam.skuState != null and queryParam.skuState != ''">
+        <if test="queryParam.skuState != null">
             and sku.sku_status = #{queryParam.skuState}
         </if>
         <if test="queryParam.supplierId != null and queryParam.supplierId != ''">
@@ -95,7 +95,7 @@
         <if test="queryParam.skuCode != null and queryParam.skuCode != ''">
             and sku.sku_code = #{queryParam.skuCode}
         </if>
-        <if test="queryParam.skuState != null and queryParam.skuState != ''">
+        <if test="queryParam.skuState != null">
             and sku.sku_status = #{queryParam.skuState}
         </if>
         <if test="queryParam.supplierId != null and queryParam.supplierId != ''">
