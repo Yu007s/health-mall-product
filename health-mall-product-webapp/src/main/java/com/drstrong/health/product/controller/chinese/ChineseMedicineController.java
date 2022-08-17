@@ -69,7 +69,7 @@ public class ChineseMedicineController implements ChineseMedicineRemoteApi {
     @Override
     @ApiOperation("相反药材信息展示")
     public ResultVO<List<ChineseMedicineResponse>> queryConflictMedicine(@RequestParam("medicineCode") @NotBlank(message="药材编码不能为空") String medicineCode) {
-        List<ChineseMedicineResponse> chineseMedicineResponses = chineseMedicineService.queryPageForConflict(medicineCode);
+        List<ChineseMedicineResponse> chineseMedicineResponses = chineseMedicineService.queryForConflict(medicineCode);
         return ResultVO.success(chineseMedicineResponses);
     }
 }
