@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.response.chinese;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,6 +13,7 @@ import java.io.Serializable;
  */
 @Data
 @ApiModel("供应商基础信息")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SupplierBaseInfoVO implements Serializable {
 	private static final long serialVersionUID = -2091597682405619203L;
 

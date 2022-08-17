@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.response.chinese;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @Data
 @ApiModel("中药材相反信息,和之前的出参保持一致")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChineseMedicineConflictVO implements Serializable {
 	private static final long serialVersionUID = 713733319205888686L;
 
