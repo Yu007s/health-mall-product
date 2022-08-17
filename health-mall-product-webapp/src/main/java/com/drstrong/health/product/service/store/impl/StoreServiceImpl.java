@@ -98,6 +98,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         storeEntity.setStoreType(null);
         //互联网医院不支持更新
         storeEntity.setAgencyId(null);
+        checkStore(storeEntity);
         //更新店铺
         super.updateById(storeEntity);
         //更新店铺发票
@@ -111,13 +112,13 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     public List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, String storeTypeName) {
         LambdaQueryWrapper<StoreEntity> storeEntityQueryWrapper = new LambdaQueryWrapper<>();
         Integer storeType = StoreTypeEnum.nameToCode(storeTypeName);
-        storeEntityQueryWrapper.select(StoreEntity::getStoreName,StoreEntity::getId,StoreEntity::getStoreType,StoreEntity::getAgencyId)
-                .eq(storeId != null, StoreEntity::getId, storeId)
+        storeEntityQueryWrapper.eq(storeId != null, StoreEntity::getId, storeId)
                 .like(StringUtils.isNotBlank(storeName), StoreEntity::getStoreName, storeName)
                 .eq(storeType != null, StoreEntity::getStoreType, storeType)
                 .eq(agencyId != null, StoreEntity::getAgencyId, agencyId)
                 .eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         List<StoreEntity> storeEntities = list(storeEntityQueryWrapper);
+        storeEntities.sort((a,b) -> b.getChangedAt().compareTo(a.getChangedAt()));
         return storeEntities.stream().map(storeEntity -> {
             StoreInfoResponse storeInfoResponse = BeanUtil.copyProperties(storeEntity, StoreInfoResponse.class);
             Integer storeTypeCode = storeEntity.getStoreType();
@@ -298,6 +299,13 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         LambdaQueryWrapper<StoreEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(StoreEntity::getStoreName,store.getStoreName()).eq(StoreEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode()).last("limit 1");
         StoreEntity one = super.getOne(queryWrapper);
+        if(store.getId() != null){
+            //说明是编辑店铺  此时根据名字检索  如果检索到有店铺但是id不是传入id  那么报错
+            if(one != null && !one.getId().equals(store.getId())){
+                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"已经存在同名店铺");
+            }
+            return;
+        }
         if(one != null){
             throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"已经存在同名店铺");
         }
