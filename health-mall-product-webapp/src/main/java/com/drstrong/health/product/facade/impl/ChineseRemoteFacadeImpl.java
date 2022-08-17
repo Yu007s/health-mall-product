@@ -294,7 +294,8 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 					ChineseSkuInfoExtendVO.StockInfoVO stockInfoVO = new ChineseSkuInfoExtendVO.StockInfoVO();
 					stockInfoVO.setSupplierId(skuCanStockResponse.getSupplierId());
 					stockInfoVO.setSupplierName(skuCanStockResponse.getSupplierName());
-					stockInfoVO.setVirtualQuantity(BigDecimal.valueOf(skuCanStockResponse.getAvailableQuantity()));
+					BigDecimal virtualQuantity = Optional.ofNullable(skuCanStockResponse.getAvailableQuantity()).map(BigDecimal::valueOf).orElse(null);
+					stockInfoVO.setVirtualQuantity(virtualQuantity);
 					stockInfoVOList.add(stockInfoVO);
 				});
 				chineseSkuInfoExtendVO.setStockInfoVOList(stockInfoVOList);
