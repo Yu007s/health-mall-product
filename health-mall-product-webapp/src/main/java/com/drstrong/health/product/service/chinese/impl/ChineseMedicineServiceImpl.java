@@ -101,26 +101,26 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         chineseMedicineEntity.setChangedBy(userId);
         //更新相反药材名表
         List<String> conflictMedicineCodes = chineseMedicineVO.getConflictMedicineCodes();
-        if (conflictMedicineCodes != null && conflictMedicineCodes.size() != 0) {
-            Set<String> medicineSet = new HashSet<>(conflictMedicineCodes);
-            if (medicineSet.size() != conflictMedicineCodes.size()) {
-                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "重复的相反药材");
+        Set<String> medicineSet = new HashSet<>(conflictMedicineCodes);
+        if (conflictMedicineCodes.size() != 0 && medicineSet.size() != conflictMedicineCodes.size()) {
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "重复的相反药材");
+        }
+        if (StringUtils.isNotBlank(chineseMedicineVO.getMedicineCode())) {
+            if (medicineSet.contains(chineseMedicineVO.getMedicineCode())) {
+                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "药材相反药材名称不能与自己相同");
             }
-            if (StringUtils.isNotBlank(chineseMedicineVO.getMedicineCode())) {
-                if (medicineSet.contains(chineseMedicineVO.getMedicineCode())) {
-                    throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "药材相反药材不能与自己相同");
-                }
-            }
+        }
+        if(medicineSet.size() != 0) {
             List<ChineseMedicineEntity> byMedicineCode = this.getByMedicineCode(medicineSet);
             if (byMedicineCode.size() != medicineSet.size()) {
                 throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "相反药材中有不存在的中药材");
             }
-            ChineseMedicineConflictEntity chineseMedicineConflictEntity = new ChineseMedicineConflictEntity();
-            String collect = String.join(",", conflictMedicineCodes);
-            chineseMedicineConflictEntity.setMedicineCode(medicineCode);
-            chineseMedicineConflictEntity.setMedicineConflictCodes(collect);
-            chineseMedicineConflictService.saveOrUpdate(chineseMedicineConflictEntity, userId);
         }
+        ChineseMedicineConflictEntity chineseMedicineConflictEntity = new ChineseMedicineConflictEntity();
+        String collect = String.join(",", conflictMedicineCodes);
+        chineseMedicineConflictEntity.setMedicineCode(medicineCode);
+        chineseMedicineConflictEntity.setMedicineConflictCodes(collect);
+        chineseMedicineConflictService.saveOrUpdate(chineseMedicineConflictEntity, userId);
         return super.saveOrUpdate(chineseMedicineEntity);
     }
 
@@ -188,10 +188,14 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
 
     @Override
     @Transactional(readOnly = true)
-    public List<ChineseMedicineResponse> queryPageForConflict(String medicineCode) {
+    public List<ChineseMedicineResponse> queryForConflict(String medicineCode) {
         ChineseMedicineConflictEntity chineseMedicineConflictEntity = chineseMedicineConflictService.getByMedicineCode(medicineCode);
-        if (chineseMedicineConflictEntity == null || chineseMedicineConflictEntity.getMedicineConflictCodes() == null) {
-            return new ArrayList<>(1);
+        if (chineseMedicineConflictEntity == null ) {
+            return new ArrayList<>(0);
+        }
+        String medicineConflictCodes = chineseMedicineConflictEntity.getMedicineConflictCodes();
+        if (StringUtils.isBlank(medicineConflictCodes)) {
+            return new ArrayList<>(0);
         }
         List<String> conflictCodes = Arrays.asList(chineseMedicineConflictEntity.getMedicineConflictCodes().split(","));
         LambdaQueryWrapper<ChineseMedicineEntity> medicineWrapper = new LambdaQueryWrapper<>();

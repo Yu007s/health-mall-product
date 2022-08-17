@@ -5,7 +5,6 @@ import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoRes
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
-import io.swagger.models.auth.In;
 
 import java.util.List;
 import java.util.Map;
@@ -35,11 +34,11 @@ public interface ChineseMedicineService {
     ChineseMedicineSearchVO queryPage(String medicineCode, String medicineName, Integer pageNo, Integer pageSize);
 
     /**
-     * 查询中药材分页展示  根据药材编码列表查找  带分页参数
+     * 查询中药材 根据药材编码列表查找
      * @param medicineCode 药材编码  根据此编码查询相反药材列表
      * @return 查询所得中药材列表
      */
-    List<ChineseMedicineResponse> queryPageForConflict(String medicineCode);
+    List<ChineseMedicineResponse> queryForConflict(String medicineCode);
 
     /**
      * 逻辑删除药材

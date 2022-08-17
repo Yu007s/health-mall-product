@@ -8,6 +8,7 @@ import com.drstrong.health.product.dao.chinese.ChineseMedicineConflictMapper;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.service.chinese.ChineseMedicineConflictService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,16 +28,13 @@ public class ChineseMedicineConflictServiceImpl extends CustomServiceImpl<Chines
     public ChineseMedicineConflictEntity getByMedicineCode(String medicineCode) {
         LambdaQueryWrapper<ChineseMedicineConflictEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.select(ChineseMedicineConflictEntity::getMedicineConflictCodes)
-                .eq(ChineseMedicineConflictEntity::getMedicineCode, medicineCode);
+                .eq(ChineseMedicineConflictEntity::getMedicineCode, medicineCode).eq(ChineseMedicineConflictEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode());
         return getOne(lambdaQueryWrapper);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdate(ChineseMedicineConflictEntity conflictEntity, Long userId) {
-        if (conflictEntity == null || conflictEntity.getMedicineCode() == null || conflictEntity.getMedicineCode().isEmpty()) {
-            return;
-        }
         LambdaQueryWrapper<ChineseMedicineConflictEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ChineseMedicineConflictEntity::getMedicineCode, conflictEntity.getMedicineCode())
                 .eq(ChineseMedicineConflictEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
@@ -47,6 +45,10 @@ public class ChineseMedicineConflictServiceImpl extends CustomServiceImpl<Chines
             conflictEntity.setCreatedBy(userId);
         }
         conflictEntity.setChangedBy(userId);
+        String medicineConflictCodes = conflictEntity.getMedicineConflictCodes();
+        if(StringUtils.isBlank(medicineConflictCodes)) {
+            conflictEntity.setDelFlag(DelFlagEnum.IS_DELETED.getCode());
+        }
         LambdaQueryWrapper<ChineseMedicineConflictEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ChineseMedicineConflictEntity::getMedicineCode, conflictEntity.getMedicineCode())
                 .eq(ChineseMedicineConflictEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
