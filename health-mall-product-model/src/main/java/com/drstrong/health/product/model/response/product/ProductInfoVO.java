@@ -1,6 +1,7 @@
 package com.drstrong.health.product.model.response.product;
 
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoExtendVO;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.util.List;
  */
 @Data
 @ApiModel("商品信息的返回值")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductInfoVO implements Serializable {
 	private static final long serialVersionUID = -747362472766957432L;
 
