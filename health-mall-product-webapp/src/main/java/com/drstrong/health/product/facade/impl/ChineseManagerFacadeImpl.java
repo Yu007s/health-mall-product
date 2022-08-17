@@ -295,7 +295,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
     }
 
 	/**
-	 * 根据店铺 id 获取店铺的供应商信息
+	 * 根据店铺 id 获取店铺的供应商信息(只展示有关联关系的供应商)
 	 *
 	 * @param storeId 店铺 id
 	 * @return 供应商集合
@@ -303,8 +303,8 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 	 * @date 2022/8/8 14:53
 	 */
 	@Override
-	public List<SupplierBaseInfoVO> getStoreSupplierInfo(Long storeId) {
-		if (Objects.isNull(storeId)) {
+	public List<SupplierBaseInfoVO> getStoreSupplierInfo(Long storeId, String medicineCode) {
+		if (Objects.isNull(storeId) || StringUtils.isBlank(medicineCode)) {
 			return Lists.newArrayList();
 		}
 		// 1.查询店铺关联的供应商信息
@@ -313,14 +313,14 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 			return Lists.newArrayList();
 		}
 		List<Long> supplierIdList = supplierEntityList.stream().map(StoreLinkSupplierEntity::getSupplierId).distinct().collect(toList());
-		// 2.获取供应商名称
-		Map<Long, String> supplierNameToMap = supplierRemoteProService.getSupplierNameToMap(supplierIdList);
-		List<SupplierBaseInfoVO> supplierBaseInfoVOList = Lists.newArrayListWithCapacity(supplierEntityList.size());
-		supplierEntityList.forEach(storeLinkSupplierEntity -> {
-			Long supplierId = storeLinkSupplierEntity.getSupplierId();
+		// 2.根据药材 code,查询该药材在哪些供应商中已经关联
+		List<SupplierInfoDTO> supplierInfoDTOList = supplierRemoteProService.searchSupplierByCode(medicineCode);
+		// 3.组装返回值
+		List<SupplierBaseInfoVO> supplierBaseInfoVOList = Lists.newArrayListWithCapacity(supplierInfoDTOList.size());
+		supplierInfoDTOList.stream().filter(supplierInfoDTO -> supplierIdList.contains(supplierInfoDTO.getSupplierId())).forEach(supplierInfoDTO -> {
 			SupplierBaseInfoVO supplierBaseInfoVO = new SupplierBaseInfoVO();
-			supplierBaseInfoVO.setSupplierId(supplierId);
-			supplierBaseInfoVO.setSupplierName(supplierNameToMap.get(supplierId));
+			supplierBaseInfoVO.setSupplierId(supplierInfoDTO.getSupplierId());
+			supplierBaseInfoVO.setSupplierName(supplierInfoDTO.getSupplierName());
 			supplierBaseInfoVOList.add(supplierBaseInfoVO);
 		});
 		return supplierBaseInfoVOList;

@@ -94,14 +94,15 @@ public interface ChineseManagerFacade {
     List<SupplierChineseManagerSkuVO> listSupplierChineseManagerSkuExport(ChineseManagerSkuRequest skuRequest);
 
 	/**
-	 * 根据店铺 id 获取店铺的供应商信息
+	 * 根据店铺 id 获取店铺的供应商信息(只展示有关联关系的供应商)
 	 *
 	 * @param storeId 店铺 id
+	 * @param medicineCode 中药材 code
 	 * @return 供应商集合
 	 * @author liuqiuyi
 	 * @date 2022/8/8 14:53
 	 */
-	List<SupplierBaseInfoVO> getStoreSupplierInfo(Long storeId);
+	List<SupplierBaseInfoVO> getStoreSupplierInfo(Long storeId, String medicineCode);
 
     /**
      * 店铺数据初始化,将中药材默认上架到所有店铺,关联天江供应商

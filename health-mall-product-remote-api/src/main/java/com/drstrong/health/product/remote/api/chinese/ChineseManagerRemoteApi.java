@@ -67,7 +67,7 @@ public interface ChineseManagerRemoteApi {
 
     @ApiOperation("查询店铺的供应商信息")
     @GetMapping("/store/supplier")
-    ResultVO<List<SupplierBaseInfoVO>> getStoreSupplierInfo(@RequestParam("storeId") Long storeId);
+    ResultVO<List<SupplierBaseInfoVO>> getStoreSupplierInfo(@RequestParam("storeId") Long storeId, @RequestParam("medicineCode") String medicineCode);
 
     @ApiOperation("数据修复接口-获取所有的老表的中药材信息")
     @GetMapping("/list/oldChineseMedicine")

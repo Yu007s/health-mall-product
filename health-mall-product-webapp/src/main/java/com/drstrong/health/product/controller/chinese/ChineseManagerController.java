@@ -80,8 +80,8 @@ public class ChineseManagerController implements ChineseManagerRemoteApi {
     }
 
     @Override
-    public ResultVO<List<SupplierBaseInfoVO>> getStoreSupplierInfo(Long storeId) {
-        return ResultVO.success(chineseManagerFacade.getStoreSupplierInfo(storeId));
+    public ResultVO<List<SupplierBaseInfoVO>> getStoreSupplierInfo(Long storeId, String medicineCode) {
+        return ResultVO.success(chineseManagerFacade.getStoreSupplierInfo(storeId, medicineCode));
     }
 
     @Override
