@@ -71,7 +71,9 @@ public class StockRemoteProService {
 		if (CollectionUtils.isEmpty(skuCanStockResponseList)) {
 			return Maps.newHashMap();
 		}
-		return skuCanStockResponseList.stream().collect(groupingBy(SkuCanStockResponse::getSkuCode));
+		return skuCanStockResponseList.stream()
+				.filter(skuCanStockResponse -> StringUtils.isNotBlank(skuCanStockResponse.getSkuCode()))
+				.collect(groupingBy(SkuCanStockResponse::getSkuCode));
 	}
 
 	/**
