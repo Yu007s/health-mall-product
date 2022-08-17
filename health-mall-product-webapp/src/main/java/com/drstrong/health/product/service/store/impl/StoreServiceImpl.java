@@ -277,6 +277,9 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         storeEntity.setId(storeRequest.getStoreId());
         if (integer.equals(StoreTypeEnum.INT_HOSPITAL.getCode())) {
             Long agencyId = storeRequest.getAgencyId();
+            if(agencyId == null || agencyService.id2name(agencyId) == null) {
+                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "店铺类型为互联网医院，但未关联互联网医院或关联了错误的互联网医院");
+            }
             storeEntity.setAgencyId(agencyId);
         }
         //组装发票实例
