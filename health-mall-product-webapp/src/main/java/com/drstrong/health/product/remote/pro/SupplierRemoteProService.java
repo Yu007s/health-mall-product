@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.drstrong.health.ware.model.result.ResultVO;
 import com.drstrong.health.ware.remote.api.SupplierManageRemoteApi;
+import com.drstrong.health.ware.remote.api.SupplierSkuRemoteApi;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -25,6 +27,9 @@ import java.util.stream.Collectors;
 public class SupplierRemoteProService {
 	@Resource
 	SupplierManageRemoteApi supplierManageRemoteApi;
+
+	@Resource
+	SupplierSkuRemoteApi supplierSkuRemoteApi;
 
 	/**
 	 * 根据供应商 id 获取供应商信息,并转换成 map
@@ -55,11 +60,33 @@ public class SupplierRemoteProService {
 				log.error("invoke supplierManageRemoteApi.queryBySupplierIds() result is error! result:{}", JSON.toJSONString(listResult));
 				return Lists.newArrayList();
 			}
-			List<SupplierInfoDTO> supplierInfoList = listResult.getData();
-			log.info("invoke supplierManageRemoteApi.queryBySupplierIds() success,result:{}", JSON.toJSONString(supplierInfoList));
-			return supplierInfoList;
+			return listResult.getData();
 		} catch (Exception e) {
 			log.error("invoke supplierManageRemoteApi.queryBySupplierIds() an error occurred!", e);
+			return Lists.newArrayList();
+		}
+	}
+
+	/**
+	 * 根据供应商 id 获取供应商信息
+	 *
+	 * @author liuqiuyi
+	 * @date 2022/8/5 13:52
+	 */
+	public List<SupplierInfoDTO> searchSupplierByCode(String medicineCode) {
+		if (StringUtils.isBlank(medicineCode)) {
+			return Lists.newArrayList();
+		}
+		log.info("invoke supplierSkuRemoteApi.searchSupplierByDicCode() param:{}", medicineCode);
+		try {
+			ResultVO<List<SupplierInfoDTO>> listResultVO = supplierSkuRemoteApi.searchSupplierByDicCode(medicineCode);
+			if (Objects.isNull(listResultVO) || !listResultVO.isSuccess()) {
+				log.error("invoke supplierSkuRemoteApi.searchSupplierByDicCode() result is error! result:{}", medicineCode);
+				return Lists.newArrayList();
+			}
+			return listResultVO.getData();
+		} catch (Exception e) {
+			log.error("invoke supplierSkuRemoteApi.searchSupplierByDicCode() an error occurred!", e);
 			return Lists.newArrayList();
 		}
 	}
