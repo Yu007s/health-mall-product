@@ -57,11 +57,10 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
 	 *
 	 * @param skuName sku 名称
 	 * @param storeId 店铺 id
-	 * @return sku 信息
      * @author liuqiuyi
      * @date 2022/8/18 10:33
      */
-    ChineseSkuInfoEntity checkSkuNameIsRepeat(String skuName, Long storeId);
+    void checkSkuNameIsRepeat(String skuName, Long storeId);
 
 	/**
 	 * 根据药材 code 集合和店铺id，获取中药信息
