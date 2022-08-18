@@ -351,17 +351,18 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
             if (Objects.isNull(skuInfoEntity)) {
                 throw new BusinessException(ErrorEnums.SKU_IS_NULL);
             }
+            // 如果是修改,且修改前后 skuName 不一样,也需要校验 skuName 是否重复
+			if (!Objects.equals(skuInfoEntity.getSkuName(), saveOrUpdateSkuVO.getSkuName())) {
+				chineseSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateSkuVO.getSkuName(), saveOrUpdateSkuVO.getStoreId());
+			}
         } else {
             // 校验是否重复添加
             ChineseSkuInfoEntity chineseSkuInfoEntity = chineseSkuInfoService.getByMedicineCodeAndStoreId(saveOrUpdateSkuVO.getMedicineCode(), saveOrUpdateSkuVO.getStoreId());
             if (Objects.nonNull(chineseSkuInfoEntity)) {
                 throw new BusinessException(ErrorEnums.CHINESE_IS_REPEAT);
             }
-        }
-        // 5.校验相同店铺下,sku名称是否重复添加
-		ChineseSkuInfoEntity chineseSkuInfo = chineseSkuInfoService.getBySkuNameAndStoreId(saveOrUpdateSkuVO.getSkuName(), saveOrUpdateSkuVO.getStoreId());
-		if (Objects.nonNull(chineseSkuInfo)) {
-			throw new BusinessException(ErrorEnums.SKU_NAME_IS_REPEAT);
+			// 5.校验相同店铺下,sku名称是否重复添加
+			chineseSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateSkuVO.getSkuName(), saveOrUpdateSkuVO.getStoreId());
 		}
 	}
 
