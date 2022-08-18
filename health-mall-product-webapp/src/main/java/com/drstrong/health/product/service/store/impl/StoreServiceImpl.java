@@ -48,19 +48,19 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(StoreInfoDetailSaveRequest storeRequest)  {
+    public void save(StoreInfoDetailSaveRequest storeRequest) {
         Long userId = storeRequest.getUserId();
         StoreInvoiceEntity invoice = BeanUtil.copyProperties(storeRequest, StoreInvoiceEntity.class);
         List<StoreLinkSupplierEntity> storeLinkSuppliers = new ArrayList<>(storeRequest.getSupplierIds().size());
         StoreEntity storeEntity = new StoreEntity();
-        buildEntityForSaveOrUpdate(storeRequest,storeEntity,storeLinkSuppliers,invoice,userId);
+        buildEntityForSaveOrUpdate(storeRequest, storeEntity, storeLinkSuppliers, invoice, userId);
         checkStore(storeEntity);
         if (storeEntity.getAgencyId() != null) {
             //校验将要关联的互联网医院是否已经关联了店铺
             LambdaQueryWrapper<StoreEntity> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(StoreEntity::getAgencyId, storeEntity.getAgencyId()).eq(StoreEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode()).last("limit 1");
+            queryWrapper.eq(StoreEntity::getAgencyId, storeEntity.getAgencyId()).eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode()).last("limit 1");
             StoreEntity one = super.getOne(queryWrapper);
-            if(one != null){
+            if (one != null) {
                 throw new BusinessException("该互联网医院已经关联了店铺");
             }
         }
@@ -80,19 +80,23 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         //这里为店铺配送设置一个默认优先级
         SaveDeliveryRequest saveDeliveryRequest = new SaveDeliveryRequest();
         saveDeliveryRequest.setStoreId(storeId);
+        List<Long> supplierIds = storeRequest.getSupplierIds();
+        if (supplierIds.size() == 0) {
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "店铺供应商设置错误");
+        }
         saveDeliveryRequest.setDefaultDelPriority(storeRequest.getSupplierIds());
         saveDeliveryRequest.setDefaultDelPriority(saveDeliveryRequest.getDefaultDelPriority());
-        storeDeliveryPriorityService.save(saveDeliveryRequest,userId);
+        storeDeliveryPriorityService.save(saveDeliveryRequest, userId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(StoreInfoDetailSaveRequest storeRequest)  {
+    public void update(StoreInfoDetailSaveRequest storeRequest) {
         StoreInvoiceEntity invoice = BeanUtil.copyProperties(storeRequest, StoreInvoiceEntity.class);
         List<StoreLinkSupplierEntity> storeLinkSuppliers = new ArrayList<>(storeRequest.getSupplierIds().size());
         StoreEntity storeEntity = new StoreEntity();
         Long userId = storeRequest.getUserId();
-        buildEntityForSaveOrUpdate(storeRequest,storeEntity,storeLinkSuppliers,invoice,userId);
+        buildEntityForSaveOrUpdate(storeRequest, storeEntity, storeLinkSuppliers, invoice, userId);
         Long storeId = storeEntity.getId();
         //禁止更新字段设置为null
         storeEntity.setStoreType(null);
@@ -102,14 +106,14 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         //更新店铺
         super.updateById(storeEntity);
         //更新店铺发票
-        LambdaQueryWrapper<StoreInvoiceEntity> lambdaQueryWrapper =  new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(StoreInvoiceEntity::getStoreId, storeId).eq(StoreInvoiceEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode());
-        storeInvoiceMapper.update(invoice,lambdaQueryWrapper);
+        LambdaQueryWrapper<StoreInvoiceEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(StoreInvoiceEntity::getStoreId, storeId).eq(StoreInvoiceEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+        storeInvoiceMapper.update(invoice, lambdaQueryWrapper);
     }
 
 
     @Override
-    public List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, String storeTypeName) {
+    public List<StoreInfoResponse> query(Long storeId, String storeName, Long agencyId, String storeTypeName) {
         LambdaQueryWrapper<StoreEntity> storeEntityQueryWrapper = new LambdaQueryWrapper<>();
         Integer storeType = StoreTypeEnum.nameToCode(storeTypeName);
         storeEntityQueryWrapper.eq(storeId != null, StoreEntity::getId, storeId)
@@ -118,7 +122,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
                 .eq(agencyId != null, StoreEntity::getAgencyId, agencyId)
                 .eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         List<StoreEntity> storeEntities = list(storeEntityQueryWrapper);
-        storeEntities.sort((a,b) -> b.getChangedAt().compareTo(a.getChangedAt()));
+        storeEntities.sort((a, b) -> b.getChangedAt().compareTo(a.getChangedAt()));
         return storeEntities.stream().map(storeEntity -> {
             StoreInfoResponse storeInfoResponse = BeanUtil.copyProperties(storeEntity, StoreInfoResponse.class);
             Integer storeTypeCode = storeEntity.getStoreType();
@@ -203,7 +207,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         //所有互联网医院
         List<String> allName = agencyService.getAllName();
         for (int i = 0; i < allName.size(); i++) {
-            StoreQueryResponse.AgencyIdAndName agencyIdAndName = new StoreQueryResponse.AgencyIdAndName(Long.valueOf(i+1).toString(), allName.get(i));
+            StoreQueryResponse.AgencyIdAndName agencyIdAndName = new StoreQueryResponse.AgencyIdAndName(Long.valueOf(i + 1).toString(), allName.get(i));
             agencyIdAndNames.add(agencyIdAndName);
         }
         StoreQueryResponse storeQueryResponse = new StoreQueryResponse();
@@ -238,7 +242,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     public StoreInfoEditResponse queryById(Long storeId) {
         StoreEntity storeEntity = super.getById(storeId);
         if (storeEntity == null) {
-            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"不存在的店铺");
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "不存在的店铺");
         }
         Long storeEntityId = storeEntity.getId();
         //根据店铺id 查询发票信息  组合后返回
@@ -246,7 +250,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         //查询关联供应商信息
         List<StoreLinkSupplierEntity> linkSupplierEntities = storeLinkSupplierService.queryByStoreId(storeId);
         List<Long> supplierIds = linkSupplierEntities.stream().map(StoreLinkSupplierEntity::getSupplierId).collect(Collectors.toList());
-        return buildStoreInfoResponse(invoice, storeEntity,supplierIds);
+        return buildStoreInfoResponse(invoice, storeEntity, supplierIds);
     }
 
     private StoreInfoEditResponse buildStoreInfoResponse(StoreInvoiceEntity storeInvoiceEntity, StoreEntity storeEntity, List<Long> suppliers) {
@@ -263,21 +267,21 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         return storeInfoEditResponse;
     }
 
-    private void buildEntityForSaveOrUpdate(StoreInfoDetailSaveRequest storeRequest,StoreEntity storeEntity,
-                                            List<StoreLinkSupplierEntity> linkSupplierEntities,StoreInvoiceEntity storeInvoiceEntity,Long userId) {
+    private void buildEntityForSaveOrUpdate(StoreInfoDetailSaveRequest storeRequest, StoreEntity storeEntity,
+                                            List<StoreLinkSupplierEntity> linkSupplierEntities, StoreInvoiceEntity storeInvoiceEntity, Long userId) {
         //组装店铺实体
         storeEntity.setChangedBy(userId);
         storeEntity.setStoreName(storeRequest.getStoreName());
         String storeTypeName = storeRequest.getStoreTypeName();
         Integer integer = StoreTypeEnum.nameToCode(storeTypeName);
         if (integer == null) {
-            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"错误的店铺类型名称");
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "错误的店铺类型名称");
         }
         storeEntity.setStoreType(integer);
         storeEntity.setId(storeRequest.getStoreId());
         if (integer.equals(StoreTypeEnum.INT_HOSPITAL.getCode())) {
             Long agencyId = storeRequest.getAgencyId();
-            if(agencyId == null || agencyService.id2name(agencyId) == null) {
+            if (agencyId == null || agencyService.id2name(agencyId) == null) {
                 throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "店铺类型为互联网医院，但未关联互联网医院或关联了错误的互联网医院");
             }
             storeEntity.setAgencyId(agencyId);
@@ -296,21 +300,22 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
 
     /**
      * 检验店铺相关信息是否合法
+     *
      * @param store 店铺
      */
     private void checkStore(StoreEntity store) {
         LambdaQueryWrapper<StoreEntity> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(StoreEntity::getStoreName,store.getStoreName()).eq(StoreEntity::getDelFlag,DelFlagEnum.UN_DELETED.getCode()).last("limit 1");
+        queryWrapper.eq(StoreEntity::getStoreName, store.getStoreName()).eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode()).last("limit 1");
         StoreEntity one = super.getOne(queryWrapper);
-        if(store.getId() != null){
+        if (store.getId() != null) {
             //说明是编辑店铺  此时根据名字检索  如果检索到有店铺但是id不是传入id  那么报错
-            if(one != null && !one.getId().equals(store.getId())){
-                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"已经存在同名店铺");
+            if (one != null && !one.getId().equals(store.getId())) {
+                throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "已经存在同名店铺");
             }
             return;
         }
-        if(one != null){
-            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(),"已经存在同名店铺");
+        if (one != null) {
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "已经存在同名店铺");
         }
     }
 

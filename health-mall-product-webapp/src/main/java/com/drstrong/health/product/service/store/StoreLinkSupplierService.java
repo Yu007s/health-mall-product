@@ -11,6 +11,10 @@ import java.util.List;
  * @Date 2022/07/30/9:36
  */
 public interface StoreLinkSupplierService  {
+    /**
+     * 批量存储店铺关联供应商
+     * @param linkSupplierEntities 店铺关联供应商实体类列表
+     */
     void saveBatch(List<StoreLinkSupplierEntity > linkSupplierEntities);
 
     /**
@@ -25,5 +29,5 @@ public interface StoreLinkSupplierService  {
      * @param supplierId 供应商id
      * @return 查询所得店铺信息
      */
-    public List<StoreInfoResponse> queryBySupplierId(Long supplierId) ;
+     List<StoreInfoResponse> queryBySupplierId(Long supplierId) ;
 }

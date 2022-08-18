@@ -135,7 +135,7 @@ public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDel
         DeliveryPriorityEntity one = getOne(lambdaQueryWrapper);
         List<Long> defaultIds = saveDeliveryRequest.getDefaultDelPriority();
         if (defaultIds.stream().anyMatch(Objects::isNull)) {
-            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "错误的供应商设置");
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "错误的默认供应商设置");
         }
         DeliveryPriRequest defaultDelPriority = new DeliveryPriRequest();
         //默认配送优先级设置
