@@ -125,7 +125,7 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
      * @date 2022/8/18 10:33
      */
     @Override
-    public ChineseSkuInfoEntity checkSkuNameIsRepeat(String skuName, Long storeId) {
+    public void checkSkuNameIsRepeat(String skuName, Long storeId) {
         if (StringUtils.isBlank(skuName) || Objects.isNull(storeId)) {
             throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
         }
@@ -134,7 +134,10 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
                 .eq(ChineseSkuInfoEntity::getSkuName, skuName)
                 .eq(ChineseSkuInfoEntity::getStoreId, storeId)
                 .last("limit 1");
-        return Optional.ofNullable(getOne(queryWrapper)).orElseThrow(() -> new BusinessException(ErrorEnums.SKU_NAME_IS_REPEAT));
+        ChineseSkuInfoEntity skuInfoEntity = getOne(queryWrapper);
+        if (Objects.nonNull(skuInfoEntity)) {
+            throw new BusinessException(ErrorEnums.SKU_NAME_IS_REPEAT);
+        }
     }
 
     /**
