@@ -29,4 +29,20 @@
          and del_flag = 0
         limit 20
     </select>
+
+    <select id="queryByMedicineIds"
+            resultType="com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        product_chinese_medicine
+        <where>
+            id in
+            <foreach collection="medicineIds" item="item" index="index" separator=",">
+                (
+                #{item}
+                )
+            </foreach>
+        </where>
+    </select>
 </mapper>

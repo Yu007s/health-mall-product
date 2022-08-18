@@ -45,8 +45,10 @@ public enum ErrorEnums implements IBaseResult {
 	CHINESE_IS_REPEAT("11108", "同一店铺下相同药材不能重复添加"),
 	SKU_IS_NULL("11109", "sku不存在或已下架"),
 	CHINESE_MEDICINE_IS_NULL("11110", "中药材不存在"),
-	SUPPLIER_IS_NULL("11111", "供应商不存在"),
+	SUPPLIER_IS_NULL("11111", "供应商不存在或未建立关联"),
 	SAVE_IS_NULL("11112", "保存数据失败"),
+	SKU_NAME_IS_REPEAT("11113", "相同店铺下 sku 名称不能重复"),
+	MEDICINE_CODE_NOT_ASSOCIATED("11114", "药材未关联供应商"),
 
 	STORE_NAME_LENGTH("17000", "店铺名称长度不正确"),
 	STORE_NAME_REPEAT("17100", "店铺名称已存在"),

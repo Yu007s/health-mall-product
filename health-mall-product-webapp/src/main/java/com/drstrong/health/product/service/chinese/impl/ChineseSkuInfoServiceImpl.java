@@ -36,6 +36,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -102,12 +103,41 @@ public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoM
      */
     @Override
     public ChineseSkuInfoEntity getByMedicineCodeAndStoreId(String medicineCode, Long storeId) {
+        if (StringUtils.isBlank(medicineCode) || Objects.isNull(storeId)) {
+            return null;
+        }
         LambdaQueryWrapper<ChineseSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .eq(StringUtils.isNoneBlank(medicineCode), ChineseSkuInfoEntity::getMedicineCode, medicineCode)
-                .eq(Objects.nonNull(storeId), ChineseSkuInfoEntity::getStoreId, storeId)
+                .eq(ChineseSkuInfoEntity::getMedicineCode, medicineCode)
+                .eq(ChineseSkuInfoEntity::getStoreId, storeId)
                 .last("limit 1");
         return getOne(queryWrapper);
+    }
+
+    /**
+     * 根据 skuName 和店铺 id 获取 sku 信息
+     * <p> skuName 完全匹配,用于判断店铺中 skuName 是否重复,重复抛出异常 </>
+     *
+     * @param skuName sku 名称
+     * @param storeId 店铺 id
+     * @return sku 信息
+     * @author liuqiuyi
+     * @date 2022/8/18 10:33
+     */
+    @Override
+    public void checkSkuNameIsRepeat(String skuName, Long storeId) {
+        if (StringUtils.isBlank(skuName) || Objects.isNull(storeId)) {
+            throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
+        }
+        LambdaQueryWrapper<ChineseSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .eq(ChineseSkuInfoEntity::getSkuName, skuName)
+                .eq(ChineseSkuInfoEntity::getStoreId, storeId)
+                .last("limit 1");
+        ChineseSkuInfoEntity skuInfoEntity = getOne(queryWrapper);
+        if (Objects.nonNull(skuInfoEntity)) {
+            throw new BusinessException(ErrorEnums.SKU_NAME_IS_REPEAT);
+        }
     }
 
     /**

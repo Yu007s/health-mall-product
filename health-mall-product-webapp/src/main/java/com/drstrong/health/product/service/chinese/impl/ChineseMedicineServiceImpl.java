@@ -279,6 +279,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
 
     /**
      * 根据老的药材 id 获取药材 code,组成 map
+     * <p> 注意:包含了删除的数据 </>
      *
      * @param medicineIds 药材id
      * @author liuqiuyi
@@ -292,6 +293,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
 
     /**
      * 根据老的药材 id 获取药材信息
+     * <p> 注意:包含了删除的数据 </>
      *
      * @param medicineIds 老药材 id 集合
      * @return 药材信息集合
@@ -303,9 +305,6 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         if (CollectionUtils.isEmpty(medicineIds)) {
             return Lists.newArrayList();
         }
-        LambdaQueryWrapper<ChineseMedicineEntity> queryWrapper = Wrappers.<ChineseMedicineEntity>lambdaQuery()
-                .eq(ChineseMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .in(ChineseMedicineEntity::getId, medicineIds);
-        return list(queryWrapper);
+        return chineseMedicineMapper.queryByMedicineIds(medicineIds);
     }
 }

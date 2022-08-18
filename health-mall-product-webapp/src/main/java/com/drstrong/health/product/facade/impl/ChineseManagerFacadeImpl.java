@@ -33,6 +33,7 @@ import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.ware.model.response.SkuStockResponse;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -339,10 +340,14 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         if (CollectionUtils.isEmpty(storeEntityList)) {
             throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
         }
-        // 3.校验供应商是否存在
-        List<Long> supplierIds = saveOrUpdateSkuVO.getSupplierInfoList().stream().map(SaveOrUpdateSkuVO.SupplierInfo::getSupplierId).collect(toList());
-        List<SupplierInfoDTO> supplierInfoDTOList = supplierRemoteProService.getSupplierNameByIds(supplierIds);
-        if (CollectionUtils.isEmpty(storeEntityList) || !Objects.equals(supplierInfoDTOList.size(), supplierIds.size())) {
+        // 3.校验药材是否关联了供应商
+		List<SupplierInfoDTO> supplierInfoDTOList = supplierRemoteProService.searchSupplierByCode(saveOrUpdateSkuVO.getMedicineCode());
+		if (CollectionUtils.isEmpty(supplierInfoDTOList)) {
+			throw new BusinessException(ErrorEnums.MEDICINE_CODE_NOT_ASSOCIATED);
+		}
+		List<Long> supplierIds = supplierInfoDTOList.stream().map(SupplierInfoDTO::getSupplierId).collect(toList());
+		boolean supplierFlag = saveOrUpdateSkuVO.getSupplierInfoList().stream().anyMatch(supplierInfo -> !supplierIds.contains(supplierInfo.getSupplierId()));
+        if (supplierFlag) {
             throw new BusinessException(ErrorEnums.SUPPLIER_IS_NULL);
         }
         // 4.如果是更新sku，校验skuCode是否存在，否则校验重复添加
@@ -351,14 +356,20 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
             if (Objects.isNull(skuInfoEntity)) {
                 throw new BusinessException(ErrorEnums.SKU_IS_NULL);
             }
+            // 如果是修改,且修改前后 skuName 不一样,也需要校验 skuName 是否重复
+			if (!Objects.equals(skuInfoEntity.getSkuName(), saveOrUpdateSkuVO.getSkuName())) {
+				chineseSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateSkuVO.getSkuName(), saveOrUpdateSkuVO.getStoreId());
+			}
         } else {
             // 校验是否重复添加
             ChineseSkuInfoEntity chineseSkuInfoEntity = chineseSkuInfoService.getByMedicineCodeAndStoreId(saveOrUpdateSkuVO.getMedicineCode(), saveOrUpdateSkuVO.getStoreId());
             if (Objects.nonNull(chineseSkuInfoEntity)) {
                 throw new BusinessException(ErrorEnums.CHINESE_IS_REPEAT);
             }
-        }
-    }
+			// 5.校验相同店铺下,sku名称是否重复添加
+			chineseSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateSkuVO.getSkuName(), saveOrUpdateSkuVO.getStoreId());
+		}
+	}
 
     private List<ChineseManagerSkuVO> buildChineseManagerSkuResponse(List<ChineseSkuInfoEntity> skuInfoEntityList,
                                                                      Map<String, Set<Long>> skuCodeSupplierIdsMap,
@@ -420,44 +431,52 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 	@Override
 	@Deprecated
 	public List<StoreDataInitializeRequest.CompensateInfo> storeDataInitialize(StoreDataInitializeRequest initializeRequest) {
+		// 用于存储需要上架的中药材
+		Map<Long, List<Long>> storeIdMedicineIdsMap = Maps.newHashMapWithExpectedSize(4);
 		if (!CollectionUtils.isEmpty(initializeRequest.getStoreIds()) && CollectionUtils.isEmpty(initializeRequest.getCompensateInfoList())) {
 			// 数据修复,获取结果
-			List<StoreDataInitializeRequest.CompensateInfo> compensateInfoList = initSaveSku(initializeRequest);
+			List<StoreDataInitializeRequest.CompensateInfo> compensateInfoList = initSaveSku(initializeRequest, storeIdMedicineIdsMap);
 			// 更新上架状态
-			updateStatue(initializeRequest.getStoreIds());
+			updateStatue(storeIdMedicineIdsMap);
 			return compensateInfoList;
 		} else if (!CollectionUtils.isEmpty(initializeRequest.getCompensateInfoList())) {
 			// 数据修复,获取结果
-			List<StoreDataInitializeRequest.CompensateInfo> compensateInfos = compensateSaveSku(initializeRequest);
-			List<Long> storeIds = initializeRequest.getCompensateInfoList().stream().map(StoreDataInitializeRequest.CompensateInfo::getStoreId).distinct().collect(toList());
+			List<StoreDataInitializeRequest.CompensateInfo> compensateInfos = compensateSaveSku(initializeRequest, storeIdMedicineIdsMap);
 			// 更新上架状态
-			updateStatue(storeIds);
+			updateStatue(storeIdMedicineIdsMap);
 			return compensateInfos;
 		} else {
 			throw new BusinessException("未执行任何初始化操作,请检查传参!");
 		}
 	}
 
-	private void updateStatue(List<Long> storeIds){
-		// 将商品修改为上架状态
-		ChineseSkuInfoEntity chineseSkuInfoEntity = ChineseSkuInfoEntity.builder().build();
-		chineseSkuInfoEntity.setSkuStatus(ProductStateEnum.HAS_PUT.getCode());
-		chineseSkuInfoEntity.setChangedAt(LocalDateTime.now());
-		LambdaQueryWrapper<ChineseSkuInfoEntity> updateWrapper = Wrappers.<ChineseSkuInfoEntity>lambdaQuery().in(ChineseSkuInfoEntity::getStoreId, storeIds);
-		chineseSkuInfoService.update(chineseSkuInfoEntity, updateWrapper);
+	private void updateStatue(Map<Long, List<Long>> storeIdMedicineIdsMap) {
+		if (CollectionUtils.isEmpty(storeIdMedicineIdsMap)) {
+			return;
+		}
+		for (Map.Entry<Long, List<Long>> storeIdMedicineIdsEntry : storeIdMedicineIdsMap.entrySet()) {
+			Long storeId = storeIdMedicineIdsEntry.getKey();
+			List<Long> medicineIds = storeIdMedicineIdsEntry.getValue();
+
+			// 将商品修改为上架状态
+			ChineseSkuInfoEntity chineseSkuInfoEntity = ChineseSkuInfoEntity.builder().build();
+			chineseSkuInfoEntity.setSkuStatus(ProductStateEnum.HAS_PUT.getCode());
+			chineseSkuInfoEntity.setChangedAt(LocalDateTime.now());
+			LambdaQueryWrapper<ChineseSkuInfoEntity> updateWrapper = Wrappers.<ChineseSkuInfoEntity>lambdaQuery()
+					.eq(ChineseSkuInfoEntity::getStoreId, storeId).in(ChineseSkuInfoEntity::getOldMedicineId, medicineIds);
+			chineseSkuInfoService.update(chineseSkuInfoEntity, updateWrapper);
+		}
 	}
 
 	@Deprecated
-	private List<StoreDataInitializeRequest.CompensateInfo> compensateSaveSku(StoreDataInitializeRequest initializeRequest) {
+	private List<StoreDataInitializeRequest.CompensateInfo> compensateSaveSku(StoreDataInitializeRequest initializeRequest, Map<Long, List<Long>> storeIdMedicineIdsMap) {
 		List<StoreDataInitializeRequest.CompensateInfo> resultList = Lists.newArrayList();
 
 		List<StoreDataInitializeRequest.CompensateInfo> compensateInfoList = initializeRequest.getCompensateInfoList();
 		Set<Long> medicineIds = compensateInfoList.stream().map(StoreDataInitializeRequest.CompensateInfo::getMedicineId).collect(toSet());
 
 		// 1.获取需要补偿的老药材
-		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery()
-				.eq(OldChineseMedicine::getInvalid, DelFlagEnum.UN_DELETED.getCode())
-				.in(OldChineseMedicine::getId, medicineIds);
+		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery().in(OldChineseMedicine::getId, medicineIds);
 		List<OldChineseMedicine> oldChineseMedicineList = oldChineseMedicineMapper.selectList(queryWrapper);
 		if (CollectionUtils.isEmpty(oldChineseMedicineList)) {
 			return resultList;
@@ -489,8 +508,15 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 				saveOrUpdateSkuVO.setSupplierInfoList(Lists.newArrayList(supplierInfo));
 				saveOrUpdateSkuVO.setOperatorId(0L);
 
-
 				chineseSkuInfoService.saveSku(saveOrUpdateSkuVO);
+
+				// 如果修复的药材是正常状态,需要进行上架操作
+				if (Objects.equals(0, oldChineseMedicine.getInvalid())) {
+					if (CollectionUtils.isEmpty(storeIdMedicineIdsMap.get(storeId))) {
+						storeIdMedicineIdsMap.put(storeId, Lists.newArrayListWithCapacity(8));
+					}
+					storeIdMedicineIdsMap.get(storeId).add(oldChineseMedicine.getId());
+				}
 			} catch (Throwable e) {
 				log.error("初始化数据失败,异常信息为:", e);
 				StoreDataInitializeRequest.CompensateInfo info = new StoreDataInitializeRequest.CompensateInfo();
@@ -503,10 +529,10 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 	}
 
 	@Deprecated
-	private List<StoreDataInitializeRequest.CompensateInfo> initSaveSku(StoreDataInitializeRequest initializeRequest) {
-		List<StoreDataInitializeRequest.CompensateInfo> resultList = Lists.newArrayList();
+	private List<StoreDataInitializeRequest.CompensateInfo> initSaveSku(StoreDataInitializeRequest initializeRequest, Map<Long, List<Long>> storeIdMedicineIdsMap) {
+		List<StoreDataInitializeRequest.CompensateInfo> resultList = Lists.newArrayListWithCapacity(500);
 		// 1.获取所有的老药材
-		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery().eq(OldChineseMedicine::getInvalid, DelFlagEnum.UN_DELETED.getCode());
+		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery();
 		List<OldChineseMedicine> oldChineseMedicineList = oldChineseMedicineMapper.selectList(queryWrapper);
 		if (CollectionUtils.isEmpty(oldChineseMedicineList)) {
 			return resultList;
@@ -519,6 +545,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 		List<Long> storeIds = initializeRequest.getStoreIds();
 		Long supplierId = initializeRequest.getSupplierId();
 		for (Long storeId : storeIds) {
+			List<Long> needUpMedicineIds = Lists.newArrayListWithCapacity(500);
 			oldChineseMedicineList.forEach(oldChineseMedicine -> {
 				try {
 					SaveOrUpdateSkuVO saveOrUpdateSkuVO = new SaveOrUpdateSkuVO();
@@ -537,6 +564,10 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 					saveOrUpdateSkuVO.setOperatorId(0L);
 
 					chineseSkuInfoService.saveSku(saveOrUpdateSkuVO);
+					// 保存成功后,如果该药材是正常状态,则需要进行上架
+					if (Objects.equals(0, oldChineseMedicine.getInvalid())) {
+						needUpMedicineIds.add(oldChineseMedicine.getId());
+					}
 				} catch (Throwable e) {
 					log.error("初始化数据失败,异常信息为:", e);
 					StoreDataInitializeRequest.CompensateInfo info = new StoreDataInitializeRequest.CompensateInfo();
@@ -545,6 +576,8 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 					resultList.add(info);
 				}
 			});
+
+			storeIdMedicineIdsMap.put(storeId, needUpMedicineIds);
 		}
 		return resultList;
 	}
@@ -558,7 +591,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 	@Override
 	@Deprecated
 	public List<OldChineseMedicine> listOldChineseMedicine() {
-		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery().eq(OldChineseMedicine::getInvalid, DelFlagEnum.UN_DELETED.getCode());
+		LambdaQueryWrapper<OldChineseMedicine> queryWrapper = Wrappers.<OldChineseMedicine>lambdaQuery();
 		return oldChineseMedicineMapper.selectList(queryWrapper);
 	}
 
