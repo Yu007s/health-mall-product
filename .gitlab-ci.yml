@@ -37,7 +37,7 @@ Maven build:
     - k8s
   extends: .maven-build
   script:
-    - mvn -DskipTests clean package -P !dev $MAVEN_OPTS
+    - mvn -DskipTests clean install -Pproduct $MAVEN_OPTS
 
 
 SonarQube check:
@@ -131,7 +131,7 @@ testing-3:
 testing-4:
   stage: deploy to testing
   variables:
-    K8S_CLUSTER: '$INSIDE_K8S_CLUSTER'
+    K8S_CLUSTER: '$CCE1_DEV'
     ENV_NAME: 'testing-4'
     APP_CONFIG: '${JVM_OPTS_TESTING4}'
     ARGO_PROJ: '${BUSINESS_NAME}-dev'
