@@ -358,7 +358,12 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
                 throw new BusinessException(ErrorEnums.CHINESE_IS_REPEAT);
             }
         }
-    }
+        // 5.校验相同店铺下,sku名称是否重复添加
+		ChineseSkuInfoEntity chineseSkuInfo = chineseSkuInfoService.getBySkuNameAndStoreId(saveOrUpdateSkuVO.getSkuName(), saveOrUpdateSkuVO.getStoreId());
+		if (Objects.nonNull(chineseSkuInfo)) {
+			throw new BusinessException(ErrorEnums.SKU_NAME_IS_REPEAT);
+		}
+	}
 
     private List<ChineseManagerSkuVO> buildChineseManagerSkuResponse(List<ChineseSkuInfoEntity> skuInfoEntityList,
                                                                      Map<String, Set<Long>> skuCodeSupplierIdsMap,
