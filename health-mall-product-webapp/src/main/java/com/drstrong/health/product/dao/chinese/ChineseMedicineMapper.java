@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -19,4 +20,6 @@ import java.util.List;
 public interface ChineseMedicineMapper extends BaseMapper<ChineseMedicineEntity> {
 
 	List<ChineseMedicineEntity> likeQueryByKeyword(@Param("keyword") String keyword);
+
+	List<ChineseMedicineEntity> queryByMedicineIds(@Param("medicineIds") Set<Long> medicineIds);
 }
