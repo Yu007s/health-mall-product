@@ -81,7 +81,7 @@ public class SupplierRemoteProService {
 		try {
 			ResultVO<List<SupplierInfoDTO>> listResultVO = supplierSkuRemoteApi.searchSupplierByDicCode(medicineCode);
 			if (Objects.isNull(listResultVO) || !listResultVO.isSuccess()) {
-				log.error("invoke supplierSkuRemoteApi.searchSupplierByDicCode() result is error! result:{}", medicineCode);
+				log.error("invoke supplierSkuRemoteApi.searchSupplierByDicCode() result is error! result:{}", JSON.toJSONString(listResultVO));
 				return Lists.newArrayList();
 			}
 			return listResultVO.getData();

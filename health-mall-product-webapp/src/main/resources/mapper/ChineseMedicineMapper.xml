@@ -38,10 +38,8 @@
         product_chinese_medicine
         <where>
             id in
-            <foreach collection="medicineIds" item="item" index="index" separator=",">
-                (
-                #{item}
-                )
+            <foreach collection="medicineIds" separator="," open="(" close=")" item="id">
+                #{id}
             </foreach>
         </where>
     </select>

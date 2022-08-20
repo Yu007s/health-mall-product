@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.response.chinese;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -48,6 +49,7 @@ public class ChineseManagerSkuVO implements Serializable {
     private List<String> supplierName;
 
     @ApiModelProperty("价格/克,单位：元")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal price;
 
     @ApiModelProperty("sku状态，0-未上架，1-已上架")
