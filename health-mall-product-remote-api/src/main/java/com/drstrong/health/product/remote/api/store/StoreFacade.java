@@ -30,4 +30,12 @@ public interface StoreFacade {
     @ApiOperation("查询老的桐庐邮费设置信息")
     @GetMapping("/searchOldTLPostage")
     List<OldAreaFreight> searchOldTLPostage() ;
+
+
+    /**
+     * 根据互联网医院id查询店铺id
+     * @param agencyId 互联网医院id
+     * @return 店铺id
+     */
+    Long getStoreByAgencyId(@RequestParam("agencyId") @NotNull Long agencyId);
 }

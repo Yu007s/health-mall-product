@@ -87,6 +87,12 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     }
 
     @Override
+    public Long getStoreByAgencyId(@RequestParam("agencyId") @NotNull Long agencyId) {
+        StoreEntity store = storeService.getStoreByAgencyIdOrStoreId(agencyId, null);
+        return store.getId();
+    }
+
+    @Override
     public ResultVO<List<StoreInfoResponse>> queryByIds(Set<Long> storeIds) {
         List<StoreEntity> storeEntityList = storeService.listByIds(storeIds);
         List<StoreInfoResponse> responseList = Lists.newArrayListWithCapacity(storeEntityList.size());
