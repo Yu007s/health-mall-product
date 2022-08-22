@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.entity.store.OldAreaFreight;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
+import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
@@ -89,6 +90,9 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     @Override
     public Long getStoreByAgencyId(@RequestParam("agencyId") @NotNull Long agencyId) {
         StoreEntity store = storeService.getStoreByAgencyIdOrStoreId(agencyId, null);
+        if(store == null){
+            throw new BusinessException("错误的互联网医院id");
+        }
         return store.getId();
     }
 
