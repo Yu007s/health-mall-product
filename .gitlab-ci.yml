@@ -25,6 +25,7 @@ variables:
 stages:
   - maven package
   - build docker image
+#  - deploy to dev
   - deploy to testing
   - deploy to pre
   - deploy to prod
@@ -49,25 +50,25 @@ Image build:
   extends: .docker
 
 
-dev-169:
-  stage: deploy to dev
-  variables:
-    K8S_CLUSTER: '$INSIDE_K8S_CLUSTER'
-    # sre and developer define
-    ENV_NAME: 'dev-169'
-    # sre define
-    APP_CONFIG: '${JVM_OPTS_DEV169}'
-    # sre define
-    ARGO_PROJ: '${BUSINESS_NAME}-dev'
-    # sre define
-    CD_GIT_PATH: 'dev'
-    DNS: '$DNS_DEV169'
-    # nacos
-    NACOS_IP: '$NACOS_IP_DEV169'
-    NACOS_NS: '$NACOS_NS_DEV169'
-  extends: .deploy
-  only:
-    - master
+#dev-169:
+#  stage: deploy to dev
+#  variables:
+#    K8S_CLUSTER: '$INSIDE_K8S_CLUSTER'
+#    # sre and developer define
+#    ENV_NAME: 'dev-169'
+#    # sre define
+#    APP_CONFIG: '${JVM_OPTS_DEV169}'
+#    # sre define
+#    ARGO_PROJ: '${BUSINESS_NAME}-dev'
+#    # sre define
+#    CD_GIT_PATH: 'dev'
+#    DNS: '$DNS_DEV169'
+#    # nacos
+#    NACOS_IP: '$NACOS_IP_DEV169'
+#    NACOS_NS: '$NACOS_NS_DEV169'
+#  extends: .deploy
+#  only:
+#    - master
 
 
 testing-1:
