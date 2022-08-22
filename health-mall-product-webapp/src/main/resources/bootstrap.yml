@@ -1,0 +1,9 @@
+app:
+  id: health-mall-product
+apollo:
+  autoUpdateInjectedSpringProperties: true
+  bootstrap:
+    enabled: true
+    namespaces: log4j2-spring.xml,common,config,cache,mq,db,quartz
+    eagerLoad:
+      enabled: true

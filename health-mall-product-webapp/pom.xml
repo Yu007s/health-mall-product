@@ -19,24 +19,15 @@
     </properties>
 
     <dependencies>
-        <!--   strong webapp 基础依赖     -->
-        <dependency>
-            <groupId>cn.strong</groupId>
-            <artifactId>drstrong-webapp-base</artifactId>
-            <version>2021.11-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>dynamic-arthas-spring-boot-starter</artifactId>
-                    <groupId>cn.strong</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>com.alibaba.nacos</groupId>
             <artifactId>nacos-client</artifactId>
             <version>1.4.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.drstrong.health</groupId>
             <artifactId>health-mall-product-model</artifactId>
@@ -129,31 +120,9 @@
         </dependency>
         <!-- 对接 apollo -->
         <dependency>
-            <groupId>cn.strong</groupId>
-            <artifactId>leke-apollo-spring-boot-starter</artifactId>
-            <version>2021.09-SNAPSHOT</version>
+            <groupId>com.ctrip.framework.apollo</groupId>
+            <artifactId>apollo-client</artifactId>
         </dependency>
-
-        <!--    自定义区域    -->
-
-        <!--        &lt;!&ndash;  mysql && mybatis && mybatis plus &ndash;&gt;
-                <dependency>
-                    <groupId>cn.strong</groupId>
-                    <artifactId>strong-mybatis-plus-extend</artifactId>
-                </dependency>
-
-                &lt;!&ndash;   redis client with lettuce   &ndash;&gt;
-                <dependency>
-                    <groupId>cn.strong</groupId>
-                    <artifactId>lettuce-spring-boot-starter</artifactId>
-                </dependency>
-
-                &lt;!&ndash;   分布式锁     &ndash;&gt;
-                <dependency>
-                    <groupId>cn.strong</groupId>
-                    <artifactId>klock-spring-boot-starter</artifactId>
-                </dependency>-->
-
         <dependency>
             <groupId>com.drstrong.health</groupId>
             <artifactId>health-redis-spring-boot-starter</artifactId>
@@ -168,7 +137,6 @@
         <dependency>
             <groupId>com.drstrong.health</groupId>
             <artifactId>health-common</artifactId>
-            <version>TEST1-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.springfox</groupId>
@@ -180,8 +148,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!--    自定义区域结束    -->
-
         <!--    junit    -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -206,8 +172,8 @@
             <version>3.4.1</version>
         </dependency>
         <dependency>
-            <groupId>cn.strong</groupId>
-            <artifactId>strong-mybatis-plus-extend</artifactId>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-mybatis-plus-starter</artifactId>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
