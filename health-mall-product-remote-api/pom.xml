@@ -26,12 +26,6 @@
             <groupId>com.drstrong.health</groupId>
             <artifactId>health-mall-product-model</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-openfeign-core</artifactId>
-            <version>3.0.0</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <!--
@@ -42,36 +36,38 @@
         test4 环境: TEST4-SNAPSHOT
         pre 和 prod 环境: RELEASE-SNAPSHOT
     -->
-
 <!--
+
    <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.drstrong.health</groupId>
-    <version>TEST1-SNAPSHOT</version>
+    <version>${huihui.version}</version>
     <artifactId>health-mall-product-remote-api</artifactId>
     <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <huihui.version>TEST1-SNAPSHOT</huihui.version>
+        <openfeign.version>2.2.7.RELEASE</openfeign.version>
+        <bp-bo.version>RELEASE-SNAPSHOT</bp-bo.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.naiterui.ehp</groupId>
             <artifactId>bp-bo</artifactId>
-            <version>RELEASE-SNAPSHOT</version>
+            <version>${bp-bo.version}</version>
         </dependency>
         <dependency>
             <groupId>com.drstrong.health</groupId>
             <artifactId>health-mall-product-model</artifactId>
-            <version>TEST1-SNAPSHOT</version>
+            <version>${huihui.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-openfeign-core</artifactId>
-            <version>3.0.0</version>
-            <scope>compile</scope>
+            <version>${openfeign.version}</version>
         </dependency>
     </dependencies>
 

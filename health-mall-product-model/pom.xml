@@ -16,15 +16,18 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
-
     <dependencies>
         <dependency>
-            <groupId>cn.strong</groupId>
-            <artifactId>strong-common</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
-            <groupId>cn.strong</groupId>
-            <artifactId>strong-mybatis-plus-extend</artifactId>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-mybatis-plus-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-common</artifactId>
         </dependency>
     </dependencies>
 
@@ -43,27 +46,33 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.drstrong.health</groupId>
-    <version>TEST1-SNAPSHOT</version>
+    <version>${huihui.version}</version>
     <artifactId>health-mall-product-model</artifactId>
     <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <huihui.version>TEST1-SNAPSHOT</huihui.version>
+        <lombok.version>1.18.20</lombok.version>
     </properties>
 
 
     <dependencies>
         <dependency>
-            <groupId>cn.strong</groupId>
-            <artifactId>strong-common</artifactId>
-            <version>2021.06-SNAPSHOT</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-annotation</artifactId>
-            <version>3.3.1</version>
-            <scope>compile</scope>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-mybatis-plus-starter</artifactId>
+            <version>${huihui.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-common</artifactId>
+            <version>${huihui.version}</version>
         </dependency>
     </dependencies>
 
