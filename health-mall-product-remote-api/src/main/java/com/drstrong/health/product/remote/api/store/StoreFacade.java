@@ -37,5 +37,7 @@ public interface StoreFacade {
      * @param agencyId 互联网医院id
      * @return 店铺id
      */
+    @ApiOperation("根据互联网医院id查询店铺id")
+    @GetMapping("/getStoreByAgencyId")
     Long getStoreByAgencyId(@RequestParam("agencyId") @NotNull Long agencyId);
 }
