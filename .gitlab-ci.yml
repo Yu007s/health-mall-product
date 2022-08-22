@@ -25,7 +25,6 @@ variables:
 stages:
   - maven package
   - build docker image
-  - deploy to dev
   - deploy to testing
   - deploy to pre
   - deploy to prod
