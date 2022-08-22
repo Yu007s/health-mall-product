@@ -19,10 +19,11 @@
     </properties>
 
     <dependencies>
-        <!-- hutool -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
+            <!-- 不要去除版本号,父类的版本号会和 tlog 中的版本不兼容 -->
+            <version>5.7.16</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba.nacos</groupId>
@@ -150,6 +151,10 @@
                 <exclusion>
                     <artifactId>health-sleuth-spring-boot-starter</artifactId>
                     <groupId>com.drstrong.health</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hutool-all</artifactId>
+                    <groupId>cn.hutool</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
