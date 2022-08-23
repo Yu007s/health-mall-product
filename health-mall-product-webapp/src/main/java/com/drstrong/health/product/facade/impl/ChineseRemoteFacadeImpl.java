@@ -141,8 +141,8 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 			skuCodes.add(chineseSkuInfoEntity.getSkuCode());
 		});
 		// 3.获取药材名称
-		Map<String, String> medicineCodeAndNameMap = chineseMedicineService.listMedicineByIds(medicineIds)
-				.stream().collect(Collectors.toMap(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName, (v1, v2) -> v1));
+		Map<String, ChineseMedicineEntity> medicineCodeAndEntityMap = chineseMedicineService.listMedicineByIds(medicineIds)
+				.stream().collect(Collectors.toMap(ChineseMedicineEntity::getMedicineCode, dto -> dto, (v1, v2) -> v1));
 		// 4.获取 spu 信息
 		Map<String, SkuInfoEntity> skuCodeSkuInfoMap = skuInfoService.getBySkuCodesToMap(skuCodes);
 		// 5.判断是否需要查询库存信息
@@ -156,7 +156,7 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 			productInfoVO.setStoreChineseDeliveryInfoList(storeChineseDeliveryInfoList);
 		}
 		// 7.组装数据返回
-		List<ChineseSkuInfoExtendVO> skuExtendVOList = buildChineseSkuExtendVOList(storeEntity.getStoreName(), chineseSkuInfoEntityList, medicineCodeAndNameMap, skuCodeStockMap, skuCodeSkuInfoMap);
+		List<ChineseSkuInfoExtendVO> skuExtendVOList = buildChineseSkuExtendVOList(storeEntity.getStoreName(), chineseSkuInfoEntityList, medicineCodeAndEntityMap, skuCodeStockMap, skuCodeSkuInfoMap);
 		productInfoVO.setChineseSkuInfoExtendVOList(skuExtendVOList);
 		return productInfoVO;
 	}
@@ -269,7 +269,7 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 	}
 
 	private List<ChineseSkuInfoExtendVO> buildChineseSkuExtendVOList(String storeName, List<ChineseSkuInfoEntity> skuInfoEntityList,
-																	 Map<String, String> medicineCodeAndNameMap, Map<String, List<SkuCanStockResponse>> skuCodeStockMap,
+																	 Map<String, ChineseMedicineEntity> medicineCodeAndEntityMap, Map<String, List<SkuCanStockResponse>> skuCodeStockMap,
 																	 Map<String, SkuInfoEntity> skuCodeSkuInfoMap) {
 		List<ChineseSkuInfoExtendVO> chineseSkuInfoExtendVOList = Lists.newArrayListWithCapacity(skuInfoEntityList.size());
 		skuInfoEntityList.forEach(chineseSkuInfoEntity -> {
@@ -282,10 +282,12 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 			chineseSkuInfoExtendVO.setProductType(ProductTypeEnum.CHINESE.getCode());
 			chineseSkuInfoExtendVO.setProductTypeName(ProductTypeEnum.CHINESE.getValue());
 			chineseSkuInfoExtendVO.setMedicineId(chineseSkuInfoEntity.getOldMedicineId());
-			chineseSkuInfoExtendVO.setMedicineName(medicineCodeAndNameMap.get(chineseSkuInfoEntity.getMedicineCode()));
 			chineseSkuInfoExtendVO.setStoreName(storeName);
 			chineseSkuInfoExtendVO.setSkuState(chineseSkuInfoEntity.getSkuStatus());
 			chineseSkuInfoExtendVO.setSkuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()));
+			ChineseMedicineEntity chineseMedicineEntity = Optional.ofNullable(medicineCodeAndEntityMap.get(chineseSkuInfoEntity.getMedicineCode())).orElse(new ChineseMedicineEntity());
+			chineseSkuInfoExtendVO.setMedicineName(chineseMedicineEntity.getMedicineName());
+			chineseSkuInfoExtendVO.setMaxDosage(chineseMedicineEntity.getMaxDosage());
 			// 设置库存信息
 			if (!CollectionUtils.isEmpty(skuCodeStockMap) && skuCodeStockMap.containsKey(chineseSkuInfoEntity.getSkuCode())) {
 				List<SkuCanStockResponse> stockResponseList = skuCodeStockMap.get(chineseSkuInfoEntity.getSkuCode());
