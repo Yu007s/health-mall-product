@@ -96,8 +96,8 @@
         </dependency>
         <!--log4j2 依赖-->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j2</artifactId>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-log-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
             <groupId>com.lmax</groupId>
