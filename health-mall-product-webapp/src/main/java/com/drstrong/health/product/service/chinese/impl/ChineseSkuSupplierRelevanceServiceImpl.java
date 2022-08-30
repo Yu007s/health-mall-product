@@ -1,7 +1,7 @@
 package com.drstrong.health.product.service.chinese.impl;
 
-import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.chinese.ChineseSkuSupplierRelevanceMapper;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierRelevanceEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
@@ -29,7 +29,7 @@ import java.util.Set;
  */
 @Service
 @Slf4j
-public class ChineseSkuSupplierRelevanceServiceImpl extends CustomServiceImpl<ChineseSkuSupplierRelevanceMapper, ChineseSkuSupplierRelevanceEntity> implements ChineseSkuSupplierRelevanceService {
+public class ChineseSkuSupplierRelevanceServiceImpl extends ServiceImpl<ChineseSkuSupplierRelevanceMapper, ChineseSkuSupplierRelevanceEntity> implements ChineseSkuSupplierRelevanceService {
 
     /**
      * 根据 skuCode 集合查询关联关系

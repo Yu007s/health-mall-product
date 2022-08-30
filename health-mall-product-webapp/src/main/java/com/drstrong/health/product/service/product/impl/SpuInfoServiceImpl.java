@@ -1,6 +1,6 @@
 package com.drstrong.health.product.service.product.impl;
 
-import cn.strong.mybatis.plus.extend.CustomServiceImpl;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.product.SpuInfoMapper;
 import com.drstrong.health.product.model.entity.product.SpuInfoEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
@@ -24,7 +24,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class SpuInfoServiceImpl extends CustomServiceImpl<SpuInfoMapper, SpuInfoEntity> implements SpuInfoService {
+public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfoEntity> implements SpuInfoService {
 
     /**
      * 保存 spu 信息

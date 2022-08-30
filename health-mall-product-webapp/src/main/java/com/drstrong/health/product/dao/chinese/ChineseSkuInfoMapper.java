@@ -1,9 +1,9 @@
 package com.drstrong.health.product.dao.chinese;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.dto.SupplierChineseSkuDTO;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
-import cn.strong.mybatis.plus.extend.CustomBaseMapper;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -19,7 +19,7 @@ import java.util.List;
  * @since 2022-08-01
  */
 @Mapper
-public interface ChineseSkuInfoMapper extends CustomBaseMapper<ChineseSkuInfoEntity> {
+public interface ChineseSkuInfoMapper extends BaseMapper<ChineseSkuInfoEntity> {
     /**
      * 根据查询条件，分页查询 sku 信息
      *

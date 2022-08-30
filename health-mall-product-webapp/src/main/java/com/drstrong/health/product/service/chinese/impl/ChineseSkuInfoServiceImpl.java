@@ -1,10 +1,10 @@
 package com.drstrong.health.product.service.chinese.impl;
 
-import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.chinese.ChineseSkuInfoMapper;
 import com.drstrong.health.product.model.dto.SupplierChineseSkuDTO;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
  * @since 2022-08-01
  */
 @Service
-public class ChineseSkuInfoServiceImpl extends CustomServiceImpl<ChineseSkuInfoMapper, ChineseSkuInfoEntity> implements ChineseSkuInfoService {
+public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper, ChineseSkuInfoEntity> implements ChineseSkuInfoService {
     @Resource
     ChineseSkuInfoMapper chineseSkuInfoMapper;
 

@@ -1,7 +1,7 @@
 package com.drstrong.health.product.dao.store;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.drstrong.health.product.model.entity.store.DeliveryPriorityEntity;
-import cn.strong.mybatis.plus.extend.CustomBaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
  * @since 2022-08-05
  */
 @Mapper
-public interface StoreDeliveryPriorityMapper extends CustomBaseMapper<DeliveryPriorityEntity> {
+public interface StoreDeliveryPriorityMapper extends BaseMapper<DeliveryPriorityEntity> {
     void updateBatch(List<DeliveryPriorityEntity> entityList);
 
 }
