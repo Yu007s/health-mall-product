@@ -26,6 +26,11 @@
             <groupId>com.drstrong.health</groupId>
             <artifactId>health-mall-product-model</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-common</artifactId>
+        </dependency>
     </dependencies>
 
     <!--
