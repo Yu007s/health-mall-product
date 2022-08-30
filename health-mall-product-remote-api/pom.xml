@@ -9,6 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>health-mall-product-remote-api</artifactId>
+    <version>${huihui.version}</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -20,11 +21,15 @@
         <dependency>
             <groupId>com.naiterui.ehp</groupId>
             <artifactId>bp-bo</artifactId>
-            <version>RELEASE-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.drstrong.health</groupId>
             <artifactId>health-mall-product-model</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-common</artifactId>
         </dependency>
     </dependencies>
 

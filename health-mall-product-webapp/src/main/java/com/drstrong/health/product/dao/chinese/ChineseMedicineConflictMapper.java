@@ -1,6 +1,6 @@
 package com.drstrong.health.product.dao.chinese;
 
-import cn.strong.mybatis.plus.extend.CustomBaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2022-07-207 17:12:26
  */
 @Mapper
-public interface ChineseMedicineConflictMapper extends CustomBaseMapper<ChineseMedicineConflictEntity> {
+public interface ChineseMedicineConflictMapper extends BaseMapper<ChineseMedicineConflictEntity> {
 
 }

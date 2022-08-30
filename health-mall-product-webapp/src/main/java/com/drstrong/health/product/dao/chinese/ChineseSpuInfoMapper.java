@@ -1,7 +1,7 @@
 package com.drstrong.health.product.dao.chinese;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.drstrong.health.product.model.entity.chinese.ChineseSpuInfoEntity;
-import cn.strong.mybatis.plus.extend.CustomBaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2022-08-01
  */
 @Mapper
-public interface ChineseSpuInfoMapper extends CustomBaseMapper<ChineseSpuInfoEntity> {
+public interface ChineseSpuInfoMapper extends BaseMapper<ChineseSpuInfoEntity> {
 
 }

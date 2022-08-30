@@ -1,8 +1,8 @@
 package com.drstrong.health.product.service.product.impl;
 
-import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.product.SkuInfoMapper;
 import com.drstrong.health.product.model.entity.product.SkuInfoEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toMap;
  */
 @Slf4j
 @Service
-public class SkuInfoServiceImpl extends CustomServiceImpl<SkuInfoMapper, SkuInfoEntity> implements SkuInfoService {
+public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfoEntity> implements SkuInfoService {
 
     /**
      * 根据 skuCode 获取sku主表信息

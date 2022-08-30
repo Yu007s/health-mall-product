@@ -1,9 +1,9 @@
 package com.drstrong.health.product.service.chinese.impl;
 
-import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.chinese.ChineseMedicineConflictMapper;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
@@ -22,7 +22,7 @@ import java.util.List;
  * @Date 2022/07/27/19:32
  */
 @Service
-public class ChineseMedicineConflictServiceImpl extends CustomServiceImpl<ChineseMedicineConflictMapper, ChineseMedicineConflictEntity>
+public class ChineseMedicineConflictServiceImpl extends ServiceImpl<ChineseMedicineConflictMapper, ChineseMedicineConflictEntity>
         implements ChineseMedicineConflictService {
     @Override
     public ChineseMedicineConflictEntity getByMedicineCode(String medicineCode) {

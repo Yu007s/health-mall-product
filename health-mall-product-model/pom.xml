@@ -9,6 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>health-mall-product-model</artifactId>
+    <version>${huihui.version}</version>
     <packaging>jar</packaging>
 
     <properties>

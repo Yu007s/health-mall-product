@@ -1,7 +1,7 @@
 package com.drstrong.health.product.service.chinese.impl;
 
-import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.chinese.ChineseSpuInfoMapper;
 import com.drstrong.health.product.model.entity.chinese.ChineseSpuInfoEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
@@ -30,7 +30,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class ChineseSpuInfoServiceImpl extends CustomServiceImpl<ChineseSpuInfoMapper, ChineseSpuInfoEntity> implements ChineseSpuInfoService {
+public class ChineseSpuInfoServiceImpl extends ServiceImpl<ChineseSpuInfoMapper, ChineseSpuInfoEntity> implements ChineseSpuInfoService {
     @Resource
     SpuInfoService spuInfoService;
 

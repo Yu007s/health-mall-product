@@ -1,6 +1,6 @@
 package com.drstrong.health.product.dao.banner;
 
-import cn.strong.mybatis.plus.extend.CustomBaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.entity.banner.Banner;
 import com.drstrong.health.product.model.response.banner.BannerListResponse;
@@ -20,7 +20,7 @@ import java.util.List;
  * @since 2021-12-14
  */
 @Mapper
-public interface BannerMapper extends CustomBaseMapper<Banner> {
+public interface BannerMapper extends BaseMapper<Banner> {
 
     /**
      * 获取轮播图

@@ -8,6 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>health-mall-product-mq-model</artifactId>
+    <version>${huihui.version}</version>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>

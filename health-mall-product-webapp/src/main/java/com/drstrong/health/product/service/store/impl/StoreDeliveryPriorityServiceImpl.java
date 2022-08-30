@@ -3,6 +3,7 @@ package com.drstrong.health.product.service.store.impl;
 import cn.hutool.core.stream.CollectorUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.model.entity.store.DeliveryPriorityEntity;
 import com.drstrong.health.product.dao.store.StoreDeliveryPriorityMapper;
 import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
@@ -17,7 +18,6 @@ import com.drstrong.health.product.model.response.store.delievy.DeliveryPriRespo
 import com.drstrong.health.product.model.response.store.delievy.DeliveryPriorityVO;
 import com.drstrong.health.product.service.area.AreaService;
 import com.drstrong.health.product.service.store.StoreDeliveryPriorityService;
-import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.drstrong.health.product.service.store.StoreLinkSupplierService;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.drstrong.health.ware.model.result.ResultVO;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  * @since 2022-08-05
  */
 @Service
-public class StoreDeliveryPriorityServiceImpl extends CustomServiceImpl<StoreDeliveryPriorityMapper, DeliveryPriorityEntity> implements StoreDeliveryPriorityService {
+public class StoreDeliveryPriorityServiceImpl extends ServiceImpl<StoreDeliveryPriorityMapper, DeliveryPriorityEntity> implements StoreDeliveryPriorityService {
 
     @Resource
     StoreLinkSupplierService storeLinkSupplierService;
