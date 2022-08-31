@@ -120,9 +120,8 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
                 .like(StringUtils.isNotBlank(storeName), StoreEntity::getStoreName, storeName)
                 .eq(storeType != null, StoreEntity::getStoreType, storeType)
                 .eq(agencyId != null, StoreEntity::getAgencyId, agencyId)
-                .eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+                .eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode()).orderByDesc(StoreEntity::getId);
         List<StoreEntity> storeEntities = list(storeEntityQueryWrapper);
-        storeEntities.sort((a, b) -> b.getChangedAt().compareTo(a.getChangedAt()));
         return storeEntities.stream().map(storeEntity -> {
             StoreInfoResponse storeInfoResponse = BeanUtil.copyProperties(storeEntity, StoreInfoResponse.class);
             Integer storeTypeCode = storeEntity.getStoreType();
