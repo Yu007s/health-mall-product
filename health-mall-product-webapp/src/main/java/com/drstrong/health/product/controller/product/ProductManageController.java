@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Validated
 @RestController
-@RequestMapping("/product/manage")
+@RequestMapping("/inner/product/manage")
 @Slf4j
 @Api(tags = {"cms-商品管理"})
 public class ProductManageController implements ProductManageFacade {

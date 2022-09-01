@@ -27,7 +27,7 @@ import java.util.Set;
  */
 @Validated
 @RestController
-@RequestMapping("/inner/chinese")
+@RequestMapping("/inner/product/chinese")
 @Slf4j
 @Api(tags = {"中药对外业务的远程接口"})
 public class ChineseRemoteController implements ChineseRemoteApi {

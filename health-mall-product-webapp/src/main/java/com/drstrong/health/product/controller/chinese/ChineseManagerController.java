@@ -30,7 +30,7 @@ import java.util.Set;
  */
 @Validated
 @RestController
-@RequestMapping("/inner/chinese/manage")
+@RequestMapping("/inner/product/chinese/manage")
 @Slf4j
 @Api(tags = {"cms-中药管理页面远程接口"})
 public class ChineseManagerController implements ChineseManagerRemoteApi {

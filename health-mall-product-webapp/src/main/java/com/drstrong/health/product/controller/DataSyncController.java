@@ -23,7 +23,7 @@ import java.util.List;
  * @date 2021/12/27 11:17
  */
 @RestController
-@RequestMapping("/data/sync")
+@RequestMapping("/inner/product/data/sync")
 @Slf4j
 public class DataSyncController implements DataSyncFacade {
 	@Resource

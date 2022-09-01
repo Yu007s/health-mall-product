@@ -29,7 +29,7 @@ import java.util.Set;
  * @date 2021/12/7 09:51
  */
 @RestController
-@RequestMapping("/product/productStore")
+@RequestMapping("/inner/product/productStore")
 @Slf4j
 public class ProductStoreController implements StoreRemoteApi {
 

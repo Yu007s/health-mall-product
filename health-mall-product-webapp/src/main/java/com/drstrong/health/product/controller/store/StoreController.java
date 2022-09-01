@@ -33,7 +33,7 @@ import java.util.Set;
  * @Date 2022/07/30/14:14
  */
 @RestController
-@RequestMapping("/product/chinese/store")
+@RequestMapping("/inner/product/chinese/store")
 public class StoreController implements StoreFacade, StoreRemoteApi {
 
     @Resource

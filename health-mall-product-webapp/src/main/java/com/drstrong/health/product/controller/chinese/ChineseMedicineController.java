@@ -27,7 +27,7 @@ import java.util.List;
 @Validated
 @Slf4j
 @RestController
-@RequestMapping("/product/chinese/medicine")
+@RequestMapping("/inner/product/chinese/medicine")
 public class ChineseMedicineController implements ChineseMedicineRemoteApi {
     @Resource
     private ChineseMedicineService chineseMedicineService;

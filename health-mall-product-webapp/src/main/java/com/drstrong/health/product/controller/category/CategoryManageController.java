@@ -27,7 +27,7 @@ import java.util.Objects;
  * @date 2021/12/6 09:38
  */
 @RestController
-@RequestMapping("/product/category")
+@RequestMapping("/inner/product/category")
 @Slf4j
 @Api(tags = {"商品分类"})
 public class CategoryManageController implements CategoryManageFacade {

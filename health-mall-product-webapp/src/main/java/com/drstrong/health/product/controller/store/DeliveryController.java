@@ -19,7 +19,7 @@ import java.util.List;
  * @Date 2022/08/05/14:44
  */
 @RestController
-@RequestMapping("/product/chinese/store/delivery")
+@RequestMapping("/inner/product/chinese/store/delivery")
 public class DeliveryController implements DeliveryRemoteApi {
     @Resource
     private StoreDeliveryPriorityService storeDeliveryPriorityService;

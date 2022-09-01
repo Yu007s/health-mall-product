@@ -22,7 +22,7 @@ import javax.annotation.Resource;
  * @date 2021/12/22 17:33
  */
 @RestController
-@RequestMapping("/product/banner")
+@RequestMapping("/inner/product/banner")
 @Slf4j
 @Api(tags = {"轮播图"})
 public class BannerManageController implements BannerManageFacade {
