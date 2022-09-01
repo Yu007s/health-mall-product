@@ -22,7 +22,7 @@ import java.util.List;
  * @date 2021/12/20 15:23
  */
 @Api("健康商城-前台分类管理远程接口")
-@FeignClient(value = "health-mall-product", path = "/product/category")
+@FeignClient(value = "health-mall-product", path = "/inner/product/category")
 public interface CategoryManageFacade {
 	@ApiOperation(value = "获取所有前台分类", notes = "前台分类较少,前后端讨论后决定不进行分页查询")
 	@PostMapping("/front/query")

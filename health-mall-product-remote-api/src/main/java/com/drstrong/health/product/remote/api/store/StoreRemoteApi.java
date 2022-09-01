@@ -24,7 +24,7 @@ import java.util.Set;
  * @Date 2022/08/06/15:22
  */
 @Api("健康商城-商品服务-店铺管理")
-@FeignClient(value = "health-mall-product", path = "/product/chinese/store")
+@FeignClient(value = "health-mall-product", path = "/inner/product/chinese/store/manage")
 public interface StoreRemoteApi {
 
     /**

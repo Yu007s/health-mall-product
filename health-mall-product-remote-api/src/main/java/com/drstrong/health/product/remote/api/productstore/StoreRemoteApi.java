@@ -26,7 +26,7 @@ import java.util.Set;
  * @createTime 2021/12/15 15:54
  * @since TODO
  */
-@FeignClient(value = "health-mall-product",path = "/product/productStore")
+@FeignClient(value = "health-mall-product",path = "/inner/product/productStore")
 public interface StoreRemoteApi {
 
     @ApiOperation("获取所有的店铺信息")

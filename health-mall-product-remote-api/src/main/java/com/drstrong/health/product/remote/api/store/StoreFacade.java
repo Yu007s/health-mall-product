@@ -16,7 +16,7 @@ import java.util.List;
  * @Author xieYueFeng
  * @Date 2022/07/26/11:55
  */
-@FeignClient(value = "health-mall-product", path = "/product/chinese/store")
+@FeignClient(value = "health-mall-product", path = "/inner/product/chinese/store")
 public interface StoreFacade {
     /**
      * 根据供应商id查询关联的店铺信息

@@ -21,7 +21,7 @@ import java.util.List;
  * @Date 2022/08/06/16:27
  */
 @Api("健康商城-商品服务-安全用药中药材管理页面远程接口")
-@FeignClient(value = "health-mall-product", path = "/product/chinese/medicine")
+@FeignClient(value = "health-mall-product", path = "/inner/product/chinese/medicine")
 public interface ChineseMedicineRemoteApi {
 
     /**

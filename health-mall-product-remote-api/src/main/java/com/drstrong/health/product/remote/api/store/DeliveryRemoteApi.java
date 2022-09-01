@@ -21,7 +21,7 @@ import java.util.List;
  * @Date 2022/08/06/17:32
  */
 @Api("健康商城-商品服务-店铺配送优先级管理")
-@FeignClient(value = "health-mall-product", path = "/product/chinese/store/delivery")
+@FeignClient(value = "health-mall-product", path = "/inner/product/chinese/store/delivery")
 public interface DeliveryRemoteApi {
 
     /**
