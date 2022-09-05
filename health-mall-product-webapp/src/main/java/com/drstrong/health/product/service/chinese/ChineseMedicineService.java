@@ -1,11 +1,14 @@
 package com.drstrong.health.product.service.chinese;
 
+import com.drstrong.health.product.controller.datasync.model.ChineseMedicineAlias;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
+import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -105,4 +108,23 @@ public interface ChineseMedicineService {
 	 * @date 2022/8/15 10:18
 	 */
 	List<ChineseMedicineEntity> listMedicineByIds(Set<Long> medicineIds);
+
+	/**
+	 * 迁移老的中药材库数据实现  只用于数据迁移！
+	 * @param chineseMedicines  老中药材库实体类
+	 */
+	void insertBatch(List<OldChineseMedicine> chineseMedicines);
+
+	/**
+	 * 迁移老的中药材库  更新别名 只用于数据迁移！
+	 * @param hashMap id -> 别名实体类
+	 */
+	void updateAlias(HashMap<Long, List<ChineseMedicineAlias>> hashMap);
+
+	/**
+	 * 根据id获取实体  只用于数据迁移！
+	 * @param ids id集合
+	 * @return 查找所得
+	 */
+	List<ChineseMedicineEntity> getByIds(List<Long> ids);
 }

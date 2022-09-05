@@ -43,4 +43,14 @@
             </foreach>
         </where>
     </select>
+    <insert id="insertBatch" >
+        insert into product_chinese_medicine
+        ( id,medicine_name, medicine_code, medicine_pinyin, alias_pinyin, max_dosage, created_at, changed_at, version, del_flag )
+        VALUES
+            <foreach collection="chineseMedicines" separator=","  item = "chineseMedicine">
+                (#{chineseMedicine.id}, #{chineseMedicine.medicineName}, #{chineseMedicine.medicineCode},
+                #{chineseMedicine.medicinePinyin}, #{chineseMedicine.aliasPinyin}, #{chineseMedicine.maxDosage},
+                #{chineseMedicine.createdAt}, #{chineseMedicine.changedAt}, #{chineseMedicine.version},#{chineseMedicine.delFlag})
+            </foreach>
+    </insert>
 </mapper>

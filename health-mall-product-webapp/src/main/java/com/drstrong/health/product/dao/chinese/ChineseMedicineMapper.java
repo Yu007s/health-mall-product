@@ -22,4 +22,10 @@ public interface ChineseMedicineMapper extends BaseMapper<ChineseMedicineEntity>
 	List<ChineseMedicineEntity> likeQueryByKeyword(@Param("keyword") String keyword);
 
 	List<ChineseMedicineEntity> queryByMedicineIds(@Param("medicineIds") Set<Long> medicineIds);
+
+	/**
+	 * 批量插入  数据迁移
+	 * @param chineseMedicines 需要迁移的新数据
+	 */
+	void insertBatch(@Param("chineseMedicines") List<ChineseMedicineEntity> chineseMedicines);
 }

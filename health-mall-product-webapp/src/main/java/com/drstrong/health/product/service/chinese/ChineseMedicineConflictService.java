@@ -1,8 +1,10 @@
 package com.drstrong.health.product.service.chinese;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.drstrong.health.product.controller.datasync.model.ChineseMedicineConflict;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -43,4 +45,10 @@ public interface ChineseMedicineConflictService extends IService<ChineseMedicine
      * @date 2022/8/8 11:34
      */
     List<ChineseMedicineConflictEntity> listAllConflictEntity();
+
+    /**
+     * 数据库迁移  相反药材表迁移
+     * @param conflicts  相反药材表
+     */
+    void updateFromOld(HashMap<Long, List<ChineseMedicineConflict>> conflicts);
 }

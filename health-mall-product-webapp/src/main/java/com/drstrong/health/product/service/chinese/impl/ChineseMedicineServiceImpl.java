@@ -7,9 +7,11 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.drstrong.health.product.controller.datasync.model.ChineseMedicineAlias;
 import com.drstrong.health.product.dao.chinese.ChineseMedicineMapper;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
+import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
@@ -22,13 +24,13 @@ import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -306,5 +308,62 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
             return Lists.newArrayList();
         }
         return chineseMedicineMapper.queryByMedicineIds(medicineIds);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void insertBatch(List<OldChineseMedicine> chineseMedicines) {
+        List<ChineseMedicineEntity> chineseMedicineEntities = new ArrayList<>(50);
+        for (OldChineseMedicine chineseMedicine : chineseMedicines) {
+            BigDecimal maxDosage = chineseMedicine.getMaxDosage();
+            String name = chineseMedicine.getName();
+            String pinyin = chineseMedicine.getPinyin();
+            Integer invalid = chineseMedicine.getInvalid();
+            ChineseMedicineEntity chineseMedicineEntity = new ChineseMedicineEntity();
+            if (pinyin.length() > 200) {
+                pinyin = pinyin.substring(0, 200);
+            }
+            chineseMedicineEntity.setMedicinePinyin(pinyin);
+            chineseMedicineEntity.setMaxDosage(maxDosage);
+            chineseMedicineEntity.setDelFlag(invalid);
+            if (name.length() > 200) {
+                name = name.substring(0, 200);
+            }
+            chineseMedicineEntity.setMedicineName(name);
+            chineseMedicineEntity.setId(chineseMedicine.getId());
+            String nextMedicineCode = UniqueCodeUtils.getNextMedicineCode(name);
+            chineseMedicineEntity.setMedicineCode(nextMedicineCode);
+            chineseMedicineEntity.setAliasPinyin(" ");
+            chineseMedicineEntity.setVersion(1);
+            chineseMedicineEntities.add(chineseMedicineEntity);
+        }
+        if (chineseMedicineEntities.size() != 0) {
+            chineseMedicineMapper.insertBatch(chineseMedicineEntities);
+        }
+    }
+
+    @Override
+    public void updateAlias(HashMap<Long, List<ChineseMedicineAlias>> hashMap) {
+        List<ChineseMedicineEntity> updateList = new ArrayList<>();
+        for (Map.Entry<Long, List<ChineseMedicineAlias>> longListEntry : hashMap.entrySet()) {
+            Long key = longListEntry.getKey();
+            List<ChineseMedicineAlias> value = longListEntry.getValue();
+            String pinYins = value.stream().map(ChineseMedicineAlias::getPinyin).collect(Collectors.joining(","));
+            String alias = value.stream().map(ChineseMedicineAlias::getName).collect(Collectors.joining(","));
+            ChineseMedicineEntity chineseMedicineEntity = new ChineseMedicineEntity();
+            chineseMedicineEntity.setAliasPinyin(pinYins);
+            chineseMedicineEntity.setMedicineAlias(alias);
+            chineseMedicineEntity.setId(key);
+            updateList.add(chineseMedicineEntity);
+        }
+        updateBatchById(updateList);
+    }
+
+    @Override
+    public List<ChineseMedicineEntity> getByIds(List<Long> ids) {
+        if (ids == null || ids.size() == 0 ){
+            return new ArrayList<>(0);
+        }
+        return super.listByIds(ids);
     }
 }
