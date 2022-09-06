@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 @Setter
 @TableName("chinese_medicine_alias")
 @ApiModel(value = "ChineseMedicineAlias对象", description = "中药材别名表")
+@Deprecated
 public class ChineseMedicineAlias implements Serializable {
 
     private static final long serialVersionUID = 1L;

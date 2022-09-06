@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @DS(DsName.SLAVE_I)
+@Deprecated
 public class OldChineseMedicineConflictServiceImpl extends ServiceImpl<OldChineseMedicineConflictMapper, ChineseMedicineConflict> implements IChineseMedicineConflictService {
 
     @Override

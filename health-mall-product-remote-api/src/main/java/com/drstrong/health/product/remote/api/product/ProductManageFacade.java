@@ -26,6 +26,7 @@ import java.util.List;
  */
 @Api("健康商城-商品管理远程接口")
 @FeignClient(value = "health-mall-product", path = "/inner/product/manage")
+@Deprecated
 public interface ProductManageFacade {
 	@ApiOperation("根据后台分类,获取商品属性")
 	@ApiImplicitParams({

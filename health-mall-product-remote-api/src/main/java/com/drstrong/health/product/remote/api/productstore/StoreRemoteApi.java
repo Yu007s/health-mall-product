@@ -27,6 +27,7 @@ import java.util.Set;
  * @since TODO
  */
 @FeignClient(value = "health-mall-product",path = "/inner/product/productStore")
+@Deprecated
 public interface StoreRemoteApi {
 
     @ApiOperation("获取所有的店铺信息")

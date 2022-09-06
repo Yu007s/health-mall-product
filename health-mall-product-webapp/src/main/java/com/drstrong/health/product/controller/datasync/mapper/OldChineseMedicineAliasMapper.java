@@ -16,6 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 @DS(DsName.SLAVE_I)
+@Deprecated
 public interface OldChineseMedicineAliasMapper extends BaseMapper<ChineseMedicineAlias> {
 
 }

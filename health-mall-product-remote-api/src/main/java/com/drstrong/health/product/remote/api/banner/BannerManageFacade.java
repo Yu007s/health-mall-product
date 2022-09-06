@@ -26,6 +26,7 @@ import java.util.List;
  */
 @Api("健康商城-轮播图管理远程接口")
 @FeignClient(value = "health-mall-product", path = "/inner/product/banner")
+@Deprecated
 public interface BannerManageFacade {
 
     @ApiOperation("添加轮播图")

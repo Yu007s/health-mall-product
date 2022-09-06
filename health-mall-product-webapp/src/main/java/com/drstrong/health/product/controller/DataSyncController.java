@@ -35,6 +35,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/inner/product/data/sync")
 @Slf4j
+@Deprecated
 public class DataSyncController implements DataSyncFacade {
     @Resource
     DataSyncServiceImpl dataSyncService;

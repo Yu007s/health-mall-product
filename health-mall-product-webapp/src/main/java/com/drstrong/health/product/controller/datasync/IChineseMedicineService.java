@@ -16,6 +16,7 @@ import java.util.List;
  * @author xieYueFeng
  * @since 2022-07-207 17:12:26
  */
+@Deprecated
 public interface IChineseMedicineService extends IService<OldChineseMedicine> {
     /**
      * 根据药材id获取药材  老数据库中

@@ -16,6 +16,7 @@ import java.util.List;
  * @author xieYueFeng
  * @since 2022-07-207 17:12:26
  */
+@Deprecated
 public interface IChineseMedicineAliasService extends IService<ChineseMedicineAlias> {
     /**
      * 根据主键id 获取中药材别名

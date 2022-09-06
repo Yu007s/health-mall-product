@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/inner/product/productStore")
 @Slf4j
+@Deprecated
 public class ProductStoreController implements StoreRemoteApi {
 
 	@Resource
@@ -43,94 +45,103 @@ public class ProductStoreController implements StoreRemoteApi {
 
 	@Override
 	public ResultVO<List<StoreInfoResponse>> queryAllStore() {
-		List<StoreInfoResponse> storeInfoResponses = storeService.queryAll();
-		return ResultVO.success(storeInfoResponses);
+//		List<StoreInfoResponse> storeInfoResponses = storeService.queryAll();
+//		return ResultVO.success(storeInfoResponses);
+		return ResultVO.success(new ArrayList<>());
 	}
 
 	@Override
 	public ResultVO<Object> add(StoreAddOrUpdateRequest storeAddOrUpdateRequest, String userId) {
-		storeService.add(storeAddOrUpdateRequest, userId);
+//		storeService.add(storeAddOrUpdateRequest, userId);
 		return ResultVO.success();
 	}
 
 	@Override
 	public ResultVO<Object> update(StoreAddOrUpdateRequest storeAddOrUpdateRequest, String userId) {
-		storeService.update(storeAddOrUpdateRequest, userId);
-		storeService.sendStoreChangeEvent(storeAddOrUpdateRequest.getStoreId(), userId, StoreChangeTypeEnum.UPDATE_NAME);
+//		storeService.update(storeAddOrUpdateRequest, userId);
+//		storeService.sendStoreChangeEvent(storeAddOrUpdateRequest.getStoreId(), userId, StoreChangeTypeEnum.UPDATE_NAME);
 		return ResultVO.success();
 	}
 
 	@Override
 	public ResultVO<Object> updateState(StoreIdRequest storeIdRequest, String userId) {
-		storeService.updateState(storeIdRequest, userId);
-		storeService.sendStoreChangeEvent(storeIdRequest.getStoreId(), userId, StoreChangeTypeEnum.UPDATE_STATE);
+//		storeService.updateState(storeIdRequest, userId);
+//		storeService.sendStoreChangeEvent(storeIdRequest.getStoreId(), userId, StoreChangeTypeEnum.UPDATE_STATE);
 		return ResultVO.success();
 	}
 
 	@Override
 	public ResultVO<StorePostage> getPostage(Long storeId) {
-		StorePostage storePostage = storeService.getPostage(storeId);
-		return ResultVO.success(storePostage);
+//		StorePostage storePostage = storeService.getPostage(storeId);
+//		return ResultVO.success(storePostage);
+		return ResultVO.success(new StorePostage());
 	}
 
 	@Override
 	public ResultVO<Object> updatePostage(StorePostage storePostage, String userId) {
-		storeService.updatePostage(storePostage, userId);
+//		storeService.updatePostage(storePostage, userId);
 		return ResultVO.success();
 	}
 
 	@Override
 	public ResultVO<PageVO<StoreSkuResponse>> pageSkuList(StoreSkuRequest storeSkuRequest) {
-		PageVO<StoreSkuResponse> pageVO = storeThreeRelevanceService.pageSkuList(storeSkuRequest);
-		return ResultVO.success(pageVO);
+//		PageVO<StoreSkuResponse> pageVO = storeThreeRelevanceService.pageSkuList(storeSkuRequest);
+//		return ResultVO.success(pageVO);
+		PageVO<StoreSkuResponse> objectPageVO = PageVO.newBuilder().pageNo(storeSkuRequest.getPageNo()).pageSize(storeSkuRequest.getPageSize()).totalCount(0).result(new ArrayList<>()).build();
+		return ResultVO.success(objectPageVO);
 	}
 
 	@Override
 	public ResultVO<Object> updatePurchasePrice(UpdateThreeRequest updateThreeRequest, String userId) {
-		storeThreeRelevanceService.updatePurchasePrice(updateThreeRequest, userId);
+//		storeThreeRelevanceService.updatePurchasePrice(updateThreeRequest, userId);
 		return ResultVO.success();
 	}
 
 	@Override
 	public ResultVO<Object> relevanceAdd(RelevanceThreeRequest relevanceThreeRequest, String userId) {
-		storeThreeRelevanceService.relevanceAdd(relevanceThreeRequest, userId);
+//		storeThreeRelevanceService.relevanceAdd(relevanceThreeRequest, userId);
 		return ResultVO.success();
 	}
 
 	@Override
 	public ResultVO<Object> updateSkuState(UpdateSkuRequest updateSkuRequest, String userId) {
-		storeThreeRelevanceService.updateSkuState(updateSkuRequest, userId);
+//		storeThreeRelevanceService.updateSkuState(updateSkuRequest, userId);
 		return ResultVO.success();
 	}
 
 	@Override
 	public ResultVO<List<StoreSkuResponse>> searchSkuList(StoreSkuRequest storeSkuRequest) {
-		List<StoreSkuResponse> storeSkuResponses = storeThreeRelevanceService.searchSkuList(storeSkuRequest);
-		return ResultVO.success(storeSkuResponses);
+//		List<StoreSkuResponse> storeSkuResponses = storeThreeRelevanceService.searchSkuList(storeSkuRequest);
+//		return ResultVO.success(storeSkuResponses);
+		return ResultVO.success(new ArrayList<>());
 	}
 
 
 	@Override
 	public List<StorePostageDTO> getStorePostageByIds(Set<Long> storeIds, String areaName) {
-		return storeService.getStorePostageByIds(storeIds, areaName);
+//		return storeService.getStorePostageByIds(storeIds, areaName);
+		return new ArrayList<>();
 	}
 
 	@Override
 	public ResultVO<List<AreaInfoResponse>> queryAllProvince() {
-		List<AreaInfoResponse> areaInfoResponses = areaService.queryAllProvince();
-		return ResultVO.success(areaInfoResponses);
+//		List<AreaInfoResponse> areaInfoResponses = areaService.queryAllProvince();
+//		return ResultVO.success(areaInfoResponses);
+		return ResultVO.success(new ArrayList<>());
 	}
 
 	@Override
 	@TLogAspect({"skuIds"})
 	public List<ThreeSkuInfoResponse> queryBySkuIds(List<Long> skuIds) {
-		log.info("远程服务提供：获取sku三方关联信息");
-		return storeThreeRelevanceService.queryBySkuIds(skuIds);
+//		log.info("远程服务提供：获取sku三方关联信息");
+//		return storeThreeRelevanceService.queryBySkuIds(skuIds);
+		return new ArrayList<>();
 	}
 
 	@Override
 	public ResultVO<List<StoreInfoResponse>> queryByStoreIds(Set<Long> storeIds) {
-		List<StoreInfoResponse> storeInfoResponses = storeService.queryByStoreIds(storeIds);
-		return ResultVO.success(storeInfoResponses);
+//		List<StoreInfoResponse> storeInfoResponses = storeService.queryByStoreIds(storeIds);
+//		return ResultVO.success(storeInfoResponses);
+		return ResultVO.success(new ArrayList<>());
 	}
 }

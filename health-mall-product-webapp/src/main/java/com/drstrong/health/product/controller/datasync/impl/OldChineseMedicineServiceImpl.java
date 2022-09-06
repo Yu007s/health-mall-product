@@ -19,6 +19,7 @@ import java.util.List;
  * @since 2022-07-207 17:12:26
  */
 @Service
+@Deprecated
 public class OldChineseMedicineServiceImpl extends ServiceImpl<OldChineseMedicineMapper, OldChineseMedicine> implements IChineseMedicineService {
     @Override
     public List<OldChineseMedicine> getMedicines(Long id) {

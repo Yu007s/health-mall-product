@@ -15,6 +15,7 @@ import java.util.List;
  * @author xieYueFeng
  * @since 2022-07-207 17:12:26
  */
+@Deprecated
 public interface IChineseMedicineConflictService extends IService<ChineseMedicineConflict> {
     /**
      * 根据中药材id  获取相反药材实体
