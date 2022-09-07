@@ -37,7 +37,7 @@ Maven build:
     - k8s
   extends: .maven-build
   script:
-    - mvn -DskipTests clean install -Pproduct $MAVEN_OPTS
+    - mvn -DskipTests clean install -U -Pproduct $MAVEN_OPTS
 
 
 SonarQube check:
