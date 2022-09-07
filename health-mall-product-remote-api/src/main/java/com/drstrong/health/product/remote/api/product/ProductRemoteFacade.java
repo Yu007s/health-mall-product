@@ -32,6 +32,7 @@ public interface ProductRemoteFacade {
 	 */
 	@ApiOperation("根据 skuId 集合,获取 sku 信息")
 	@PostMapping("getSkuBySkuIds")
+	@Deprecated
 	List<ProductSkuInfoDTO> getSkuInfoBySkuIds(@RequestBody QueryProductRequest queryProductRequest);
 
 	/**
@@ -45,6 +46,7 @@ public interface ProductRemoteFacade {
 	 */
 	@ApiOperation("根据 skuId 集合,获取 sku 信息")
 	@PostMapping("list/sku/contain/del")
+	@Deprecated
 	List<ProductSkuInfoDTO> getSkuInfoBySkuIdsContainDel(@RequestBody QueryProductRequest queryProductRequest);
 
 	/**
@@ -59,6 +61,7 @@ public interface ProductRemoteFacade {
 	 */
 	@ApiOperation(value = "搜索spu的名称,只返回spu名称和标题", notes = "和之前空中药房的搜索结果数据结构保持一致")
 	@GetMapping("/searchSpuNameByName")
+	@Deprecated
 	List<SearchNameResultDTO> searchSpuNameByName(@RequestParam("content") String content, @RequestParam(value = "count", required = false) Integer count);
 
 	/**
@@ -72,6 +75,7 @@ public interface ProductRemoteFacade {
 	 */
 	@ApiOperation("查询sku搜索结果")
 	@GetMapping("/searchSkuDetail")
+	@Deprecated
 	List<ProductSkuInfoDTO> searchSkuDetail(@RequestParam("content") String content);
 
 	/**
@@ -85,6 +89,7 @@ public interface ProductRemoteFacade {
 	 */
 	@ApiOperation("根据后台分类 id 查询商品信息")
 	@GetMapping("getSkuInfoByCategoryId")
+	@Deprecated
 	List<ProductSkuInfoDTO> getSkuInfoByCategoryId(@RequestParam("categoryId") Long categoryId);
 
 	/**
@@ -100,6 +105,7 @@ public interface ProductRemoteFacade {
 	 */
 	@ApiOperation(value = "根据 skuId 或者 skuCode 查询商品详情", notes = "空中药房中需要查询商品详情")
 	@GetMapping("/sku/getDetail")
+	@Deprecated
 	ProductSkuDetailsDTO getSkuDetail(@RequestParam(value = "skuCode", required = false) String skuCode, @RequestParam(value = "skuId", required = false) Long skuId);
 
 	/**
@@ -113,10 +119,12 @@ public interface ProductRemoteFacade {
 	 */
 	@ApiOperation("skuCode 和 skuId 进行转换")
 	@PostMapping("/sku/id/code")
+	@Deprecated
 	List<SkuIdAndCodeDTO> listSkuIdOrCode(@RequestBody QueryProductRequest queryProductRequest);
 
 	@ApiOperation("根据skuId查询发票所需相关信息")
 	@GetMapping("invoiceInfoBySkuId")
+	@Deprecated
 	SkuInvoiceDTO getInvoiceInfoBySkuId(@RequestParam("skuId") Long skuId);
 
 	/**
@@ -129,6 +137,7 @@ public interface ProductRemoteFacade {
 	 */
 	@ApiOperation("根据 skuId 或者 skuCode 集合查询发票所需相关信息")
 	@PostMapping("list/invoice")
+	@Deprecated
 	List<SkuInvoiceDTO> listInvoiceBySkuIds(@RequestBody QueryProductRequest queryProductRequest);
 
 	@ApiOperation("sku对应sku编码")

@@ -1,8 +1,8 @@
 package com.drstrong.health.product.service.banner.impl;
 
 
-import cn.strong.common.utils.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.constants.banner.BannerConstants;
 import com.drstrong.health.product.dao.banner.BannerMapper;
 import com.drstrong.health.product.model.entity.banner.Banner;
@@ -12,11 +12,11 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.banner.BannerListResponse;
 import com.drstrong.health.product.model.response.banner.BannerResponse;
 import com.drstrong.health.product.service.banner.BannerService;
-import cn.strong.mybatis.plus.extend.CustomServiceImpl;
 import com.drstrong.health.product.service.redis.IRedisService;
 import com.drstrong.health.redis.utils.RedisUtils;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class BannerServiceImpl extends CustomServiceImpl<BannerMapper, Banner> implements BannerService {
+public class BannerServiceImpl extends ServiceImpl<BannerMapper, Banner> implements BannerService {
 
     @Resource
     BannerMapper bannerDao;

@@ -20,7 +20,8 @@ import java.util.List;
  * @author liuqiuyi
  * @date 2021/12/27 11:05
  */
-@FeignClient(value = "health-mall-product", path = "/data/sync")
+@FeignClient(value = "health-mall-product", path = "/inner/product/data/sync")
+@Deprecated
 public interface DataSyncFacade {
 
 	/**

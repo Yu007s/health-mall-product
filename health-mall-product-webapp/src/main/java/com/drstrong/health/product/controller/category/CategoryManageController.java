@@ -13,6 +13,7 @@ import com.drstrong.health.product.service.category.BackCategoryService;
 import com.drstrong.health.product.service.category.FrontCategoryService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.Lists;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -27,9 +28,10 @@ import java.util.Objects;
  * @date 2021/12/6 09:38
  */
 @RestController
-@RequestMapping("/product/category")
+@RequestMapping("/inner/product/category")
 @Slf4j
 @Api(tags = {"商品分类"})
+@Deprecated
 public class CategoryManageController implements CategoryManageFacade {
 	@Resource
 	FrontCategoryService frontCategoryService;
@@ -39,40 +41,42 @@ public class CategoryManageController implements CategoryManageFacade {
 
 	@Override
 	public ResultVO<List<FrontCategoryVO>> frontQuery(CategoryQueryRequest categoryQueryRequest) {
-		List<FrontCategoryVO> frontCategoryVoList = frontCategoryService.queryByParamToTree(categoryQueryRequest);
-		return ResultVO.success(frontCategoryVoList);
+//		List<FrontCategoryVO> frontCategoryVoList = frontCategoryService.queryByParamToTree(categoryQueryRequest);
+//		return ResultVO.success(frontCategoryVoList);
+		return ResultVO.success(Lists.newArrayList());
 	}
 
 	@Override
 	public ResultVO<List<BackCategoryVO>> backQuery(CategoryQueryRequest categoryQueryRequest) {
-		List<BackCategoryVO> backCategoryVOList = backCategoryService.queryByParamToTree(categoryQueryRequest);
-		return ResultVO.success(backCategoryVOList);
+//		List<BackCategoryVO> backCategoryVOList = backCategoryService.queryByParamToTree(categoryQueryRequest);
+//		return ResultVO.success(backCategoryVOList);
+		return ResultVO.success(Lists.newArrayList());
 	}
 
 	@Override
 	public ResultVO<Object> addFront(@RequestBody @Valid AddOrUpdateFrontCategoryRequest addOrUpdateFrontCategoryRequest) {
-		frontCategoryService.add(addOrUpdateFrontCategoryRequest);
+//		frontCategoryService.add(addOrUpdateFrontCategoryRequest);
 		return ResultVO.success();
 	}
 
 	@Override
 	public ResultVO<Object> updateFront(@RequestBody @Valid AddOrUpdateFrontCategoryRequest updateFrontCategoryRequest) {
-		if (Objects.isNull(updateFrontCategoryRequest.getCategoryId())) {
+/*		if (Objects.isNull(updateFrontCategoryRequest.getCategoryId())) {
 			throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
 		}
-		frontCategoryService.update(updateFrontCategoryRequest);
+		frontCategoryService.update(updateFrontCategoryRequest);*/
 		return ResultVO.success();
 	}
 
 	@Override
 	public ResultVO<Object> updateStateFront(@RequestBody @Valid CategoryIdRequest categoryIdRequest) {
-		frontCategoryService.updateStateFront(categoryIdRequest.getCategoryId(), categoryIdRequest.getUserId());
+//		frontCategoryService.updateStateFront(categoryIdRequest.getCategoryId(), categoryIdRequest.getUserId());
 		return ResultVO.success();
 	}
 
 	@Override
 	public ResultVO<Object> deleteFront(@RequestBody @Valid CategoryIdRequest categoryIdRequest) {
-		frontCategoryService.deleteFrontCategoryById(categoryIdRequest.getCategoryId(), categoryIdRequest.getUserId());
+//		frontCategoryService.deleteFrontCategoryById(categoryIdRequest.getCategoryId(), categoryIdRequest.getUserId());
 		return ResultVO.success();
 	}
 }

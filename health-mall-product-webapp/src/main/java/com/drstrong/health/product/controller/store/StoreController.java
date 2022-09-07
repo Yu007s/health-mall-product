@@ -1,136 +1,111 @@
 package com.drstrong.health.product.controller.store;
 
-import com.drstrong.health.product.model.request.store.*;
-import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.area.AreaInfoResponse;
+import com.drstrong.health.product.dao.store.OldFreightPostageMapper;
+import com.drstrong.health.product.dao.store.StoreLinkSupplierMapper;
+import com.drstrong.health.product.model.entity.store.OldAreaFreight;
+import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
+import com.drstrong.health.product.model.request.store.StoreSearchRequest;
+import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultVO;
+import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
-import com.drstrong.health.product.model.response.store.StoreSkuResponse;
-import com.drstrong.health.product.model.response.store.ThreeSkuInfoResponse;
-import com.drstrong.health.product.mq.model.product.StoreChangeTypeEnum;
+import com.drstrong.health.product.model.response.store.StoreQueryResponse;
+import com.drstrong.health.product.remote.api.store.StoreFacade;
 import com.drstrong.health.product.remote.api.store.StoreRemoteApi;
-import com.drstrong.health.product.remote.model.StorePostageDTO;
-import com.drstrong.health.product.service.area.AreaService;
 import com.drstrong.health.product.service.store.StoreService;
-import com.drstrong.health.product.service.store.StoreThreeRelevanceService;
-import com.yomahub.tlog.core.annotation.TLogAspect;
-import lombok.extern.slf4j.Slf4j;
+import com.google.common.collect.Lists;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
 /**
- * 店铺管理
+ * 备忘  店铺id  与名字  对应  存在redis中
  *
- * @author liuqiuyi
- * @date 2021/12/7 09:51
+ * @Author xieYueFeng
+ * @Date 2022/07/30/14:14
  */
 @RestController
-@RequestMapping("/product/store")
-@Slf4j
-public class StoreController implements StoreRemoteApi {
+@RequestMapping("/inner/product/chinese/store")
+public class StoreController implements StoreFacade, StoreRemoteApi {
 
-	@Resource
-	private StoreService storeService;
-	@Resource
-	private StoreThreeRelevanceService storeThreeRelevanceService;
-
-	@Resource
-	private AreaService areaService;
-
-	@Override
-	public ResultVO<List<StoreInfoResponse>> queryAllStore() {
-		List<StoreInfoResponse> storeInfoResponses = storeService.queryAll();
-		return ResultVO.success(storeInfoResponses);
-	}
-
-	@Override
-	public ResultVO<Object> add(StoreAddOrUpdateRequest storeAddOrUpdateRequest, String userId) {
-		storeService.add(storeAddOrUpdateRequest, userId);
-		return ResultVO.success();
-	}
-
-	@Override
-	public ResultVO<Object> update(StoreAddOrUpdateRequest storeAddOrUpdateRequest, String userId) {
-		storeService.update(storeAddOrUpdateRequest, userId);
-		storeService.sendStoreChangeEvent(storeAddOrUpdateRequest.getStoreId(), userId, StoreChangeTypeEnum.UPDATE_NAME);
-		return ResultVO.success();
-	}
-
-	@Override
-	public ResultVO<Object> updateState(StoreIdRequest storeIdRequest, String userId) {
-		storeService.updateState(storeIdRequest, userId);
-		storeService.sendStoreChangeEvent(storeIdRequest.getStoreId(), userId, StoreChangeTypeEnum.UPDATE_STATE);
-		return ResultVO.success();
-	}
-
-	@Override
-	public ResultVO<StorePostage> getPostage(Long storeId) {
-		StorePostage storePostage = storeService.getPostage(storeId);
-		return ResultVO.success(storePostage);
-	}
-
-	@Override
-	public ResultVO<Object> updatePostage(StorePostage storePostage, String userId) {
-		storeService.updatePostage(storePostage, userId);
-		return ResultVO.success();
-	}
-
-	@Override
-	public ResultVO<PageVO<StoreSkuResponse>> pageSkuList(StoreSkuRequest storeSkuRequest) {
-		PageVO<StoreSkuResponse> pageVO = storeThreeRelevanceService.pageSkuList(storeSkuRequest);
-		return ResultVO.success(pageVO);
-	}
-
-	@Override
-	public ResultVO<Object> updatePurchasePrice(UpdateThreeRequest updateThreeRequest, String userId) {
-		storeThreeRelevanceService.updatePurchasePrice(updateThreeRequest, userId);
-		return ResultVO.success();
-	}
-
-	@Override
-	public ResultVO<Object> relevanceAdd(RelevanceThreeRequest relevanceThreeRequest, String userId) {
-		storeThreeRelevanceService.relevanceAdd(relevanceThreeRequest, userId);
-		return ResultVO.success();
-	}
-
-	@Override
-	public ResultVO<Object> updateSkuState(UpdateSkuRequest updateSkuRequest, String userId) {
-		storeThreeRelevanceService.updateSkuState(updateSkuRequest, userId);
-		return ResultVO.success();
-	}
-
-	@Override
-	public ResultVO<List<StoreSkuResponse>> searchSkuList(StoreSkuRequest storeSkuRequest) {
-		List<StoreSkuResponse> storeSkuResponses = storeThreeRelevanceService.searchSkuList(storeSkuRequest);
-		return ResultVO.success(storeSkuResponses);
-	}
+    @Resource
+    private StoreService storeService;
+    @Resource
+    StoreLinkSupplierMapper storeLinkSupplierMapper;
+    @Resource
+    private OldFreightPostageMapper oldFreightPostageMapper;
 
 
-	@Override
-	public List<StorePostageDTO> getStorePostageByIds(Set<Long> storeIds, String areaName) {
-		return storeService.getStorePostageByIds(storeIds, areaName);
-	}
+    @Override
+    public ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store)  {
+        String msg;
+        if (store.getStoreId() == null) {
+            storeService.save(store);
+            msg = "新增店铺成功";
+        } else {
+            storeService.update(store);
+            msg = "修改店铺成功";
+        }
+        return ResultVO.success(msg);
+    }
 
-	@Override
-	public ResultVO<List<AreaInfoResponse>> queryAllProvince() {
-		List<AreaInfoResponse> areaInfoResponses = areaService.queryAllProvince();
-		return ResultVO.success(areaInfoResponses);
-	}
+    @Override
+    public ResultVO<List<StoreInfoResponse>> queryStore(@RequestBody StoreSearchRequest storeSearchRequest) {
+        List<StoreInfoResponse> query = storeService.query(storeSearchRequest.getStoreId(),storeSearchRequest.getStoreName(),
+                storeSearchRequest.getAgencyId(), storeSearchRequest.getStoreTypeName());
+        return ResultVO.success(query);
+    }
 
-	@Override
-	@TLogAspect({"skuIds"})
-	public List<ThreeSkuInfoResponse> queryBySkuIds(List<Long> skuIds) {
-		log.info("远程服务提供：获取sku三方关联信息");
-		return storeThreeRelevanceService.queryBySkuIds(skuIds);
-	}
+    @Override
+    public ResultVO<StoreInfoEditResponse> queryStoreDetail(@RequestParam("storeId") @NotNull(message = "店铺id不能为空") Long storeId) {
+        StoreInfoEditResponse storeInfoEditResponse = storeService.queryById(storeId);
+        return ResultVO.success(storeInfoEditResponse);
+    }
 
-	@Override
-	public ResultVO<List<StoreInfoResponse>> queryByStoreIds(Set<Long> storeIds) {
-		List<StoreInfoResponse> storeInfoResponses = storeService.queryByStoreIds(storeIds);
-		return ResultVO.success(storeInfoResponses);
-	}
+
+    @Override
+    public ResultVO<StoreQueryResponse> queryStoreInfo() {
+        StoreQueryResponse storeQueryResponse = storeService.queryStoreConInfo();
+        return ResultVO.success(storeQueryResponse);
+    }
+
+    @Override
+    public List<StoreInfoResponse> queryStoreBySupplierId(@RequestParam("supplierId") @NotNull(message = "供应商id不能为空") Long supplierId) {
+        return storeLinkSupplierMapper.findStoreBySupplierId(supplierId);
+    }
+
+    @Override
+    public List<OldAreaFreight> searchOldTLPostage() {
+        return oldFreightPostageMapper.searchOldTLPostage();
+    }
+
+    @Override
+    public Long getStoreByAgencyId(@RequestParam("agencyId") @NotNull Long agencyId) {
+        StoreEntity store = storeService.getStoreByAgencyIdOrStoreId(agencyId, null);
+        if(store == null){
+            throw new BusinessException("错误的互联网医院id");
+        }
+        return store.getId();
+    }
+
+    @Override
+    public ResultVO<List<StoreInfoResponse>> queryByIds(Set<Long> storeIds) {
+        List<StoreEntity> storeEntityList = storeService.listByIds(storeIds);
+        List<StoreInfoResponse> responseList = Lists.newArrayListWithCapacity(storeEntityList.size());
+        storeEntityList.forEach(storeEntity -> {
+            StoreInfoResponse storeInfoResponse = new StoreInfoResponse();
+            storeInfoResponse.setId(storeEntity.getId());
+            storeInfoResponse.setStoreName(storeEntity.getStoreName());
+            responseList.add(storeInfoResponse);
+        });
+        return ResultVO.success(responseList);
+    }
 }

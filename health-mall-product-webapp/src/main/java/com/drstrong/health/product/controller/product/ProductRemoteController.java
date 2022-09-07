@@ -11,6 +11,7 @@ import com.drstrong.health.product.remote.model.request.QueryProductRequest;
 import com.drstrong.health.product.service.product.ProductRemoteService;
 import com.drstrong.health.product.service.product.ProductSkuRevenueService;
 import com.drstrong.health.product.service.product.ProductSkuService;
+import com.google.common.collect.Lists;
 import com.naiterui.ehp.bp.bo.b2c.cms.CmsSkuBO;
 import com.naiterui.ehp.bp.bo.b2c.cms.ProductBO;
 import io.swagger.annotations.Api;
@@ -54,8 +55,10 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	 * @date 2021/12/14 17:21
 	 */
 	@Override
+	@Deprecated
 	public List<ProductSkuInfoDTO> getSkuInfoBySkuIds(QueryProductRequest queryProductRequest) {
-		return productRemoteService.getSkuInfoBySkuIds(queryProductRequest);
+//		return productRemoteService.getSkuInfoBySkuIds(queryProductRequest);
+		return Lists.newArrayList();
 	}
 
 	/**
@@ -68,8 +71,10 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	 * @date 2022/1/10 16:54
 	 */
 	@Override
+	@Deprecated
 	public List<ProductSkuInfoDTO> getSkuInfoBySkuIdsContainDel(QueryProductRequest queryProductRequest) {
-		return productRemoteService.getSkuInfoBySkuIdsContainDel(queryProductRequest);
+//		return productRemoteService.getSkuInfoBySkuIdsContainDel(queryProductRequest);
+		return Lists.newArrayList();
 	}
 
 	/**
@@ -82,8 +87,10 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	 * @date 2021/12/17 15:49
 	 */
 	@Override
+	@Deprecated
 	public List<SearchNameResultDTO> searchSpuNameByName(String content, Integer count) {
-		return productRemoteService.searchSpuNameByName(content, count);
+//		return productRemoteService.searchSpuNameByName(content, count);
+		return Lists.newArrayList();
 	}
 
 	/**
@@ -96,8 +103,10 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	 * @date 2021/12/18 14:05
 	 */
 	@Override
+	@Deprecated
 	public List<ProductSkuInfoDTO> searchSkuDetail(@RequestParam("content") String content) {
-		return productRemoteService.searchSkuDetail(content);
+//		return productRemoteService.searchSkuDetail(content);
+		return Lists.newArrayList();
 	}
 
 	/**
@@ -109,8 +118,10 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	 * @date 2021/12/24 13:54
 	 */
 	@Override
+	@Deprecated
 	public List<ProductSkuInfoDTO> getSkuInfoByCategoryId(Long categoryId) {
-		return productRemoteService.getSkuInfoByCategoryId(categoryId);
+//		return productRemoteService.getSkuInfoByCategoryId(categoryId);
+		return Lists.newArrayList();
 	}
 
 	/**
@@ -125,8 +136,10 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	 * @date 2021/12/24 11:30
 	 */
 	@Override
+	@Deprecated
 	public ProductSkuDetailsDTO getSkuDetail(String skuCode, Long skuId) {
-		return productRemoteService.getSkuDetail(skuCode, skuId);
+//		return productRemoteService.getSkuDetail(skuCode, skuId);
+		return new ProductSkuDetailsDTO();
 	}
 
 	/**
@@ -139,13 +152,16 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	 * @date 2021/12/24 20:07
 	 */
 	@Override
+	@Deprecated
 	public List<SkuIdAndCodeDTO> listSkuIdOrCode(QueryProductRequest queryProductRequest) {
-		return productRemoteService.listSkuIdOrCode(queryProductRequest);
+//		return productRemoteService.listSkuIdOrCode(queryProductRequest);
+		return Lists.newArrayList();
 	}
 
 	@Override
+	@Deprecated
 	public SkuInvoiceDTO getInvoiceInfoBySkuId(Long skuId) {
-		if(Objects.isNull(skuId)){
+		/*if(Objects.isNull(skuId)){
 			throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
 		}
 		SkuInvoiceDTO skuInvoiceDTO = new SkuInvoiceDTO();
@@ -158,7 +174,8 @@ public class ProductRemoteController implements ProductRemoteFacade {
 		if(Objects.nonNull(skuRevenue)){
 			skuInvoiceDTO.setRevenueCode(skuRevenue.getRevenueCode()).setRevenueRate(skuRevenue.getRevenueRate());
 		}
-		return skuInvoiceDTO;
+		return skuInvoiceDTO;*/
+		return new SkuInvoiceDTO();
 	}
 
 	/**
@@ -170,8 +187,10 @@ public class ProductRemoteController implements ProductRemoteFacade {
 	 * @date 2022/1/10 10:23
 	 */
 	@Override
+	@Deprecated
 	public List<SkuInvoiceDTO> listInvoiceBySkuIds(QueryProductRequest queryProductRequest) {
-		return productRemoteService.listInvoiceBySkuIds(queryProductRequest);
+//		return productRemoteService.listInvoiceBySkuIds(queryProductRequest);
+		return Lists.newArrayList();
 	}
 
 	@Override

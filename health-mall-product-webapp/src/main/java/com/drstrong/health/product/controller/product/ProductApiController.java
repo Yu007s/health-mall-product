@@ -34,6 +34,7 @@ import java.util.List;
 @RequestMapping("/product")
 @Slf4j
 @Api(tags = {"小程序-商品 api"})
+@Deprecated
 public class ProductApiController {
 	@Resource
 	ProductBasicsInfoService productBasicsInfoService;

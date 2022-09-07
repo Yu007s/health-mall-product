@@ -25,6 +25,7 @@ import java.util.List;
 @Api(tags = "轮播图")
 @RestController
 @RequestMapping("/banner")
+@Deprecated
 public class BannerController {
 
     @Resource

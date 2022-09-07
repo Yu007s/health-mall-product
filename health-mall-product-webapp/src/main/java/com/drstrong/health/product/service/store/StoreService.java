@@ -1,62 +1,96 @@
 package com.drstrong.health.product.service.store;
 
 import com.drstrong.health.product.model.entity.store.StoreEntity;
-import com.drstrong.health.product.model.enums.CategoryProductNumOperateEnum;
-import com.drstrong.health.product.model.request.store.StoreAddOrUpdateRequest;
-import com.drstrong.health.product.model.request.store.StoreIdRequest;
-import com.drstrong.health.product.model.request.store.StorePostage;
+import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
+import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
-import com.drstrong.health.product.mq.model.product.StoreChangeTypeEnum;
-import com.drstrong.health.product.remote.model.StorePostageDTO;
+import com.drstrong.health.product.model.response.store.StoreQueryResponse;
 
 import java.util.List;
 import java.util.Set;
 
 /**
- * @author lsx
- * @projectName health-mall-product
- * @desc 店铺service
- * @createTime 2021/12/13 11:24
+ * @Author xieYueFeng
+ * @Date 2022/07/30/9:15
  */
 public interface StoreService {
 
-    List<StoreInfoResponse> queryAll();
-
-    void add(StoreAddOrUpdateRequest storeAddOrUpdateRequest,String userId);
-
-    void update(StoreAddOrUpdateRequest storeAddOrUpdateRequest,String userId);
-
-    void updateState(StoreIdRequest storeIdRequest, String userId);
-
-    StorePostage getPostage(Long storeId);
-
-    StoreEntity getByStoreId(Long storeId);
-
-    void updatePostage(StorePostage storePostage,String userId);
-
-    List<StoreEntity> querySetPostageByStoreIds(List<Long> storeIds);
-
-    List<StorePostageDTO> getStorePostageByIds(Set<Long> storeIds, String areaName);
-
-    List<StoreInfoResponse> queryByStoreIds(Set<Long> storeIds);
+    /**
+     * 保存店铺信息
+     *
+     * @param store  店铺信息
+     */
+    void save(StoreInfoDetailSaveRequest store);
+	/**
+	 * 保存店铺信息
+	 *
+	 * @param store  店铺信息
+	 */
+	void update(StoreInfoDetailSaveRequest store);
 
 	/**
-	 * 增加或者减少 店铺的商品数量
+	 * 查询店铺信息
+	 * @param storeId 店铺id
+	 * @param storeName 店铺名字
+	 * @param agencyId 互联网医院id
+	 * @param storeType 店铺类型名字
+	 * @return 店铺信息返回值
+	 */
+    List<StoreInfoResponse> query(Long storeId,String storeName,Long agencyId, String storeType);
+
+    /**
+     * 通过店铺id查找店铺详细信息
+     *
+     * @param storeId 店铺id
+     * @return 店铺详情（带有发票信息详情页面）
+     */
+    StoreInfoEditResponse queryById(Long storeId);
+
+    /**
+     * 根据店铺id集合查询店铺信息
+     *
+     * @param storeIds 店铺id集合
+     * @return 店铺信息集合
+     * @author liuqiuyi
+     * @date 2022/8/1 15:26
+     */
+    List<StoreEntity> listByIds(Set<Long> storeIds);
+
+	/**
+	 * 根据店铺id集合查询店铺信息
 	 *
 	 * @param storeId 店铺id
-	 * @param count   要累加的商品数量
+	 * @return 店铺信息集合
 	 * @author liuqiuyi
-	 * @date 2021/12/28 11:08
+	 * @date 2022/8/1 15:26
 	 */
-	void addOrReduceProductNumById(Long storeId, Integer count, CategoryProductNumOperateEnum operateEnum);
+    StoreEntity getById(Long storeId);
 
 	/**
-	 * 发送店铺变更的事件
+	 * 根据互联网医院 id，获取店铺信息
 	 *
-	 * @param userId  操作人 id
+	 * @param agencyId 互联网医院 id
 	 * @param storeId 店铺 id
+	 * @return 店铺信息
 	 * @author liuqiuyi
-	 * @date 2021/12/30 11:03
+	 * @date 2022/8/3 19:47
 	 */
-	void sendStoreChangeEvent(Long storeId, String userId, StoreChangeTypeEnum storeChangeTypeEnum);
+	StoreEntity getStoreByAgencyIdOrStoreId(Long agencyId, Long storeId);
+
+
+	/**
+	 * 店铺查询页面返回相应信息
+	 * @return  互联网医院 名字 id 店铺类型名字
+	 */
+	 StoreQueryResponse queryStoreConInfo();
+
+	/**
+	 * 根据互联网医院 id 获取店铺 id
+	 *
+	 * @param agencyIds 互联网医院 id
+	 * @return 店铺信息
+	 * @author liuqiuyi
+	 * @date 2022/8/8 19:57
+	 */
+	List<StoreEntity> getStoreByAgencyIds(Set<Long> agencyIds);
 }

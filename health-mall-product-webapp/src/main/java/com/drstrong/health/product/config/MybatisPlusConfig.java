@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 /**
  * mybatis plus 插件配置
@@ -18,7 +19,10 @@ public class MybatisPlusConfig {
 	 */
 	@Bean
 	public PaginationInterceptor paginationInterceptor() {
-		return new PaginationInterceptor();
+		PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
+		// 设置最大数据为500条，避免全表扫描
+		paginationInterceptor.setLimit(500L);
+		return paginationInterceptor;
 	}
 
 	/**
@@ -27,5 +31,14 @@ public class MybatisPlusConfig {
 	@Bean
 	public OptimisticLockerInterceptor optimisticLockerInterceptor() {
 		return new OptimisticLockerInterceptor();
+	}
+
+	/**
+	 * 创建时间和修改时间自动插入的组件
+	 */
+	@Bean
+	@Primary
+	public CustomizeMetaObjectHandler customizeMetaObjectHandler(){
+		return new CustomizeMetaObjectHandler();
 	}
 }

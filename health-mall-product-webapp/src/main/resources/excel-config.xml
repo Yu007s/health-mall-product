@@ -21,7 +21,7 @@
 		format 通常用于固定不变的常量映射,比如状态(0:未删除,1:已删除,导入的value在前,导出的value在后
 	-->
 
-	<excel id="storeSkuExport" class="com.drstrong.health.product.model.response.store.StoreSkuResponse"
+	<excel id="storeSkuExport" class="com.drstrong.health.product.model.response.productstore.StoreSkuResponse"
 			   requiredTag="true" showBorder="true" sheetname="店铺商品信息" defaultAlign="center" defaultColumnWidth="3000">
 			<field name="skuCode" title="商品SKU码"/>
 			<field name="skuName" title="商品SKU名称"/>

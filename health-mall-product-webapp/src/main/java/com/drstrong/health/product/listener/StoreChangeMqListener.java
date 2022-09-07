@@ -3,7 +3,7 @@ package com.drstrong.health.product.listener;
 import com.drstrong.health.product.config.MqTopicConfig;
 import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.entity.product.ProductSkuEntity;
-import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.entity.productstore.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.StoreStatusEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
@@ -15,7 +15,7 @@ import com.drstrong.health.product.mq.model.product.StoreChangeEvent;
 import com.drstrong.health.product.mq.model.product.StoreChangeTypeEnum;
 import com.drstrong.health.product.service.product.ProductBasicsInfoService;
 import com.drstrong.health.product.service.product.ProductSkuService;
-import com.drstrong.health.product.service.store.StoreService;
+import com.drstrong.health.product.service.productstore.ProductStoreService;
 import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.product.utils.CustomTLogMqConsumerProcessor;
 import com.drstrong.health.product.utils.MqMessageUtil;
@@ -57,7 +57,7 @@ public class StoreChangeMqListener implements RocketMQListener<TLogMqWrapBean<St
 	private RedisUtils redisUtils;
 
 	@Resource
-	private StoreService storeService;
+	private ProductStoreService storeService;
 
 	@Resource
 	private ProductBasicsInfoService productBasicsInfoService;

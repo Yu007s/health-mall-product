@@ -33,6 +33,7 @@ import java.util.List;
 @RequestMapping("/product/category")
 @Slf4j
 @Api(tags = {"小程序-商品分类"})
+@Deprecated
 public class CategoryApiController {
 	@Resource
 	FrontCategoryService frontCategoryService;

@@ -152,6 +152,18 @@ public class PageVO<T> implements Serializable {
 		this.numOfElements = this.totalCount;
 	}
 
+	public static <T> PageVO<T> buildPageVO() {
+		return buildPageVO(1, 10, 0);
+	}
+
+	public static <T> PageVO<T> buildPageVO(Integer pageNo, Integer pageSize,long totalCount) {
+		return buildPageVO(pageNo, pageSize, totalCount, null);
+	}
+
+	public static <T> PageVO<T> buildPageVO(Integer pageNo, Integer pageSize, long totalCount, List<?> result) {
+		return PageVO.newBuilder().pageNo(pageNo).pageSize(pageSize).totalCount((int) totalCount).result(result).build();
+	}
+
 	public int getPageNo() {
 		return this.pageNo;
 	}

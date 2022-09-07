@@ -3,14 +3,14 @@ package com.drstrong.health.product.service;
 import com.drstrong.health.common.utils.JsonUtils;
 import com.drstrong.health.product.SpringBootTests;
 import com.drstrong.health.product.config.MqTopicConfig;
-import com.drstrong.health.product.controller.store.StoreController;
-import com.drstrong.health.product.model.request.store.StoreSkuRequest;
-import com.drstrong.health.product.model.request.store.UpdateSkuRequest;
+import com.drstrong.health.product.controller.productstore.ProductStoreController;
+import com.drstrong.health.product.model.request.productstore.StoreSkuRequest;
+import com.drstrong.health.product.model.request.productstore.UpdateSkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.store.StoreSkuResponse;
+import com.drstrong.health.product.model.response.productstore.StoreSkuResponse;
 import com.drstrong.health.product.mq.model.SkuStateStockMqEvent;
-import com.drstrong.health.product.remote.api.store.StoreRemoteApi;
-import com.drstrong.health.product.service.store.impl.StoreThreeRelevanceServiceImpl;
+import com.drstrong.health.product.remote.api.productstore.StoreRemoteApi;
+import com.drstrong.health.product.service.productstore.impl.StoreThreeRelevanceServiceImpl;
 import com.drstrong.health.product.utils.MqMessageUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ public class ExampleServiceTest extends SpringBootTests {
     @Resource
     private StoreThreeRelevanceServiceImpl storeThreeRelevanceService;
     @Resource
-    private StoreController storeController;
+    private ProductStoreController productStoreController;
     @Resource
     private MqMessageUtil mqMessageUtil;
     @Resource
