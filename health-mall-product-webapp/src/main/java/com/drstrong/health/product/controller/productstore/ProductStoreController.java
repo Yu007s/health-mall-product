@@ -32,7 +32,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/inner/product/productStore")
 @Slf4j
-@Deprecated
+//@Deprecated
 public class ProductStoreController implements StoreRemoteApi {
 
 	@Resource
@@ -125,9 +125,8 @@ public class ProductStoreController implements StoreRemoteApi {
 
 	@Override
 	public ResultVO<List<AreaInfoResponse>> queryAllProvince() {
-//		List<AreaInfoResponse> areaInfoResponses = areaService.queryAllProvince();
-//		return ResultVO.success(areaInfoResponses);
-		return ResultVO.success(new ArrayList<>());
+		List<AreaInfoResponse> areaInfoResponses = areaService.queryAllProvince();
+		return ResultVO.success(areaInfoResponses);
 	}
 
 	@Override
