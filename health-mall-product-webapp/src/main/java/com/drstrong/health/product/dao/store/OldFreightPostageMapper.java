@@ -19,6 +19,6 @@ public interface OldFreightPostageMapper extends BaseMapper<OldAreaFreight> {
 
     @Select(" SELECT a.*,b.name as areaName" +
             " FROM `freight_pharmacy_area` a JOIN p_city b ON a.area_id = b.id" +
-            " WHERE a.warehouse_id = 91 and a.del_flag = 0")
+            " WHERE a.warehouse_id = 90 and a.del_flag = 0")
     List<OldAreaFreight> searchOldTLPostage();
 }
