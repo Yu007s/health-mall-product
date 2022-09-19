@@ -27,7 +27,7 @@ stages:
   - build docker image
 #  - deploy to dev
   - deploy to testing
-  - deploy to pre
+#  - deploy to pre
   - deploy to prod
 
 
@@ -37,7 +37,7 @@ Maven build:
     - k8s
   extends: .maven-build
   script:
-    - mvn -DskipTests clean install -U -Pproduct $MAVEN_OPTS
+    - mvn -DskipTests clean install -Pproduct $MAVEN_OPTS
 
 
 SonarQube check:
@@ -86,8 +86,6 @@ testing-1:
   extends: .deploy
   only:
     - /^testing-1-.*/
-    - /^hotfix-.*/
-    - master
 
 
 testing-2:
@@ -105,27 +103,6 @@ testing-2:
   extends: .deploy
   only:
     - /^testing-2-.*/
-    - /^hotfix-.*/
-    - master
-
-
-testing-3:
-  stage: deploy to testing
-  variables:
-    K8S_CLUSTER: '$INSIDE_K8S_CLUSTER'
-    ENV_NAME: 'testing-3'
-    APP_CONFIG: '${JVM_OPTS_TESTING3}'
-    ARGO_PROJ: '${BUSINESS_NAME}-dev'
-    CD_GIT_PATH: 'testing'
-    DNS: '$DNS_TESTING3'
-    # nacos
-    NACOS_IP: '$NACOS_IP_TESTING3'
-    NACOS_NS: '$NACOS_NS_TESTING3'
-  extends: .deploy
-  only:
-    - /^testing-3-.*/
-    - /^hotfix-.*/
-    - master
 
 
 testing-4:
@@ -143,26 +120,24 @@ testing-4:
   extends: .deploy
   only:
     - /^testing-4-.*/
-    - /^hotfix-.*/
-    - master
 
 
-pre:
-  stage: deploy to pre
-  variables:
-    K8S_CLUSTER: '$CCE2'
-    ENV_NAME: 'pre'
-    APP_CONFIG: '${JVM_OPTS_PRE}'
-    ARGO_PROJ: '${BUSINESS_NAME}-pre'
-    CD_GIT_PATH: 'pre'
-    DNS: '$DNS_PRE'
-    # nacos
-    NACOS_IP: '$NACOS_IP_PRE'
-    NACOS_NS: '$NACOS_NS_PRE'
-  extends: .deploy
-  only:
-    - release
-    - /^hotfix-.*/
+#pre:
+#  stage: deploy to pre
+#  variables:
+#    K8S_CLUSTER: '$CCE2'
+#    ENV_NAME: 'pre'
+#    APP_CONFIG: '${JVM_OPTS_PRE}'
+#    ARGO_PROJ: '${BUSINESS_NAME}-pre'
+#    CD_GIT_PATH: 'pre'
+#    DNS: '$DNS_PRE'
+#    # nacos
+#    NACOS_IP: '$NACOS_IP_PRE'
+#    NACOS_NS: '$NACOS_NS_PRE'
+#  extends: .deploy
+#  only:
+#    - release
+#    - /^hotfix-.*/
 
 
 prod:
@@ -201,11 +176,47 @@ prod-v1:
     - /^hotfix-.*/
 
 
+prod-v1-canary:
+  stage: deploy to prod
+  variables:
+    K8S_CLUSTER: '$CCE2'
+    ENV_NAME: 'prod-v1-canary'
+    APP_CONFIG: '${JVM_OPTS_PROD}'
+    ARGO_PROJ: '${BUSINESS_NAME}-prod'
+    CD_GIT_PATH: 'prod'
+    DNS: '$DNS_PROD'
+    # nacos
+    NACOS_IP: '$NACOS_IP_PROD'
+    NACOS_NS: '$NACOS_NS_PROD_V1'
+  extends: .deploy
+  only:
+    - release
+    - /^hotfix-.*/
+
+
 prod-v2:
   stage: deploy to prod
   variables:
     K8S_CLUSTER: '$CCE2'
     ENV_NAME: 'prod-v2'
+    APP_CONFIG: '${JVM_OPTS_PROD}'
+    ARGO_PROJ: '${BUSINESS_NAME}-prod'
+    CD_GIT_PATH: 'prod'
+    DNS: '$DNS_PROD'
+    # nacos
+    NACOS_IP: '$NACOS_IP_PROD'
+    NACOS_NS: '$NACOS_NS_PROD_V2'
+  extends: .deploy
+  only:
+    - release
+    - /^hotfix-.*/
+
+
+prod-v2-canary:
+  stage: deploy to prod
+  variables:
+    K8S_CLUSTER: '$CCE2'
+    ENV_NAME: 'prod-v2-canary'
     APP_CONFIG: '${JVM_OPTS_PROD}'
     ARGO_PROJ: '${BUSINESS_NAME}-prod'
     CD_GIT_PATH: 'prod'
