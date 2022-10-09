@@ -43,6 +43,17 @@
             </foreach>
         </where>
     </select>
+
+    <select id="getByMedicineCodeIgnoreDel"
+            resultType="com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity">
+        select
+            <include refid="Base_Column_List"/>
+        from
+            product_chinese_medicine
+        where
+         medicine_code = #{medicineCode}
+    </select>
+
     <insert id="insertBatch" >
         insert into product_chinese_medicine
         ( id,medicine_name, medicine_code, medicine_pinyin, alias_pinyin, max_dosage, created_at, changed_at, version, del_flag )

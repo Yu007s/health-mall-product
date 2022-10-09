@@ -212,7 +212,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
             response.setStoreName(storeName);
         }
         // 2.根据药材code获取药材名称
-        ChineseMedicineEntity chineseMedicineEntity = chineseMedicineService.getByMedicineCode(skuInfoEntity.getMedicineCode());
+        ChineseMedicineEntity chineseMedicineEntity = chineseMedicineService.getByMedicineCodeIgnoreDel(skuInfoEntity.getMedicineCode());
         if (Objects.nonNull(chineseMedicineEntity)) {
             response.setMedicineName(chineseMedicineEntity.getMedicineName());
         }

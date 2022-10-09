@@ -28,4 +28,6 @@ public interface ChineseMedicineMapper extends BaseMapper<ChineseMedicineEntity>
 	 * @param chineseMedicines 需要迁移的新数据
 	 */
 	void insertBatch(@Param("chineseMedicines") List<ChineseMedicineEntity> chineseMedicines);
+
+	ChineseMedicineEntity getByMedicineCodeIgnoreDel(@Param("medicineCode") String medicineCode);
 }

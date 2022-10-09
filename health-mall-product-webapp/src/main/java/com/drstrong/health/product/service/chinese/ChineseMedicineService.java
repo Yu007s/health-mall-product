@@ -66,6 +66,15 @@ public interface ChineseMedicineService {
      */
     ChineseMedicineEntity getByMedicineCode(String medicineCode);
 
+    /**
+     * 根据药材code获取中药材信息,并忽略是否删除
+	 *
+	 * @param medicineCode 药材code
+     * @author liuqiuyi
+     * @date 2022/9/29 11:34
+     */
+    ChineseMedicineEntity getByMedicineCodeIgnoreDel(String medicineCode);
+
 	/**
 	 * 根据药材code获取中药材信息
 	 *
