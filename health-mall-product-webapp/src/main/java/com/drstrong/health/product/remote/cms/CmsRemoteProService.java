@@ -60,7 +60,7 @@ public class CmsRemoteProService {
 				return commAttributeDTO;
 			}, (o, n) -> o));
 		} catch (Exception e) {
-			log.info("invoke ICMSFeignClient.vueQuery an error occurred,param:{}", dictCommAttribute, e);
+			log.error("invoke ICMSFeignClient.vueQuery an error occurred,param:{}", dictCommAttribute, e);
 			throw e;
 		}
 	}

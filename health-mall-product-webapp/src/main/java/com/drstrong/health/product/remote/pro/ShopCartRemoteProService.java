@@ -39,7 +39,7 @@ public class ShopCartRemoteProService {
 			}
 			return hasProduct;
 		} catch (Exception e) {
-			log.info("invoke shopCartRemoteApi.checkHasProduct an error occurred,param:{}", userId, e);
+			log.error("invoke shopCartRemoteApi.checkHasProduct an error occurred,param:{}", userId, e);
 			throw e;
 		}
 	}
