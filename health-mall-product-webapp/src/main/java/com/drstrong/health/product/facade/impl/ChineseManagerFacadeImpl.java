@@ -389,6 +389,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
                     .price(BigDecimalUtil.F2Y(chineseSkuInfoEntity.getPrice()))
                     .skuState(chineseSkuInfoEntity.getSkuStatus())
                     .skuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()))
+					.oldMedicineId(chineseSkuInfoEntity.getOldMedicineId())
                     .build();
             // 设值供应商名称
             List<String> supplierNames = Lists.newArrayListWithCapacity(supplierIds.size());

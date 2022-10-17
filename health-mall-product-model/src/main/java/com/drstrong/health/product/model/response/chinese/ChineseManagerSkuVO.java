@@ -27,6 +27,9 @@ import java.util.Set;
 public class ChineseManagerSkuVO implements Serializable {
     private static final long serialVersionUID = 3740737744156485985L;
 
+    @ApiModelProperty("老的中药材表主键id，兼容老数据需要")
+    private Long oldMedicineId;
+
     @ApiModelProperty("中药材编码")
     private String medicineCode;
 
