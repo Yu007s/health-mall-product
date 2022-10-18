@@ -9,6 +9,7 @@ import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.product.ProductInfoVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.chinese.ChineseRemoteApi;
+import com.drstrong.health.product.remote.model.ChineseMedicineDTO;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -62,5 +64,10 @@ public class ChineseRemoteController implements ChineseRemoteApi {
 	@Override
 	public ResultVO<List<ChineseMedicineInfoResponse>> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes) {
 		return ResultVO.success(chineseRemoteFacade.checkHasUpChineseByMedicineCodes(medicineCodes));
+	}
+
+	@Override
+	public ResultVO<List<ChineseMedicineDTO>> getChineseMedicineDTOListByIds(Set<Long> ids) {
+		return ResultVO.success(chineseRemoteFacade.getChineseMedicineDTOListByIds(ids));
 	}
 }

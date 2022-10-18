@@ -1,5 +1,6 @@
 package com.drstrong.health.product.facade.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
 import com.drstrong.health.product.facade.ChineseRemoteFacade;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
@@ -18,6 +19,7 @@ import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoExtendVO
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.product.ProductInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.remote.model.ChineseMedicineDTO;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineConflictService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
@@ -331,5 +333,11 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 			chineseSkuInfoVOList.add(chineseSkuInfoVO);
 		});
 		return chineseSkuInfoVOList;
+	}
+
+	@Override
+	public List<ChineseMedicineDTO> getChineseMedicineDTOListByIds(Set<Long> ids) {
+		List<ChineseMedicineEntity>  list  = chineseMedicineService.listMedicineByIds(ids);
+		return BeanUtil.copyToList(Optional.ofNullable(list).orElse(Collections.emptyList()),ChineseMedicineDTO.class);
 	}
 }

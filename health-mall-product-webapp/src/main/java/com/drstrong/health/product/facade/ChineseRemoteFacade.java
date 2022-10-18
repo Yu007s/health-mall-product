@@ -1,12 +1,15 @@
 package com.drstrong.health.product.facade;
 
+import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
 import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.product.ProductInfoVO;
+import com.drstrong.health.product.remote.model.ChineseMedicineDTO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -77,4 +80,12 @@ public interface ChineseRemoteFacade {
 	 * @date 2022/8/11 17:35
 	 */
 	List<ChineseMedicineInfoResponse> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes);
+
+
+	/**
+	 * 获取中药材信息 通过id查询
+	 * @param ids 主键list
+	 * @return 中药材信息
+	 */
+	List<ChineseMedicineDTO> getChineseMedicineDTOListByIds(Set<Long> ids);
 }
