@@ -59,5 +59,5 @@ public interface ChineseRemoteApi {
 	ResultVO<List<ChineseMedicineInfoResponse>> checkHasUpChineseByMedicineCodes(@RequestBody @NotNull(message = "参数不能为空") @Size(max = 200, message = "入参不能超过200") Set<String> medicineCodes);
 	@ApiOperation("通过IDs获取中药材详情")
 	@PostMapping("/get/chineseMedicineDTO")
-	ResultVO<List<ChineseMedicineDTO>> getChineseMedicineDTOListByIds(Set<Long> ids);
+	ResultVO<List<ChineseMedicineDTO>> getChineseMedicineDTOListByIds(@RequestBody  Set<Long> ids);
 }
