@@ -12,13 +12,13 @@ public class SkuChineseAgencyDTO {
     /**
      * 未上架
      */
-    private final static int NO_SALE = 0;
+    public final static int NO_SALE = 0;
 
 
     /**
      * 已上架
      */
-    private final static int SALE = 1;
+    public final static int SALE = 1;
 
     private Long id;
     private String skuCode;
