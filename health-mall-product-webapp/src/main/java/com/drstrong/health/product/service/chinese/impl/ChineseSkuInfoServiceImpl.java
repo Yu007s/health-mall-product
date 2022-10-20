@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.drstrong.health.common.enums.AgencyIdEnum;
 import com.drstrong.health.product.dao.chinese.ChineseSkuInfoMapper;
+import com.drstrong.health.product.facade.ChineseRemoteFacade;
 import com.drstrong.health.product.model.dto.SupplierChineseSkuDTO;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierRelevanceEntity;
@@ -17,8 +19,11 @@ import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
+import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.remote.api.chinese.ChineseRemoteApi;
+import com.drstrong.health.product.remote.model.SkuChineseAgencyDTO;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
@@ -34,11 +39,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * <p>
@@ -64,6 +68,9 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
 
     @Resource
     StockRemoteProService stockRemoteProService;
+
+    @Resource
+    ChineseRemoteFacade chineseRemoteFacade;
 
     /**
      * 根据条件分页查询 sku 信息
@@ -413,5 +420,18 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
             relevanceEntityList.add(supplierRelevanceEntity);
         });
         return relevanceEntityList;
+    }
+
+
+    @Override
+    public List<SkuChineseAgencyDTO> listSkuChineseAgencyDTO(Integer skuStatus, Collection<Long> medicineIds) {
+        List<SkuChineseAgencyDTO> chineseAgencyDTOS = chineseSkuInfoMapper.listSkuChineseAgencyDTO(skuStatus,medicineIds);
+        if (CollectionUtils.isEmpty(chineseAgencyDTOS))return Collections.emptyList();
+        List<AgencyStoreVO>  agencyStoreVOList = chineseRemoteFacade.listStoreByAgencyIds(Arrays.stream(AgencyIdEnum.values()).map(i->Long.valueOf(i.getCode())).collect(Collectors.toSet()));
+        Map<Long,Long> storeAgencyMap =  Optional.ofNullable(agencyStoreVOList).orElse(Collections.emptyList()).stream().collect(toMap(AgencyStoreVO::getStoreId, AgencyStoreVO::getAgencyId, (v1, v2) -> v1));
+        chineseAgencyDTOS.forEach(i->{
+            i.setAgencyId(storeAgencyMap.get(i.getStoreId()));
+        });
+        return chineseAgencyDTOS;
     }
 }

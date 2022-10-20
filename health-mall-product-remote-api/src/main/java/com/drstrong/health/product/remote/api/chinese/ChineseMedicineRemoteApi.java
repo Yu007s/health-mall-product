@@ -6,14 +6,17 @@ import com.drstrong.health.product.model.response.chinese.ChineseMedicineRespons
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
+import com.drstrong.health.product.remote.model.SkuChineseAgencyDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -73,4 +76,8 @@ public interface ChineseMedicineRemoteApi {
     @ApiOperation("相反药材信息分查询")
     @GetMapping("/conflictList")
     ResultVO<List<ChineseMedicineResponse>> queryConflictMedicine(@RequestParam("medicineCode") @NotBlank(message = "药材编码不能为空") String medicineCode);
+
+    @ApiOperation("获取中药SKU")
+    @GetMapping("/listSkuChineseAgencyDTO")
+    ResultVO<List<SkuChineseAgencyDTO>> listSkuChineseAgencyDTO(@RequestParam("skuStatus")  Integer skuStatus ,@RequestBody Collection<Long> medicineIds);
 }

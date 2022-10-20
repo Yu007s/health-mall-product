@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.dto.SupplierChineseSkuDTO;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
+import com.drstrong.health.product.remote.model.SkuChineseAgencyDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -51,4 +53,12 @@ public interface ChineseSkuInfoMapper extends BaseMapper<ChineseSkuInfoEntity> {
 	 * @date 2022/8/1 14:19
 	 */
 	List<SupplierChineseSkuDTO> listSupplierChineseManagerSkuExport(@Param("queryParam") ChineseManagerSkuRequest queryParam);
+
+	/**
+	 * 查询sku上下架状态
+	 * @param skuStatus
+	 * @param medicineIds
+	 * @return
+	 */
+	List<SkuChineseAgencyDTO> listSkuChineseAgencyDTO(@Param("skuStatus") Integer skuStatus, @Param("medicineIds") Collection<Long> medicineIds);
 }

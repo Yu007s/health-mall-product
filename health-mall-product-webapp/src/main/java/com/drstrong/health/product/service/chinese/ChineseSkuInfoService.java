@@ -7,7 +7,10 @@ import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
+import com.drstrong.health.product.remote.model.SkuChineseAgencyDTO;
+import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -169,4 +172,11 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
 	 * @date 2022/8/5 10:40
 	 */
 	List<SupplierChineseSkuDTO> listSupplierChineseManagerSkuExport(ChineseManagerSkuRequest queryParam);
+
+	/**
+	 * 根据上下架状态查询 SKU
+	 * @param skuStatus
+	 * @return
+	 */
+	List<SkuChineseAgencyDTO> listSkuChineseAgencyDTO(Integer skuStatus, Collection<Long> medicineIds);
 }

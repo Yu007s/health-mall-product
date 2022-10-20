@@ -8,7 +8,9 @@ import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchV
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.chinese.ChineseMedicineRemoteApi;
+import com.drstrong.health.product.remote.model.SkuChineseAgencyDTO;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
+import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +20,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,6 +34,8 @@ import java.util.List;
 public class ChineseMedicineController implements ChineseMedicineRemoteApi {
     @Resource
     private ChineseMedicineService chineseMedicineService;
+    @Resource
+    private ChineseSkuInfoService chineseSkuInfoService;
 
     @Override
     @ApiOperation("新建/编辑药材")
@@ -71,5 +76,11 @@ public class ChineseMedicineController implements ChineseMedicineRemoteApi {
     public ResultVO<List<ChineseMedicineResponse>> queryConflictMedicine(@RequestParam("medicineCode") @NotBlank(message="药材编码不能为空") String medicineCode) {
         List<ChineseMedicineResponse> chineseMedicineResponses = chineseMedicineService.queryForConflict(medicineCode);
         return ResultVO.success(chineseMedicineResponses);
+    }
+
+    @Override
+    @ApiOperation("获取中药SKU")
+    public ResultVO<List<SkuChineseAgencyDTO>> listSkuChineseAgencyDTO(Integer skuStatus, Collection<Long> medicineIds) {
+        return ResultVO.success( chineseSkuInfoService.listSkuChineseAgencyDTO(skuStatus,medicineIds));
     }
 }

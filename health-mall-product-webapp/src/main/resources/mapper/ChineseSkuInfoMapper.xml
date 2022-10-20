@@ -116,4 +116,22 @@
 
         <include refid="querySkuByRequest"/>
     </select>
+    <select id="listSkuChineseAgencyDTO"
+            resultType="com.drstrong.health.product.remote.model.SkuChineseAgencyDTO">
+        SELECT sku.id,
+        sku.sku_code,
+        sku.sku_name,
+        sku.old_medicine_id,
+        sku.medicine_code,
+        sku.store_id,
+        sku.price,
+        sku.sku_status
+        FROM pms_chinese_sku_info sku
+        WHERE sku.del_flag = 0
+        AND sku.sku_status = #{skuStatus}
+        AND sku.old_medicine_id IN
+        <foreach collection="medicineIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>
