@@ -55,7 +55,7 @@ public class PharmacyGoodsRemoteProService {
 			List<SkuHasStockVO> skuHasStockVOList = Optional.ofNullable(stockListVoResult.getData()).map(SkuHasStockListVO::getSkuHasStockList).orElse(Lists.newArrayList());
 			return skuHasStockVOList.stream().collect(toMap(SkuHasStockVO::getSkuId, SkuHasStockVO::getHasStock, (o, n) -> o));
 		} catch (Exception e) {
-			log.info("invoke pharmacyGoodsRemoteApi.getSkuHasStock an error occurred,param:{}", skuIdList, e);
+			log.error("invoke pharmacyGoodsRemoteApi.getSkuHasStock an error occurred,param:{}", skuIdList, e);
 			throw e;
 		}
 	}
@@ -84,7 +84,7 @@ public class PharmacyGoodsRemoteProService {
 			List<SkuStockNumVO> skuHasStockVOList = Optional.ofNullable(numListVoResult.getData()).map(SkuStockNumListVO::getSkuStockNumList).orElse(Lists.newArrayList());
 			return skuHasStockVOList.stream().collect(toMap(SkuStockNumVO::getSkuId, SkuStockNumVO::getStockNum, (o, n) -> o));
 		} catch (Exception e) {
-			log.info("invoke pharmacyGoodsRemoteApi.getSkuStockNum an error occurred,param:{}", skuIdList, e);
+			log.error("invoke pharmacyGoodsRemoteApi.getSkuStockNum an error occurred,param:{}", skuIdList, e);
 			throw e;
 		}
 	}

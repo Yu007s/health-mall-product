@@ -242,6 +242,21 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
     }
 
     /**
+     * 根据药材code获取中药材信息,并忽略是否删除
+     *
+     * @param medicineCode 药材code
+     * @author liuqiuyi
+     * @date 2022/9/29 11:34
+     */
+    @Override
+    public ChineseMedicineEntity getByMedicineCodeIgnoreDel(String medicineCode) {
+        if (StringUtils.isBlank(medicineCode)) {
+            return null;
+        }
+        return chineseMedicineMapper.getByMedicineCodeIgnoreDel(medicineCode);
+    }
+
+    /**
      * 根据药材code获取中药材信息
      *
      * @param medicineCodes 药材code
