@@ -1,7 +1,7 @@
 package com.drstrong.health.product.service.chinese.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -27,7 +27,7 @@ import com.drstrong.health.product.service.product.SkuInfoService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,9 +36,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -48,6 +46,7 @@ import java.util.stream.Collectors;
  * @author mybatis plus generator
  * @since 2022-08-01
  */
+@Slf4j
 @Service
 public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper, ChineseSkuInfoEntity> implements ChineseSkuInfoService {
     @Resource
@@ -203,6 +202,25 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
     }
 
     /**
+     * 根据 medicineCodes 集合查询 sku 信息
+     *
+     * @param medicineCodes 药材编号
+     * @return sku 信息
+     * @author liuqiuyi
+     * @date 2022/8/1 16:15
+     */
+    @Override
+    public List<ChineseSkuInfoEntity> listByMedicineCodes(Set<String> medicineCodes) {
+        if (CollectionUtils.isEmpty(medicineCodes)) {
+            return Lists.newArrayList();
+        }
+        LambdaQueryWrapper<ChineseSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(ChineseSkuInfoEntity::getMedicineCode, medicineCodes);
+        return list(queryWrapper);
+    }
+
+    /**
      * 保存sku信息
      *
      * @param saveOrUpdateSkuVO 接口入参
@@ -327,28 +345,6 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
     }
 
     /**
-     * 校验是否有上架的 sku
-     * <p> 用于供应商那边删除中药材时进行校验,如果删除的中药材关联了上架的 sku,则不允许删除 </>
-     *
-     * @param medicineCodes 药材 code
-     * @return 已有上架sku 的  medicineCodes
-     * @author liuqiuyi
-     * @date 2022/8/11 17:18
-     */
-    @Override
-    public Set<String> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes) {
-        if (CollectionUtils.isEmpty(medicineCodes)) {
-            return Sets.newHashSet();
-        }
-        List<ChineseSkuInfoEntity> chineseSkuInfoEntityList = list(new QueryWrapper<ChineseSkuInfoEntity>().select("DISTINCT medicine_code").lambda()
-                .select(ChineseSkuInfoEntity::getMedicineCode)
-                .eq(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .in(ChineseSkuInfoEntity::getMedicineCode, medicineCodes)
-                .eq(ChineseSkuInfoEntity::getSkuStatus, ProductStateEnum.HAS_PUT.getCode()));
-        return chineseSkuInfoEntityList.stream().map(ChineseSkuInfoEntity::getMedicineCode).collect(Collectors.toSet());
-    }
-
-    /**
      * 根据 skuCode 或者 药材 id,查询中药 sku 信息
      * <p> 仅支持查询同一店铺的 sku 信息 </>
      *
@@ -398,6 +394,28 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
     @Override
     public List<SupplierChineseSkuDTO> listSupplierChineseManagerSkuExport(ChineseManagerSkuRequest queryParam) {
         return chineseSkuInfoMapper.listSupplierChineseManagerSkuExport(queryParam);
+    }
+
+    /**
+     * 根据skuCodes逻辑删除
+     *
+     * @param skuCodes sku编号
+     * @author liuqiuyi
+     * @date 2022/10/31 14:32
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteSkuInfoBySkuCodes(Set<String> skuCodes, Long operatorId) {
+        if (CollectionUtils.isEmpty(skuCodes) || Objects.isNull(operatorId)) {
+            log.info("invoke ChineseSkuInfoServiceImpl.deleteSkuInfoBySkuCodes() param is null,param:{},{}", JSONUtil.toJsonStr(skuCodes), operatorId);
+            return;
+        }
+        lambdaUpdate()
+                .in(ChineseSkuInfoEntity::getSkuCode, skuCodes)
+                .eq(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .set(ChineseSkuInfoEntity::getDelFlag, DelFlagEnum.IS_DELETED.getCode())
+                .set(ChineseSkuInfoEntity::getChangedBy, operatorId)
+                .update();
     }
 
     private List<ChineseSkuSupplierRelevanceEntity> buildChineseSkuSupplierRelevanceList(SaveOrUpdateSkuVO saveOrUpdateSkuVO, String skuCode) {

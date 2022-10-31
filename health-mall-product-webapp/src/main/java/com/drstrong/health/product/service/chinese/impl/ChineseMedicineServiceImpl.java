@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.chinese.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.extra.pinyin.PinyinUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -19,10 +20,12 @@ import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchV
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultStatus;
+import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineConflictService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
+import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +55,9 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
 
     @Resource
     ChineseMedicineMapper chineseMedicineMapper;
+
+    @Resource
+    SupplierRemoteProService supplierRemoteProService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -129,8 +135,14 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removeByCode(String medicineCode, Long userId) {
+        // 1.校验是否关联了 sku
         if (chineseSkuInfoService.checkHasChineseByMedicineCode(medicineCode)) {
-            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "药材已经关联sku");
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "药材已经关联sku,不允许删除!");
+        }
+        // 2.校验是否关联了供应商
+        List<SupplierInfoDTO> supplierInfoDTOList = supplierRemoteProService.searchSupplierByCodeIsThrowError(medicineCode);
+        if (CollectionUtil.isNotEmpty(supplierInfoDTOList)) {
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "药材已经关联了供应商,不允许删除!");
         }
         //逻辑删除药材
         LambdaUpdateWrapper<ChineseMedicineEntity> lambdaQueryWrapper = new LambdaUpdateWrapper<>();

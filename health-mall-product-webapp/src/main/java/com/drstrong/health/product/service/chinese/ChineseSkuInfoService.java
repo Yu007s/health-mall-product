@@ -93,6 +93,16 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
      */
     List<ChineseSkuInfoEntity> listBySkuCode(Set<String> skuCodes);
 
+	/**
+	 * 根据 medicineCodes 集合查询 sku 信息
+	 *
+	 * @param medicineCodes 药材编号
+	 * @return sku 信息
+	 * @author liuqiuyi
+	 * @date 2022/8/1 16:15
+	 */
+    List<ChineseSkuInfoEntity> listByMedicineCodes(Set<String> medicineCodes);
+
     /**
      * 更新sku信息
      *
@@ -130,17 +140,6 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
      */
     Boolean checkHasChineseByMedicineCode(String medicineCode);
 
-    /**
-     * 校验是否有上架的 sku
-	 * <p> 用于供应商那边删除中药材时进行校验,如果删除的中药材关联了上架的 sku,则不允许删除 </>
-	 *
-	 * @param medicineCodes 药材 code
-	 * @return 已有上架sku 的  medicineCodes
-     * @author liuqiuyi
-     * @date 2022/8/11 17:18
-     */
-	Set<String> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes);
-
 	/**
 	 * 根据 skuCode 或者 药材 id,查询中药 sku 信息
 	 * <p> 仅支持查询同一店铺的 sku 信息 </>
@@ -169,4 +168,13 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
 	 * @date 2022/8/5 10:40
 	 */
 	List<SupplierChineseSkuDTO> listSupplierChineseManagerSkuExport(ChineseManagerSkuRequest queryParam);
+
+	/**
+	 * 根据skuCodes逻辑删除
+	 *
+	 * @param skuCodes sku编号
+	 * @author liuqiuyi
+	 * @date 2022/10/31 14:32
+	 */
+	void deleteSkuInfoBySkuCodes(Set<String> skuCodes, Long operatorId);
 }

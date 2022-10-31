@@ -1,5 +1,6 @@
 package com.drstrong.health.product.facade.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSON;
 import com.drstrong.health.product.facade.ChineseRemoteFacade;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
@@ -10,6 +11,7 @@ import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
+import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
 import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
@@ -22,6 +24,7 @@ import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineConflictService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
+import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceService;
 import com.drstrong.health.product.service.product.SkuInfoService;
 import com.drstrong.health.product.service.store.StoreDeliveryPriorityService;
 import com.drstrong.health.product.service.store.StoreService;
@@ -32,6 +35,7 @@ import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -39,6 +43,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.*;
 
 /**
  * 中药的远程接口门面层
@@ -69,6 +75,9 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 
 	@Resource
 	SkuInfoService skuInfoService;
+
+	@Resource
+	ChineseSkuSupplierRelevanceService chineseSkuSupplierRelevanceService;
 
 	/**
 	 * 根据关键字和互联网医院 id 模糊搜索药材
@@ -255,8 +264,48 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 	 * @date 2022/8/11 17:35
 	 */
 	@Override
-	public List<ChineseMedicineInfoResponse> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes) {
-		Set<String> upMedicineCodes = chineseSkuInfoService.checkHasUpChineseByMedicineCodes(medicineCodes);
+	@Transactional(rollbackFor = Exception.class)
+	public List<ChineseMedicineInfoResponse> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes, Long supplierId, Long operatorId) {
+		// 1.先查询出所有的 sku 信息
+		List<ChineseSkuInfoEntity> chineseSkuInfoEntityList = chineseSkuInfoService.listByMedicineCodes(medicineCodes);
+		if (CollectionUtils.isEmpty(chineseSkuInfoEntityList)) {
+			return Lists.newArrayList();
+		}
+		Set<String> skuCodes = chineseSkuInfoEntityList.stream().map(ChineseSkuInfoEntity::getSkuCode).collect(Collectors.toSet());
+		// 2.根据 skuCode 信息获取供应商
+		Map<String, Set<Long>> skuCodeAndSupplierIdsMap = chineseSkuSupplierRelevanceService.getSkuCodeAndSupplierIdsMap(skuCodes);
+		// 3.判断供应商关联的店铺是否存在已上架的 sku 信息
+		List<ChineseMedicineInfoResponse> infoResponseList = checkHasUpSku(chineseSkuInfoEntityList, skuCodeAndSupplierIdsMap, supplierId);
+		if (CollectionUtil.isNotEmpty(infoResponseList)) {
+			return infoResponseList;
+		}
+		// 4.如果校验通过,则删除这些药材关联供应商对应的店铺 sku 信息以及关联关系
+		Set<String> deleteSkuCodes = chineseSkuInfoEntityList.stream().filter(chineseSkuInfoEntity ->
+				Objects.equals(UpOffEnum.DOWN.getCode(), chineseSkuInfoEntity.getSkuStatus())
+						&& skuCodeAndSupplierIdsMap.getOrDefault(chineseSkuInfoEntity.getSkuCode(), Sets.newHashSet()).contains(supplierId))
+				.map(ChineseSkuInfoEntity::getSkuCode).collect(toSet());
+		chineseSkuInfoService.deleteSkuInfoBySkuCodes(deleteSkuCodes, operatorId);
+		chineseSkuSupplierRelevanceService.deleteRelevanceBySkuCodesAndSupplierId(deleteSkuCodes, supplierId, operatorId);
+		return Lists.newArrayList();
+	}
+
+	/**
+	 * 校验供应商关联的店铺中,是否有上线的sku 信息
+	 *
+	 * @author liuqiuyi
+	 * @date 2022/10/31 14:13
+	 */
+	private List<ChineseMedicineInfoResponse> checkHasUpSku(List<ChineseSkuInfoEntity> chineseSkuInfoEntityList, Map<String, Set<Long>> skuCodeAndSupplierIdsMap, Long supplierId) {
+		// 筛选出 sku 是上线状态,并且店铺关联了传入的供应商
+		List<ChineseSkuInfoEntity> upSkuInfoList = chineseSkuInfoEntityList.stream().filter(chineseSkuInfoEntity ->
+				Objects.equals(UpOffEnum.UP.getCode(), chineseSkuInfoEntity.getSkuStatus())
+						&& skuCodeAndSupplierIdsMap.getOrDefault(chineseSkuInfoEntity.getSkuCode(), Sets.newHashSet()).contains(supplierId))
+				.collect(Collectors.toList());
+		if (CollectionUtils.isEmpty(upSkuInfoList)) {
+			return Lists.newArrayList();
+		}
+		Set<String> upMedicineCodes = upSkuInfoList.stream().map(ChineseSkuInfoEntity::getMedicineCode).collect(Collectors.toSet());
+		// 获取这部分药材的名称,返回
 		List<ChineseMedicineEntity> chineseMedicineEntityList = chineseMedicineService.getByMedicineCode(upMedicineCodes);
 		List<ChineseMedicineInfoResponse> infoResponseList = Lists.newArrayListWithCapacity(chineseMedicineEntityList.size());
 		chineseMedicineEntityList.forEach(chineseMedicineEntity -> {

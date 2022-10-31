@@ -1,5 +1,7 @@
 package com.drstrong.health.product.service.chinese.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.chinese.ChineseSkuSupplierRelevanceMapper;
@@ -16,8 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import static java.util.stream.Collectors.*;
 
 /**
  * <p>
@@ -52,6 +57,20 @@ public class ChineseSkuSupplierRelevanceServiceImpl extends ServiceImpl<ChineseS
     }
 
     /**
+     * 根据 skuCode 集合查询关联关系,并组装成 map
+     *
+     * @param skuCodes skuCode 集合
+     * @return skuCode 和供应商的关联关系
+     * @author liuqiuyi
+     * @date 2022/10/31 11:53
+     */
+    @Override
+    public Map<String, Set<Long>> getSkuCodeAndSupplierIdsMap(Set<String> skuCodes) {
+        return listQueryBySkuCodeList(skuCodes).stream()
+                .collect(groupingBy(ChineseSkuSupplierRelevanceEntity::getSkuCode, mapping(ChineseSkuSupplierRelevanceEntity::getSupplierId, toSet())));
+    }
+
+    /**
      * 根据 skuCode 删除关联关系
      *
      * @param skuCode sku 编码
@@ -67,6 +86,29 @@ public class ChineseSkuSupplierRelevanceServiceImpl extends ServiceImpl<ChineseS
         lambdaUpdate()
                 .eq(ChineseSkuSupplierRelevanceEntity::getSkuCode, skuCode)
                 .eq(ChineseSkuSupplierRelevanceEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .set(ChineseSkuSupplierRelevanceEntity::getDelFlag, DelFlagEnum.IS_DELETED.getCode())
+                .set(ChineseSkuSupplierRelevanceEntity::getChangedBy, operatorId)
+                .update();
+    }
+
+    /**
+     * 逻辑删除
+     *
+     * @param skuCodes
+     * @param operatorId
+     * @author liuqiuyi
+     * @date 2022/10/31 14:42
+     */
+    @Override
+    public void deleteRelevanceBySkuCodesAndSupplierId(Set<String> skuCodes, Long supplierId, Long operatorId) {
+        if (CollectionUtil.isEmpty(skuCodes) || Objects.isNull(operatorId) || Objects.isNull(supplierId)) {
+            log.info("invoke ChineseSkuSupplierRelevanceServiceImpl.deleteRelevanceBySkuCodes() param is null,param:{},{},{}", JSONUtil.toJsonStr(skuCodes), supplierId, operatorId);
+            return;
+        }
+        lambdaUpdate()
+                .in(ChineseSkuSupplierRelevanceEntity::getSkuCode, skuCodes)
+                .eq(ChineseSkuSupplierRelevanceEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .eq(ChineseSkuSupplierRelevanceEntity::getSupplierId, supplierId)
                 .set(ChineseSkuSupplierRelevanceEntity::getDelFlag, DelFlagEnum.IS_DELETED.getCode())
                 .set(ChineseSkuSupplierRelevanceEntity::getChangedBy, operatorId)
                 .update();

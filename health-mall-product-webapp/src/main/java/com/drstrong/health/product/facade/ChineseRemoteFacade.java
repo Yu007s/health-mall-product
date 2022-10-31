@@ -76,5 +76,5 @@ public interface ChineseRemoteFacade {
 	 * @author liuqiuyi
 	 * @date 2022/8/11 17:35
 	 */
-	List<ChineseMedicineInfoResponse> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes);
+	List<ChineseMedicineInfoResponse> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes, Long supplierId, Long operatorId);
 }
