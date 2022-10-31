@@ -1,7 +1,6 @@
 package com.drstrong.health.product.remote.api.category;
 
 import com.drstrong.health.product.model.entity.category.BackCategoryEntity;
-import com.drstrong.health.product.model.entity.category.CategoryAttributeEntity;
 import com.drstrong.health.product.model.entity.product.CategoryAttributeItemEntity;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -10,8 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
 
 /**
  * 数据同步的远程接口
@@ -23,34 +20,6 @@ import java.util.List;
 @FeignClient(value = "health-mall-product", path = "/inner/product/data/sync")
 @Deprecated
 public interface DataSyncFacade {
-
-	/**
-	 * 同步 p_category 表的数据
-	 *
-	 * @author liuqiuyi
-	 * @date 2021/12/27 11:10
-	 */
-	@PostMapping("/p_category/sync")
-	ResultVO<Object> categorySync(@RequestBody List<BackCategoryEntity> categoryEntityList);
-
-	/**
-	 * 同步 p_category_attribute 表的数据
-	 *
-	 * @author liuqiuyi
-	 * @date 2021/12/27 11:15
-	 */
-	@PostMapping("p_category_attribute/sync")
-	ResultVO<Object> categoryAttributeSync(@RequestBody List<CategoryAttributeEntity> entityList);
-
-	/**
-	 * 同步 p_category_attribute_item 表
-	 *
-	 * @author liuqiuyi
-	 * @date 2021/12/27 11:16
-	 */
-	@PostMapping("p_category_attribute_item/sync")
-	ResultVO<Object> categoryAttributeItem(@RequestBody List<CategoryAttributeItemEntity> entityList);
-
 	/**
 	 * p_category 保存或更新分类
 	 *
