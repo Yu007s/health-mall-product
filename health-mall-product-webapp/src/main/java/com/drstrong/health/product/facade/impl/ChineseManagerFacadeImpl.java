@@ -1,11 +1,15 @@
 package com.drstrong.health.product.facade.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.drstrong.health.common.enums.OperateTypeEnum;
+import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.dao.chinese.OldChineseMedicineMapper;
 import com.drstrong.health.product.facade.ChineseManagerFacade;
+import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.dto.SupplierChineseSkuDTO;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
@@ -13,7 +17,6 @@ import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierReleva
 import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
-import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
@@ -30,6 +33,7 @@ import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceSe
 import com.drstrong.health.product.service.store.StoreLinkSupplierService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
+import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.drstrong.health.ware.model.response.SkuStockResponse;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.google.common.collect.Lists;
@@ -77,6 +81,9 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 
 	@Resource
 	StoreLinkSupplierService storeLinkSupplierService;
+
+	@Resource
+	private OperationLogSendUtil operationLogSendUtil;
 
     /**
      * 中药管理页面，列表查询
@@ -174,14 +181,26 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
     public void saveOrUpdateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO) {
         log.info("invoke saveOrUpdateSku() param：{}", JSON.toJSONString(saveOrUpdateSkuVO));
         boolean updateFlag = StringUtils.isNotBlank(saveOrUpdateSkuVO.getSkuCode());
+		OperationLog operationLog = new OperationLog();
         // 校验请求入参
-        checkSaveOrUpdateSkuParam(saveOrUpdateSkuVO, updateFlag);
+		checkSaveOrUpdateSkuParam(saveOrUpdateSkuVO, updateFlag, operationLog);
         // 保存或者更新
+		String skuCode;
         if (updateFlag) {
-            chineseSkuInfoService.updateSku(saveOrUpdateSkuVO);
-        } else {
-            chineseSkuInfoService.saveSku(saveOrUpdateSkuVO);
+			skuCode = chineseSkuInfoService.updateSku(saveOrUpdateSkuVO);
+		} else {
+			skuCode = chineseSkuInfoService.saveSku(saveOrUpdateSkuVO);
         }
+        // 查询库中最新的 sku 数据
+		ChineseSkuInfoEntity changeAfterData = chineseSkuInfoService.getBySkuCode(skuCode);
+        // 组装操作日志
+		operationLog.setChangeAfterData(JSONUtil.toJsonStr(changeAfterData));
+		operationLog.setBusinessId(skuCode);
+		operationLog.setOperationType(OperationLogConstant.MALL_PRODUCT_SKU_CHANGE);
+		operationLog.setOperateContent(OperationLogConstant.SAVE_UPDATE_SKU);
+		operationLog.setOperationUserId(saveOrUpdateSkuVO.getOperatorId());
+		operationLog.setOperationUserType(OperateTypeEnum.CMS.getCode());
+		operationLogSendUtil.sendOperationLog(operationLog);
     }
 
     /**
@@ -253,7 +272,27 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         }
         // 3.更新
         chineseSkuInfoService.updateSkuStatue(updateSkuStateRequest);
+        // 4.组装发送操作日志
+		sendSkuStatusUpdateLog(chineseSkuInfoEntityList,skuCodeList, updateSkuStateRequest.getOperatorId());
     }
+
+	private void sendSkuStatusUpdateLog(List<ChineseSkuInfoEntity> beforeDataList, Set<String> skuCodeList, Long operatorId) {
+		Map<String, ChineseSkuInfoEntity> skuCodeInfoMap = chineseSkuInfoService.listBySkuCode(skuCodeList)
+				.stream().collect(toMap(ChineseSkuInfoEntity::getSkuCode, dto -> dto, (v1, v2) -> v1));
+
+		beforeDataList.forEach(chineseSkuInfoEntity -> {
+			OperationLog operationLog = OperationLog.builder()
+					.businessId(chineseSkuInfoEntity.getSkuCode())
+					.operationType(OperationLogConstant.MALL_PRODUCT_SKU_CHANGE)
+					.operateContent(OperationLogConstant.SKU_STATUS_CHANGE)
+					.changeBeforeData(JSONUtil.toJsonStr(chineseSkuInfoEntity))
+					.changeAfterData(JSONUtil.toJsonStr(skuCodeInfoMap.get(chineseSkuInfoEntity.getSkuCode())))
+					.operationUserId(operatorId)
+					.operationUserType(OperateTypeEnum.CMS.getCode())
+					.build();
+			operationLogSendUtil.sendOperationLog(operationLog);
+		});
+	}
 
     /**
      * 供应商中药库存页面，列表查询接口,提供给供应商远程调用
@@ -327,45 +366,46 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 		return supplierBaseInfoVOList;
 	}
 
-	private void checkSaveOrUpdateSkuParam(SaveOrUpdateSkuVO saveOrUpdateSkuVO, boolean updateFlag) {
-        // 1.根据药材code校验编码是否存在
-        ChineseMedicineEntity chineseMedicineEntity = chineseMedicineService.getByMedicineCode(saveOrUpdateSkuVO.getMedicineCode());
-        if (Objects.isNull(chineseMedicineEntity)) {
-            throw new BusinessException(ErrorEnums.CHINESE_MEDICINE_IS_NULL);
-        }
-        saveOrUpdateSkuVO.setMedicineId(chineseMedicineEntity.getId());
-        saveOrUpdateSkuVO.setMedicineName(chineseMedicineEntity.getMedicineName());
-        // 2.校验店铺是否存在
-        List<StoreEntity> storeEntityList = storeService.listByIds(Sets.newHashSet(saveOrUpdateSkuVO.getStoreId()));
-        if (CollectionUtils.isEmpty(storeEntityList)) {
-            throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
-        }
-        // 3.校验药材是否关联了供应商
+	private void checkSaveOrUpdateSkuParam(SaveOrUpdateSkuVO saveOrUpdateSkuVO, boolean updateFlag, OperationLog operationLog) {
+		// 1.根据药材code校验编码是否存在
+		ChineseMedicineEntity chineseMedicineEntity = chineseMedicineService.getByMedicineCode(saveOrUpdateSkuVO.getMedicineCode());
+		if (Objects.isNull(chineseMedicineEntity)) {
+			throw new BusinessException(ErrorEnums.CHINESE_MEDICINE_IS_NULL);
+		}
+		saveOrUpdateSkuVO.setMedicineId(chineseMedicineEntity.getId());
+		saveOrUpdateSkuVO.setMedicineName(chineseMedicineEntity.getMedicineName());
+		// 2.校验店铺是否存在
+		List<StoreEntity> storeEntityList = storeService.listByIds(Sets.newHashSet(saveOrUpdateSkuVO.getStoreId()));
+		if (CollectionUtils.isEmpty(storeEntityList)) {
+			throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
+		}
+		// 3.校验药材是否关联了供应商
 		List<SupplierInfoDTO> supplierInfoDTOList = supplierRemoteProService.searchSupplierByCode(saveOrUpdateSkuVO.getMedicineCode());
 		if (CollectionUtils.isEmpty(supplierInfoDTOList)) {
 			throw new BusinessException(ErrorEnums.MEDICINE_CODE_NOT_ASSOCIATED);
 		}
 		List<Long> supplierIds = supplierInfoDTOList.stream().map(SupplierInfoDTO::getSupplierId).collect(toList());
 		boolean supplierFlag = saveOrUpdateSkuVO.getSupplierInfoList().stream().anyMatch(supplierInfo -> !supplierIds.contains(supplierInfo.getSupplierId()));
-        if (supplierFlag) {
-            throw new BusinessException(ErrorEnums.SUPPLIER_IS_NULL);
-        }
-        // 4.如果是更新sku，校验skuCode是否存在，否则校验重复添加
-        if (updateFlag) {
-            ChineseSkuInfoEntity skuInfoEntity = chineseSkuInfoService.getBySkuCode(saveOrUpdateSkuVO.getSkuCode());
-            if (Objects.isNull(skuInfoEntity)) {
-                throw new BusinessException(ErrorEnums.SKU_IS_NULL);
-            }
-            // 如果是修改,且修改前后 skuName 不一样,也需要校验 skuName 是否重复
+		if (supplierFlag) {
+			throw new BusinessException(ErrorEnums.SUPPLIER_IS_NULL);
+		}
+		// 4.如果是更新sku，校验skuCode是否存在，否则校验重复添加
+		if (updateFlag) {
+			ChineseSkuInfoEntity skuInfoEntity = chineseSkuInfoService.getBySkuCode(saveOrUpdateSkuVO.getSkuCode());
+			if (Objects.isNull(skuInfoEntity)) {
+				throw new BusinessException(ErrorEnums.SKU_IS_NULL);
+			}
+			// 如果是修改,且修改前后 skuName 不一样,也需要校验 skuName 是否重复
 			if (!Objects.equals(skuInfoEntity.getSkuName(), saveOrUpdateSkuVO.getSkuName())) {
 				chineseSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateSkuVO.getSkuName(), saveOrUpdateSkuVO.getStoreId());
 			}
-        } else {
-            // 校验是否重复添加
-            ChineseSkuInfoEntity chineseSkuInfoEntity = chineseSkuInfoService.getByMedicineCodeAndStoreId(saveOrUpdateSkuVO.getMedicineCode(), saveOrUpdateSkuVO.getStoreId());
-            if (Objects.nonNull(chineseSkuInfoEntity)) {
-                throw new BusinessException(ErrorEnums.CHINESE_IS_REPEAT);
-            }
+			operationLog.setChangeBeforeData(JSONUtil.toJsonStr(skuInfoEntity));
+		} else {
+			// 校验是否重复添加
+			ChineseSkuInfoEntity chineseSkuInfoEntity = chineseSkuInfoService.getByMedicineCodeAndStoreId(saveOrUpdateSkuVO.getMedicineCode(), saveOrUpdateSkuVO.getStoreId());
+			if (Objects.nonNull(chineseSkuInfoEntity)) {
+				throw new BusinessException(ErrorEnums.CHINESE_IS_REPEAT);
+			}
 			// 5.校验相同店铺下,sku名称是否重复添加
 			chineseSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateSkuVO.getSkuName(), saveOrUpdateSkuVO.getStoreId());
 		}

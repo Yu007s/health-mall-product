@@ -1,6 +1,8 @@
 package com.drstrong.health.product.remote.pro;
 
 import com.alibaba.fastjson.JSON;
+import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.drstrong.health.ware.model.result.ResultVO;
 import com.drstrong.health.ware.remote.api.SupplierManageRemoteApi;
@@ -88,6 +90,30 @@ public class SupplierRemoteProService {
 		} catch (Exception e) {
 			log.error("invoke supplierSkuRemoteApi.searchSupplierByDicCode() an error occurred!", e);
 			return Lists.newArrayList();
+		}
+	}
+
+	/**
+	 * 根据供应商 id 获取供应商信息
+	 *
+	 * @author liuqiuyi
+	 * @date 2022/8/5 13:52
+	 */
+	public List<SupplierInfoDTO> searchSupplierByCodeIsThrowError(String medicineCode) {
+		if (StringUtils.isBlank(medicineCode)) {
+			throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
+		}
+		log.info("invoke supplierSkuRemoteApi.searchSupplierByDicCode() param:{}", medicineCode);
+		try {
+			ResultVO<List<SupplierInfoDTO>> listResultVO = supplierSkuRemoteApi.searchSupplierByDicCode(medicineCode);
+			if (Objects.isNull(listResultVO) || !listResultVO.isSuccess()) {
+				log.error("invoke supplierSkuRemoteApi.searchSupplierByDicCode() result is error! result:{}", JSON.toJSONString(listResultVO));
+				throw new BusinessException(ErrorEnums.REMOTE_INVOKE_ERROR);
+			}
+			return listResultVO.getData();
+		} catch (Exception e) {
+			log.error("invoke supplierSkuRemoteApi.searchSupplierByDicCode() an error occurred!", e);
+			throw new BusinessException(ErrorEnums.REMOTE_INVOKE_ERROR);
 		}
 	}
 }

@@ -63,8 +63,8 @@ public class ChineseRemoteController implements ChineseRemoteApi {
 	}
 
 	@Override
-	public ResultVO<List<ChineseMedicineInfoResponse>> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes) {
-		return ResultVO.success(chineseRemoteFacade.checkHasUpChineseByMedicineCodes(medicineCodes));
+	public ResultVO<List<ChineseMedicineInfoResponse>> checkHasUpChineseByMedicineCodes(Set<String> medicineCodes, Long supplierId, Long operatorId) {
+		return ResultVO.success(chineseRemoteFacade.checkHasUpChineseByMedicineCodes(medicineCodes, supplierId, operatorId));
 	}
 
 	@Override

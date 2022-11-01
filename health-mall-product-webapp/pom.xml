@@ -217,6 +217,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-sleuth-spring-boot-starter</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <finalName>health-mall-product</finalName>

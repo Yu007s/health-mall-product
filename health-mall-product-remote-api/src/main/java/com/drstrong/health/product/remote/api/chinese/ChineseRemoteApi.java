@@ -1,6 +1,5 @@
 package com.drstrong.health.product.remote.api.chinese;
 
-import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
 import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -56,7 +54,10 @@ public interface ChineseRemoteApi {
 
 	@ApiOperation("根据药材编码校验是否有上架的sku,用于供应商那边删除中药材时进行校验,如果删除的中药材关联了上架的 sku,则不允许删除")
 	@PostMapping("/check/up/chinese")
-	ResultVO<List<ChineseMedicineInfoResponse>> checkHasUpChineseByMedicineCodes(@RequestBody @NotNull(message = "参数不能为空") @Size(max = 200, message = "入参不能超过200") Set<String> medicineCodes);
+	ResultVO<List<ChineseMedicineInfoResponse>> checkHasUpChineseByMedicineCodes(@RequestBody @NotNull(message = "参数不能为空") @Size(max = 200, message = "入参不能超过200") Set<String> medicineCodes,
+																				 @RequestParam("supplierId") @NotNull(message = "供应商 id 不能为空") Long supplierId,
+																				 @RequestParam("operatorId") @NotNull(message = "操作人 id 不能为空") Long operatorId);
+
 	@ApiOperation("通过IDs获取中药材详情")
 	@PostMapping("/get/chineseMedicineDTO")
 	ResultVO<List<ChineseMedicineDTO>> getChineseMedicineDTOListByIds(@RequestBody  Set<Long> ids);
