@@ -1,6 +1,7 @@
 package com.drstrong.health.product.utils;
 
 import com.drstrong.health.common.exception.BusinessException;
+import com.drstrong.health.common.mq.support.IMqMessage;
 import com.yomahub.tlog.core.mq.TLogMqWrapBean;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,30 @@ public class MqMessageUtil {
 
     @Resource
     private RocketMQTemplate rocketMQTemplate;
+
+    /**
+     * 发送即时mq消息
+     *
+     * @param topic
+     * @param tag
+     * @param iMqMessage
+     */
+    public void sendMsg(String topic, String tag, IMqMessage iMqMessage) {
+        Message<IMqMessage> message = MessageBuilder.withPayload(iMqMessage).build();
+        String destination = "";
+        if (StringUtils.isNotEmpty(tag)) {
+            destination = String.format("%s:%s", topic, tag);
+        } else {
+            destination = topic;
+        }
+        SendResult sendResult = rocketMQTemplate.syncSend(destination, message,3000);
+        if (sendResult.getSendStatus().equals(SendStatus.SEND_OK)) {
+            log.info("send message to mq success,topic:[{}], tag:[{}], content:[{}]", topic, tag, iMqMessage);
+        } else {
+            log.error("send message to mq failed,topic:[{}], tag:[{}], content:[{}], rocketMq sendResult:[{}]", topic, tag, iMqMessage, sendResult);
+            throw new BusinessException("发送mq消息失败");
+        }
+    }
 
     /**
      * 发送普通mq消息

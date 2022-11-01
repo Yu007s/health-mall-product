@@ -37,4 +37,10 @@ public class MqTopicConfig {
 	 */
 	@Value("${sku.state.stock.tag}")
 	private String skuStateStockTag;
+
+	@Value("${health.log.topic}")
+	private String logTopic;
+
+	@Value("${health.log.tag}")
+	private String logTag;
 }

@@ -229,7 +229,7 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO){
+    public String saveSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO){
         // 1.校验 spu 是否存在，如果不存在，生成 spu 信息
         ChineseSpuInfoEntity spuInfoEntity = chineseSpuInfoService.getByMedicineCode(saveOrUpdateSkuVO.getMedicineCode(), saveOrUpdateSkuVO.getStoreId());
         String spuCode;
@@ -266,6 +266,7 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
         skuInfoService.save(infoEntity);
         chineseSkuSupplierRelevanceService.saveBatch(relevanceEntityList);
         stockRemoteProService.saveOrUpdateStockInfo(skuCode, saveOrUpdateSkuVO);
+        return skuCode;
     }
 
     /**
@@ -277,7 +278,7 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO) {
+    public String updateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO) {
         String skuCode = saveOrUpdateSkuVO.getSkuCode();
         // 1.根据 skuCode 更新中药 sku 表
         ChineseSkuInfoEntity chineseSkuInfoEntity = ChineseSkuInfoEntity.builder()
@@ -303,6 +304,7 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
         SkuInfoEntity skuInfoEntity = skuInfoService.getBySkuCode(skuCode);
         chineseSpuInfoService.updateMedicineCodeBySpuCode(skuInfoEntity.getSpuCode(), saveOrUpdateSkuVO);
         stockRemoteProService.saveOrUpdateStockInfo(skuCode, saveOrUpdateSkuVO);
+        return skuCode;
     }
 
     /**

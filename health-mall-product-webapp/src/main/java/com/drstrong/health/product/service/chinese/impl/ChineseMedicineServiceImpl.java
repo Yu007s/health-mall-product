@@ -2,14 +2,18 @@ package com.drstrong.health.product.service.chinese.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.extra.pinyin.PinyinUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.drstrong.health.common.enums.OperateTypeEnum;
+import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.controller.datasync.model.ChineseMedicineAlias;
 import com.drstrong.health.product.dao.chinese.ChineseMedicineMapper;
+import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
@@ -24,6 +28,7 @@ import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineConflictService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
+import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.google.common.collect.Lists;
@@ -59,9 +64,14 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
     @Resource
     SupplierRemoteProService supplierRemoteProService;
 
+    @Resource
+    OperationLogSendUtil operationLogSendUtil;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean save(ChineseMedicineVO chineseMedicineVO) {
+        OperationLog operationLog = new OperationLog();
+
         Long userId = chineseMedicineVO.getUserId();
         String medicineCode = chineseMedicineVO.getMedicineCode();
         ChineseMedicineEntity chineseMedicineEntity = new ChineseMedicineEntity();
@@ -80,6 +90,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
             }
             chineseMedicineEntity.setId(byMedicineCode.getId());
             chineseMedicineEntity.setMedicineCode(chineseMedicineVO.getMedicineCode());
+            operationLog.setChangeBeforeData(JSONUtil.toJsonStr(byMedicineCode));
         } else {
             //新增药材  检验药材是否重名
             if (getOneByName != null) {
@@ -129,12 +140,25 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         chineseMedicineConflictEntity.setMedicineCode(medicineCode);
         chineseMedicineConflictEntity.setMedicineConflictCodes(collect);
         chineseMedicineConflictService.saveOrUpdate(chineseMedicineConflictEntity, userId);
-        return super.saveOrUpdate(chineseMedicineEntity);
+        boolean saveOrUpdate = super.saveOrUpdate(chineseMedicineEntity);
+        // 组装操作日志
+        operationLog.setBusinessId(chineseMedicineEntity.getMedicineCode());
+        operationLog.setOperationType(OperationLogConstant.MALL_PRODUCT_CHINESE_MEDICINE_CHANGE);
+        operationLog.setOperateContent(OperationLogConstant.SAVE_OR_UPDATE_CHINESE_MEDICINE);
+        operationLog.setChangeAfterData(JSONUtil.toJsonStr(chineseMedicineEntity));
+        operationLog.setOperationUserId(userId);
+        operationLog.setOperationUserType(OperateTypeEnum.CMS.getCode());
+        operationLogSendUtil.sendOperationLog(operationLog);
+        return saveOrUpdate;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removeByCode(String medicineCode, Long userId) {
+        ChineseMedicineEntity chineseMedicineEntity = getByMedicineCode(medicineCode);
+        if (Objects.isNull(chineseMedicineEntity)) {
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "药材信息不存在!");
+        }
         // 1.校验是否关联了 sku
         if (chineseSkuInfoService.checkHasChineseByMedicineCode(medicineCode)) {
             throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "药材已经关联sku,不允许删除!");
@@ -154,6 +178,22 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         ChineseMedicineConflictEntity chineseMedicineConflictEntity = new ChineseMedicineConflictEntity();
         chineseMedicineConflictEntity.setMedicineCode(medicineCode);
         chineseMedicineConflictService.delete(chineseMedicineConflictEntity, userId);
+        // 组装并发送操作日志
+        sendOperationLog(medicineCode, userId, chineseMedicineEntity);
+    }
+
+    private void sendOperationLog(String medicineCode, Long userId, ChineseMedicineEntity changeBeforeData) {
+        ChineseMedicineEntity afterChineseMedicineEntity = getByMedicineCode(medicineCode);
+        OperationLog operationLog = OperationLog.builder()
+                .businessId(medicineCode)
+                .operationType(OperationLogConstant.MALL_PRODUCT_CHINESE_MEDICINE_CHANGE)
+                .operateContent(OperationLogConstant.DELETE_CHINESE_MEDICINE)
+                .changeBeforeData(JSONUtil.toJsonStr(changeBeforeData))
+                .changeAfterData(JSONUtil.toJsonStr(afterChineseMedicineEntity))
+                .operationUserId(userId)
+                .operationUserType(OperateTypeEnum.CMS.getCode())
+                .build();
+        operationLogSendUtil.sendOperationLog(operationLog);
     }
 
     @Override

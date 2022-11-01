@@ -110,7 +110,7 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
      * @author liuqiuyi
      * @date 2022/8/1 15:44
      */
-    void updateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO);
+    String updateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO);
 
     /**
      * 保存sku信息
@@ -119,7 +119,7 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
      * @author liuqiuyi
      * @date 2022/8/1 15:44
      */
-    void saveSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO);
+    String saveSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO);
 
     /**
      * 根据 skuCode 批量更新sku状态
