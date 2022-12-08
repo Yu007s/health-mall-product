@@ -56,6 +56,15 @@ public class SaveOrUpdateSkuVO implements Serializable{
     @Valid
     private List<SupplierInfo> supplierInfoList;
 
+    @ApiModelProperty("剂量类型 0-无限制 1-按倍数限制")
+    @NotNull(message = "剂量类型不能为空")
+    private Integer dosageType;
+
+    @ApiModelProperty("剂量倍数值")
+    @Min(value = 1, message = "剂量倍数不能小于 1")
+    @Max(value = 9999, message = "剂量倍数不能大于 9999")
+    private Integer dosageValue;
+
     @ApiModelProperty(value = "操作人", hidden = true)
     private Long operatorId;
 

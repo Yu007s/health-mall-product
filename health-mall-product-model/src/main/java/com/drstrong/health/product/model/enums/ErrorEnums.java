@@ -50,6 +50,7 @@ public enum ErrorEnums implements IBaseResult {
 	SAVE_IS_NULL("11112", "保存数据失败"),
 	SKU_NAME_IS_REPEAT("11113", "相同店铺下 sku 名称不能重复"),
 	MEDICINE_CODE_NOT_ASSOCIATED("11114", "药材未关联供应商"),
+	PARAM_TYPE_IS_ERROR("11115", "参数不符合要求"),
 
 	STORE_NAME_LENGTH("17000", "店铺名称长度不正确"),
 	STORE_NAME_REPEAT("17100", "店铺名称已存在"),

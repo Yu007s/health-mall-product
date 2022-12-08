@@ -65,4 +65,14 @@ public class ChineseSkuInfoEntity extends BaseStandardEntity implements Serializ
      * sku上下架状态；0-未上架，1-已上架
      */
     private Integer skuStatus;
+
+    /**
+     * 剂量类型 0-无限制 1-按倍数限制
+     */
+    private Integer dosageType;
+
+    /**
+     * 倍数值
+     */
+    private Integer dosageValue;
 }

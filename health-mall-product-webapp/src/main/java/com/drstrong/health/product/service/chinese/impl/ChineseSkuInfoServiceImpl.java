@@ -14,6 +14,7 @@ import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierReleva
 import com.drstrong.health.product.model.entity.chinese.ChineseSpuInfoEntity;
 import com.drstrong.health.product.model.entity.product.SkuInfoEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.enums.DosageTypeEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
@@ -260,6 +261,8 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
                 .storeId(saveOrUpdateSkuVO.getStoreId())
                 .price(BigDecimalUtil.Y2F(saveOrUpdateSkuVO.getPrice()))
                 .skuStatus(ProductStateEnum.UN_PUT.getCode())
+                .dosageType(saveOrUpdateSkuVO.getDosageType())
+                .dosageValue(Objects.equals(DosageTypeEnum.MULTIPLE.getCode(), saveOrUpdateSkuVO.getDosageType()) ? saveOrUpdateSkuVO.getDosageValue() : 0)
                 .build();
         chineseSkuInfoEntity.setCreatedBy(saveOrUpdateSkuVO.getOperatorId());
         chineseSkuInfoEntity.setChangedBy(saveOrUpdateSkuVO.getOperatorId());
@@ -299,6 +302,8 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
                 .medicineCode(saveOrUpdateSkuVO.getMedicineCode())
                 .storeId(saveOrUpdateSkuVO.getStoreId())
                 .price(BigDecimalUtil.Y2F(saveOrUpdateSkuVO.getPrice()))
+                .dosageType(saveOrUpdateSkuVO.getDosageType())
+                .dosageValue(Objects.equals(DosageTypeEnum.MULTIPLE.getCode(), saveOrUpdateSkuVO.getDosageType()) ? saveOrUpdateSkuVO.getDosageValue() : 0)
                 .build();
         chineseSkuInfoEntity.setChangedBy(saveOrUpdateSkuVO.getOperatorId());
 
