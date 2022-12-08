@@ -12,7 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @since 2021/6/8 15:39.
  */
 @SpringBootApplication
-@EnableFeignClients(basePackages = {"com.drstrong.health.ware.remote", "com.drstrong.health.product.remote.cms", "com.drstrong.health.order.remote"})
+@EnableFeignClients(basePackages = {"com.drstrong.health"})
 @EnableDiscoveryClient
 //启用redis配置
 @EnableRedisAutoConfiguration
