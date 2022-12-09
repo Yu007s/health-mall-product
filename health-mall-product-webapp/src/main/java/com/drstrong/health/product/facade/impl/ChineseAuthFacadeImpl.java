@@ -55,10 +55,17 @@ public class ChineseAuthFacadeImpl implements ChineseAuthFacade {
 	ChineseMedicineService chineseMedicineService;
 
 
+	/**
+	 * 查询店铺所有存在倍数限制的中药
+	 *
+	 * @param chineseQueryDosageRequest 参数
+	 * @author liuqiuyi
+	 * @date 2022/12/9 09:51
+	 */
 	@Override
 	public List<ChineseSkuInfoVO> queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest) {
 		// 1.查询店铺信息
-		Long storeId = queryStoreId(chineseQueryDosageRequest.getStoreId(), chineseQueryDosageRequest.getAgencyId(), chineseQueryDosageRequest.getUcUserId());
+		Long storeId = queryStoreId(chineseQueryDosageRequest.getStoreId(), chineseQueryDosageRequest.getAgencyId(), chineseQueryDosageRequest.getUcDoctorId());
 		Assert.notNull(storeId, () -> new BusinessException(ErrorEnums.STORE_NOT_EXIST));
 		// 2.查询店铺下所有设置了剂量倍数的中药材信息
 		LambdaQueryWrapper<ChineseSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<ChineseSkuInfoEntity>()
@@ -96,6 +103,15 @@ public class ChineseAuthFacadeImpl implements ChineseAuthFacade {
 		return resultSkuInfoVoList;
 	}
 
+	/**
+	 * 根据参数获取店铺id
+	 *
+	 * @param storeId    店铺 id
+	 * @param agencyId   互联网医院 id
+	 * @param ucDoctorId 用户中心的医生 id
+	 * @author liuqiuyi
+	 * @date 2022/12/8 17:36
+	 */
 	@Override
 	public Long queryStoreId(Long storeId, Long agencyId, Long ucDoctorId) {
 		Long queryStoreId = Opt.ofNullable(storeService.getStoreByAgencyIdOrStoreId(agencyId, storeId)).map(StoreEntity::getId).orElse(null);

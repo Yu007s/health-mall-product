@@ -34,7 +34,7 @@ public class ChineseAuthController {
 	@ApiOperation("查询店铺所有存在倍数限制的中药")
 	@GetMapping("/sku/dosage/all")
 	public ResultVO<List<ChineseSkuInfoVO>> queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest) {
-		chineseQueryDosageRequest.setUcUserId(UserUtil.getUserId());
+		chineseQueryDosageRequest.setUcDoctorId(UserUtil.getUserId());
 		return ResultVO.success(chineseAuthFacade.queryAllDosage(chineseQueryDosageRequest));
 	}
 }

@@ -13,11 +13,21 @@ import java.util.List;
  */
 public interface ChineseAuthFacade {
 
+	/**
+	 * 查询店铺所有存在倍数限制的中药
+	 *
+	 * @param chineseQueryDosageRequest 参数
+	 * @author liuqiuyi
+	 * @date 2022/12/9 09:51
+	 */
 	List<ChineseSkuInfoVO> queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest);
 
 	/**
-	 * 获取店铺id
+	 * 根据参数获取店铺id
 	 *
+	 * @param storeId    店铺 id
+	 * @param agencyId   互联网医院 id
+	 * @param ucDoctorId 用户中心的医生 id
 	 * @author liuqiuyi
 	 * @date 2022/12/8 17:36
 	 */

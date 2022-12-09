@@ -25,6 +25,6 @@ public class ChineseQueryDosageRequest implements Serializable {
 	@ApiModelProperty("互联网医院 id")
 	private Long agencyId;
 
-	@ApiModelProperty(value = "用户 id", hidden = true)
-	private Long ucUserId;
+	@ApiModelProperty(value = "用户中心的医生id", hidden = true)
+	private Long ucDoctorId;
 }
