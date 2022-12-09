@@ -1,6 +1,7 @@
 package com.drstrong.health.product.facade;
 
 import com.drstrong.health.product.model.request.chinese.ChineseQueryDosageRequest;
+import com.drstrong.health.product.model.response.chinese.ChineseDosageInfoVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface ChineseAuthFacade {
 	 * @author liuqiuyi
 	 * @date 2022/12/9 09:51
 	 */
-	List<ChineseSkuInfoVO> queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest);
+	ChineseDosageInfoVO queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest);
 
 	/**
 	 * 根据参数获取店铺id

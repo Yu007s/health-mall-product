@@ -2,6 +2,7 @@ package com.drstrong.health.product.controller.chinese;
 
 import com.alibaba.fastjson.JSONObject;
 import com.drstrong.health.product.facade.ChineseRemoteFacade;
+import com.drstrong.health.product.model.request.chinese.ChineseQueryDosageRequest;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
 import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
@@ -71,5 +72,10 @@ public class ChineseRemoteController implements ChineseRemoteApi {
 	public ResultVO<List<ChineseMedicineDTO>> getChineseMedicineDTOListByIds(Set<Long> ids) {
 		log.info("invoke getChineseMedicineDTOListByIds param:{}", JSONObject.toJSONString(ids));
 		return ResultVO.success(chineseRemoteFacade.getChineseMedicineDTOListByIds(ids));
+	}
+
+	@Override
+	public ResultVO<List<ChineseSkuInfoVO>> queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest) {
+		return ResultVO.success(chineseRemoteFacade.queryAllDosage(chineseQueryDosageRequest));
 	}
 }

@@ -3,6 +3,7 @@ package com.drstrong.health.product.controller.chinese;
 import com.drstrong.health.common.utils.UserUtil;
 import com.drstrong.health.product.facade.ChineseAuthFacade;
 import com.drstrong.health.product.model.request.chinese.ChineseQueryDosageRequest;
+import com.drstrong.health.product.model.response.chinese.ChineseDosageInfoVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
@@ -33,7 +34,7 @@ public class ChineseAuthController {
 
 	@ApiOperation("查询店铺所有存在倍数限制的中药")
 	@GetMapping("/sku/dosage/all")
-	public ResultVO<List<ChineseSkuInfoVO>> queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest) {
+	public ResultVO<ChineseDosageInfoVO> queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest) {
 		chineseQueryDosageRequest.setUcDoctorId(UserUtil.getUserId());
 		return ResultVO.success(chineseAuthFacade.queryAllDosage(chineseQueryDosageRequest));
 	}

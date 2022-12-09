@@ -1,6 +1,7 @@
 package com.drstrong.health.product.facade;
 
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
+import com.drstrong.health.product.model.request.chinese.ChineseQueryDosageRequest;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
 import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
@@ -87,4 +88,13 @@ public interface ChineseRemoteFacade {
 	 * @return 中药材信息
 	 */
 	List<ChineseMedicineDTO> getChineseMedicineDTOListByIds(Set<Long> ids);
+
+	/**
+	 * 查询店铺下所有存在倍数限制的药材
+	 *
+	 * @param chineseQueryDosageRequest 入参
+	 * @author liuqiuyi
+	 * @date 2022/12/9 10:21
+	 */
+	List<ChineseSkuInfoVO> queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest);
 }

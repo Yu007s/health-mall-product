@@ -1,5 +1,6 @@
 package com.drstrong.health.product.remote.api.chinese;
 
+import com.drstrong.health.product.model.request.chinese.ChineseQueryDosageRequest;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
 import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
@@ -61,4 +62,9 @@ public interface ChineseRemoteApi {
 	@ApiOperation("通过IDs获取中药材详情")
 	@PostMapping("/get/chineseMedicineDTO")
 	ResultVO<List<ChineseMedicineDTO>> getChineseMedicineDTOListByIds(@RequestBody  Set<Long> ids);
+
+
+	@ApiOperation("查询店铺所有存在倍数限制的中药")
+	@PostMapping("/sku/dosage/all")
+	ResultVO<List<ChineseSkuInfoVO>> queryAllDosage(@RequestBody ChineseQueryDosageRequest chineseQueryDosageRequest);
 }

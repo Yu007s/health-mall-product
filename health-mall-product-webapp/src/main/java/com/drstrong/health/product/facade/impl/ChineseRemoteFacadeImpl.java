@@ -2,7 +2,9 @@ package com.drstrong.health.product.facade.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
+import com.drstrong.health.product.facade.ChineseAuthFacade;
 import com.drstrong.health.product.facade.ChineseRemoteFacade;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
@@ -13,6 +15,7 @@ import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
+import com.drstrong.health.product.model.request.chinese.ChineseQueryDosageRequest;
 import com.drstrong.health.product.model.request.chinese.QueryChineseSkuRequest;
 import com.drstrong.health.product.model.request.store.AgencyStoreVO;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineConflictVO;
@@ -80,6 +83,9 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 
 	@Resource
 	ChineseSkuSupplierRelevanceService chineseSkuSupplierRelevanceService;
+
+	@Resource
+	ChineseAuthFacade chineseAuthFacade;
 
 	/**
 	 * 根据关键字和互联网医院 id 模糊搜索药材
@@ -378,6 +384,8 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 					.price(BigDecimal.valueOf(chineseSkuInfoEntity.getPrice()))
 					.skuState(chineseSkuInfoEntity.getSkuStatus())
 					.skuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()))
+					.dosageType(chineseSkuInfoEntity.getDosageType())
+					.dosageValue(chineseSkuInfoEntity.getDosageValue())
 					.build();
 			chineseSkuInfoVOList.add(chineseSkuInfoVO);
 		});
@@ -388,5 +396,18 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 	public List<ChineseMedicineDTO> getChineseMedicineDTOListByIds(Set<Long> ids) {
 		List<ChineseMedicineEntity>  list  = chineseMedicineService.listMedicineByIds(ids);
 		return BeanUtil.copyToList(Optional.ofNullable(list).orElse(Collections.emptyList()),ChineseMedicineDTO.class);
+	}
+
+	/**
+	 * 查询店铺下所有存在倍数限制的药材
+	 *
+	 * @param chineseQueryDosageRequest 入参
+	 * @author liuqiuyi
+	 * @date 2022/12/9 10:21
+	 */
+	@Override
+	public List<ChineseSkuInfoVO> queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest) {
+		log.info("invoke chineseAuthFacade.queryAllDosage param:{}", JSONUtil.toJsonStr(chineseQueryDosageRequest));
+		return chineseAuthFacade.queryAllDosage(chineseQueryDosageRequest).getDosageChineseSkuInfoList();
 	}
 }

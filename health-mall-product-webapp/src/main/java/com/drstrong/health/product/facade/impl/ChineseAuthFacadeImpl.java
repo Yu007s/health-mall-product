@@ -14,6 +14,7 @@ import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.chinese.ChineseQueryDosageRequest;
+import com.drstrong.health.product.model.response.chinese.ChineseDosageInfoVO;
 import com.drstrong.health.product.model.response.chinese.ChineseSkuInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.pro.UserRemoteProService;
@@ -23,6 +24,7 @@ import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.ware.enums.SkuStatusEnum;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -54,6 +56,8 @@ public class ChineseAuthFacadeImpl implements ChineseAuthFacade {
 	@Resource
 	ChineseMedicineService chineseMedicineService;
 
+	@Value("${posts.min.gram:5}")
+	private Integer postsMinGram;
 
 	/**
 	 * 查询店铺所有存在倍数限制的中药
@@ -63,7 +67,8 @@ public class ChineseAuthFacadeImpl implements ChineseAuthFacade {
 	 * @date 2022/12/9 09:51
 	 */
 	@Override
-	public List<ChineseSkuInfoVO> queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest) {
+	public ChineseDosageInfoVO queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest) {
+		ChineseDosageInfoVO chineseDosageInfoVO = ChineseDosageInfoVO.builder().dosageChineseSkuInfoList(Lists.newArrayList()).postsMinGram(postsMinGram).build();
 		// 1.查询店铺信息
 		Long storeId = queryStoreId(chineseQueryDosageRequest.getStoreId(), chineseQueryDosageRequest.getAgencyId(), chineseQueryDosageRequest.getUcDoctorId());
 		Assert.notNull(storeId, () -> new BusinessException(ErrorEnums.STORE_NOT_EXIST));
@@ -75,7 +80,7 @@ public class ChineseAuthFacadeImpl implements ChineseAuthFacade {
 				.eq(ChineseSkuInfoEntity::getSkuStatus, SkuStatusEnum.SKU_UP.getCode());
 		List<ChineseSkuInfoEntity> chineseSkuInfoEntityList = chineseSkuInfoService.getBaseMapper().selectList(queryWrapper);
 		if (CollectionUtil.isEmpty(chineseSkuInfoEntityList)) {
-			return Lists.newArrayList();
+			return chineseDosageInfoVO;
 		}
 		// 3.查询药材信息
 		Set<String> medicineCodeList = chineseSkuInfoEntityList.stream().map(ChineseSkuInfoEntity::getMedicineCode).collect(Collectors.toSet());
@@ -100,7 +105,8 @@ public class ChineseAuthFacadeImpl implements ChineseAuthFacade {
 					.dosageValue(chineseSkuInfoEntity.getDosageValue())
 					.build());
 		});
-		return resultSkuInfoVoList;
+		chineseDosageInfoVO.setDosageChineseSkuInfoList(resultSkuInfoVoList);
+		return chineseDosageInfoVO;
 	}
 
 	/**
