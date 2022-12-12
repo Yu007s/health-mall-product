@@ -3,6 +3,7 @@ package com.drstrong.health.product.facade.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Opt;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.drstrong.health.product.facade.ChineseAuthFacade;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
@@ -21,6 +22,7 @@ import com.drstrong.health.product.remote.pro.UserRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
 import com.drstrong.health.product.service.store.StoreService;
+import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.ware.enums.SkuStatusEnum;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +70,7 @@ public class ChineseAuthFacadeImpl implements ChineseAuthFacade {
 	 */
 	@Override
 	public ChineseDosageInfoVO queryAllDosage(ChineseQueryDosageRequest chineseQueryDosageRequest) {
+		log.info("invoke queryAllDosage() param:{}", JSONUtil.toJsonStr(chineseQueryDosageRequest));
 		ChineseDosageInfoVO chineseDosageInfoVO = ChineseDosageInfoVO.builder().dosageChineseSkuInfoList(Lists.newArrayList()).postsMinGram(postsMinGram).build();
 		// 1.查询店铺信息
 		Long storeId = queryStoreId(chineseQueryDosageRequest.getStoreId(), chineseQueryDosageRequest.getAgencyId(), chineseQueryDosageRequest.getUcDoctorId());
@@ -99,6 +102,7 @@ public class ChineseAuthFacadeImpl implements ChineseAuthFacade {
 					.medicineName(chineseMedicineEntity.getMedicineName())
 					.maxDosage(chineseMedicineEntity.getMaxDosage())
 					.storeId(chineseSkuInfoEntity.getStoreId())
+					.price(BigDecimalUtil.F2Y(chineseSkuInfoEntity.getPrice()))
 					.skuState(chineseSkuInfoEntity.getSkuStatus())
 					.skuStateName(ProductStateEnum.getValueByCode(chineseSkuInfoEntity.getSkuStatus()))
 					.dosageType(chineseSkuInfoEntity.getDosageType())
