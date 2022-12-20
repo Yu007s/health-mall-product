@@ -395,8 +395,13 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 		}
 		// 4.校验剂量字段
 		Assert.isTrue(DosageTypeEnum.checkCodeIsExist(saveOrUpdateSkuVO.getDosageType()),() -> new BusinessException(ErrorEnums.PARAM_TYPE_IS_ERROR));
-		if (Objects.equals(DosageTypeEnum.MULTIPLE.getCode(), saveOrUpdateSkuVO.getDosageType()) && Objects.isNull(saveOrUpdateSkuVO.getDosageValue())) {
-			throw new BusinessException(ErrorEnums.PARAM_TYPE_IS_ERROR);
+		if (Objects.equals(DosageTypeEnum.MULTIPLE.getCode(), saveOrUpdateSkuVO.getDosageType())) {
+			if (Objects.isNull(saveOrUpdateSkuVO.getDosageValue())) {
+				throw new BusinessException(ErrorEnums.PARAM_TYPE_IS_ERROR);
+			}
+			if (saveOrUpdateSkuVO.getDosageValue() < 1 || saveOrUpdateSkuVO.getDosageValue() > 9999) {
+				throw new BusinessException(ErrorEnums.PARAM_TYPE_IS_ERROR);
+			}
 		}
 		// 5.如果是更新sku，校验skuCode是否存在，否则校验重复添加
 		if (updateFlag) {
