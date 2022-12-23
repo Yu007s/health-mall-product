@@ -221,6 +221,24 @@
             <groupId>com.drstrong.health</groupId>
             <artifactId>health-sleuth-spring-boot-starter</artifactId>
         </dependency>
+        <!-- 用户 -->
+        <dependency>
+            <groupId>com.drstrong.health</groupId>
+            <artifactId>health-user-api</artifactId>
+        </dependency>
+        <!--服务指标采集-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <finalName>health-mall-product</finalName>
