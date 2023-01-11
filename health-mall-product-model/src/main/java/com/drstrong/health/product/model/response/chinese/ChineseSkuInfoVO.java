@@ -64,4 +64,10 @@ public class ChineseSkuInfoVO implements Serializable {
 
 	@ApiModelProperty("sku状态名称")
 	private String skuStateName;
+
+	@ApiModelProperty("剂量类型 0-无限制 1-按倍数限制")
+	private Integer dosageType;
+
+	@ApiModelProperty("剂量倍数值")
+	private Integer dosageValue;
 }

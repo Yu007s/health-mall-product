@@ -128,6 +128,11 @@ public class DefaultExceptionAdvice {
 		return this.defHandler((IBaseResult) ResultStatus.NOT_FOUND, e);
 	}
 
+	@ExceptionHandler({com.drstrong.health.common.exception.BusinessException .class})
+	public <T> ResultVO<T> handCommonBusinessException(com.drstrong.health.common.exception.BusinessException be) {
+		return this.defHandler(be.getMessage(), be);
+	}
+
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	@ExceptionHandler({Exception.class})
 	public <T> ResultVO<T> handleException(Exception e) {

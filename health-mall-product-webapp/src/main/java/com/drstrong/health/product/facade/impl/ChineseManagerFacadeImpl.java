@@ -1,5 +1,6 @@
 package com.drstrong.health.product.facade.impl;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -17,6 +18,7 @@ import com.drstrong.health.product.model.entity.chinese.ChineseSkuSupplierReleva
 import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
+import com.drstrong.health.product.model.enums.DosageTypeEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
@@ -224,6 +226,8 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
         response.setSkuName(skuInfoEntity.getSkuName());
         response.setPrice(BigDecimalUtil.F2Y(skuInfoEntity.getPrice()));
         response.setStoreId(skuInfoEntity.getStoreId());
+        response.setDosageType(skuInfoEntity.getDosageType());
+        response.setDosageValue(skuInfoEntity.getDosageValue());
         // 1、根据店铺id获取店铺名称
         List<StoreEntity> storeEntityList = storeService.listByIds(Sets.newHashSet(skuInfoEntity.getStoreId()));
         if (!CollectionUtils.isEmpty(storeEntityList)) {
@@ -389,7 +393,17 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 		if (supplierFlag) {
 			throw new BusinessException(ErrorEnums.SUPPLIER_IS_NULL);
 		}
-		// 4.如果是更新sku，校验skuCode是否存在，否则校验重复添加
+		// 4.校验剂量字段
+		Assert.isTrue(DosageTypeEnum.checkCodeIsExist(saveOrUpdateSkuVO.getDosageType()),() -> new BusinessException(ErrorEnums.PARAM_TYPE_IS_ERROR));
+		if (Objects.equals(DosageTypeEnum.MULTIPLE.getCode(), saveOrUpdateSkuVO.getDosageType())) {
+			if (Objects.isNull(saveOrUpdateSkuVO.getDosageValue())) {
+				throw new BusinessException(ErrorEnums.PARAM_TYPE_IS_ERROR);
+			}
+			if (saveOrUpdateSkuVO.getDosageValue() < 1 || saveOrUpdateSkuVO.getDosageValue() > 9999) {
+				throw new BusinessException(ErrorEnums.PARAM_TYPE_IS_ERROR);
+			}
+		}
+		// 5.如果是更新sku，校验skuCode是否存在，否则校验重复添加
 		if (updateFlag) {
 			ChineseSkuInfoEntity skuInfoEntity = chineseSkuInfoService.getBySkuCode(saveOrUpdateSkuVO.getSkuCode());
 			if (Objects.isNull(skuInfoEntity)) {
