@@ -54,7 +54,7 @@ public class ChineseManagerController implements ChineseManagerRemoteApi {
 
     @Override
     public ResultVO<Object> saveOrUpdateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO) {
-        chineseManagerFacade.saveOrUpdateSku(saveOrUpdateSkuVO);
+        chineseManagerFacade.saveOrUpdateSku(saveOrUpdateSkuVO, saveOrUpdateSkuVO.getMedicineCode() + saveOrUpdateSkuVO.getStoreId());
         return ResultVO.success();
     }
 

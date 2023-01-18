@@ -35,6 +35,7 @@ import com.drstrong.health.product.service.chinese.ChineseSkuSupplierRelevanceSe
 import com.drstrong.health.product.service.store.StoreLinkSupplierService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
+import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.drstrong.health.ware.model.response.SkuStockResponse;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
@@ -44,6 +45,7 @@ import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.boot.autoconfigure.klock.annotation.Dlock;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -173,14 +175,16 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 	}
 
 	/**
-     * 保存sku信息
-     *
-     * @param saveOrUpdateSkuVO 接口入参
-     * @author liuqiuyi
-     * @date 2022/8/1 15:44
-     */
+	 * 保存sku信息
+	 *
+	 * @param saveOrUpdateSkuVO 接口入参
+	 * @param lockKey 分布式锁的key，这里使用入参中的 medicineCode 和 storeId 加锁
+	 * @author liuqiuyi
+	 * @date 2022/8/1 15:44
+	 */
     @Override
-    public void saveOrUpdateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO) {
+	@Dlock(prefix = RedisKeyUtils.SAVE_OR_UPDATE_SKU, name = "#lockKey", waitTime = 2, leaseTime = 3)
+    public void saveOrUpdateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO, String lockKey) {
         log.info("invoke saveOrUpdateSku() param：{}", JSON.toJSONString(saveOrUpdateSkuVO));
         boolean updateFlag = StringUtils.isNotBlank(saveOrUpdateSkuVO.getSkuCode());
 		OperationLog operationLog = new OperationLog();

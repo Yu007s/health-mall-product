@@ -49,14 +49,15 @@ public interface ChineseManagerFacade {
      */
 	List<ChineseMedicineResponse> likeQueryChineseMedicine(String keyword);
 
-    /**
-     * 保存sku信息
-     *
-     * @param saveOrUpdateSkuVO 接口入参
-     * @author liuqiuyi
-     * @date 2022/8/1 15:44
-     */
-    void saveOrUpdateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO);
+	/**
+	 * 保存sku信息
+	 *
+	 * @param saveOrUpdateSkuVO 接口入参
+	 * @param lockKey 分布式锁的key，这里使用入参中的 medicineCode 和 storeId 加锁
+	 * @author liuqiuyi
+	 * @date 2022/8/1 15:44
+	 */
+	void saveOrUpdateSku(SaveOrUpdateSkuVO saveOrUpdateSkuVO, String lockKey);
 
     /**
      * 根据 skuCode 获取详情
