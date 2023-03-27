@@ -239,6 +239,18 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
         </dependency>
+        <!-- 分布式锁 -->
+        <dependency>
+            <groupId>cn.strong</groupId>
+            <artifactId>klock-spring-boot-starter</artifactId>
+            <version>2021.06-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.redisson</groupId>
+                    <artifactId>redisson</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
     <build>
         <finalName>health-mall-product</finalName>

@@ -22,6 +22,9 @@ public class RedisKeyUtils {
 
 	private static final String STORE_CHANGE = "store_change";
 
+	public static final String SAVE_OR_UPDATE_SKU = "save_sku";
+
+
 	/**
 	 * 获取商品的唯一编号,自增
 	 * <p> 和之前 b2c 中的保持一致 </>
