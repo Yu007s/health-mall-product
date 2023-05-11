@@ -1,10 +1,10 @@
 include:
   - local: '/.developer-vars.yml'
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/.huihui-ops-vars.yml'
-  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/maven-huihui.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/maven-huihui-color.yml'
   - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/sonar-huihui.yml'
-  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/docker-image.yml'
-  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/huihui-jar-deploy-v2.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/docker-image-color.yml'
+  - remote: 'https://gitlab.leke.cn/deployments/include/-/raw/master/huihui-jar-deploy-v2-color.yml'
 
 
 variables:
@@ -25,9 +25,8 @@ variables:
 stages:
   - maven package
   - build docker image
-#  - deploy to dev
+  - deploy to dev
   - deploy to testing
-#  - deploy to pre
   - deploy to prod
 
 
@@ -37,45 +36,26 @@ Maven build:
     - k8s
   extends: .maven-build
   script:
-    - mvn -DskipTests clean install -Pproduct $MAVEN_OPTS
+    - mvn -DskipTests clean install -U -Pproduct $MAVEN_OPTS
 
 
-SonarQube check:
-  stage: maven package
-  extends: .sonarqube-check
-
-
+#SonarQube check:
+#  stage: maven package
+#  extends: .sonarqube-check
+#
+#
 Image build:
   stage: build docker image
   extends: .docker
+  needs: ["Maven build"]
 
-
-#dev-169:
-#  stage: deploy to dev
-#  variables:
-#    K8S_CLUSTER: '$INSIDE_K8S_CLUSTER'
-#    # sre and developer define
-#    ENV_NAME: 'dev-169'
-#    # sre define
-#    APP_CONFIG: '${JVM_OPTS_DEV169}'
-#    # sre define
-#    ARGO_PROJ: '${BUSINESS_NAME}-dev'
-#    # sre define
-#    CD_GIT_PATH: 'dev'
-#    DNS: '$DNS_DEV169'
-#    # nacos
-#    NACOS_IP: '$NACOS_IP_DEV169'
-#    NACOS_NS: '$NACOS_NS_DEV169'
-#  extends: .deploy
-#  only:
-#    - master
-
-
-testing-1:
-  stage: deploy to testing
+dev:
+  stage: deploy to dev
   variables:
     K8S_CLUSTER: '$INSIDE_K8S_CLUSTER'
-    ENV_NAME: 'testing-1'
+    ENV_NAME: 'dev-${v}'
+    CD_GIT_BRANCH: 'dev-${v}'
+    K8S_NS: '${BUSINESS_NAME}-testing-1'
     APP_CONFIG: '${JVM_OPTS_TESTING1}'
     ARGO_PROJ: '${BUSINESS_NAME}-dev'
     CD_GIT_PATH: 'testing'
@@ -88,28 +68,13 @@ testing-1:
     - /^testing-1-.*/
 
 
-testing-2:
-  stage: deploy to testing
-  variables:
-    K8S_CLUSTER: '$INSIDE_K8S_CLUSTER'
-    ENV_NAME: 'testing-2'
-    APP_CONFIG: '${JVM_OPTS_TESTING2}'
-    ARGO_PROJ: '${BUSINESS_NAME}-dev'
-    CD_GIT_PATH: 'testing'
-    DNS: '$DNS_TESTING2'
-    # nacos
-    NACOS_IP: '$NACOS_IP_TESTING2'
-    NACOS_NS: '$NACOS_NS_TESTING2'
-  extends: .deploy
-  only:
-    - /^testing-2-.*/
-
-
-testing-4:
+testing:
   stage: deploy to testing
   variables:
     K8S_CLUSTER: '$CCE1_DEV'
-    ENV_NAME: 'testing-4'
+    ENV_NAME: 'testing-${v}'
+    CD_GIT_BRANCH: 'testing-${v}'
+    K8S_NS: '${BUSINESS_NAME}-testing-4'
     APP_CONFIG: '${JVM_OPTS_TESTING4}'
     ARGO_PROJ: '${BUSINESS_NAME}-dev'
     CD_GIT_PATH: 'testing-cce1'
@@ -118,87 +83,18 @@ testing-4:
     NACOS_IP: '$NACOS_IP_TESTING4'
     NACOS_NS: '$NACOS_NS_TESTING4'
   extends: .deploy
+  needs: ["Image build"]
   only:
     - /^testing-4-.*/
-
-
-#pre:
-#  stage: deploy to pre
-#  variables:
-#    K8S_CLUSTER: '$CCE2'
-#    ENV_NAME: 'pre'
-#    APP_CONFIG: '${JVM_OPTS_PRE}'
-#    ARGO_PROJ: '${BUSINESS_NAME}-pre'
-#    CD_GIT_PATH: 'pre'
-#    DNS: '$DNS_PRE'
-#    # nacos
-#    NACOS_IP: '$NACOS_IP_PRE'
-#    NACOS_NS: '$NACOS_NS_PRE'
-#  extends: .deploy
-#  only:
-#    - release
-#    - /^hotfix-.*/
 
 
 prod:
   stage: deploy to prod
   variables:
     K8S_CLUSTER: '$CCE2'
-    ENV_NAME: 'prod'
-    APP_CONFIG: '${JVM_OPTS_PROD}'
-    ARGO_PROJ: '${BUSINESS_NAME}-prod'
-    CD_GIT_PATH: 'prod'
-    DNS: '$DNS_PROD'
-    # nacos
-    NACOS_IP: '$NACOS_IP_PROD'
-    NACOS_NS: '$NACOS_NS_PROD'
-  extends: .deploy
-  only:
-    - release
-    - /^hotfix-.*/
-
-
-prod-v1:
-  stage: deploy to prod
-  variables:
-    K8S_CLUSTER: '$CCE2'
-    ENV_NAME: 'prod-v1'
-    APP_CONFIG: '${JVM_OPTS_PROD}'
-    ARGO_PROJ: '${BUSINESS_NAME}-prod'
-    CD_GIT_PATH: 'prod'
-    DNS: '$DNS_PROD'
-    # nacos
-    NACOS_IP: '$NACOS_IP_PROD'
-    NACOS_NS: '$NACOS_NS_PROD_V1'
-  extends: .deploy
-  only:
-    - release
-    - /^hotfix-.*/
-
-
-prod-v1-canary:
-  stage: deploy to prod
-  variables:
-    K8S_CLUSTER: '$CCE2'
-    ENV_NAME: 'prod-v1-canary'
-    APP_CONFIG: '${JVM_OPTS_PROD}'
-    ARGO_PROJ: '${BUSINESS_NAME}-prod'
-    CD_GIT_PATH: 'prod'
-    DNS: '$DNS_PROD'
-    # nacos
-    NACOS_IP: '$NACOS_IP_PROD'
-    NACOS_NS: '$NACOS_NS_PROD_V1'
-  extends: .deploy
-  only:
-    - release
-    - /^hotfix-.*/
-
-
-prod-v2:
-  stage: deploy to prod
-  variables:
-    K8S_CLUSTER: '$CCE2'
-    ENV_NAME: 'prod-v2'
+    ENV_NAME: 'prod-${v}'
+    CD_GIT_BRANCH: 'prod-${v}'
+    K8S_NS: '${BUSINESS_NAME}-prod'
     APP_CONFIG: '${JVM_OPTS_PROD}'
     ARGO_PROJ: '${BUSINESS_NAME}-prod'
     CD_GIT_PATH: 'prod'
@@ -207,24 +103,7 @@ prod-v2:
     NACOS_IP: '$NACOS_IP_PROD'
     NACOS_NS: '$NACOS_NS_PROD_V2'
   extends: .deploy
+  needs: ["Image build"]
   only:
-    - release
-    - /^hotfix-.*/
-
-
-prod-v2-canary:
-  stage: deploy to prod
-  variables:
-    K8S_CLUSTER: '$CCE2'
-    ENV_NAME: 'prod-v2-canary'
-    APP_CONFIG: '${JVM_OPTS_PROD}'
-    ARGO_PROJ: '${BUSINESS_NAME}-prod'
-    CD_GIT_PATH: 'prod'
-    DNS: '$DNS_PROD'
-    # nacos
-    NACOS_IP: '$NACOS_IP_PROD'
-    NACOS_NS: '$NACOS_NS_PROD_V2'
-  extends: .deploy
-  only:
-    - release
+    - /^release.*/
     - /^hotfix-.*/
