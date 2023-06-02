@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreQueryResponse;
+import com.drstrong.health.product.model.response.store.v3.StorePostageVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -71,4 +72,10 @@ public interface StoreRemoteApi {
     @ApiOperation("根据店铺 id 集合查询店铺基本信息")
     @PostMapping("/query/ids")
     ResultVO<List<StoreInfoResponse>> queryByIds(@RequestBody Set<Long> storeIds);
+
+    @ApiOperation("根据店铺 id 查询店铺的配送费信息")
+    @GetMapping("/query/postage")
+    ResultVO<StorePostageVO> queryStorePostage(@RequestParam("storeId") @NotNull(message = "店铺id不能为空") Long storeId);
+
+
 }

@@ -11,6 +11,7 @@ import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreQueryResponse;
+import com.drstrong.health.product.model.response.store.v3.StorePostageVO;
 import com.drstrong.health.product.remote.api.store.StoreFacade;
 import com.drstrong.health.product.remote.api.store.StoreRemoteApi;
 import com.drstrong.health.product.service.store.StoreService;
@@ -107,5 +108,10 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
             responseList.add(storeInfoResponse);
         });
         return ResultVO.success(responseList);
+    }
+
+    @Override
+    public ResultVO<StorePostageVO> queryStorePostage(@NotNull(message = "店铺id不能为空") Long storeId) {
+        return ResultVO.success();
     }
 }
