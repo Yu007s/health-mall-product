@@ -39,4 +39,10 @@ public class StoreInvoiceServiceImpl extends ServiceImpl<StoreInvoiceMapper, Sto
         update(lambdaQueryWrapper);
     }
 
+    @Override
+    public void updateByStoreId(Long storeId, StoreInvoiceEntity storeInvoiceEntity) {
+        LambdaQueryWrapper<StoreInvoiceEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(StoreInvoiceEntity::getStoreId, storeId).eq(StoreInvoiceEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+        update(storeInvoiceEntity, lambdaQueryWrapper);
+    }
 }

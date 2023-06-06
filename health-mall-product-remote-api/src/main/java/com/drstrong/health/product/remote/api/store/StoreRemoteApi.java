@@ -1,5 +1,7 @@
 package com.drstrong.health.product.remote.api.store;
 
+import com.drstrong.health.product.model.request.store.SaveStorePostageRequest;
+import com.drstrong.health.product.model.request.store.SaveStoreSupplierPostageRequest;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -77,5 +79,11 @@ public interface StoreRemoteApi {
     @GetMapping("/query/postage")
     ResultVO<StorePostageVO> queryStorePostage(@RequestParam("storeId") @NotNull(message = "店铺id不能为空") Long storeId);
 
+    @ApiOperation("保存店铺包邮金额")
+    @PostMapping("/save/free-postage")
+    ResultVO<Void> saveStorePostage(@RequestBody SaveStorePostageRequest saveStorePostageRequest);
 
+    @ApiOperation("保存店铺下供应商的包邮金额")
+    @PostMapping("/save/supplier-postage")
+    ResultVO<Void> saveStoreSupplierPostage(@RequestBody SaveStoreSupplierPostageRequest saveStoreSupplierPostageRequest);
 }

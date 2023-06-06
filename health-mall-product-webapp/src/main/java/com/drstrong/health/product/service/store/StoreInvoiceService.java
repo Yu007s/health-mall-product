@@ -6,9 +6,10 @@ import com.drstrong.health.product.model.entity.store.StoreInvoiceEntity;
  * @Author xieYueFeng
  * @Date 2022/07/30/9:54
  */
-public interface
-StoreInvoiceService {
+public interface StoreInvoiceService {
     StoreInvoiceEntity getByStoreId(Long storeId);
+
     void removeByStoreId(Long storeId);
 
+    void updateByStoreId(Long storeId, StoreInvoiceEntity storeInvoiceEntity);
 }

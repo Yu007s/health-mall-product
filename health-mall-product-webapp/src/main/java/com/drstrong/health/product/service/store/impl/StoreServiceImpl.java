@@ -1,6 +1,8 @@
 package com.drstrong.health.product.service.store.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -10,6 +12,7 @@ import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.entity.store.StoreInvoiceEntity;
 import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.StoreTypeEnum;
 import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
@@ -19,6 +22,7 @@ import com.drstrong.health.product.model.response.store.*;
 import com.drstrong.health.product.service.store.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +37,7 @@ import java.util.stream.Collectors;
  * @Date 2022/07/30/9:24
  */
 @Service
+@Slf4j
 public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> implements StoreService {
     @Resource
     AgencyService agencyService;
@@ -49,8 +54,15 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void save(StoreInfoDetailSaveRequest storeRequest) {
+        // 入参校验 ObjectUtil.isNull(storeRequest.getHasInvoiceInfo()) 是为了兼容老页面
+        checkStoreInvoiceParam(storeRequest);
+
         Long userId = storeRequest.getUserId();
-        StoreInvoiceEntity invoice = BeanUtil.copyProperties(storeRequest, StoreInvoiceEntity.class);
+        // 供应链三期修改,发票信息为非必填项
+        StoreInvoiceEntity invoice = null;
+        if (Objects.equals(1, storeRequest.getHasInvoiceInfo()) || ObjectUtil.isNull(storeRequest.getHasInvoiceInfo())) {
+             invoice = BeanUtil.copyProperties(storeRequest, StoreInvoiceEntity.class);
+        }
         List<StoreLinkSupplierEntity> storeLinkSuppliers = new ArrayList<>(storeRequest.getSupplierIds().size());
         StoreEntity storeEntity = new StoreEntity();
         buildEntityForSaveOrUpdate(storeRequest, storeEntity, storeLinkSuppliers, invoice, userId);
@@ -67,9 +79,11 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         storeEntity.setCreatedBy(userId);
         super.save(storeEntity);
         Long storeId = storeEntity.getId();
-        invoice.setStoreId(storeId);
-        invoice.setCreatedBy(userId);
-        storeInvoiceMapper.insert(invoice);
+        if (Objects.nonNull(invoice)) {
+            invoice.setStoreId(storeId);
+            invoice.setCreatedBy(userId);
+            storeInvoiceMapper.insert(invoice);
+        }
         storeLinkSuppliers.forEach(
                 storeLinkSupplierEntity -> {
                     storeLinkSupplierEntity.setCreatedBy(userId);
@@ -92,11 +106,13 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(StoreInfoDetailSaveRequest storeRequest) {
-        StoreInvoiceEntity invoice = BeanUtil.copyProperties(storeRequest, StoreInvoiceEntity.class);
+        // 入参校验
+        checkStoreInvoiceParam(storeRequest);
+
         List<StoreLinkSupplierEntity> storeLinkSuppliers = new ArrayList<>(storeRequest.getSupplierIds().size());
         StoreEntity storeEntity = new StoreEntity();
         Long userId = storeRequest.getUserId();
-        buildEntityForSaveOrUpdate(storeRequest, storeEntity, storeLinkSuppliers, invoice, userId);
+        buildEntityForSaveOrUpdate(storeRequest, storeEntity, storeLinkSuppliers, null, userId);
         Long storeId = storeEntity.getId();
         //禁止更新字段设置为null
         storeEntity.setStoreType(null);
@@ -105,11 +121,56 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         checkStore(storeEntity);
         //更新店铺
         super.updateById(storeEntity);
-        //更新店铺发票
-        LambdaQueryWrapper<StoreInvoiceEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(StoreInvoiceEntity::getStoreId, storeId).eq(StoreInvoiceEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
-        storeInvoiceMapper.update(invoice, lambdaQueryWrapper);
+        // 供应链三期修改,发票信息为非必填项
+        updateStoreInvoiceInfo(storeId, storeRequest);
     }
+
+	private void checkStoreInvoiceParam(StoreInfoDetailSaveRequest storeRequest) {
+		if (ObjectUtil.equals(1, storeRequest.getHasInvoiceInfo()) || ObjectUtil.isNull(storeRequest.getHasInvoiceInfo())) {
+            if (StringUtils.isAnyBlank(storeRequest.getEnterpriseTaxNumber(),
+                    storeRequest.getEnterpriseBankAccount(),
+                    storeRequest.getEnterpriseTelNumber(),
+                    storeRequest.getEnterpriseAddress(),
+                    storeRequest.getPayee(),
+                    storeRequest.getChecker(),
+                    storeRequest.getAppSecret(),
+                    storeRequest.getAppKey())) {
+                log.error("保存店铺发票信息,有参数不符合要求,入参为:{}", JSONUtil.toJsonStr(storeRequest));
+                throw new BusinessException(ErrorEnums.PARAM_TYPE_IS_ERROR);
+            }
+        }
+	}
+
+	/**
+	 * 供应链三期修改,发票信息为非必填项,如果进行修改,存在三种情况:
+	 * <p>
+	 * 之前有发票 -> 现在也有  -- 更新
+	 * 之前有发票 -> 现在没有 -- 删除老发票信息
+	 * 之前没有发票 -> 现在有  -- 新增
+     * 之前没有发票 -> 现在也没有 -- 不处理
+	 * </>
+	 */
+	private void updateStoreInvoiceInfo(Long storeId, StoreInfoDetailSaveRequest storeRequest) {
+        boolean hasInvoiceInfo = Objects.equals(1, storeRequest.getHasInvoiceInfo()) || Objects.isNull(storeRequest.getHasInvoiceInfo());
+        StoreInvoiceEntity storeInvoiceEntity = storeInvoiceService.getByStoreId(storeId);
+        if (ObjectUtil.isNotNull(storeInvoiceEntity)) {
+            if (hasInvoiceInfo) {
+                // 更新
+                StoreInvoiceEntity invoice = BeanUtil.copyProperties(storeRequest, StoreInvoiceEntity.class);
+                invoice.setChangedBy(storeRequest.getUserId());
+                storeInvoiceService.updateByStoreId(storeId, invoice);
+            } else {
+                // 删除老发票信息
+                storeInvoiceService.removeByStoreId(storeId);
+            }
+        } else if (hasInvoiceInfo) {
+            // 新增
+            StoreInvoiceEntity invoice = BeanUtil.copyProperties(storeRequest, StoreInvoiceEntity.class);
+            invoice.setCreatedBy(storeRequest.getUserId());
+            invoice.setStoreId(storeId);
+            storeInvoiceMapper.insert(invoice);
+        }
+	}
 
 
     @Override
@@ -286,7 +347,9 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
             storeEntity.setAgencyId(agencyId);
         }
         //组装发票实例
-        storeInvoiceEntity.setChangedBy(userId);
+        if (Objects.nonNull(storeInvoiceEntity)) {
+            storeInvoiceEntity.setChangedBy(userId);
+        }
         //组装供应商实例列表
         List<Long> supplierIds = storeRequest.getSupplierIds();
         supplierIds.forEach(supplierId -> {

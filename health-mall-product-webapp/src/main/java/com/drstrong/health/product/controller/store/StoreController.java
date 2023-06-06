@@ -4,6 +4,8 @@ import com.drstrong.health.product.dao.store.OldFreightPostageMapper;
 import com.drstrong.health.product.dao.store.StoreLinkSupplierMapper;
 import com.drstrong.health.product.model.entity.store.OldAreaFreight;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.request.store.SaveStorePostageRequest;
+import com.drstrong.health.product.model.request.store.SaveStoreSupplierPostageRequest;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
@@ -112,6 +114,16 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
 
     @Override
     public ResultVO<StorePostageVO> queryStorePostage(@NotNull(message = "店铺id不能为空") Long storeId) {
+        return ResultVO.success();
+    }
+
+    @Override
+    public ResultVO<Void> saveStorePostage(SaveStorePostageRequest saveStorePostageRequest) {
+        return ResultVO.success();
+    }
+
+    @Override
+    public ResultVO<Void> saveStoreSupplierPostage(SaveStoreSupplierPostageRequest saveStoreSupplierPostageRequest) {
         return ResultVO.success();
     }
 }
