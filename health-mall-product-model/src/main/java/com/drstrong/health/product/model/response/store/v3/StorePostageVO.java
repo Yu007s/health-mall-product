@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -31,7 +32,7 @@ public class StorePostageVO implements Serializable {
 	private String storeName;
 
 	@ApiModelProperty("店铺总邮费")
-	private Long freePostage;
+	private BigDecimal freePostage;
 
 	@ApiModelProperty("店铺供应商邮费信息")
 	private List<StoreSupplierPostageVO> storeSupplierPostageList;
@@ -58,7 +59,7 @@ public class StorePostageVO implements Serializable {
 		private String supplierTypeName;
 
 		@ApiModelProperty("供应商全局邮费")
-		private Long freePostage;
+		private BigDecimal freePostage;
 
 		@ApiModelProperty("店铺供应商各区域的邮费设置")
 		private List<StoreSupplierAreaPostageVO> storeSupplierAreaPostageList;
@@ -80,6 +81,6 @@ public class StorePostageVO implements Serializable {
 		private String areaName;
 
 		@ApiModelProperty("配送费,单位:元")
-		private Long postage;
+		private BigDecimal postage;
 	}
 }

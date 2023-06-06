@@ -81,9 +81,9 @@ public interface StoreRemoteApi {
 
     @ApiOperation("保存店铺包邮金额")
     @PostMapping("/save/free-postage")
-    ResultVO<Void> saveStorePostage(@RequestBody SaveStorePostageRequest saveStorePostageRequest);
+    ResultVO<Void> saveStorePostage(@RequestBody @Valid SaveStorePostageRequest saveStorePostageRequest);
 
     @ApiOperation("保存店铺下供应商的包邮金额")
     @PostMapping("/save/supplier-postage")
-    ResultVO<Void> saveStoreSupplierPostage(@RequestBody SaveStoreSupplierPostageRequest saveStoreSupplierPostageRequest);
+    ResultVO<Void> saveStoreSupplierPostage(@RequestBody @Valid SaveStoreSupplierPostageRequest saveStoreSupplierPostageRequest);
 }

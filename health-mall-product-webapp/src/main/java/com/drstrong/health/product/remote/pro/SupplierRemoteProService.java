@@ -46,6 +46,18 @@ public class SupplierRemoteProService {
 	}
 
 	/**
+	 * 获取供应商的信息,转成 map
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/6/6 17:08
+	 */
+	public Map<Long, SupplierInfoDTO> getSupplierInfoToMap(List<Long> supplierIds) {
+		List<SupplierInfoDTO> supplierInfoList = getSupplierNameByIds(supplierIds);
+		return Optional.ofNullable(supplierInfoList).orElse(Lists.newArrayList()).stream()
+				.collect(Collectors.toMap(SupplierInfoDTO::getSupplierId, dto -> dto, (v1, v2) -> v1));
+	}
+
+	/**
 	 * 根据供应商 id 获取供应商信息
 	 *
 	 * @author liuqiuyi

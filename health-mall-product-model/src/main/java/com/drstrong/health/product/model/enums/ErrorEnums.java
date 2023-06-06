@@ -14,13 +14,7 @@ import com.drstrong.health.product.model.response.result.IBaseResult;
  * 			10：通用
  * 			001：参数格式校验失败
  * 			11：商品
- * 			12：订单
- * 			13：购物车
- * 			14：物流
- * 			15：优惠券
- * 			16：用户
- * 			17:店铺
- * 			20：库存
+ * 			12: 配送费
  * 			21:导入导出
  * </p>
  *
@@ -61,6 +55,8 @@ public enum ErrorEnums implements IBaseResult {
 
 	EXCEL_EXPORT_ERROR("21000", "文档导出错误"),
 	EXCEL_IMPORT_ERROR("21100", "文档导入错误"),
+
+	STORE_POSTAGE_IS_NULL("12001", "配送费信息不存在"),
 	;
 
 	private String code;

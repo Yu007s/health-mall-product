@@ -2,6 +2,7 @@ package com.drstrong.health.product.controller.store;
 
 import com.drstrong.health.product.dao.store.OldFreightPostageMapper;
 import com.drstrong.health.product.dao.store.StoreLinkSupplierMapper;
+import com.drstrong.health.product.facade.postage.StorePostageFacade;
 import com.drstrong.health.product.model.entity.store.OldAreaFreight;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.request.store.SaveStorePostageRequest;
@@ -45,6 +46,9 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     StoreLinkSupplierMapper storeLinkSupplierMapper;
     @Resource
     private OldFreightPostageMapper oldFreightPostageMapper;
+
+    @Resource
+    StorePostageFacade storePostageFacade;
 
 
     @Override
@@ -114,16 +118,18 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
 
     @Override
     public ResultVO<StorePostageVO> queryStorePostage(@NotNull(message = "店铺id不能为空") Long storeId) {
+        return ResultVO.success(storePostageFacade.queryStorePostage(storeId));
+    }
+
+    @Override
+    public ResultVO<Void> saveStorePostage(@RequestBody @Valid SaveStorePostageRequest saveStorePostageRequest) {
+        storePostageFacade.saveStorePostage(saveStorePostageRequest);
         return ResultVO.success();
     }
 
     @Override
-    public ResultVO<Void> saveStorePostage(SaveStorePostageRequest saveStorePostageRequest) {
-        return ResultVO.success();
-    }
-
-    @Override
-    public ResultVO<Void> saveStoreSupplierPostage(SaveStoreSupplierPostageRequest saveStoreSupplierPostageRequest) {
+    public ResultVO<Void> saveStoreSupplierPostage(@RequestBody @Valid SaveStoreSupplierPostageRequest saveStoreSupplierPostageRequest) {
+        storePostageFacade.saveStoreSupplierPostage(saveStoreSupplierPostageRequest);
         return ResultVO.success();
     }
 }
