@@ -16,4 +16,6 @@ public interface IncentivePolicyConfigService extends IService<IncentivePolicyCo
 	 * @date 2023/6/7 14:36
 	 */
 	IncentivePolicyConfigEntity queryByStoreIdAndGoalType(Long storeId, Integer goalType, String earningName);
+
+
 }

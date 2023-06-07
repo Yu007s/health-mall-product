@@ -36,6 +36,11 @@ public class OperationLogConstant {
 		 */
 		public static final String DELETE_CHINESE_MEDICINE = "deleteChineseMedicine";
 
+		/**
+		 * sku的激励政策变动
+		 */
+		public static final String SKU_INCENTIVE_POLICY_CHANGE = "skuIncentivePolicyChange";
+
 	/**
 	 * 店铺信息变动
 	 */
