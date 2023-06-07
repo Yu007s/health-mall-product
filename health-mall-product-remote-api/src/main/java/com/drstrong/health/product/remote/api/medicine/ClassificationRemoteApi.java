@@ -19,7 +19,7 @@ import java.util.List;
  * @date 2023/6/6 16:41
  */
 @Api("健康商城-安全用药-药品分类远程接口")
-@FeignClient(value = "health-mall-product", path = "/inner/product/MedicineClassification")
+@FeignClient(value = "health-mall-product", path = "/inner/product/medicine/classification")
 public interface ClassificationRemoteApi {
 
 
