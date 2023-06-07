@@ -13,7 +13,7 @@ import java.util.List;
 
 
 /**
- * 中药的远程接口
+ * 药品分类远程接口
  *
  * @author zzw
  * @date 2023/6/6 16:41

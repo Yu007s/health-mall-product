@@ -1,0 +1,18 @@
+package com.drstrong.health.product.dao.medicine;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
+import org.apache.ibatis.annotations.Mapper;
+
+/**
+ * <p>
+ * 西/成药品库 Mapper 接口
+ * </p>
+ *
+ * @author zzw
+ * @since 2023-06-07
+ */
+@Mapper
+public interface WesternMedicineMapper extends BaseMapper<WesternMedicineEntity> {
+
+}
