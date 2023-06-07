@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.mybatis.PmsMedicineUsageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.medication.MedicineUsageEntity">
+        <id column="id" property="id"/>
+        <result column="specifications_id" property="specificationsId"/>
+        <result column="type" property="type"/>
+        <result column="dosage_cycle" property="dosageCycle"/>
+        <result column="dosage_cycle_unit" property="dosageCycleUnit"/>
+        <result column="dosage_count" property="dosageCount"/>
+        <result column="each_dosage_count" property="eachDosageCount"/>
+        <result column="each_dose_unit" property="eachDoseUnit"/>
+        <result column="packag_spec" property="packagSpec"/>
+        <result column="quantity_unit" property="quantityUnit"/>
+        <result column="usage_method" property="usageMethod"/>
+        <result column="usage_time" property="usageTime"/>
+        <result column="version" property="version"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="changed_at" property="changedAt"/>
+        <result column="changed_by" property="changedBy"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, specifications_id, type, dosage_cycle, dosage_cycle_unit, dosage_count, each_dosage_count, each_dose_unit, packag_spec, quantity_unit, usage_method, usage_time, version, created_at, created_by, changed_at, changed_by
+    </sql>
+
+</mapper>

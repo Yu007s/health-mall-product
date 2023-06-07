@@ -42,7 +42,7 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     /**
      * 分类信息，json
      */
-    private String medicineCategoryInfo;
+    private String medicineClassificationInfo;
 
     @ApiModelProperty(value = "药品本位码")
     private String standardCode;
@@ -55,8 +55,31 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     private String approvalNumber;
 
     @ApiModelProperty(value = "操作人 id", hidden = true)
-    private String userId;
+    private Long userId;
 
+
+    @Data
+    @ApiModel("分类id")
+    public static class MedicineClassificationInfoRequest implements Serializable {
+
+        private static final long serialVersionUID = -4277079128548673211L;
+
+        @ApiModelProperty(value = "药品分类id")
+        private Long drugClassificationId;
+
+        @ApiModelProperty(value = "药理分类id")
+        private Long pharmacologyClassificationId;
+
+        @ApiModelProperty(value = "剂型分类id")
+        private Long agentClassificationId;
+
+        @ApiModelProperty(value = "安全分类id")
+        private Long securityClassificationId;
+
+        @ApiModelProperty(value = "原料分类id")
+        private Long materialsClassificationId;
+
+    }
 
     @Data
     @ApiModel("药品说明")

@@ -74,7 +74,7 @@ public class WesternMedicineEntity extends BaseStandardEntity implements Seriali
     /**
      * 分类信息，json
      */
-    private String medicineCategoryInfo;
+    private String medicineClassificationInfo;
 
     /**
      * 药品本位码

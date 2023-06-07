@@ -39,7 +39,7 @@ public interface ClassificationRemoteApi {
      *
      * @return
      */
-    @ApiOperation("获取药品分类集合")
+    @ApiOperation("获取所有药品分类")
     @GetMapping("/searchAll")
     ResultVO<List<FixedClassificationVO>> getAllClassification();
 }
