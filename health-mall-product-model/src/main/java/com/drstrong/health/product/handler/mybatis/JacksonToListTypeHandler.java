@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedJdbcTypes;
+import org.apache.ibatis.type.MappedTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +18,8 @@ import java.util.List;
  * @author liuqiuyi
  * @date 2023/6/6 11:34
  */
+@MappedJdbcTypes(JdbcType.VARCHAR)
+@MappedTypes({List.class})
 public abstract class JacksonToListTypeHandler<T> extends AbstractJsonTypeHandler<List<T>> {
 	private static final Logger log = LoggerFactory.getLogger(JacksonToListTypeHandler.class);
 	private static ObjectMapper objectMapper = new ObjectMapper();

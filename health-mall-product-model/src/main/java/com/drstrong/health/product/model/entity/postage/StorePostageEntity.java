@@ -32,7 +32,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@TableName("pms_store_postage")
+@TableName(value = "pms_store_postage", autoResultMap = true)
 public class StorePostageEntity extends BaseStandardEntity implements Serializable {
 	private static final long serialVersionUID = 1989063757616927698L;
 
@@ -49,12 +49,12 @@ public class StorePostageEntity extends BaseStandardEntity implements Serializab
 	/**
 	 * 店铺供应商包邮金额信息,json字段存储
 	 */
-	@TableField(typeHandler = SupplierFreePostageInfoTypeHandler.class)
+	@TableField(value = "supplier_free_postage_info", typeHandler = SupplierFreePostageInfoTypeHandler.class)
 	private List<SupplierFreePostageInfo> supplierFreePostageInfo;
 	/**
 	 * 店铺供应商区域邮费设置,json字段存储
 	 */
-	@TableField(typeHandler = SupplierAreaPostageInfoTypeHandler.class)
+	@TableField(value = "supplier_area_postage_info", typeHandler = SupplierAreaPostageInfoTypeHandler.class)
 	private List<SupplierAreaPostageInfo> supplierAreaPostageInfo;
 
 	public static StorePostageEntity buildDefaultEntity(Long operatorId) {
