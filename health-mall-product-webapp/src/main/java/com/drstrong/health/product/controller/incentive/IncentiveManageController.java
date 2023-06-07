@@ -1,7 +1,8 @@
 package com.drstrong.health.product.controller.incentive;
 
-import com.drstrong.health.product.facade.incentive.IncentivePolicyConfigFacade;
+import com.drstrong.health.product.facade.incentive.SkuIncentivePolicyFacade;
 import com.drstrong.health.product.model.request.incentive.SaveEarningNameRequest;
+import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.incentive.IncentiveManageRemoteApi;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,11 +20,17 @@ import javax.validation.Valid;
 @RequestMapping("/inner/incentive/manage")
 public class IncentiveManageController implements IncentiveManageRemoteApi {
 	@Resource
-	IncentivePolicyConfigFacade incentivePolicyConfigFacade;
+	SkuIncentivePolicyFacade skuIncentivePolicyFacade;
 
 	@Override
 	public ResultVO<Void> saveEarningName(@RequestBody @Valid SaveEarningNameRequest saveEarningNameRequest) {
-		incentivePolicyConfigFacade.saveEarningName(saveEarningNameRequest);
+		skuIncentivePolicyFacade.saveEarningName(saveEarningNameRequest);
+		return ResultVO.success();
+	}
+
+	@Override
+	public ResultVO<Void> saveOrUpdateSkuPolicy(@RequestBody @Valid SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest) {
+		skuIncentivePolicyFacade.saveOrUpdateSkuPolicy(saveOrUpdateSkuPolicyRequest);
 		return ResultVO.success();
 	}
 }
