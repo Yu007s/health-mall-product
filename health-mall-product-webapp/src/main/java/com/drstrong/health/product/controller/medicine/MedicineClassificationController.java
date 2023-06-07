@@ -22,7 +22,7 @@ import java.util.List;
  * @since 2023-06-06
  */
 @RestController
-@RequestMapping("/inner/product/MedicineClassification")
+@RequestMapping("/inner/product/medicine/classification")
 @Slf4j
 public class MedicineClassificationController implements ClassificationRemoteApi {
 
