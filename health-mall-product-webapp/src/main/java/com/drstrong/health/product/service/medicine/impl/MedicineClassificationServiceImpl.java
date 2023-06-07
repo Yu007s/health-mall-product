@@ -48,23 +48,16 @@ public class MedicineClassificationServiceImpl extends ServiceImpl<MedicineClass
     }
 
     @Override
-    public List<FixedClassificationVO> getAllClassification() {
+    public Map<Integer, List<MedicineClassificationVO>> getAllClassification() {
         List<MedicineClassificationEntity> medicineClassificationList = list(new LambdaQueryWrapper<MedicineClassificationEntity>().eq(MedicineClassificationEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode()));
         List<MedicineClassificationVO> result = buildClassificationTree(medicineClassificationList);
         Map<Integer, List<MedicineClassificationVO>> collect = result.stream().collect(Collectors.groupingBy(MedicineClassificationVO::getClassificationType));
-        List<FixedClassificationVO> voList = collect.entrySet().stream()
-                .map(entry -> FixedClassificationVO.builder()
-                        .classificationType(entry.getKey())
-                        .classificationName(MedicineClassificationEnum.getValueByCode(entry.getKey()))
-                        .medicineClassificationList(entry.getValue())
-                        .build())
-                .collect(Collectors.toList());
-        return voList;
+        return collect;
     }
 
     public List<MedicineClassificationVO> buildClassificationTree(List<MedicineClassificationEntity> medicineClassificationList) {
+        medicineClassificationList = BaseTree.listToTree(medicineClassificationList);
         List<MedicineClassificationVO> result = BeanUtil.copyToList(Optional.ofNullable(medicineClassificationList).orElse(Collections.emptyList()), MedicineClassificationVO.class);
-        BaseTree.listToTree(result);
         return result;
     }
 }

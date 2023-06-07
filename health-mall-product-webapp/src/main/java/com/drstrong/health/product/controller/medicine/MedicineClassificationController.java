@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -35,7 +36,7 @@ public class MedicineClassificationController implements ClassificationRemoteApi
     }
 
     @Override
-    public ResultVO<List<FixedClassificationVO>> getAllClassification() {
+    public ResultVO<Map<Integer, List<MedicineClassificationVO>>> getAllClassification() {
         return ResultVO.success(medicineClassificationService.getAllClassification());
     }
 }

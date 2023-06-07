@@ -1,6 +1,5 @@
 package com.drstrong.health.product.remote.api.medicine;
 
-import com.drstrong.health.product.model.response.medicine.FixedClassificationVO;
 import com.drstrong.health.product.model.response.medicine.MedicineClassificationVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -41,5 +41,5 @@ public interface ClassificationRemoteApi {
      */
     @ApiOperation("获取所有药品分类")
     @GetMapping("/searchAll")
-    ResultVO<List<FixedClassificationVO>> getAllClassification();
+    ResultVO<Map<Integer, List<MedicineClassificationVO>>> getAllClassification();
 }

@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.response.medicine.FixedClassificationVO
 import com.drstrong.health.product.model.response.medicine.MedicineClassificationVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -30,6 +31,6 @@ public interface MedicineClassificationService extends IService<MedicineClassifi
      *
      * @return
      */
-    List<FixedClassificationVO> getAllClassification();
+    Map<Integer, List<MedicineClassificationVO>> getAllClassification();
 
 }
