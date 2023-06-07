@@ -15,6 +15,8 @@ import com.drstrong.health.product.model.response.result.IBaseResult;
  * 			001：参数格式校验失败
  * 			11：商品
  * 			12: 配送费
+ * 		    13: 标签
+ * 		    14: 激励政策
  * 			21:导入导出
  * </p>
  *
@@ -57,6 +59,11 @@ public enum ErrorEnums implements IBaseResult {
 	EXCEL_IMPORT_ERROR("21100", "文档导入错误"),
 
 	STORE_POSTAGE_IS_NULL("12001", "配送费信息不存在"),
+
+	STORE_LABEL_REPEAT("13001", "店铺下标签名称重复"),
+	STORE_LABEL_NOT_EXIST("13002", "店铺下标签不存在"),
+
+	INCENTIVE_POLICY_CONFIG_REPEAT("14001", "店铺下收益名称重复")
 	;
 
 	private String code;

@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -34,5 +36,7 @@ public class SaveStorePostageRequest extends OperatorUserInfo implements Seriali
 
 	@ApiModelProperty("包邮金额")
 	@NotNull(message = "包邮金额不能为空")
+	@DecimalMin(value = "0.00", message = "价格不能小于0")
+	@DecimalMax(value = "99999.99", message = "价格不能大于99999.99")
 	private BigDecimal freePostage;
 }
