@@ -2,12 +2,15 @@ package com.drstrong.health.product.remote.api.incentive;
 
 import com.drstrong.health.product.model.request.incentive.SaveEarningNameRequest;
 import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
+import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDetailVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 
@@ -22,4 +25,8 @@ public interface IncentiveManageRemoteApi {
 	@ApiOperation("sku激励政策保存或更新")
 	@PostMapping("/save-or-update/sku/policy")
 	ResultVO<Void> saveOrUpdateSkuPolicy(@RequestBody @Valid SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest);
+
+	@ApiOperation("查询sku激励政策")
+	@GetMapping("/query/sku/policy")
+	ResultVO<SkuIncentivePolicyDetailVO> queryPolicyDetailBySkuCode(@RequestParam("skuCode") String skuCode);
 }

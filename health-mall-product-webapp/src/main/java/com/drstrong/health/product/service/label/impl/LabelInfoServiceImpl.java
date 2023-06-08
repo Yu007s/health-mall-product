@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.label.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -7,6 +8,7 @@ import com.drstrong.health.product.dao.label.LabelInfoMapper;
 import com.drstrong.health.product.model.entity.label.LabelInfoEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.service.label.LabelInfoService;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +38,24 @@ public class LabelInfoServiceImpl extends ServiceImpl<LabelInfoMapper, LabelInfo
 				.eq(LabelInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
 				.eq(LabelInfoEntity::getId, id);
 		return baseMapper.selectOne(queryWrapper);
+	}
+
+	/**
+	 * 根据 Ids 查询
+	 *
+	 * @param ids
+	 * @author liuqiuyi
+	 * @date 2023/6/7 12:01
+	 */
+	@Override
+	public List<LabelInfoEntity> queryByIds(List<Long> ids) {
+		if (CollectionUtil.isEmpty(ids)) {
+			return Lists.newArrayList();
+		}
+		LambdaQueryWrapper<LabelInfoEntity> queryWrapper = new LambdaQueryWrapper<LabelInfoEntity>()
+				.eq(LabelInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+				.in(LabelInfoEntity::getId, ids);
+		return baseMapper.selectList(queryWrapper);
 	}
 
 	/**

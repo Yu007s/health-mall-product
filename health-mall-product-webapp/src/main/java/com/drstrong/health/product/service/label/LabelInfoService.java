@@ -21,6 +21,14 @@ public interface LabelInfoService extends IService<LabelInfoEntity> {
 	LabelInfoEntity queryById(Long id);
 
 	/**
+	 * 根据 Ids 查询
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/6/7 12:01
+	 */
+	List<LabelInfoEntity> queryByIds(List<Long> ids);
+
+	/**
 	 * 根据店铺 id 和标签名称查询
 	 *
 	 * @author liuqiuyi
