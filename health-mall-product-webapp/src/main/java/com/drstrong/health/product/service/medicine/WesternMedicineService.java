@@ -2,6 +2,11 @@ package com.drstrong.health.product.service.medicine;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
+import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
+import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
+import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.category.CategoryProductVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
 
 /**
  * <p>
@@ -13,5 +18,37 @@ import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity
  */
 public interface WesternMedicineService extends IService<WesternMedicineEntity> {
 
-    void saveOrUpdateMedicine();
+    /**
+     * 保存/修改西药
+     *
+     * @param addOrUpdateMedicineRequest
+     */
+    void saveOrUpdateMedicine(AddOrUpdateMedicineRequest addOrUpdateMedicineRequest);
+
+
+    /**
+     * 查询西药详情信息
+     *
+     * @param id
+     */
+    void queryMedicineDetailInfo(Long id);
+
+
+    /**
+     * 根据 medicineCode查询药品
+     *
+     * @param medicineCode
+     * @return
+     */
+    WesternMedicineEntity queryByMedicineCode(String medicineCode);
+
+
+    /**
+     * 西药分页列表
+     *
+     * @param request
+     * @return
+     */
+    PageVO<WesternMedicineVO> queryMedicinePageList(WesternMedicineRequest request);
+
 }

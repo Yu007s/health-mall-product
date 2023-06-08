@@ -1,7 +1,17 @@
 package com.drstrong.health.product.remote.api.medicine;
 
+import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
+import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
+import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.validation.Valid;
 
 
 /**
@@ -15,4 +25,17 @@ import org.springframework.cloud.openfeign.FeignClient;
 public interface WesternMedicineRemoteApi {
 
 
+    @ApiOperation("保存/修改西药")
+    @PostMapping("/save-or-update")
+    ResultVO<Void> saveOrUpdateMedicine(@RequestBody @Valid AddOrUpdateMedicineRequest medicineRequest);
+
+
+    @ApiOperation("西药详情")
+    @GetMapping("/queryById")
+    ResultVO<Void> queryMedicineDetailInfo(@RequestParam("id") Long id);
+
+
+    @ApiOperation("西药详情")
+    @GetMapping("/page/info")
+    ResultVO<Void> queryMedicinePageInfo(@RequestBody WesternMedicineRequest westernMedicineRequest);
 }

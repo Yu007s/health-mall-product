@@ -2,12 +2,14 @@ package com.drstrong.health.product.model.request.medicine;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Data
+@Builder
 @ApiModel("保存或更新西药请求对象")
 public class AddOrUpdateMedicineRequest implements Serializable {
 
@@ -27,6 +29,9 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     @ApiModelProperty(value = "品牌名称")
     private String brandName;
 
+    @ApiModelProperty(value = "品牌名称")
+    private String fullName;
+
     @ApiModelProperty(value = "药品编号")
     private String medicineCode;
 
@@ -39,11 +44,6 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     @ApiModelProperty(value = "化学名称")
     private String chemicalName;
 
-    /**
-     * 分类信息，json
-     */
-    private String medicineClassificationInfo;
-
     @ApiModelProperty(value = "药品本位码")
     private String standardCode;
 
@@ -53,6 +53,12 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     @ApiModelProperty(value = "批准文号/注册证号")
     @NotNull(message = "批准文号/注册证号不能为空")
     private String approvalNumber;
+
+    @ApiModelProperty(value = "分类信息")
+    private MedicineClassificationInfoRequest medicineClassificationInfo;
+
+    @ApiModelProperty(value = "药品说明")
+    private MedicineInstructionsRequest medicineInstructions;
 
     @ApiModelProperty(value = "操作人 id", hidden = true)
     private Long userId;
@@ -78,58 +84,11 @@ public class AddOrUpdateMedicineRequest implements Serializable {
 
         @ApiModelProperty(value = "原料分类id")
         private Long materialsClassificationId;
-
     }
 
-    @Data
-    @ApiModel("药品说明")
-    public static class MedicineInstructionsRequest implements Serializable {
-
-        private static final long serialVersionUID = 732108391993017126L;
-
-        @ApiModelProperty(value = "西药id")
-        private Long medicineId;
-
-        @ApiModelProperty(value = "成分")
-        private String ingredients;
-
-        @ApiModelProperty(value = "性状")
-        private String phenotypicTrait;
-
-        @ApiModelProperty(value = "适应症/功能主治")
-        @NotNull(message = "适应症/功能主治 不能为空")
-        private String indications;
-
-        @ApiModelProperty(value = "用法用量")
-        @NotNull(message = "用法用量不能为空")
-        private String usageDosage;
-
-        @ApiModelProperty(value = "不良反应")
-        private String adverseEffects;
-
-        @ApiModelProperty(value = "禁忌")
-        private String contraindications;
-
-        @ApiModelProperty(value = "注意事项")
-        private String mattersNeedingAttention;
-
-        @ApiModelProperty(value = "药品贮藏")
-        @NotNull(message = "药品贮藏不能为空")
-        private String medicineStorage;
-
-        @ApiModelProperty(value = "生产企业")
-        @NotNull(message = "生产企业不能为空")
-        private String productionEnterprise;
-
-        @ApiModelProperty(value = "上市许可持有人")
-        private String listingLicensee;
-
-        @ApiModelProperty(value = "有效期")
-        @NotNull(message = "有效期不能为空")
-        private String periodValidity;
-
-        @ApiModelProperty(value = "执行标准")
-        @NotNull(message = "执行标准不能为空")
-        private String executionStandard;
+    public void constructFullName() {
+        if (brandName != null || medicineName != null || commonName != null) {
+            this.fullName = brandName + medicineName + commonName;
+        }
     }
 }
