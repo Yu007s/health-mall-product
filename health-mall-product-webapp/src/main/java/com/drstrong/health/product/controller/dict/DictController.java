@@ -1,4 +1,4 @@
-package com.drstrong.health.product.controller.controller;
+package com.drstrong.health.product.controller.dict;
 
 import com.drstrong.health.product.model.dto.DictDTO;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -7,7 +7,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
