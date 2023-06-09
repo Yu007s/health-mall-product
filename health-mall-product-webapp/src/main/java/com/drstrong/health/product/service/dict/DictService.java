@@ -1,6 +1,6 @@
 package com.drstrong.health.product.service.dict;
 
-import com.drstrong.health.product.model.entity.dict.DictEntity;
+import com.drstrong.health.product.model.dto.DictDTO;
 
 import java.util.List;
 
@@ -10,6 +10,6 @@ import java.util.List;
  */
 public interface DictService {
 
-    List<DictEntity> getDictByType(String dictType);
+    List<DictDTO> getDictByType(String dictType);
 
 }

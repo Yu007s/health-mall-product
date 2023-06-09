@@ -1,6 +1,6 @@
 package com.drstrong.health.product.controller.controller;
 
-import com.drstrong.health.product.model.entity.dict.DictEntity;
+import com.drstrong.health.product.model.dto.DictDTO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.service.dict.DictService;
 import io.swagger.annotations.Api;
@@ -32,7 +32,7 @@ public class DictController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "dictType", value = "字典类型", dataType = "string", required = true)
     })
-    public ResultVO<List<DictEntity>> getDictByType(String dictType) {
+    public ResultVO<List<DictDTO>> getDictByType(String dictType) {
         return ResultVO.success(dictService.getDictByType(dictType));
     }
 }
