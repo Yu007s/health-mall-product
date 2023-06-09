@@ -37,11 +37,20 @@ public interface StoreDeliveryPriorityService extends IService<DeliveryPriorityE
     List<Long> queryByStoreIdAndArea(Long storeId, Long areaId);
 
     /**
+     * 这个接口后续将废弃,为了暂时兼容老逻辑,等供应链三期正式上线后可以去除
+     *
      * 保存店铺配送优先级
      * @param saveDeliveryRequest 店铺配送优先级相关数据
      * @param userId 用户id
      */
+    @Deprecated
     void save(SaveDeliveryRequest saveDeliveryRequest, Long userId);
 
-
+    /**
+     * 保存店铺配送优先级
+     *
+     * @author liuqiuyi
+     * @date 2023/6/9 13:45
+     */
+	void saveDeliveryInfoV3(SaveDeliveryRequest saveDeliveryRequest, Long userId);
 }

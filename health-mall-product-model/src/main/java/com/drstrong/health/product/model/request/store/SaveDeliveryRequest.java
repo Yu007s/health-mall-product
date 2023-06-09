@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.request.store;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @Date 2022/08/01/14:37
  */
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 @ApiModel("配送优先级请求")
 public class SaveDeliveryRequest implements Serializable {
 
