@@ -14,6 +14,7 @@
         <result column="english_name" property="englishName"/>
         <result column="chemical_name" property="chemicalName"/>
         <result column="standard_code" property="standardCode"/>
+        <result column="data_integrity" property="dataIntegrity"/>
         <result column="approval_number" property="approvalNumber"/>
         <result column="version" property="version"/>
         <result column="del_flag" property="delFlag"/>
@@ -25,36 +26,55 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, medicine_name, full_name, common_name, brand_name, medicine_code, pinyin, english_name, chemical_name, medicine_category_info, standard_code, approval_number, version, del_flag, created_by, created_at, changed_by, changed_at
+        id
+        , medicine_name, full_name, common_name, brand_name, medicine_code, pinyin, english_name, chemical_name, medicine_category_info, standard_code, data_integrity, approval_number, version, del_flag, created_by, created_at, changed_by, changed_at
     </sql>
 
-    <select id="queryMedicinePageList" resultType="com.drstrong.health.product.model.response.medicine.WesternMedicineVO">
+    <select id="queryMedicinePageList"
+            resultType="com.drstrong.health.product.model.response.medicine.WesternMedicineVO">
         SELECT
-            m.*,
-            mi.production_enterprise
+        m.*,
+        mi.production_enterprise,
+        CASE WHEN ms.medicine_id IS NULL THEN 0 ELSE 1 END AS relationSpec
         FROM
-            pms_western_medicine m
-            JOIN pms_western_medicine_instructions mi ON mi.medicine_id = m.id
-              <where>
-                  m.del_flag = 0
-                  <if test="queryParam.searchName != null and queryParam.searchName != ''">
-                    AND (m.medicine_name LIKE CONCAT('%', #{queryParam.searchName}, '%')
-                    OR m.common_name LIKE CONCAT('%', #{queryParam.searchName}, '%')
-                    OR m.medicine_code LIKE CONCAT('%', #{queryParam.searchName}, '%'))
-                  </if>
-                  <if test="queryParam.drugClassificationId != null">
-
-                  </if>
-                  <if test="queryParam.pharmacologyClassificationId != null">
-
-                  </if>
-                  <if test="queryParam.createStart != null">
-                      AND m.created_at &gt;= #{queryParam.createStart}
-                  </if>
-                  <if test="queryParam.createEnd != null">
-                      AND m.created_at &lt;= #{queryParam.createEnd}
-                  </if>
-              </where>
+        pms_western_medicine m
+        JOIN pms_western_medicine_instructions mi ON mi.medicine_id = m.id
+        LEFT JOIN pms_western_medicine_specifications ms ON ms.medicine_id = m.id
+        <where>
+            m.del_flag = 0
+            <if test="queryParam.searchName != null and queryParam.searchName != ''">
+                AND (m.medicine_name LIKE CONCAT('%', #{queryParam.searchName}, '%')
+                OR m.common_name LIKE CONCAT('%', #{queryParam.searchName}, '%')
+                OR m.medicine_code LIKE CONCAT('%', #{queryParam.searchName}, '%'))
+            </if>
+            <if test="queryParam.drugClassificationId != null">
+                AND JSON_EXTRACT(m.medicine_classification_info, '$.drugClassificationId') =
+                #{queryParam.drugClassificationId};
+            </if>
+            <if test="queryParam.pharmacologyClassificationId != null">
+                AND JSON_EXTRACT(m.medicine_classification_info, '$.pharmacologyClassificationId') =
+                #{queryParam.pharmacologyClassificationId};
+            </if>
+            <if test="queryParam.createStart != null">
+                AND m.created_at &gt;= #{queryParam.createStart}
+            </if>
+            <if test="queryParam.createEnd != null">
+                AND m.created_at &lt;= #{queryParam.createEnd}
+            </if>
+            <if test="queryParam.dataIntegrity != null">
+                AND m.dataIntegrity = #{queryParam.dataIntegrity}
+            </if>
+            <if test="queryParam.relationSpec != null">
+                <choose>
+                    <when test="queryParam.relationSpec == 0">
+                        AND relationSpec = 0
+                    </when>
+                    <otherwise>
+                        AND relationSpec > 0
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
         order by m.id desc
     </select>
 

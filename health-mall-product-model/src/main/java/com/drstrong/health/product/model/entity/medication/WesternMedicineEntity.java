@@ -82,6 +82,11 @@ public class WesternMedicineEntity extends BaseStandardEntity implements Seriali
     private String standardCode;
 
     /**
+     * 资料完整  0：不完整，1：完整
+     */
+    private Integer dataIntegrity;
+
+    /**
      * 批准文号/注册证号
      */
     private String approvalNumber;
