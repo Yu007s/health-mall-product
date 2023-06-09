@@ -5,13 +5,17 @@ import java.time.LocalDateTime;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.common.exception.BusinessException;
 import com.drstrong.health.common.utils.DateUtil;
+import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.dao.medicine.WesternMedicineMapper;
+import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineInstructionsEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
@@ -25,6 +29,9 @@ import com.drstrong.health.product.service.medicine.WesternMedicineInstructionsS
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.naiterui.common.redis.RedisUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +46,7 @@ import java.util.Date;
  * @author zzw
  * @since 2023-06-07
  */
+@Slf4j
 @Service
 public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMapper, WesternMedicineEntity> implements WesternMedicineService {
 
@@ -53,20 +61,32 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
     //旧redis key
     private static final String SERIAL_NUMBER_REDIS_KEY = "naiterui-b2c|product_serial_number";
 
+    private static final String SAVE_WESTERN_MEDICINE = "saveWesternMedicine";
+
+    private static final String UPDATE_WESTERN_MEDICINE = "updateWesternMedicine";
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdateMedicine(AddOrUpdateMedicineRequest addOrUpdateMedicineRequest) {
-        WesternMedicineEntity westernMedicine = queryByMedicineCode(addOrUpdateMedicineRequest.getMedicineCode());
+        log.info("invoke saveOrUpdateMedicine() param：{}", JSON.toJSONString(addOrUpdateMedicineRequest));
+        boolean updateFlag = ObjectUtil.isAllEmpty(addOrUpdateMedicineRequest.getId(), addOrUpdateMedicineRequest.getMedicineCode());
         WesternMedicineEntity westernMedicineEntity = buildWesternMedicineEntity(addOrUpdateMedicineRequest);
-        if (ObjectUtil.isNotNull(westernMedicine)) {
+        String logJsonStr = JSONUtil.toJsonStr(westernMedicineEntity);
+        if (updateFlag) {
+            WesternMedicineEntity westernMedicine = queryByMedicineCode(addOrUpdateMedicineRequest.getMedicineCode());
             westernMedicineEntity.setId(westernMedicine.getId());
+            logJsonStr = JSONUtil.toJsonStr(westernMedicine);
         }
         //保存修改西药信息
         saveOrUpdate(westernMedicineEntity);
         //保存修改西药说明
         addOrUpdateMedicineRequest.getMedicineInstructions().setMedicineId(westernMedicineEntity.getId());
         westernMedicineInstructionsService.saveOrUpdateInstructions(addOrUpdateMedicineRequest.getMedicineInstructions());
-//        operationLogSendUtil.sendOperationLog();
+        //保存操作日志
+        OperationLog operationLog = OperationLog.buildOperationLog(westernMedicineEntity.getMedicineCode(), OperationLogConstant.SAVE_OR_UPDATE_WESTERN_MEDICINE,
+                updateFlag ? SAVE_WESTERN_MEDICINE : UPDATE_WESTERN_MEDICINE, addOrUpdateMedicineRequest.getUserId(), addOrUpdateMedicineRequest.getUserName(),
+                OperateTypeEnum.CMS.getCode(), logJsonStr);
+        operationLogSendUtil.sendOperationLog(operationLog);
     }
 
     @Override

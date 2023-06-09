@@ -63,6 +63,8 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     @ApiModelProperty(value = "操作人 id", hidden = true)
     private Long userId;
 
+    @ApiModelProperty(value = "操作人 姓名", hidden = true)
+    private String userName;
 
     @Data
     @ApiModel("分类id")
