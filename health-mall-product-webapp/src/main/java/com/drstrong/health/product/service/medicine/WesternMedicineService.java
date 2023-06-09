@@ -6,6 +6,7 @@ import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineReq
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.category.CategoryProductVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineInfoVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
 
 /**
@@ -31,7 +32,7 @@ public interface WesternMedicineService extends IService<WesternMedicineEntity> 
      *
      * @param id
      */
-    void queryMedicineDetailInfo(Long id);
+    WesternMedicineInfoVO queryMedicineDetailInfo(Long id);
 
 
     /**

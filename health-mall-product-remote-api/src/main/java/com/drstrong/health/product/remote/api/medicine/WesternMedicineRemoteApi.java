@@ -3,6 +3,7 @@ package com.drstrong.health.product.remote.api.medicine;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineInfoVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
@@ -34,7 +35,7 @@ public interface WesternMedicineRemoteApi {
 
     @ApiOperation("西药详情")
     @GetMapping("/queryById")
-    ResultVO<Void> queryMedicineDetailInfo(@RequestParam("id") Long id);
+    ResultVO<WesternMedicineInfoVO> queryMedicineDetailInfo(@RequestParam("id") Long id);
 
 
     @ApiOperation("西药分页列表")

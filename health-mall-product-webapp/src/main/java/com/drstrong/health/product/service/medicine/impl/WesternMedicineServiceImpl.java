@@ -9,14 +9,17 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.drstrong.health.common.exception.BusinessException;
 import com.drstrong.health.common.utils.DateUtil;
 import com.drstrong.health.product.dao.medicine.WesternMedicineMapper;
-import com.drstrong.health.product.model.dto.SupplierChineseSkuDTO;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
+import com.drstrong.health.product.model.entity.medication.WesternMedicineInstructionsEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.medicine.MedicineInstructionsVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineInfoVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
 import com.drstrong.health.product.service.medicine.WesternMedicineInstructionsService;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
@@ -67,8 +70,16 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
     }
 
     @Override
-    public void queryMedicineDetailInfo(Long id) {
-
+    public WesternMedicineInfoVO queryMedicineDetailInfo(Long id) {
+        WesternMedicineEntity westernMedicine = getById(id);
+        if (ObjectUtil.isNull(westernMedicine)) {
+            throw new BusinessException("西药不存在");
+        }
+        WesternMedicineInfoVO vo = BeanUtil.copyProperties(westernMedicine, WesternMedicineInfoVO.class);
+        WesternMedicineInstructionsEntity instructions = westernMedicineInstructionsService.queryByMedicineId(id);
+        MedicineInstructionsVO medicineInstructionsVO = BeanUtil.copyProperties(instructions, MedicineInstructionsVO.class);
+        vo.setMedicineInstructions(medicineInstructionsVO);
+        return vo;
     }
 
     @Override

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 药品基础分类
+ * 西药信息VO
  * </p>
  *
  * @author zzw
@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
  */
 
 @Data
-@ApiModel(description = "药品基础分类VO")
+@ApiModel(description = "西药信息VO")
 public class WesternMedicineVO implements Serializable {
 
     @ApiModelProperty(value = "西药id")
