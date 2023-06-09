@@ -3,6 +3,8 @@ package com.drstrong.health.product.controller.medicine;
 
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
+import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.medicine.WesternMedicineRemoteApi;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
@@ -40,8 +42,8 @@ public class WesternMedicineController implements WesternMedicineRemoteApi {
     }
 
     @Override
-    public ResultVO<Void> queryMedicinePageInfo(WesternMedicineRequest westernMedicineRequest) {
-        return null;
+    public ResultVO<PageVO<WesternMedicineVO>> queryMedicinePageInfo(WesternMedicineRequest westernMedicineRequest) {
+        return ResultVO.success(westernMedicineService.queryMedicinePageList(westernMedicineRequest));
     }
 }
 

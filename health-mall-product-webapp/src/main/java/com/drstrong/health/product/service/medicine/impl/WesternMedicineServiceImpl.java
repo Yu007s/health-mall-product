@@ -7,9 +7,11 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.common.utils.DateUtil;
 import com.drstrong.health.product.dao.medicine.WesternMedicineMapper;
+import com.drstrong.health.product.model.dto.SupplierChineseSkuDTO;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
@@ -82,7 +84,9 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
 
     @Override
     public PageVO<WesternMedicineVO> queryMedicinePageList(WesternMedicineRequest request) {
-        return null;
+        Page<WesternMedicineVO> entityPage = new Page<>(request.getPageNo(), request.getPageSize());
+        Page<WesternMedicineVO> westernMedicineVOPage = baseMapper.queryMedicinePageList(entityPage, request);
+        return PageVO.newBuilder().pageNo(request.getPageNo()).pageSize(request.getPageSize()).totalCount((int) westernMedicineVOPage.getTotal()).result(westernMedicineVOPage.getRecords()).build();
     }
 
 
