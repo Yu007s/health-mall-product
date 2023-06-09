@@ -244,7 +244,7 @@ public class StoreDeliveryPriorityServiceImpl extends ServiceImpl<StoreDeliveryP
         for (DeliveryPriRequest deliveryPriority : deliveryPriorities) {
             String priorities = deliveryPriority.getSupplierIds().stream().map(String::valueOf).collect(Collectors.joining(","));
             deliveryPriority.getAreaInfoList().forEach(areaInfo -> {
-                if (duplicateCheckSet.contains(areaInfo.getParentAreaId().toString() + areaInfo.getAreaId())) {
+                if (duplicateCheckSet.contains(areaInfo.getAreaId().toString() + areaInfo.getParentAreaId())) {
                     throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "不能重复设置同一个地区");
                 }
                 DeliveryPriorityEntity priorityEntity = DeliveryPriorityEntity.buildDefault(userId);
@@ -253,7 +253,7 @@ public class StoreDeliveryPriorityServiceImpl extends ServiceImpl<StoreDeliveryP
                 priorityEntity.setParentAreaId(areaInfo.getParentAreaId());
                 priorityEntity.setPriorities(priorities);
                 deliveryPriorityEntityList.add(priorityEntity);
-                duplicateCheckSet.add(areaInfo.getParentAreaId().toString() + areaInfo.getAreaId());
+                duplicateCheckSet.add(areaInfo.getAreaId().toString() + areaInfo.getParentAreaId());
             });
         }
         return deliveryPriorityEntityList;
