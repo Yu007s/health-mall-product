@@ -62,7 +62,7 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdateMedicine(AddOrUpdateMedicineRequest addOrUpdateMedicineRequest) {
         log.info("invoke saveOrUpdateMedicine() param：{}", JSON.toJSONString(addOrUpdateMedicineRequest));
-        boolean updateFlag = ObjectUtil.isAllEmpty(addOrUpdateMedicineRequest.getId(), addOrUpdateMedicineRequest.getMedicineCode());
+        boolean updateFlag = ObjectUtil.isAllNotEmpty(addOrUpdateMedicineRequest.getId(), addOrUpdateMedicineRequest.getMedicineCode());
         WesternMedicineEntity westernMedicineEntity = buildWesternMedicineEntity(addOrUpdateMedicineRequest);
         String logJsonStr = JSONUtil.toJsonStr(westernMedicineEntity);
         if (updateFlag) {
