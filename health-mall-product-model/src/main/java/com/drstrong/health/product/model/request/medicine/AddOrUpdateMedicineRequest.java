@@ -47,7 +47,7 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     @ApiModelProperty(value = "药品本位码")
     private String standardCode;
 
-    @ApiModelProperty(value = "资料完整")
+    @ApiModelProperty(value = "资料完整", hidden = true)
     private Integer dataIntegrity;
 
     @ApiModelProperty(value = "批准文号/注册证号")

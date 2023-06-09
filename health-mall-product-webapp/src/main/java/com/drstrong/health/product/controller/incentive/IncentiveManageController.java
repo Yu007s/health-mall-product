@@ -14,6 +14,8 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 /**
+ * sku 激励政策相关
+ *
  * @author liuqiuyi
  * @date 2023/6/7 15:03
  */

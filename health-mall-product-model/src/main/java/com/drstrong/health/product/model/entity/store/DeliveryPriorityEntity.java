@@ -6,10 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 
 import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
+import com.drstrong.health.product.model.enums.DelFlagEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -52,4 +54,14 @@ public class DeliveryPriorityEntity extends BaseStandardEntity implements Serial
     private String priorities;
 
 
+	public static DeliveryPriorityEntity buildDefault(Long operatorId) {
+		DeliveryPriorityEntity priorityEntity = new DeliveryPriorityEntity();
+		priorityEntity.setVersion(1);
+		priorityEntity.setDelFlag(DelFlagEnum.UN_DELETED.getCode());
+		priorityEntity.setCreatedBy(operatorId);
+		priorityEntity.setChangedAt(LocalDateTime.now());
+		priorityEntity.setChangedAt(LocalDateTime.now());
+		priorityEntity.setChangedBy(operatorId);
+		return priorityEntity;
+	}
 }

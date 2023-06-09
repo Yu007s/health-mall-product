@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.common.exception.BusinessException;
 import com.drstrong.health.common.utils.DateUtil;
+import com.drstrong.health.product.constants.MedicineConstant;
 import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.dao.medicine.WesternMedicineMapper;
 import com.drstrong.health.product.model.OperationLog;
@@ -20,6 +21,7 @@ import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity
 import com.drstrong.health.product.model.entity.medication.WesternMedicineInstructionsEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
+import com.drstrong.health.product.model.request.medicine.MedicineInstructionsRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.medicine.MedicineInstructionsVO;
@@ -30,8 +32,6 @@ import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.naiterui.common.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,13 +58,6 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
     private OperationLogSendUtil operationLogSendUtil;
 
 
-    //旧redis key
-    private static final String SERIAL_NUMBER_REDIS_KEY = "naiterui-b2c|product_serial_number";
-
-    private static final String SAVE_WESTERN_MEDICINE = "saveWesternMedicine";
-
-    private static final String UPDATE_WESTERN_MEDICINE = "updateWesternMedicine";
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdateMedicine(AddOrUpdateMedicineRequest addOrUpdateMedicineRequest) {
@@ -77,16 +70,39 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
             westernMedicineEntity.setId(westernMedicine.getId());
             logJsonStr = JSONUtil.toJsonStr(westernMedicine);
         }
+        westernMedicineEntity.setDataIntegrity(checkDataIntegrity(addOrUpdateMedicineRequest));
         //保存修改西药信息
         saveOrUpdate(westernMedicineEntity);
         //保存修改西药说明
         addOrUpdateMedicineRequest.getMedicineInstructions().setMedicineId(westernMedicineEntity.getId());
         westernMedicineInstructionsService.saveOrUpdateInstructions(addOrUpdateMedicineRequest.getMedicineInstructions());
         //保存操作日志
-        OperationLog operationLog = OperationLog.buildOperationLog(westernMedicineEntity.getMedicineCode(), OperationLogConstant.SAVE_OR_UPDATE_WESTERN_MEDICINE,
-                updateFlag ? SAVE_WESTERN_MEDICINE : UPDATE_WESTERN_MEDICINE, addOrUpdateMedicineRequest.getUserId(), addOrUpdateMedicineRequest.getUserName(),
-                OperateTypeEnum.CMS.getCode(), logJsonStr);
-        operationLogSendUtil.sendOperationLog(operationLog);
+//        OperationLog operationLog = OperationLog.buildOperationLog(westernMedicineEntity.getMedicineCode(), OperationLogConstant.SAVE_OR_UPDATE_WESTERN_MEDICINE,
+//                updateFlag ? MedicineConstant.SAVE_WESTERN_MEDICINE : MedicineConstant.UPDATE_WESTERN_MEDICINE, addOrUpdateMedicineRequest.getUserId(), addOrUpdateMedicineRequest.getUserName(),
+//                OperateTypeEnum.CMS.getCode(), logJsonStr);
+//        operationLogSendUtil.sendOperationLog(operationLog);
+    }
+
+    private Integer checkDataIntegrity(AddOrUpdateMedicineRequest medicine) {
+        MedicineInstructionsRequest instructions = medicine.getMedicineInstructions();
+        if (ObjectUtil.hasEmpty(
+                medicine.getBrandName(),
+                medicine.getMedicineName(),
+                medicine.getPinyin(),
+                medicine.getCommonName(),
+                medicine.getChemicalName(),
+                medicine.getEnglishName(),
+                medicine.getStandardCode(),
+                instructions.getIngredients(),
+                instructions.getPhenotypicTrait(),
+                instructions.getAdverseEffects(),
+                instructions.getContraindications(),
+                instructions.getMattersNeedingAttention(),
+                instructions.getListingLicensee()
+        )) {
+            return MedicineConstant.DATA_NO_INTEGRITY;
+        }
+        return MedicineConstant.DATA_INTEGRITY;
     }
 
     @Override
@@ -141,7 +157,7 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
         StringBuilder number = new StringBuilder();
         number.append("M");
         number.append(DateUtil.formatDate(new Date(), "yyMMdd"));
-        long serialNumber = RedisUtil.keyOps().incr(SERIAL_NUMBER_REDIS_KEY);
+        long serialNumber = RedisUtil.keyOps().incr(MedicineConstant.SERIAL_NUMBER_REDIS_KEY);
         number.append(String.format("%05d", serialNumber));
         return number.toString();
     }

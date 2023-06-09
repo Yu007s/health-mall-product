@@ -13,9 +13,11 @@ import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.request.store.SaveStorePostageRequest;
 import com.drstrong.health.product.model.request.store.SaveStoreSupplierPostageRequest;
+import com.drstrong.health.product.model.response.area.AreaInfoResponse;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.store.v3.StorePostageVO;
 import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
+import com.drstrong.health.product.service.area.AreaService;
 import com.drstrong.health.product.service.postage.StorePostageService;
 import com.drstrong.health.product.service.store.StoreLinkSupplierService;
 import com.drstrong.health.product.service.store.StoreService;
@@ -56,6 +58,9 @@ public class StorePostageFacadeImpl implements StorePostageFacade {
 
 	@Resource
 	SupplierRemoteProService supplierRemoteProService;
+
+	@Resource
+	AreaService areaService;
 
 	/**
 	 * 保存店铺包邮金额,并记录日志
@@ -167,6 +172,8 @@ public class StorePostageFacadeImpl implements StorePostageFacade {
 		// 3.获取供应商区域邮费设置
 		List<StorePostageEntity.SupplierAreaPostageInfo> supplierAreaPostageInfoList = Objects.isNull(storePostageEntity) ? new ArrayList<>() : storePostageEntity.getSupplierAreaPostageInfo();
 		Map<Long, List<StorePostageEntity.SupplierAreaPostageInfo>> supplierIdAreaPostageInfoListMap = supplierAreaPostageInfoList.stream().collect(Collectors.groupingBy(StorePostageEntity.SupplierAreaPostageInfo::getSupplierId));
+		// 获取区域map
+		Map<Long, String> areaIdNameMap = areaService.queryAllProvince().stream().collect(Collectors.toMap(AreaInfoResponse::getAreaId, AreaInfoResponse::getAreaName, (v1, v2) -> v1));
 		// 4.组装参数
 		List<StorePostageVO.StoreSupplierPostageVO> storeSupplierPostageVOList = Lists.newArrayListWithCapacity(storeLinkSupplierEntityList.size());
 		for (StoreLinkSupplierEntity storeLinkSupplierEntity : storeLinkSupplierEntityList) {
@@ -176,8 +183,7 @@ public class StorePostageFacadeImpl implements StorePostageFacade {
 			supplierIdAreaPostageInfoListMap.getOrDefault(supplierId, Lists.newArrayList()).forEach(supplierAreaPostageInfo -> {
 				StorePostageVO.StoreSupplierAreaPostageVO areaPostageVO = StorePostageVO.StoreSupplierAreaPostageVO.builder()
 						.areaId(supplierAreaPostageInfo.getAreaId())
-						// TODO 补充逻辑
-//						.areaName()
+						.areaName(areaIdNameMap.get(supplierAreaPostageInfo.getAreaId()))
 						.postage(BigDecimalUtil.F2Y(supplierAreaPostageInfo.getPostage()))
 						.build();
 				areaPostageVOList.add(areaPostageVO);
