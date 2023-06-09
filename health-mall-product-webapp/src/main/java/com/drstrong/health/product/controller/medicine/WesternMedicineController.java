@@ -1,13 +1,18 @@
 package com.drstrong.health.product.controller.medicine;
 
 
+import cn.hutool.core.util.ObjectUtil;
+import com.drstrong.health.log.vo.HealthLogPageQueryVO;
+import com.drstrong.health.log.vo.HealthLogVO;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineInfoVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineLogVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.medicine.WesternMedicineRemoteApi;
+import com.drstrong.health.product.remote.log.LogApiServicePlus;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +50,11 @@ public class WesternMedicineController implements WesternMedicineRemoteApi {
     @Override
     public ResultVO<PageVO<WesternMedicineVO>> queryMedicinePageInfo(WesternMedicineRequest westernMedicineRequest) {
         return ResultVO.success(westernMedicineService.queryMedicinePageList(westernMedicineRequest));
+    }
+
+    @Override
+    public ResultVO<PageVO<WesternMedicineLogVO>> queryMedicineOperationLogByPage(WesternMedicineRequest westernMedicineRequest) {
+        return ResultVO.success(westernMedicineService.queryMedicineOperationLogByPage(westernMedicineRequest));
     }
 }
 

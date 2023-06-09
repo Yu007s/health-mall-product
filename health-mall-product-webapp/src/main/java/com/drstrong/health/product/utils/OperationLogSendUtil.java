@@ -43,7 +43,7 @@ public class OperationLogSendUtil extends MqMessageUtil {
 			contentMaps.put("changeAfterData", operationLog.getChangeAfterData());
 
 			HealthLog healthLog = HealthLog.builder()
-					.source(UUID.randomUUID().toString())
+					.source(operationLog.getOperationType())
 					.tag(mqTopicConfig.getLogTag())
 					.businessId(operationLog.getBusinessId())
 					.createdBy(StrUtil.blankToDefault(operationLog.getOperationUserName(), CharSequenceUtil.EMPTY))
@@ -51,6 +51,7 @@ public class OperationLogSendUtil extends MqMessageUtil {
 					.uploaderType(operationLog.getOperationUserType())
 					.createdAt(new Date())
 					.contentMaps(contentMaps)
+					.objectId(UUID.randomUUID().toString())
 					.build();
 			String content = JSONUtil.toJsonStr(healthLog);
 
