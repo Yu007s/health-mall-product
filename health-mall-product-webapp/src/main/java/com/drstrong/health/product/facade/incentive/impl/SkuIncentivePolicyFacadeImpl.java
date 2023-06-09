@@ -14,6 +14,7 @@ import com.drstrong.health.product.model.entity.incentive.SkuIncentivePolicyEnti
 import com.drstrong.health.product.model.entity.label.LabelInfoEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.enums.EarningPolicyTypeEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.request.incentive.SaveEarningNameRequest;
 import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
@@ -102,6 +103,8 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	 */
 	@Override
 	public void saveOrUpdateSkuPolicy(SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest) {
+		// 校验 skuCode 是否存在
+		storeSkuInfoService.checkSkuExistByCode(saveOrUpdateSkuPolicyRequest.getSkuCode(), null);
 		// 1.判断是保存还是更新激励政策
 		SkuIncentivePolicyEntity skuIncentivePolicyEntity = skuIncentivePolicyService.queryBySkuCode(saveOrUpdateSkuPolicyRequest.getSkuCode());
 		// 记录日志
@@ -132,10 +135,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	@Override
 	public SkuIncentivePolicyDetailVO queryPolicyDetailBySkuCode(String skuCode) {
 		// 1.查询 sku 是否存在
-		StoreSkuInfoEntity storeSkuInfoEntity = storeSkuInfoService.queryBySkuCode(skuCode);
-		if (Objects.isNull(storeSkuInfoEntity)) {
-			throw new BusinessException(ErrorEnums.SKU_IS_NULL);
-		}
+		StoreSkuInfoEntity storeSkuInfoEntity = storeSkuInfoService.checkSkuExistByCode(skuCode, null);
 		// 2.组装返回值
 		return buildSkuIncentivePolicyDetailVO(storeSkuInfoEntity);
 	}
@@ -182,6 +182,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 					.policyConfigId(policyConfigEntityId)
 					.policyConfigName(policyConfigEntity.getEarningName())
 					.policyType(policyInfo.getPolicyType())
+					.policyTypeName(EarningPolicyTypeEnum.getValueByCode(policyInfo.getPolicyType()))
 					.policyValue(policyInfo.getPolicyValue())
 					.build();
 			skuIncentivePolicyList.add(skuIncentivePolicyVO);

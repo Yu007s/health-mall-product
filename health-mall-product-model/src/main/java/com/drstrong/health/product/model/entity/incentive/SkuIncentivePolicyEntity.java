@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.handler.mybatis.IncentivePolicyInfoTypeHandler;
 import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.enums.EarningPolicyTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -86,6 +87,7 @@ public class SkuIncentivePolicyEntity extends BaseStandardEntity implements Seri
 
 		/**
 		 * 政策类型 1-固定奖励(单位:元),2-比例提成,3-无收益
+		 * {@link EarningPolicyTypeEnum}
 		 */
 		private Integer policyType;
 

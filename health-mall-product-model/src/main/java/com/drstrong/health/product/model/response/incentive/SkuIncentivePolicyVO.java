@@ -33,6 +33,9 @@ public class SkuIncentivePolicyVO implements Serializable {
 	@ApiModelProperty("政策类型 1-固定奖励(单位:元),2-比例提成,3-无收益")
 	private Integer policyType;
 
+	@ApiModelProperty("政策类型名称 1-固定奖励(单位:元),2-比例提成,3-无收益")
+	private String policyTypeName;
+
 	@ApiModelProperty("政策值")
 	private BigDecimal policyValue;
 }
