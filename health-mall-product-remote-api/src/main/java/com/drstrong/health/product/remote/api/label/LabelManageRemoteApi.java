@@ -20,7 +20,7 @@ public interface LabelManageRemoteApi {
 
 	@ApiOperation("标签列表查询")
 	@GetMapping("/query/all")
-	ResultVO<List<LabelExtendDTO>> queryAll(@RequestParam("storeId") Long storeId, @RequestParam(value = "labelType", required = false) Integer labelType);
+	ResultVO<List<LabelExtendDTO>> queryAll(@RequestParam(value = "storeId", required = false) Long storeId, @RequestParam(value = "labelType", required = false) Integer labelType);
 
 	@ApiOperation("标签保存或者更新")
 	@PostMapping("/label/save-or-update")

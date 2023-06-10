@@ -1,8 +1,10 @@
 package com.drstrong.health.product.controller.product;
 
-import com.drstrong.health.product.model.dto.product.SaveOrUpdateStoreSkuDTO;
+import com.drstrong.health.product.facade.sku.SkuManageFacade;
+import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
+import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.v3.AgreementSkuInfoVO;
@@ -10,6 +12,8 @@ import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.product.SkuManageRemoteApi;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * sku 管理 controller
@@ -23,19 +27,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/inner/sku/manage")
 public class SkuManageRemoteController implements SkuManageRemoteApi {
+	@Resource
+	SkuManageFacade skuManageFacade;
+
 	@Override
 	public ResultVO<PageVO<AgreementSkuInfoVO>> queryAgreementManageInfo(ProductManageQueryRequest productManageQueryRequest) {
 		return ResultVO.success();
 	}
 
 	@Override
-	public ResultVO<Void> saveOrUpdateStoreProduct(SaveOrUpdateStoreSkuDTO saveOrUpdateStoreProductRequest) {
+	public ResultVO<Void> saveOrUpdateStoreProduct(SaveOrUpdateStoreSkuRequest saveOrUpdateStoreSkuRequest) {
+		skuManageFacade.saveOrUpdateStoreProduct(saveOrUpdateStoreSkuRequest);
 		return ResultVO.success();
 	}
 
 	@Override
-	public ResultVO<SaveOrUpdateStoreSkuDTO> queryDetailByCode(String skuCode) {
-		return ResultVO.success();
+	public ResultVO<StoreSkuDetailDTO> queryDetailByCode(String skuCode) {
+		return ResultVO.success(skuManageFacade.queryDetailByCode(skuCode));
 	}
 
 	@Override

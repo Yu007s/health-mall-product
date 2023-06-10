@@ -1,10 +1,13 @@
 package com.drstrong.health.product.remote.cms;
 
 import com.drstrong.health.product.model.response.cms.DictVO;
+import com.drstrong.health.product.model.response.cms.SkuProhibitAreaVO;
+import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.model.DictResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -14,9 +17,12 @@ import java.util.List;
  * @author liuqiuyi
  * @date 2021/12/22 16:55
  */
-@FeignClient(value = "${feign.cms.server.name}", path = "/sys/dict")
+@FeignClient(value = "health-cms")
 public interface ICMSFeignClient {
 
-	@GetMapping("/vue/query/{type}")
+	@GetMapping("/sys/dict/vue/query/{type}")
 	DictResponse<List<DictVO>> vueQuery(@PathVariable("type") String type);
+
+	@GetMapping("/inner/city/skuProhibitArea/list")
+	ResultVO<List<SkuProhibitAreaVO>> list(@RequestParam("type") Integer type);
 }

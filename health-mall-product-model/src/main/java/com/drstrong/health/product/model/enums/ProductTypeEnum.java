@@ -1,51 +1,36 @@
 package com.drstrong.health.product.model.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.Objects;
+import java.util.stream.Stream;
+
 /**
  * 商品类型
  *
  * @author liuqiuyi
  * @date 2021/12/16 14:04
  */
+@Getter
+@AllArgsConstructor
 public enum ProductTypeEnum {
 	/**
 	 *
 	 */
-	PRODUCT(0, "商品","P"),
-	MEDICINE(1, "药品","M"),
-	CHINESE(2, "中药","Z"),
+	PRODUCT(0, "商品", "P"),
+	MEDICINE(1, "药品", "M"),
+	CHINESE(2, "中药", "Z"),
+	AGREEMENT(3, "协定方(预制)", "X"),
 	;
 
-	private Integer code;
-	private String value;
-	private String mark;
+	private final Integer code;
+	private final String value;
+	private final String mark;
 
-	ProductTypeEnum(Integer code, String value, String mark) {
-		this.code = code;
-		this.value = value;
-		this.mark = mark;
-	}
-
-	public Integer getCode() {
-		return code;
-	}
-
-	public void setCode(Integer code) {
-		this.code = code;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public String getMark() {
-		return mark;
-	}
-
-	public void setMark(String mark) {
-		this.mark = mark;
+	public static ProductTypeEnum getEnumByCode(Integer code) {
+		return Stream.of(ProductTypeEnum.values())
+				.filter(productTypeEnum -> Objects.equals(productTypeEnum.getCode(), code))
+				.findFirst().orElse(null);
 	}
 }

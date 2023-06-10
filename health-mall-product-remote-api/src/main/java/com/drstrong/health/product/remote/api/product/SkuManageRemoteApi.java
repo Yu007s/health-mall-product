@@ -1,8 +1,9 @@
 package com.drstrong.health.product.remote.api.product;
 
-import com.drstrong.health.product.model.dto.product.SaveOrUpdateStoreSkuDTO;
+import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
+import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.v3.AgreementSkuInfoVO;
@@ -25,11 +26,11 @@ public interface SkuManageRemoteApi {
 
 	@ApiOperation("保存或更新店铺的 sku 信息(不包含中药)")
 	@PostMapping("/store/save-or-update/sku")
-	ResultVO<Void> saveOrUpdateStoreProduct(@RequestBody SaveOrUpdateStoreSkuDTO saveOrUpdateStoreProductRequest);
+	ResultVO<Void> saveOrUpdateStoreProduct(@RequestBody SaveOrUpdateStoreSkuRequest saveOrUpdateStoreProductRequest);
 
 	@ApiOperation("根据skuCode查询详情(不包含中药)")
 	@GetMapping("/store/save-or-update/sku")
-	ResultVO<SaveOrUpdateStoreSkuDTO> queryDetailByCode(@RequestParam("skuCode") String skuCode);
+	ResultVO<StoreSkuDetailDTO> queryDetailByCode(@RequestParam("skuCode") String skuCode);
 
 	@ApiOperation("批量上下架(不包含中药)")
 	@PostMapping("/update/sku-status")
