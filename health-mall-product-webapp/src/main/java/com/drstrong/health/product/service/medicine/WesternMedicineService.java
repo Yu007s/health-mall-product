@@ -25,7 +25,7 @@ public interface WesternMedicineService extends IService<WesternMedicineEntity> 
      *
      * @param addOrUpdateMedicineRequest
      */
-    void saveOrUpdateMedicine(AddOrUpdateMedicineRequest addOrUpdateMedicineRequest);
+    Long saveOrUpdateMedicine(AddOrUpdateMedicineRequest addOrUpdateMedicineRequest);
 
 
     /**

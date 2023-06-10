@@ -1,19 +1,18 @@
 package com.drstrong.health.product.controller.medicine;
 
 
-import cn.hutool.core.util.ObjectUtil;
-import com.drstrong.health.log.vo.HealthLogPageQueryVO;
-import com.drstrong.health.log.vo.HealthLogVO;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
+import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineSpecRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineInfoVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineLogVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecInfoVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.medicine.WesternMedicineRemoteApi;
-import com.drstrong.health.product.remote.log.LogApiServicePlus;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
+import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -36,10 +35,12 @@ public class WesternMedicineController implements WesternMedicineRemoteApi {
     @Autowired
     private WesternMedicineService westernMedicineService;
 
+    @Autowired
+    private WesternMedicineSpecificationsService specificationsService;
+
     @Override
-    public ResultVO<Void> saveOrUpdateMedicine(@Valid AddOrUpdateMedicineRequest medicineRequest) {
-        westernMedicineService.saveOrUpdateMedicine(medicineRequest);
-        return ResultVO.success();
+    public ResultVO<Long> saveOrUpdateMedicine(@Valid AddOrUpdateMedicineRequest medicineRequest) {
+        return ResultVO.success(westernMedicineService.saveOrUpdateMedicine(medicineRequest));
     }
 
     @Override
@@ -55,6 +56,16 @@ public class WesternMedicineController implements WesternMedicineRemoteApi {
     @Override
     public ResultVO<PageVO<WesternMedicineLogVO>> queryMedicineOperationLogByPage(WesternMedicineRequest westernMedicineRequest) {
         return ResultVO.success(westernMedicineService.queryMedicineOperationLogByPage(westernMedicineRequest));
+    }
+
+    @Override
+    public ResultVO<Long> saveOrUpdateMedicineSpec(@Valid AddOrUpdateMedicineSpecRequest specRequest) {
+        return ResultVO.success(specificationsService.saveOrUpdateMedicineSpec(specRequest));
+    }
+
+    @Override
+    public ResultVO<WesternMedicineSpecInfoVO> queryMedicineSpecInfo(Long id) {
+        return null;
     }
 }
 

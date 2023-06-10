@@ -76,7 +76,7 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrUpdateMedicine(AddOrUpdateMedicineRequest addOrUpdateMedicineRequest) {
+    public Long saveOrUpdateMedicine(AddOrUpdateMedicineRequest addOrUpdateMedicineRequest) {
         log.info("invoke saveOrUpdateMedicine() param：{}", JSON.toJSONString(addOrUpdateMedicineRequest));
         boolean updateFlag = ObjectUtil.isAllNotEmpty(addOrUpdateMedicineRequest.getId(), addOrUpdateMedicineRequest.getMedicineCode());
         WesternMedicineEntity westernMedicineEntity = buildWesternMedicineEntity(addOrUpdateMedicineRequest);
@@ -97,6 +97,7 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
                 updateFlag ? MedicineConstant.SAVE_WESTERN_MEDICINE : MedicineConstant.UPDATE_WESTERN_MEDICINE, addOrUpdateMedicineRequest.getUserId(), addOrUpdateMedicineRequest.getUserName(),
                 OperateTypeEnum.CMS.getCode(), logJsonStr);
         operationLogSendUtil.sendOperationLog(operationLog);
+        return westernMedicineEntity.getId();
     }
 
     private Integer checkDataIntegrity(AddOrUpdateMedicineRequest medicine) {
