@@ -3,7 +3,6 @@ package com.drstrong.health.product.model.entity.medication;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 
-import java.time.LocalDateTime;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -24,7 +23,6 @@ import lombok.EqualsAndHashCode;
 @TableName("pms_medicine_usage")
 public class MedicineUsageEntity extends BaseStandardEntity implements Serializable {
 
-
     private static final long serialVersionUID = -6225375986337076010L;
 
     @TableId(value = "id", type = IdType.AUTO)
@@ -38,22 +36,12 @@ public class MedicineUsageEntity extends BaseStandardEntity implements Serializa
     /**
      * 类型 1：西药 2：协定方
      */
-    private Integer type;
+    private Integer medicineType;
 
     /**
-     * 几月、几日 、几小时:有0.5的情况
+     * 用药频次
      */
-    private Double dosageCycle;
-
-    /**
-     * 单位：日、隔日、小时、周、月等
-     */
-    private String dosageCycleUnit;
-
-    /**
-     * 次数:有若干次的情况
-     */
-    private Integer dosageCount;
+    private String medicationFrequency;
 
     /**
      * 每次几片,几毫克,几粒等等:有适量的情况
@@ -64,16 +52,6 @@ public class MedicineUsageEntity extends BaseStandardEntity implements Serializa
      * 药品单位
      */
     private String eachDoseUnit;
-
-    /**
-     * 最小规格包装数（如：一盒有多少片 ）
-     */
-    private Double packagSpec;
-
-    /**
-     * 药品单位:盒、瓶
-     */
-    private String quantityUnit;
 
     /**
      * 服用方式

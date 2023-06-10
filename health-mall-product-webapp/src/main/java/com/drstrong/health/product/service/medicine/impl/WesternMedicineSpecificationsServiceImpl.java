@@ -4,22 +4,23 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.drstrong.health.common.utils.DateUtil;
 import com.drstrong.health.product.constants.MedicineConstant;
 import com.drstrong.health.product.dao.medicine.WesternMedicineSpecificationsMapper;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
+import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineSpecRequest;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecInfoVO;
+import com.drstrong.health.product.service.medicine.MedicineUsageService;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
 import com.naiterui.common.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 
 /**
  * <p>
@@ -35,7 +36,11 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
     @Autowired
     private WesternMedicineService westernMedicineService;
 
+    @Autowired
+    private MedicineUsageService medicineUsageService;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long saveOrUpdateMedicineSpec(AddOrUpdateMedicineSpecRequest specRequest) {
         WesternMedicineEntity westernMedicine = westernMedicineService.queryByMedicineCode(specRequest.getMedicineCode());
         Assert.notNull(westernMedicine, "西药不存在");
@@ -46,12 +51,21 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
             specifications.setSpecCode(generateMedicineSpecCode(westernMedicine.getId(), westernMedicine.getMedicineCode()));
         }
         saveOrUpdate(specifications);
+        medicineUsageService.saveOrUpdateUsage(specRequest);
         return specifications.getId();
     }
 
     @Override
-    public WesternMedicineSpecInfoVO queryMedicineDetailInfo(Long id) {
-        return null;
+    public WesternMedicineSpecInfoVO queryMedicineSpecDetailInfo(Long id) {
+        WesternMedicineSpecInfoVO vo = new WesternMedicineSpecInfoVO();
+        LambdaQueryWrapper<WesternMedicineSpecificationsEntity> queryWrapper = new LambdaQueryWrapper<WesternMedicineSpecificationsEntity>()
+                .eq(WesternMedicineSpecificationsEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .eq(WesternMedicineSpecificationsEntity::getId, id);
+        WesternMedicineSpecificationsEntity specifications = baseMapper.selectOne(queryWrapper);
+        if (ObjectUtil.isNotNull(specifications)) {
+            vo = BeanUtil.copyProperties(specifications, WesternMedicineSpecInfoVO.class);
+        }
+        return vo;
     }
 
     private String generateMedicineSpecCode(Long medicineId, String medicineCode) {

@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.request.medicine;
 
+import com.drstrong.health.product.annotations.ValidUsage;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @ApiModel("药品规格")
 @Data
+@ValidUsage
 public class AddOrUpdateMedicineSpecRequest implements Serializable {
 
     private static final long serialVersionUID = 1793118656622245772L;
@@ -57,8 +59,17 @@ public class AddOrUpdateMedicineSpecRequest implements Serializable {
     @ApiModelProperty("规格")
     private String specification;
 
+    @ApiModelProperty(value = "操作人 id", hidden = true)
+    private Long userId;
+
+    @ApiModelProperty(value = "操作人 姓名", hidden = true)
+    private String userName;
+
     @ApiModelProperty("规格图片信息")
     private List<MedicineSpecImageRequest> imageInfoList;
+
+    @ApiModelProperty("用法用量")
+    private MedicineUsageRequest medicineUsage;
 
 
     @Data

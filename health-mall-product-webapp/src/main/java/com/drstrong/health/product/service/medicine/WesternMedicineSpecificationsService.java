@@ -28,5 +28,5 @@ public interface WesternMedicineSpecificationsService extends IService<WesternMe
      * @param id
      * @return
      */
-    WesternMedicineSpecInfoVO queryMedicineDetailInfo(Long id);
+    WesternMedicineSpecInfoVO queryMedicineSpecDetailInfo(Long id);
 }

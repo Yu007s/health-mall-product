@@ -12,6 +12,10 @@ public class MedicineConstant {
      */
     public static final int DATA_NO_INTEGRITY = 0;
 
+    public static final int NO_USE_USAGE_DOSAGE = 0;
+
+    public static final int USE_USAGE_DOSAGE = 1;
+
     /**
      * 保存药品
      */
