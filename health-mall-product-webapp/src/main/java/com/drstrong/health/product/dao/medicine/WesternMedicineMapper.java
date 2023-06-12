@@ -36,7 +36,7 @@ public interface WesternMedicineMapper extends BaseMapper<WesternMedicineEntity>
      * @param id
      * @return
      */
-    WesternMedicineSimpleInfoVO queryMedicineSimpleInfo(Long id);
+    WesternMedicineSimpleInfoVO queryMedicineSimpleInfo(@Param("id") Long id);
 }
 
 
