@@ -7,6 +7,7 @@ import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.category.CategoryProductVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineInfoVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineLogVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
 
 /**
@@ -24,7 +25,7 @@ public interface WesternMedicineService extends IService<WesternMedicineEntity> 
      *
      * @param addOrUpdateMedicineRequest
      */
-    void saveOrUpdateMedicine(AddOrUpdateMedicineRequest addOrUpdateMedicineRequest);
+    Long saveOrUpdateMedicine(AddOrUpdateMedicineRequest addOrUpdateMedicineRequest);
 
 
     /**
@@ -51,5 +52,14 @@ public interface WesternMedicineService extends IService<WesternMedicineEntity> 
      * @return
      */
     PageVO<WesternMedicineVO> queryMedicinePageList(WesternMedicineRequest request);
+
+
+    /**
+     * 西药操作日志分页列表
+     *
+     * @param westernMedicineRequest
+     * @return
+     */
+    PageVO<WesternMedicineLogVO> queryMedicineOperationLogByPage(WesternMedicineRequest westernMedicineRequest);
 
 }

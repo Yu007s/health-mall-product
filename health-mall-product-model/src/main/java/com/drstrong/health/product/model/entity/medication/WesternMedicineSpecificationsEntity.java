@@ -48,6 +48,11 @@ public class WesternMedicineSpecificationsEntity extends BaseStandardEntity impl
     private String specName;
 
     /**
+     * 国家统一药品编码
+     */
+    private String standardSpecCode;
+
+    /**
      * 包装规格(0.25g*12片*2板/盒)
      */
     private String packingSpec;
@@ -81,5 +86,10 @@ public class WesternMedicineSpecificationsEntity extends BaseStandardEntity impl
      * 规格
      */
     private String specification;
+
+    /**
+     * 图片json
+     */
+    private String specImageInfo;
 
 }

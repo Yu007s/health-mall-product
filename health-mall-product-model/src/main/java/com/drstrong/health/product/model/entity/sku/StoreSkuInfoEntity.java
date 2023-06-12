@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.handler.mybatis.LongListTypeHandler;
 import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
+import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -85,4 +88,18 @@ public class StoreSkuInfoEntity extends BaseStandardEntity implements Serializab
 	 */
 	@TableField(value = "prohibit_area_info", typeHandler = LongListTypeHandler.class)
 	private List<Long> prohibitAreaInfo;
+
+	public static StoreSkuInfoEntity buildDefault(Long operatorId) {
+		StoreSkuInfoEntity storeSkuInfoEntity = new StoreSkuInfoEntity();
+		storeSkuInfoEntity.setSupplierInfo(Lists.newArrayList());
+		storeSkuInfoEntity.setLabelInfo(Lists.newArrayList());
+		storeSkuInfoEntity.setProhibitAreaInfo(Lists.newArrayList());
+		storeSkuInfoEntity.setVersion(1);
+		storeSkuInfoEntity.setDelFlag(DelFlagEnum.UN_DELETED.getCode());
+		storeSkuInfoEntity.setCreatedBy(operatorId);
+		storeSkuInfoEntity.setChangedAt(LocalDateTime.now());
+		storeSkuInfoEntity.setChangedAt(LocalDateTime.now());
+		storeSkuInfoEntity.setChangedBy(operatorId);
+		return storeSkuInfoEntity;
+	}
 }
