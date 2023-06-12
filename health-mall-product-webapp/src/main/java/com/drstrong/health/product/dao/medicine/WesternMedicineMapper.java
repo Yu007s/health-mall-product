@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineSimpleInfoVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -28,6 +29,14 @@ public interface WesternMedicineMapper extends BaseMapper<WesternMedicineEntity>
      * @return
      */
     Page<WesternMedicineVO> queryMedicinePageList(Page<WesternMedicineVO> medicinePage, @Param("queryParam") WesternMedicineRequest queryParam);
+
+    /**
+     * 查询西药信息
+     *
+     * @param id
+     * @return
+     */
+    WesternMedicineSimpleInfoVO queryMedicineSimpleInfo(Long id);
 }
 
 

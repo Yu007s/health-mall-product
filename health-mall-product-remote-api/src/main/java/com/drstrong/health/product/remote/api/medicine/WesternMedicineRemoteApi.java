@@ -58,5 +58,5 @@ public interface WesternMedicineRemoteApi {
 
     @ApiOperation("西药规格分页")
     @PostMapping("/spec/page/list")
-    ResultVO<PageVO<WesternMedicineSpecVO>> queryMedicineSpecByPage(@RequestBody WesternMedicineRequest westernMedicineRequest);
+    ResultVO<WesternMedicineSimpleInfoVO> queryMedicineSpecByPage(@RequestBody WesternMedicineRequest westernMedicineRequest);
 }

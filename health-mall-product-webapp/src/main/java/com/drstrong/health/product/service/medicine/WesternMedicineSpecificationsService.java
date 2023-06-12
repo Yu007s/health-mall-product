@@ -5,6 +5,7 @@ import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecif
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineSpecRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineSimpleInfoVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecInfoVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecVO;
 
@@ -39,5 +40,5 @@ public interface WesternMedicineSpecificationsService extends IService<WesternMe
      * @param request
      * @return
      */
-    PageVO<WesternMedicineSpecVO> queryMedicineSpecByPage(WesternMedicineRequest request);
+    WesternMedicineSimpleInfoVO queryMedicineSpecByPage(WesternMedicineRequest request);
 }

@@ -75,32 +75,17 @@ public class AddOrUpdateMedicineRequest implements Serializable {
         @ApiModelProperty(value = "药品分类id")
         private Long drugClassificationId;
 
-        @ApiModelProperty(value = "药品分类名称")
-        private String drugClassName;
-
         @ApiModelProperty(value = "药理分类id")
         private Long pharmacologyClassificationId;
-
-        @ApiModelProperty(value = "药理分类名称")
-        private Long pharmacologyClassName;
 
         @ApiModelProperty(value = "剂型分类id")
         private Long agentClassificationId;
 
-        @ApiModelProperty(value = "剂型分类名称")
-        private Long agentClassName;
-
         @ApiModelProperty(value = "安全分类id")
         private Long securityClassificationId;
 
-        @ApiModelProperty(value = "安全分类名称")
-        private Long securityClassName;
-
         @ApiModelProperty(value = "原料分类id")
         private Long materialsClassificationId;
-
-        @ApiModelProperty(value = "原料分类名称")
-        private Long materialsClassName;
     }
 
     public void constructFullName() {
