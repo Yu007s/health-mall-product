@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
+
 @Api("健康商城-商品服务-商品管理页面的远程接口")
 @FeignClient(value = "health-mall-product", path = "/inner/sku/manage")
 public interface SkuManageRemoteApi {
@@ -26,7 +28,7 @@ public interface SkuManageRemoteApi {
 
 	@ApiOperation("保存或更新店铺的 sku 信息(不包含中药)")
 	@PostMapping("/store/save-or-update/sku")
-	ResultVO<Void> saveOrUpdateStoreProduct(@RequestBody SaveOrUpdateStoreSkuRequest saveOrUpdateStoreProductRequest);
+	ResultVO<Void> saveOrUpdateStoreProduct(@RequestBody @Valid SaveOrUpdateStoreSkuRequest saveOrUpdateStoreProductRequest);
 
 	@ApiOperation("根据skuCode查询详情(不包含中药)")
 	@GetMapping("/store/save-or-update/sku")

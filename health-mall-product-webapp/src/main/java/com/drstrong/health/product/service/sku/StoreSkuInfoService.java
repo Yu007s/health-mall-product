@@ -35,7 +35,7 @@ public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
 	 * @author liuqiuyi
 	 * @date 2023/6/10 14:07
 	 */
-	StoreSkuInfoEntity checkSkuNameIsRepeat(String skuName, Long storeId);
+	void checkSkuNameIsRepeat(String skuName, Long storeId);
 
 	/**
 	 * 根据药材编码和店铺 id 校验是否存在
@@ -43,5 +43,5 @@ public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
 	 * @author liuqiuyi
 	 * @date 2023/6/10 14:11
 	 */
-	StoreSkuInfoEntity checkMedicineCodeAndStoreId(String medicineCode, Long storeId);
+	void checkMedicineCodeAndStoreId(String medicineCode, Long storeId);
 }

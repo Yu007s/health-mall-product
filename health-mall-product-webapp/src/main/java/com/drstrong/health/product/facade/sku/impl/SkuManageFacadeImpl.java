@@ -1,6 +1,7 @@
 package com.drstrong.health.product.facade.sku.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.drstrong.health.common.enums.OperateTypeEnum;
@@ -102,8 +103,8 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 		storeSkuInfoEntity.setPrice(BigDecimalUtil.Y2F(saveOrUpdateStoreProductRequest.getSalePrice()));
 		storeSkuInfoEntity.setSkuStatus(UpOffEnum.DOWN.getCode());
 		storeSkuInfoEntity.setSupplierInfo(supplierInfos);
-		storeSkuInfoEntity.setLabelInfo(Lists.newArrayList(saveOrUpdateStoreProductRequest.getLabelIdList()));
-		storeSkuInfoEntity.setProhibitAreaInfo(Lists.newArrayList(saveOrUpdateStoreProductRequest.getProhibitAreaIdList()));
+		storeSkuInfoEntity.setLabelInfo(CollectionUtil.isEmpty(saveOrUpdateStoreProductRequest.getLabelIdList()) ? Lists.newArrayList() : Lists.newArrayList(saveOrUpdateStoreProductRequest.getLabelIdList()));
+		storeSkuInfoEntity.setProhibitAreaInfo(CollectionUtil.isEmpty(saveOrUpdateStoreProductRequest.getProhibitAreaIdList()) ? Lists.newArrayList() : Lists.newArrayList(saveOrUpdateStoreProductRequest.getProhibitAreaIdList()));
 		storeSkuInfoService.saveOrUpdate(storeSkuInfoEntity);
 		// 3.发送操作日志
 		operationLog.setBusinessId(storeSkuInfoEntity.getSkuCode());
@@ -125,15 +126,16 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 			throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
 		}
 		// 3.校验药材是否关联了供应商
-		List<com.drstrong.health.ware.model.response.SupplierInfoDTO> supplierInfoDTOList = supplierRemoteProService.searchSupplierByCode(saveOrUpdateStoreProductRequest.getMedicineCode());
-		if (CollectionUtils.isEmpty(supplierInfoDTOList)) {
-			throw new BusinessException(ErrorEnums.MEDICINE_CODE_NOT_ASSOCIATED);
-		}
-		List<Long> supplierIds = supplierInfoDTOList.stream().map(com.drstrong.health.ware.model.response.SupplierInfoDTO::getSupplierId).collect(toList());
-		boolean supplierFlag = saveOrUpdateStoreProductRequest.getSupplierInfoList().stream().anyMatch(supplierInfo -> !supplierIds.contains(supplierInfo.getSupplierId()));
-		if (supplierFlag) {
-			throw new BusinessException(ErrorEnums.SUPPLIER_IS_NULL);
-		}
+		// TODO 等振武的接口
+//		List<com.drstrong.health.ware.model.response.SupplierInfoDTO> supplierInfoDTOList = supplierRemoteProService.searchSupplierByCode(saveOrUpdateStoreProductRequest.getMedicineCode());
+//		if (CollectionUtils.isEmpty(supplierInfoDTOList)) {
+//			throw new BusinessException(ErrorEnums.MEDICINE_CODE_NOT_ASSOCIATED);
+//		}
+//		List<Long> supplierIds = supplierInfoDTOList.stream().map(com.drstrong.health.ware.model.response.SupplierInfoDTO::getSupplierId).collect(toList());
+//		boolean supplierFlag = saveOrUpdateStoreProductRequest.getSupplierInfoList().stream().anyMatch(supplierInfo -> !supplierIds.contains(supplierInfo.getSupplierId()));
+//		if (supplierFlag) {
+//			throw new BusinessException(ErrorEnums.SUPPLIER_IS_NULL);
+//		}
 		// 4.如果是更新sku，校验skuCode是否存在，否则校验重复添加
 		if (updateFlag) {
 			StoreSkuInfoEntity storeSkuInfoEntity = storeSkuInfoService.checkSkuExistByCode(saveOrUpdateStoreProductRequest.getSkuCode(), null);

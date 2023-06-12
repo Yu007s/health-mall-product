@@ -71,19 +71,18 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
 	 * @date 2023/6/10 14:07
 	 */
 	@Override
-	public StoreSkuInfoEntity checkSkuNameIsRepeat(String skuName, Long storeId) {
+	public void checkSkuNameIsRepeat(String skuName, Long storeId) {
 		if (StrUtil.isBlank(skuName) || Objects.isNull(storeId)) {
-			return null;
+			return;
 		}
 		LambdaQueryWrapper<StoreSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<StoreSkuInfoEntity>()
 				.eq(StoreSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
 				.eq(StoreSkuInfoEntity::getSkuName, skuName)
 				.eq(StoreSkuInfoEntity::getStoreId, storeId);
 		StoreSkuInfoEntity storeSkuInfoEntity = baseMapper.selectOne(queryWrapper);
-		if (Objects.isNull(storeSkuInfoEntity)) {
+		if (Objects.nonNull(storeSkuInfoEntity)) {
 			throw new BusinessException(ErrorEnums.SKU_NAME_IS_REPEAT);
 		}
-		return storeSkuInfoEntity;
 	}
 
 	/**
@@ -95,18 +94,17 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
 	 * @date 2023/6/10 14:11
 	 */
 	@Override
-	public StoreSkuInfoEntity checkMedicineCodeAndStoreId(String medicineCode, Long storeId) {
+	public void checkMedicineCodeAndStoreId(String medicineCode, Long storeId) {
 		if (StrUtil.isBlank(medicineCode) || Objects.isNull(storeId)) {
-			return null;
+			return;
 		}
 		LambdaQueryWrapper<StoreSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<StoreSkuInfoEntity>()
 				.eq(StoreSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
 				.eq(StoreSkuInfoEntity::getMedicineCode, medicineCode)
 				.eq(StoreSkuInfoEntity::getStoreId, storeId);
 		StoreSkuInfoEntity storeSkuInfoEntity = baseMapper.selectOne(queryWrapper);
-		if (Objects.isNull(storeSkuInfoEntity)) {
+		if (Objects.nonNull(storeSkuInfoEntity)) {
 			throw new BusinessException(ErrorEnums.CHINESE_IS_REPEAT);
 		}
-		return storeSkuInfoEntity;
 	}
 }

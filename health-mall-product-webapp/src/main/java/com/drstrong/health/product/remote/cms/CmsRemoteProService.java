@@ -96,7 +96,7 @@ public class CmsRemoteProService {
 		try {
 			log.info("invoke cmsFeignClient.list param:{}", 1);
 			ResultVO<List<SkuProhibitAreaVO>> resultVO = cmsFeignClient.list(1);
-			if (Objects.isNull(resultVO) || !resultVO.isSuccess()) {
+			if (Objects.isNull(resultVO) || !Objects.equals(resultVO.getCode(), CODE)) {
 				log.error("invoke cmsFeignClient.list return failed. result:{}", JSONUtil.toJsonStr(resultVO));
 				return Lists.newArrayList();
 			}
