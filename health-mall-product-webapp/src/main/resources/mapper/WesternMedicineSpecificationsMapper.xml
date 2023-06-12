@@ -36,14 +36,14 @@
         SELECT
         ms.id id,
         ms.medicine_id medicineId,
-        ms.spec_code specCodem,
+        ms.spec_code specCode,
         ms.spec_code specName,
         CASE
         WHEN mu.id IS NOT NULL THEN 1
         ELSE 0
         END AS useUsageDosage
         FROM pms_western_medicine_specifications ms
-        LEFT JOIN pms_medicine_usage mu ON mu.specifications_id = ms.id AND mu.medicine_type = 1
+        LEFT JOIN pms_medicine_usage mu ON mu.specifications_id = ms.id AND mu.medicine_type = 1 AND mu.del_flag = 0
         <where>
             ms.del_flag = 0 AND mu.del_flag = 0
             <if test="queryParam.id != null">

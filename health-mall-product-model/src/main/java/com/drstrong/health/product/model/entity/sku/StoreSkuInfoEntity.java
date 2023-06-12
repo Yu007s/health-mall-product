@@ -78,6 +78,12 @@ public class StoreSkuInfoEntity extends BaseStandardEntity implements Serializab
 	private List<Long> supplierInfo;
 
 	/**
+	 * 展示的分类信息,json 存储
+	 */
+	@TableField(value = "category_info", typeHandler = LongListTypeHandler.class)
+	private List<Long> categoryInfo;
+
+	/**
 	 * sku标签信息，json存储
 	 */
 	@TableField(value = "label_info", typeHandler = LongListTypeHandler.class)

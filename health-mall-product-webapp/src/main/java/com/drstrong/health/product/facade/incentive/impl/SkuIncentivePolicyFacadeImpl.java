@@ -181,8 +181,8 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 			SkuIncentivePolicyVO skuIncentivePolicyVO = SkuIncentivePolicyVO.builder()
 					.policyConfigId(policyConfigEntityId)
 					.policyConfigName(policyConfigEntity.getEarningName())
-					.policyType(policyInfo.getPolicyType())
-					.policyTypeName(EarningPolicyTypeEnum.getValueByCode(policyInfo.getPolicyType()))
+					.policyType(ObjectUtil.defaultIfNull(policyInfo.getPolicyType(), EarningPolicyTypeEnum.NONE.getCode()))
+					.policyTypeName(EarningPolicyTypeEnum.getValueByCode(ObjectUtil.defaultIfNull(policyInfo.getPolicyType(), EarningPolicyTypeEnum.NONE.getCode())))
 					.policyValue(policyInfo.getPolicyValue())
 					.build();
 			skuIncentivePolicyList.add(skuIncentivePolicyVO);

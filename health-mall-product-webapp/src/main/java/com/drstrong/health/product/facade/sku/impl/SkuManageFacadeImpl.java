@@ -9,6 +9,7 @@ import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.facade.sku.SkuManageFacade;
 import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.dto.area.AreaDTO;
+import com.drstrong.health.product.model.dto.category.CategoryDTO;
 import com.drstrong.health.product.model.dto.label.LabelDTO;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.dto.product.SupplierInfoDTO;
@@ -22,6 +23,7 @@ import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.cms.CmsRemoteProService;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
+import com.drstrong.health.product.service.category.v3.CategoryService;
 import com.drstrong.health.product.service.label.LabelInfoService;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import com.drstrong.health.product.service.store.StoreService;
@@ -69,6 +71,9 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 
 	@Resource
 	CmsRemoteProService cmsRemoteProService;
+
+	@Resource
+	CategoryService categoryService;
 
 	/**
 	 * 保存或者更新 sku 信息(目前不包括中药)
@@ -185,7 +190,9 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 				.map(labelInfoEntity -> new LabelDTO(labelInfoEntity.getId(), labelInfoEntity.getLabelName(), null, null))
 				.collect(toList());
 		// 5.获取分类信息
-
+		List<CategoryDTO> categoryDTOList = categoryService.listByIds(skuInfoEntity.getCategoryInfo()).stream()
+				.map(categoryEntity -> new CategoryDTO(categoryEntity.getId(), categoryEntity.getName()))
+				.collect(toList());
 		// 6.获取区域信息
 		List<AreaDTO> areaDTOList = cmsRemoteProService.querySkuProhibitAreaByIds(skuInfoEntity.getProhibitAreaInfo()).stream()
 				.map(skuProhibitAreaVO -> new AreaDTO(skuProhibitAreaVO.getId(), skuProhibitAreaVO.getName())).collect(toList());
@@ -197,8 +204,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 				.salePrice(BigDecimalUtil.F2Y(skuInfoEntity.getPrice()))
 				.supplierInfoList(supplierInfoDTOList)
 				.labelList(labelDTOList)
-				// TODO liuqiuyi
-//				.categoryList()
+				.categoryList(categoryDTOList)
 				.prohibitAreaList(areaDTOList)
 				.build();
 		storeSkuDetailDTO.setProductType(skuInfoEntity.getSkuType());

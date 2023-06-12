@@ -1,12 +1,14 @@
 package com.drstrong.health.product.model.response.medicine;
 
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.drstrong.health.product.model.response.PageVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 
 
 /**
@@ -19,10 +21,11 @@ import lombok.Data;
  */
 
 @Data
-@Builder
+//@Builder
 @ApiModel(description = "西药简要信息VO")
-public class WesternMedicineSimpleInfoVO {
+public class WesternMedicineSimpleInfoVO implements Serializable {
 
+    private static final long serialVersionUID = -6243348318106155159L;
     @ApiModelProperty(value = "西药id")
     private Long id;
 
@@ -37,4 +40,11 @@ public class WesternMedicineSimpleInfoVO {
 
     @ApiModelProperty(value = "规格列表")
     private PageVO<WesternMedicineSpecVO> specPageList;
+
+    public WesternMedicineSimpleInfoVO(Long id, String medicineCode, String medicineName, String agentClassName) {
+        this.id = id;
+        this.medicineCode = medicineCode;
+        this.medicineName = medicineName;
+        this.agentClassName = agentClassName;
+    }
 }

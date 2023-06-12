@@ -77,15 +77,15 @@
         </where>
         order by m.id desc
     </select>
-    <select id="queryMedicineSimpleInfo"
-            resultType="com.drstrong.health.product.model.response.medicine.WesternMedicineSimpleInfoVO">
+
+    <select id="queryMedicineSimpleInfo" resultType="com.drstrong.health.product.model.response.medicine.WesternMedicineSimpleInfoVO">
         SELECT m.id,
                m.medicine_code medicineCode,
                m.medicine_name medicineName,
-            md.classification_name agentClassName
+               mc.classification_name agentClassName
         FROM pms_western_medicine m
-                 LEFT JOIN pms_medicine_classification mc ON mc.id = medicine_classification_info ->>'agentClassificationId'
-        WHERE m.del_flag = 0
+                 LEFT JOIN pms_medicine_classification mc ON mc.id = json_extract(m.medicine_classification_info,'$.agentClassificationId')
+        WHERE m.del_flag = 0 AND m.id = #{id}
     </select>
 
 
