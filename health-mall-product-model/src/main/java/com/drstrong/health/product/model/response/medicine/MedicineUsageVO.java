@@ -11,6 +11,7 @@ import java.io.Serializable;
 @Data
 public class MedicineUsageVO implements Serializable {
 
+
     private static final long serialVersionUID = -2432092485321099595L;
 
     @ApiModelProperty("药品规格id")
