@@ -31,7 +31,7 @@ public class DictController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "dictType", value = "字典类型", dataType = "string", required = true)
     })
-    public ResultVO<List<DictDTO>> getDictByType(String dictType) {
-        return ResultVO.success(dictService.getDictByType(dictType));
+    public List<DictDTO> getDictByType(String dictType) {
+        return dictService.getDictByType(dictType);
     }
 }
