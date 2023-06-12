@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.constants.MedicineConstant;
 import com.drstrong.health.product.dao.medicine.WesternMedicineSpecificationsMapper;
@@ -13,8 +14,14 @@ import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineSpecRequest;
+import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
+import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.medicine.MedicineUsageVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecInfoVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
+import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.service.medicine.MedicineUsageService;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
@@ -75,6 +82,19 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
             }
         }
         return vo;
+    }
+
+    @Override
+    public PageVO<WesternMedicineSpecVO> queryMedicineSpecByPage(WesternMedicineRequest request) {
+        if (ObjectUtil.isNull(request.getId())) {
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "药品id不能为空");
+        }
+        Page<WesternMedicineSpecVO> westernMedicineSpecVOPage = baseMapper.queryMedicineSpecPageList(new Page<>(request.getPageNo(), request.getPageSize()), request);
+        return PageVO.newBuilder()
+                .pageNo(request.getPageNo())
+                .pageSize(request.getPageSize())
+                .totalCount((int) westernMedicineSpecVOPage.getTotal())
+                .result(westernMedicineSpecVOPage.getRecords()).build();
     }
 
     private String generateMedicineSpecCode(Long medicineId, String medicineCode) {

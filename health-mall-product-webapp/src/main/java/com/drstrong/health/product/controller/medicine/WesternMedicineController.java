@@ -5,10 +5,7 @@ import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineReq
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineSpecRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.medicine.WesternMedicineInfoVO;
-import com.drstrong.health.product.model.response.medicine.WesternMedicineLogVO;
-import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecInfoVO;
-import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
+import com.drstrong.health.product.model.response.medicine.*;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.medicine.WesternMedicineRemoteApi;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
@@ -66,6 +63,11 @@ public class WesternMedicineController implements WesternMedicineRemoteApi {
     @Override
     public ResultVO<WesternMedicineSpecInfoVO> queryMedicineSpecInfo(Long id) {
         return ResultVO.success(specificationsService.queryMedicineSpecDetailInfo(id));
+    }
+
+    @Override
+    public ResultVO<PageVO<WesternMedicineSpecVO>> queryMedicineSpecByPage(WesternMedicineRequest westernMedicineRequest) {
+        return ResultVO.success(specificationsService.queryMedicineSpecByPage(westernMedicineRequest));
     }
 }
 

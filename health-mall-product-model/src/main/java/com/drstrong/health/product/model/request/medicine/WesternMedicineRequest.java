@@ -18,6 +18,9 @@ public class WesternMedicineRequest extends PageRequest implements Serializable 
 
     private static final long serialVersionUID = 8036569750867670896L;
 
+    @ApiModelProperty(value = "药品id")
+    private Long id;
+
     @ApiModelProperty(value = "药品编码")
     private String medicineCode;
 
