@@ -27,6 +27,9 @@ public class LabelExtendDTO extends LabelDTO {
 	@ApiModelProperty("创建人 id")
 	private Long createdBy;
 
+	@ApiModelProperty("创建人名称")
+	private String createdName;
+
 	@ApiModelProperty("修改时间")
 	@JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime createdAt;

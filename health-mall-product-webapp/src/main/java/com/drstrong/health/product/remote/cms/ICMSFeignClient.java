@@ -4,9 +4,12 @@ import com.drstrong.health.product.model.response.cms.DictVO;
 import com.drstrong.health.product.model.response.cms.SkuProhibitAreaVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.model.DictResponse;
+import com.drstrong.health.user.vo.SimpleUcUserVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -25,4 +28,7 @@ public interface ICMSFeignClient {
 
 	@GetMapping("/inner/city/skuProhibitArea/list")
 	ResultVO<List<SkuProhibitAreaVO>> list(@RequestParam("type") Integer type);
+
+	@PostMapping("/inner/sys/user/simple/info/batch")
+	ResultVO<List<SimpleUcUserVO>> simpleInfoByIdList(@RequestBody List<Long> idList);
 }

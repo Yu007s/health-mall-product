@@ -8,6 +8,7 @@ import com.drstrong.health.product.model.response.cms.DictVO;
 import com.drstrong.health.product.model.response.cms.SkuProhibitAreaVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.model.DictResponse;
+import com.drstrong.health.user.vo.SimpleUcUserVO;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ import static java.util.stream.Collectors.toMap;
 @Service
 public class CmsRemoteProService {
 	private static final String SUCCESS = "success";
+	private static final String CODE = "0";
 
 	@Resource
 	ICMSFeignClient cmsFeignClient;
@@ -101,6 +103,31 @@ public class CmsRemoteProService {
 			return resultVO.getData();
 		} catch (Exception e) {
 			log.error("invoke cmsFeignClient.list an error occurred,param:{}", 1, e);
+			return Lists.newArrayList();
+		}
+	}
+
+	/**
+	 * 根据 cms id 获取名称
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/6/10 16:29
+	 */
+	public List<SimpleUcUserVO> queryByIds(List<Long> idList) {
+		if (CollectionUtils.isEmpty(idList)) {
+			log.info("invoke cmsFeignClient.simpleInfoByIdList param is null");
+			return Lists.newArrayList();
+		}
+		try {
+			log.info("invoke cmsFeignClient.simpleInfoByIdList param:{}", idList);
+			ResultVO<List<SimpleUcUserVO>> resultVO = cmsFeignClient.simpleInfoByIdList(idList);
+			if (Objects.isNull(resultVO) || !Objects.equals(resultVO.getCode(), CODE)) {
+				log.error("invoke cmsFeignClient.simpleInfoByIdList return failed. result:{}", JSONUtil.toJsonStr(resultVO));
+				return Lists.newArrayList();
+			}
+			return resultVO.getData();
+		} catch (Exception e) {
+			log.error("invoke cmsFeignClient.simpleInfoByIdList an error occurred,param:{}", idList, e);
 			return Lists.newArrayList();
 		}
 	}

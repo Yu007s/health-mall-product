@@ -7,14 +7,18 @@ import com.drstrong.health.product.model.entity.label.LabelInfoEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.request.label.SaveLabelRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.remote.cms.CmsRemoteProService;
 import com.drstrong.health.product.service.label.LabelInfoService;
+import com.drstrong.health.user.vo.SimpleUcUserVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author liuqiuyi
@@ -25,6 +29,9 @@ import java.util.Objects;
 public class LabelInfoManageFacadeImpl implements LabelInfoManageFacade {
 	@Resource
 	LabelInfoService labelInfoService;
+
+	@Resource
+	CmsRemoteProService cmsRemoteProService;
 
 
 	/**
@@ -37,8 +44,15 @@ public class LabelInfoManageFacadeImpl implements LabelInfoManageFacade {
 	 */
 	@Override
 	public List<LabelExtendDTO> listByStoreIdAndType(Long storeId, Integer labelType) {
+		// 1.查询所有标签列表
 		List<LabelInfoEntity> labelInfoEntityList = labelInfoService.listByStoreIdAndType(storeId, labelType);
-		return BeanUtil.copyToList(labelInfoEntityList, LabelExtendDTO.class);
+		List<LabelExtendDTO> labelExtendDTOList = BeanUtil.copyToList(labelInfoEntityList, LabelExtendDTO.class);
+		// 2.根据 id 查询创建人名称
+		List<Long> cmsIdList = labelExtendDTOList.stream().map(LabelExtendDTO::getCreatedBy).distinct().collect(Collectors.toList());
+		Map<Long, SimpleUcUserVO> cmsIdUserVoMap = cmsRemoteProService.queryByIds(cmsIdList).stream().collect(Collectors.toMap(SimpleUcUserVO::getId, dto -> dto, (v1, v2) -> v1));
+		// 3.设置名称
+		labelExtendDTOList.forEach(labelExtendDTO -> labelExtendDTO.setCreatedName(cmsIdUserVoMap.getOrDefault(labelExtendDTO.getCreatedBy(), new SimpleUcUserVO()).getRealName()));
+		return labelExtendDTOList;
 	}
 
 	/**
