@@ -29,14 +29,14 @@ public class MedicineUsageEntity extends BaseStandardEntity implements Serializa
     private Long id;
 
     /**
-     * 药品规格id
+     * 关联id
      */
-    private Long specificationsId;
+    private Long relationId;
 
     /**
-     * 类型 1：西药 2：协定方
+     * 关联类型 1：西药规格 2：协定方
      */
-    private Integer medicineType;
+    private Integer relationType;
 
     /**
      * 用药频次

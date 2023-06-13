@@ -5,8 +5,8 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.medication.MedicineUsageEntity">
         <id column="id" property="id"/>
-        <result column="specifications_id" property="specificationsId"/>
-        <result column="medicine_type" property="medicineType"/>
+        <result column="relation_id" property="relationId"/>
+        <result column="relation_type" property="relationType"/>
         <result column="medication_frequency" property="medicationFrequency"/>
         <result column="each_dosage_count" property="eachDosageCount"/>
         <result column="each_dose_unit" property="eachDoseUnit"/>
@@ -21,7 +21,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, specifications_id, medicine_type, medication_frequency, each_dosage_count, each_dose_unit, usage_method, usage_time, version, created_at, created_by, changed_at, changed_by
+        id, relation_id, relation_type, medication_frequency, each_dosage_count, each_dose_unit, usage_method, usage_time, version, created_at, created_by, changed_at, changed_by
     </sql>
 
 </mapper>

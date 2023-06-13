@@ -27,19 +27,19 @@ public interface MedicineUsageService extends IService<MedicineUsageEntity> {
     /**
      * 取消用法用量
      *
-     * @param specificationsId
-     * @param medicineType
+     * @param relationId
+     * @param relationType
      */
-    void cancelMedicineUsage(Long specificationsId, Integer medicineType);
+    void cancelMedicineUsage(Long relationId, Integer relationType);
 
 
     /**
      * 查询药品规格用法用量
      *
-     * @param specificationsId
-     * @param medicineType
+     * @param relationId
+     * @param relationType
      * @return
      */
-    MedicineUsageEntity getMedicineUsageBySpecId(Long specificationsId, Integer medicineType);
+    MedicineUsageEntity getMedicineUsageBySpecId(Long relationId, Integer relationType);
 
 }

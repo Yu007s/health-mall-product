@@ -28,12 +28,12 @@ public class AgreementPrescriptionMedicineController implements AgreementPrescri
 
     @Override
     public ResultVO<Long> saveOrUpdateAgreementPrescription(AddOrUpdateAgreementRequest request) {
-        return null;
+        return ResultVO.success(agreementPrescriptionMedicineService.saveOrUpdateAgreementPrescription(request));
     }
 
     @Override
     public ResultVO<AgreementPrescriptionInfoVO> queryAgreementPrescriptionInfo(Long id) {
-        return null;
+        return ResultVO.success(agreementPrescriptionMedicineService.queryAgreementPrescriptionInfo(id));
     }
 }
 

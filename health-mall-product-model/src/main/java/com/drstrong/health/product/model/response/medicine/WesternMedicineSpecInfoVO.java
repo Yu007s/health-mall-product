@@ -68,7 +68,7 @@ public class WesternMedicineSpecInfoVO implements Serializable {
     private String specification;
 
     @ApiModelProperty("规格图片信息")
-    private String imageInfoList;
+    private String specImageInfo;
 
     @ApiModelProperty("药品规格用法用量")
     private MedicineUsageVO medicineUsage;

@@ -40,13 +40,13 @@ public class MedicineUsageServiceImpl extends ServiceImpl<MedicineUsageMapper, M
         MedicineUsageRequest usageRequest = request.getMedicineUsage();
         //未设置用法用量则删除
         if (ObjectUtil.isNotNull(useUsageDosage) && ObjectUtil.equals(useUsageDosage, MedicineConstant.NO_USE_USAGE_DOSAGE)) {
-            cancelMedicineUsage(usageRequest.getSpecificationsId(), usageRequest.getMedicineType());
+            cancelMedicineUsage(usageRequest.getRelationId(), usageRequest.getRelationType());
             return;
         }
         checkParam(request.getMedicineUsage());
-        MedicineUsageEntity medicineUsage = getMedicineUsageBySpecId(usageRequest.getSpecificationsId(), usageRequest.getMedicineType());
+        MedicineUsageEntity medicineUsage = getMedicineUsageBySpecId(usageRequest.getRelationId(), usageRequest.getRelationType());
         MedicineUsageEntity medicineUsageEntity = BeanUtil.copyProperties(request.getMedicineUsage(), MedicineUsageEntity.class);
-        medicineUsageEntity.setMedicineType(1);
+        medicineUsageEntity.setRelationType(1);
         medicineUsageEntity.setChangedAt(LocalDateTime.now());
         medicineUsageEntity.setChangedBy(request.getUserId());
         if (ObjectUtil.isNull(medicineUsage)) {
@@ -61,24 +61,24 @@ public class MedicineUsageServiceImpl extends ServiceImpl<MedicineUsageMapper, M
     }
 
     @Override
-    public void cancelMedicineUsage(Long specificationsId, Integer medicineType) {
-        MedicineUsageEntity medicineUsage = getMedicineUsageBySpecId(specificationsId, medicineType);
+    public void cancelMedicineUsage(Long relationId, Integer relationType) {
+        MedicineUsageEntity medicineUsage = getMedicineUsageBySpecId(relationId, relationType);
         if (ObjectUtil.isNull(medicineUsage)) {
             return;
         }
         LambdaUpdateWrapper<MedicineUsageEntity> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(MedicineUsageEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .eq(MedicineUsageEntity::getSpecificationsId, specificationsId)
-                .eq(MedicineUsageEntity::getMedicineType, medicineType).set(MedicineUsageEntity::getDelFlag, DelFlagEnum.IS_DELETED.getCode());
+                .eq(MedicineUsageEntity::getRelationId, relationId)
+                .eq(MedicineUsageEntity::getRelationType, relationType).set(MedicineUsageEntity::getDelFlag, DelFlagEnum.IS_DELETED.getCode());
         this.update(updateWrapper);
     }
 
     @Override
-    public MedicineUsageEntity getMedicineUsageBySpecId(Long specificationsId, Integer medicineType) {
+    public MedicineUsageEntity getMedicineUsageBySpecId(Long relationId, Integer relationType) {
         LambdaQueryWrapper<MedicineUsageEntity> queryWrapper = new LambdaQueryWrapper<MedicineUsageEntity>()
                 .eq(MedicineUsageEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .eq(MedicineUsageEntity::getSpecificationsId, specificationsId)
-                .eq(MedicineUsageEntity::getMedicineType, medicineType);
+                .eq(MedicineUsageEntity::getRelationId, relationId)
+                .eq(MedicineUsageEntity::getRelationType, relationType);
         MedicineUsageEntity medicineUsage = this.getOne(queryWrapper);
         return medicineUsage;
     }

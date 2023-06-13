@@ -15,13 +15,13 @@ public class MedicineUsageRequest implements Serializable {
 
     private static final long serialVersionUID = -2989018544740817595L;
 
-    @ApiModelProperty("药品规格id")
+    @ApiModelProperty("关联id")
     @NotNull(message = "规格不能为空")
-    private Long specificationsId;
+    private Long relationId;
 
     @ApiModelProperty("类型 1：西药 2：协定方")
-    @NotNull(message = "类型不能为空")
-    private Integer medicineType = 1;
+    @NotNull(message = "关联类型 1：西药 2：协定方")
+    private Integer relationType;
 
     @ApiModelProperty("用药频次")
     @NotEmpty(message = "用药频次不能为空")

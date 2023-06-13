@@ -14,11 +14,11 @@ public class MedicineUsageVO implements Serializable {
 
     private static final long serialVersionUID = -2432092485321099595L;
 
-    @ApiModelProperty("药品规格id")
-    private Long specificationsId;
+    @ApiModelProperty("关联id")
+    private Long relationId;
 
-    @ApiModelProperty("类型 1：西药 2：协定方")
-    private Integer type;
+    @ApiModelProperty("关联类型 1：西药 2：协定方")
+    private Integer relationType;
 
     @ApiModelProperty("用药频次")
     private String medicationFrequency;
