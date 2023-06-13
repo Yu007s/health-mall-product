@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.store.StoreInvoiceMapper;
 import com.drstrong.health.product.dao.store.StoreMapper;
+import com.drstrong.health.product.facade.postage.StorePostageFacade;
+import com.drstrong.health.product.facade.postage.impl.StorePostageFacadeImpl;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.entity.store.StoreInvoiceEntity;
 import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
@@ -15,10 +17,12 @@ import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.StoreTypeEnum;
 import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
+import com.drstrong.health.product.model.request.store.SaveStoreSupplierPostageRequest;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.model.response.store.*;
+import com.drstrong.health.product.service.area.AreaService;
 import com.drstrong.health.product.service.store.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -29,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,9 +56,15 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
     @Resource
     StoreDeliveryPriorityService storeDeliveryPriorityService;
 
+    @Resource
+    StorePostageFacade storePostageFacade;
+
+	@Resource
+	AreaService areaService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(StoreInfoDetailSaveRequest storeRequest) {
+    public Long save(StoreInfoDetailSaveRequest storeRequest) {
         // 入参校验 ObjectUtil.isNull(storeRequest.getHasInvoiceInfo()) 是为了兼容老页面
         checkStoreInvoiceParam(storeRequest);
 
@@ -101,6 +112,38 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         saveDeliveryRequest.setDefaultDelPriority(storeRequest.getSupplierIds());
         saveDeliveryRequest.setDefaultDelPriority(saveDeliveryRequest.getDefaultDelPriority());
         storeDeliveryPriorityService.save(saveDeliveryRequest, userId);
+        return storeId;
+    }
+
+    /**
+     * 供应链三期需求,新店铺保存时,需要添加默认的邮费信息
+     * <p> 新店铺满 300 包邮,店铺的供应商满 88 包邮,供应商的区域满 22 包邮 </>
+     *
+     * @author liuqiuyi
+     * @date 2023/6/13 14:51
+     */
+    @Override
+    public void saveStoreDefaultPostage(List<Long> supplierIds, Long storeId) {
+        log.info("保存店铺的默认配送费,店铺id为:{},供应商id为:{}", storeId, supplierIds);
+        if (CollectionUtils.isEmpty(supplierIds) || ObjectUtil.isNull(storeId)) {
+            return;
+        }
+        // 1.获取所有的区域信息,组装默认值
+        List<SaveStoreSupplierPostageRequest.StoreSupplierAreaPostageVO> storeSupplierAreaPostageVOList = areaService.queryAll().stream()
+                .map(provinceAreaInfo -> new SaveStoreSupplierPostageRequest.StoreSupplierAreaPostageVO(Long.valueOf(provinceAreaInfo.getValue()), new BigDecimal(StorePostageFacadeImpl.STORE_SUPPLIER_AREA_FREE_POSTAGE)))
+                .collect(Collectors.toList());
+        // 2.保存供应商
+        supplierIds.forEach(supplierId -> {
+            SaveStoreSupplierPostageRequest saveStoreSupplierPostageRequest = SaveStoreSupplierPostageRequest.builder()
+                    .storeId(storeId)
+                    .supplierId(supplierId)
+                    .freePostage(new BigDecimal(StorePostageFacadeImpl.STORE_SUPPLIER_FREE_POSTAGE))
+                    .storeSupplierAreaPostageList(storeSupplierAreaPostageVOList)
+                    .build();
+            saveStoreSupplierPostageRequest.setOperatorId(9999L);
+            saveStoreSupplierPostageRequest.setOperatorName("system");
+            storePostageFacade.saveStoreSupplierPostage(saveStoreSupplierPostageRequest);
+        });
     }
 
     @Override
