@@ -55,7 +55,8 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     public ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store)  {
         String msg;
         if (store.getStoreId() == null) {
-            storeService.save(store);
+            Long storeId = storeService.save(store);
+            storeService.saveStoreDefaultPostage(store.getSupplierIds(), storeId);
             msg = "新增店铺成功";
         } else {
             storeService.update(store);

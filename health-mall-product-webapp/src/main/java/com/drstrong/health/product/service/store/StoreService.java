@@ -20,7 +20,17 @@ public interface StoreService {
      *
      * @param store  店铺信息
      */
-    void save(StoreInfoDetailSaveRequest store);
+    Long save(StoreInfoDetailSaveRequest store);
+
+	/**
+	 * 供应链三期需求,新店铺保存时,需要添加默认的邮费信息
+	 * <p> 新店铺满 300 包邮,店铺的供应商满 88 包邮,供应商的区域满 22 包邮 </>
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/6/13 14:51
+	 */
+	void saveStoreDefaultPostage(List<Long> supplierIds, Long storeId);
+
 	/**
 	 * 保存店铺信息
 	 *

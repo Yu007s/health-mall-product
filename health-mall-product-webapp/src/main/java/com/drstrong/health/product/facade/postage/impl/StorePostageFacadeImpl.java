@@ -44,6 +44,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class StorePostageFacadeImpl implements StorePostageFacade {
+	public static final String STORE_FREE_POSTAGE = "300";
+	public static final String STORE_SUPPLIER_FREE_POSTAGE = "88";
+	public static final String STORE_SUPPLIER_AREA_FREE_POSTAGE = "22";
+
 	@Resource
 	StorePostageService storePostageService;
 
@@ -110,7 +114,7 @@ public class StorePostageFacadeImpl implements StorePostageFacade {
 		if (Objects.isNull(storePostageEntity)) {
 			SaveStorePostageRequest saveStorePostageRequest = SaveStorePostageRequest.builder()
 					.storeId(saveStoreSupplierPostageRequest.getStoreId())
-					.freePostage(new BigDecimal("-1"))
+					.freePostage(new BigDecimal(STORE_FREE_POSTAGE))
 					.build();
 			saveStorePostageRequest.setOperatorId(saveStoreSupplierPostageRequest.getOperatorId());
 			saveStorePostageRequest.setOperatorName(saveStoreSupplierPostageRequest.getOperatorName());
