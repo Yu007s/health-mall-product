@@ -15,6 +15,8 @@ import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineSpecRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineUsageRequest;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecInfoVO;
+import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.service.medicine.MedicineUsageService;
 import org.springframework.stereotype.Service;
 
@@ -41,8 +43,10 @@ public class MedicineUsageServiceImpl extends ServiceImpl<MedicineUsageMapper, M
             cancelMedicineUsage(usageRequest.getSpecificationsId(), usageRequest.getMedicineType());
             return;
         }
+        checkParam(request.getMedicineUsage());
         MedicineUsageEntity medicineUsage = getMedicineUsageBySpecId(usageRequest.getSpecificationsId(), usageRequest.getMedicineType());
         MedicineUsageEntity medicineUsageEntity = BeanUtil.copyProperties(request.getMedicineUsage(), MedicineUsageEntity.class);
+        medicineUsageEntity.setMedicineType(1);
         medicineUsageEntity.setChangedAt(LocalDateTime.now());
         medicineUsageEntity.setChangedBy(request.getUserId());
         if (ObjectUtil.isNull(medicineUsage)) {
@@ -77,5 +81,18 @@ public class MedicineUsageServiceImpl extends ServiceImpl<MedicineUsageMapper, M
                 .eq(MedicineUsageEntity::getMedicineType, medicineType);
         MedicineUsageEntity medicineUsage = this.getOne(queryWrapper);
         return medicineUsage;
+    }
+
+    public void checkParam(MedicineUsageRequest medicineUsage) {
+        if (ObjectUtil.hasEmpty(
+                medicineUsage.getMedicationFrequency(),
+                medicineUsage.getEachDosageCount(),
+                medicineUsage.getEachDoseUnit(),
+                medicineUsage.getUsageTime(),
+                medicineUsage.getUsageMethod()
+        )) {
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "规格用法用量参数不能为空！");
+        }
+
     }
 }
