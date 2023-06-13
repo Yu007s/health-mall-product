@@ -8,6 +8,7 @@ import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.UpOffEnum;
+import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import lombok.extern.slf4j.Slf4j;
@@ -106,5 +107,17 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
 		if (Objects.nonNull(storeSkuInfoEntity)) {
 			throw new BusinessException(ErrorEnums.CHINESE_IS_REPEAT);
 		}
+	}
+
+	/**
+	 * 根据条件分页查询
+	 *
+	 * @param productManageQueryRequest
+	 * @author liuqiuyi
+	 * @date 2023/6/13 10:28
+	 */
+	@Override
+	public void pageQueryByParam(ProductManageQueryRequest productManageQueryRequest) {
+
 	}
 }

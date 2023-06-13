@@ -1,7 +1,10 @@
 package com.drstrong.health.product.facade.sku;
 
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
+import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
+import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.product.v3.AgreementSkuInfoVO;
 
 /**
  * @author liuqiuyi
@@ -23,4 +26,12 @@ public interface SkuManageFacade {
 	 * @date 2023/6/10 15:20
 	 */
 	StoreSkuDetailDTO queryDetailByCode(String skuCode);
+
+	/**
+	 * 协定方|西药 管理页面,列表展示
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/6/13 10:23
+	 */
+	PageVO<AgreementSkuInfoVO> queryAgreementManageInfo(ProductManageQueryRequest productManageQueryRequest);
 }
