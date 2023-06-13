@@ -1,5 +1,6 @@
-package com.drstrong.health.product.model.request.medicine;
+package com.drstrong.health.product.model.response.medicine;
 
+import com.drstrong.health.product.model.request.medicine.MedicineUsageRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -7,14 +8,13 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.List;
 
 
 @ApiModel("协定方请求实体类")
 @Data
-public class AddOrUpdateAgreementRequest implements Serializable {
+public class AgreementPrescriptionInfoVO implements Serializable {
 
-    private static final long serialVersionUID = 5164966919486101511L;
+    private static final long serialVersionUID = -8744887762392173646L;
 
     @ApiModelProperty(value = "协定方id")
     private Long id;
@@ -60,31 +60,12 @@ public class AddOrUpdateAgreementRequest implements Serializable {
     @ApiModelProperty("0：否  1：是")
     private Integer useUsageDosage;
 
-    @ApiModelProperty(value = "操作人 id", hidden = true)
-    private Long userId;
-
-    @ApiModelProperty(value = "操作人 姓名", hidden = true)
-    private String userName;
-
     @ApiModelProperty("图片信息")
-    private List<MedicineImageRequest> imageInfoList;
+    private String imageInfoList;
+
+    @ApiModelProperty("分类信息")
+    private String medicineClassificationInfo;
 
     @ApiModelProperty("用法用量")
-    private MedicineUsageRequest medicineUsage;
-
-    @Data
-    @ApiModel("分类id")
-    public static class MedicineClassificationInfoRequest implements Serializable {
-
-        private static final long serialVersionUID = 2148769498519904439L;
-
-        @ApiModelProperty(value = "剂型分类id")
-        private Long agentClassificationId;
-
-        @ApiModelProperty(value = "安全分类id")
-        private Long securityClassificationId;
-
-        @ApiModelProperty(value = "原料分类id")
-        private Long materialsClassificationId;
-    }
+    private MedicineUsageVO medicineUsage;
 }

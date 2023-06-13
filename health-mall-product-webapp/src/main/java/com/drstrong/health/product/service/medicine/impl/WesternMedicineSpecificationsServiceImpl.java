@@ -56,11 +56,14 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
         Assert.notNull(westernMedicine, "西药不存在");
         WesternMedicineSpecificationsEntity specifications = BeanUtil.copyProperties(specRequest, WesternMedicineSpecificationsEntity.class);
         specifications.setSpecImageInfo(JSONUtil.parse(specRequest.getImageInfoList()).toString());
+        specifications.setChangedBy(specRequest.getUserId());
         if (ObjectUtil.isNull(specRequest.getId())) {
             //新增
             specifications.setSpecCode(generateMedicineSpecCode(westernMedicine.getId(), westernMedicine.getMedicineCode()));
+            specifications.setCreatedBy(specRequest.getUserId());
         }
         saveOrUpdate(specifications);
+        specRequest.getMedicineUsage().setSpecificationsId(specifications.getId());
         medicineUsageService.saveOrUpdateUsage(specRequest);
         return specifications.getId();
     }

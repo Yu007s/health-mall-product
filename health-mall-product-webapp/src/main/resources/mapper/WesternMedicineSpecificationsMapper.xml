@@ -37,7 +37,7 @@
         ms.id id,
         ms.medicine_id medicineId,
         ms.spec_code specCode,
-        ms.spec_code specName,
+        ms.spec_name specName,
         CASE
         WHEN mu.id IS NOT NULL THEN 1
         ELSE 0
