@@ -44,7 +44,7 @@ public class AgreementPrescriptionMedicineEntity extends BaseStandardEntity impl
     /**
      * 分类信息，json
      */
-    private String medicineCategoryInfo;
+    private String medicineClassificationInfo;
 
     /**
      * 规格包装(0.25g*12片*2板/盒)

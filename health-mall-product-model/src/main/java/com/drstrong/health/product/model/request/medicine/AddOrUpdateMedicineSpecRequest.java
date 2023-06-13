@@ -63,25 +63,10 @@ public class AddOrUpdateMedicineSpecRequest implements Serializable {
     @ApiModelProperty(value = "操作人 姓名", hidden = true)
     private String userName;
 
-    @ApiModelProperty("规格图片信息")
-    private List<MedicineSpecImageRequest> imageInfoList;
+    @ApiModelProperty("图片信息")
+    private List<MedicineImageRequest> imageInfoList;
 
     @ApiModelProperty("用法用量")
     private MedicineUsageRequest medicineUsage;
-
-
-    @Data
-    @ApiModel("规格图片信息")
-    public static class MedicineSpecImageRequest implements Serializable {
-
-        private static final long serialVersionUID = 8993617405108740700L;
-
-        @ApiModelProperty("文件类型 1：大图 2：缩略图 3:icon")
-        private Integer type;
-
-        @ApiModelProperty("'文件路径'")
-        private String imagePath;
-
-    }
 
 }

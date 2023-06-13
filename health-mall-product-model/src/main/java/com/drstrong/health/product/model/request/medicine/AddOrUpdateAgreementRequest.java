@@ -55,25 +55,25 @@ public class AddOrUpdateAgreementRequest implements Serializable {
     @ApiModelProperty(value = "操作人 姓名", hidden = true)
     private String userName;
 
-    @ApiModelProperty("规格图片信息")
-    private List<MedicineSpecImageRequest> imageInfoList;
+    @ApiModelProperty("图片信息")
+    private List<MedicineImageRequest> imageInfoList;
 
     @ApiModelProperty("用法用量")
     private MedicineUsageRequest medicineUsage;
 
-
     @Data
-    @ApiModel("规格图片信息")
-    public static class MedicineSpecImageRequest implements Serializable {
+    @ApiModel("分类id")
+    public static class MedicineClassificationInfoRequest implements Serializable {
 
-        private static final long serialVersionUID = 8993617405108740700L;
+        private static final long serialVersionUID = 2148769498519904439L;
 
-        @ApiModelProperty("文件类型 1：大图 2：缩略图 3:icon")
-        private Integer type;
+        @ApiModelProperty(value = "剂型分类id")
+        private Long agentClassificationId;
 
-        @ApiModelProperty("'文件路径'")
-        private String imagePath;
+        @ApiModelProperty(value = "安全分类id")
+        private Long securityClassificationId;
 
+        @ApiModelProperty(value = "原料分类id")
+        private Long materialsClassificationId;
     }
-
 }

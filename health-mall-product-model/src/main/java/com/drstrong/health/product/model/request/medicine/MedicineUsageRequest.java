@@ -21,7 +21,7 @@ public class MedicineUsageRequest implements Serializable {
 
     @ApiModelProperty("类型 1：西药 2：协定方")
     @NotNull(message = "类型不能为空")
-    private Integer medicineType;
+    private Integer medicineType = 1;
 
     @ApiModelProperty("用药频次")
     @NotEmpty(message = "用药频次不能为空")
