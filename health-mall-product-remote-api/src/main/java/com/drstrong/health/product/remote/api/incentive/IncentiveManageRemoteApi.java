@@ -3,6 +3,7 @@ package com.drstrong.health.product.remote.api.incentive;
 import com.drstrong.health.product.model.request.incentive.SaveEarningNameRequest;
 import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
 import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDetailVO;
+import com.drstrong.health.product.model.response.incentive.excel.SkuIncentivePolicyDetailExcelVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,4 +30,8 @@ public interface IncentiveManageRemoteApi {
 	@ApiOperation("查询sku激励政策")
 	@GetMapping("/query/sku/policy")
 	ResultVO<SkuIncentivePolicyDetailVO> queryPolicyDetailBySkuCode(@RequestParam("skuCode") String skuCode);
+
+	@ApiOperation("查询所有sku的激励政策,用于excel导出")
+	@GetMapping("/query/all/sku/policy")
+	ResultVO<SkuIncentivePolicyDetailExcelVO> queryAllSkuPolicyDetailToExcelVO(@RequestParam("productType") Integer productType);
 }

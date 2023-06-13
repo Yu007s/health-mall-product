@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.incentive.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.incentive.IncentivePolicyConfigMapper;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author liuqiuyi
@@ -55,6 +57,26 @@ public class IncentivePolicyConfigServiceImpl extends ServiceImpl<IncentivePolic
 		LambdaQueryWrapper<IncentivePolicyConfigEntity> queryWrapper = new LambdaQueryWrapper<IncentivePolicyConfigEntity>()
 				.eq(IncentivePolicyConfigEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
 				.eq(IncentivePolicyConfigEntity::getStoreId, storeId)
+				.eq(IncentivePolicyConfigEntity::getConfigGoalType, goalType);
+		return baseMapper.selectList(queryWrapper);
+	}
+
+	/**
+	 * 根据店铺 id,目标类型和名称,查询政策配置
+	 *
+	 * @param storeIds
+	 * @param goalType
+	 * @author liuqiuyi
+	 * @date 2023/6/7 14:36
+	 */
+	@Override
+	public List<IncentivePolicyConfigEntity> listByStoreIdsAndGoalType(Set<Long> storeIds, Integer goalType) {
+		if (CollectionUtil.isEmpty(storeIds) || Objects.isNull(goalType)) {
+			return Lists.newArrayList();
+		}
+		LambdaQueryWrapper<IncentivePolicyConfigEntity> queryWrapper = new LambdaQueryWrapper<IncentivePolicyConfigEntity>()
+				.eq(IncentivePolicyConfigEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+				.in(IncentivePolicyConfigEntity::getStoreId, storeIds)
 				.eq(IncentivePolicyConfigEntity::getConfigGoalType, goalType);
 		return baseMapper.selectList(queryWrapper);
 	}

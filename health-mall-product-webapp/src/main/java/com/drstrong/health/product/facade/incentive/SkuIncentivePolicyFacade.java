@@ -3,6 +3,7 @@ package com.drstrong.health.product.facade.incentive;
 import com.drstrong.health.product.model.request.incentive.SaveEarningNameRequest;
 import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
 import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDetailVO;
+import com.drstrong.health.product.model.response.incentive.excel.SkuIncentivePolicyDetailExcelVO;
 
 /**
  * @author liuqiuyi
@@ -32,4 +33,12 @@ public interface SkuIncentivePolicyFacade {
 	 * @date 2023/6/8 14:30
 	 */
 	SkuIncentivePolicyDetailVO queryPolicyDetailBySkuCode(String skuCode);
+
+	/**
+	 * 查询所有的 sku 政策信息
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/6/13 16:54
+	 */
+	SkuIncentivePolicyDetailExcelVO querySkuPolicyDetailToExcelVO(Integer productType);
 }

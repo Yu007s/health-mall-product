@@ -15,6 +15,7 @@ import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -114,13 +115,29 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
 	 * 根据条件分页查询
 	 *
 	 * @param productManageQueryRequest
+	 * @return
 	 * @author liuqiuyi
 	 * @date 2023/6/13 10:28
-	 * @return
 	 */
 	@Override
 	public Page<StoreSkuInfoEntity> pageQueryByParam(ProductManageQueryRequest productManageQueryRequest) {
 		Page<StoreSkuInfoEntity> entityPage = new Page<>(productManageQueryRequest.getPageNo(), productManageQueryRequest.getPageSize());
 		return baseMapper.pageQueryByParam(entityPage, productManageQueryRequest);
+	}
+
+	/**
+	 * 根据类型查询所有的 sku 信息
+	 *
+	 * @param productType
+	 * @author liuqiuyi
+	 * @date 2023/6/13 16:57
+	 */
+	@Override
+	public List<StoreSkuInfoEntity> queryAllByProductType(Long storeId, Integer productType) {
+		LambdaQueryWrapper<StoreSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<StoreSkuInfoEntity>()
+				.eq(StoreSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+				.eq(Objects.nonNull(storeId), StoreSkuInfoEntity::getStoreId, storeId)
+				.eq(Objects.nonNull(productType), StoreSkuInfoEntity::getSkuType, productType);
+		return baseMapper.selectList(queryWrapper);
 	}
 }

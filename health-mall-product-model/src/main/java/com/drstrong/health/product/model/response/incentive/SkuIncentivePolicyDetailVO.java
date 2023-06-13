@@ -51,6 +51,9 @@ public class SkuIncentivePolicyDetailVO implements Serializable {
 	@ApiModelProperty("成本价,单位:元")
 	private BigDecimal costPrice;
 
+	@ApiModelProperty("利润率 (零售价-成本价）/成本价")
+	private BigDecimal profit;
+
 	@ApiModelProperty("sku 激励政策详情")
 	private List<SkuIncentivePolicyVO> skuIncentivePolicyList;
 }

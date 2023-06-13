@@ -4,6 +4,7 @@ import com.drstrong.health.product.facade.incentive.SkuIncentivePolicyFacade;
 import com.drstrong.health.product.model.request.incentive.SaveEarningNameRequest;
 import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
 import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDetailVO;
+import com.drstrong.health.product.model.response.incentive.excel.SkuIncentivePolicyDetailExcelVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.incentive.IncentiveManageRemoteApi;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,5 +41,10 @@ public class IncentiveManageController implements IncentiveManageRemoteApi {
 	@Override
 	public ResultVO<SkuIncentivePolicyDetailVO> queryPolicyDetailBySkuCode(String skuCode) {
 		return ResultVO.success(skuIncentivePolicyFacade.queryPolicyDetailBySkuCode(skuCode));
+	}
+
+	@Override
+	public ResultVO<SkuIncentivePolicyDetailExcelVO> queryAllSkuPolicyDetailToExcelVO(Integer productType) {
+		return ResultVO.success(skuIncentivePolicyFacade.querySkuPolicyDetailToExcelVO(productType));
 	}
 }
