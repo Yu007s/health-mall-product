@@ -145,6 +145,17 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
     }
 
     @Override
+    public WesternMedicineEntity queryByMedicineId(Long medicineId) {
+        if (ObjectUtil.isNull(medicineId)) {
+            return null;
+        }
+        LambdaQueryWrapper<WesternMedicineEntity> queryWrapper = new LambdaQueryWrapper<WesternMedicineEntity>()
+                .eq(WesternMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .eq(WesternMedicineEntity::getId, medicineId);
+        return baseMapper.selectOne(queryWrapper);
+    }
+
+    @Override
     public PageVO<WesternMedicineVO> queryMedicinePageList(WesternMedicineRequest request) {
         Page<WesternMedicineVO> entityPage = new Page<>(request.getPageNo(), request.getPageSize());
         Page<WesternMedicineVO> westernMedicineVOPage = baseMapper.queryMedicinePageList(entityPage, request);

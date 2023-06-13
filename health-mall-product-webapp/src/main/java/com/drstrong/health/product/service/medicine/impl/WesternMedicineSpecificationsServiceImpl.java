@@ -52,7 +52,7 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long saveOrUpdateMedicineSpec(AddOrUpdateMedicineSpecRequest specRequest) {
-        WesternMedicineEntity westernMedicine = westernMedicineService.queryByMedicineCode(specRequest.getMedicineCode());
+        WesternMedicineEntity westernMedicine = westernMedicineService.queryByMedicineId(specRequest.getMedicineId());
         Assert.notNull(westernMedicine, "西药不存在");
         WesternMedicineSpecificationsEntity specifications = BeanUtil.copyProperties(specRequest, WesternMedicineSpecificationsEntity.class);
         specifications.setSpecImageInfo(JSONUtil.parse(specRequest.getImageInfoList()).toString());

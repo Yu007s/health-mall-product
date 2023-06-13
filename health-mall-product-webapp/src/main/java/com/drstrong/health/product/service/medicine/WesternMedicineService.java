@@ -46,6 +46,15 @@ public interface WesternMedicineService extends IService<WesternMedicineEntity> 
 
 
     /**
+     * 根据 medicineId查询药品
+     *
+     * @param medicineId
+     * @return
+     */
+    WesternMedicineEntity queryByMedicineId(Long medicineId);
+
+
+    /**
      * 西药分页列表
      *
      * @param request

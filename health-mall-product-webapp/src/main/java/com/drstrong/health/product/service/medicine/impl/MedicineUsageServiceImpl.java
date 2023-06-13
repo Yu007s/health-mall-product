@@ -38,6 +38,9 @@ public class MedicineUsageServiceImpl extends ServiceImpl<MedicineUsageMapper, M
     public void saveOrUpdateUsage(AddOrUpdateMedicineSpecRequest request) {
         Integer useUsageDosage = request.getUseUsageDosage();
         MedicineUsageRequest usageRequest = request.getMedicineUsage();
+        if (ObjectUtil.isNotNull(request.getId())) {
+            usageRequest.setSpecificationsId(request.getId());
+        }
         //未设置用法用量则删除
         if (ObjectUtil.isNotNull(useUsageDosage) && ObjectUtil.equals(useUsageDosage, MedicineConstant.NO_USE_USAGE_DOSAGE)) {
             cancelMedicineUsage(usageRequest.getSpecificationsId(), usageRequest.getMedicineType());
