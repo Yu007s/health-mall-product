@@ -32,15 +32,25 @@
 
     <select id="queryMedicinePageList"
             resultType="com.drstrong.health.product.model.response.medicine.WesternMedicineVO">
-        SELECT
-        m.*,
-        mi.production_enterprise,
-        CASE WHEN ms.medicine_id IS NULL THEN 0 ELSE 1 END AS relationSpec,
-        CASE WHEN mu.id IS NULL THEN 0 ELSE 1 END AS defaultUsageDosage
+        SELECT DISTINCT
+            m.id id,
+            m.medicine_name medicineName,
+            m.full_name fullName,
+            m.common_name commonName,
+            m.medicine_code medicineCode,
+            m.data_integrity dataIntegrity,
+            m.created_at createdAt,
+            mi.production_enterprise productionEnterprise,
+            mc.classification_name drugClassification,
+            pmc.classification_name securityClassification,
+            CASE WHEN ms.medicine_id IS NULL THEN 0 ELSE 1 END AS relationSpec,
+            CASE WHEN mu.id IS NULL THEN 0 ELSE 1 END AS defaultUsageDosage
         FROM
         pms_western_medicine m
         JOIN pms_western_medicine_instructions mi ON mi.medicine_id = m.id
         LEFT JOIN pms_western_medicine_specifications ms ON ms.medicine_id = m.id
+        LEFT JOIN pms_medicine_classification mc ON mc.id = json_extract(m.medicine_classification_info,'$.drugClassificationId')
+        LEFT JOIN pms_medicine_classification pmc ON pmc.id = json_extract(m.medicine_classification_info,'$.securityClassificationId')
         LEFT JOIN pms_medicine_usage mu ON mu.relation_id = ms.id AND mu.relation_type = 1 AND mu.del_flag = 0
         <where>
             m.del_flag = 0

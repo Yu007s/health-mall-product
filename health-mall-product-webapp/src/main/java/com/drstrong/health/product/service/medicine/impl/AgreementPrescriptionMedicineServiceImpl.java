@@ -49,6 +49,6 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
 
     @Override
     public AgreementPrescriptionInfoVO queryAgreementPrescriptionInfo(Long id) {
-        return null;
+        return baseMapper.queryAgreementPrescriptionInfo(id);
     }
 }
