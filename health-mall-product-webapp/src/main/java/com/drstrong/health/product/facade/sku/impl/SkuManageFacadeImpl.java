@@ -18,7 +18,10 @@ import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
+import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
+import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.product.v3.AgreementSkuInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.cms.CmsRemoteProService;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
@@ -211,5 +214,20 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 		storeSkuDetailDTO.setSkuCode(skuInfoEntity.getSkuCode());
 		storeSkuDetailDTO.setStoreId(skuInfoEntity.getStoreId());
 		return storeSkuDetailDTO;
+	}
+
+	/**
+	 * 协定方|西药 管理页面,列表展示
+	 *
+	 * @param productManageQueryRequest
+	 * @author liuqiuyi
+	 * @date 2023/6/13 10:23
+	 */
+	@Override
+	public PageVO<AgreementSkuInfoVO> queryAgreementManageInfo(ProductManageQueryRequest productManageQueryRequest) {
+		// 1.根据入参中的条件,分页查询店铺 sku 表
+		storeSkuInfoService.pageQueryByParam(productManageQueryRequest);
+
+		return null;
 	}
 }

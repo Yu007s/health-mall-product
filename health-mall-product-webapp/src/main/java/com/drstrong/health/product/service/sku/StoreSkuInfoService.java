@@ -3,6 +3,7 @@ package com.drstrong.health.product.service.sku;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.enums.UpOffEnum;
+import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 
 /**
  * @author liuqiuyi
@@ -44,4 +45,12 @@ public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
 	 * @date 2023/6/10 14:11
 	 */
 	void checkMedicineCodeAndStoreId(String medicineCode, Long storeId);
+
+	/**
+	 * 根据条件分页查询
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/6/13 10:28
+	 */
+	void pageQueryByParam(ProductManageQueryRequest productManageQueryRequest);
 }

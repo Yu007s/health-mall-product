@@ -33,6 +33,9 @@ public class ProductManageQueryRequest extends PageRequest implements Serializab
 	@ApiModelProperty("商品类型")
 	private Integer productType;
 
+	@ApiModelProperty("规格编码")
+	private String medicineCode;
+
 	@ApiModelProperty("sku 名称")
 	private String skuName;
 
