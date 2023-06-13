@@ -21,7 +21,6 @@ import java.io.Serializable;
  */
 
 @Data
-//@Builder
 @ApiModel(description = "西药简要信息VO")
 public class WesternMedicineSimpleInfoVO implements Serializable {
 

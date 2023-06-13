@@ -4,11 +4,16 @@ package com.drstrong.health.product.service.medicine.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.medicine.AgreementPrescriptionMedicineMapper;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateAgreementRequest;
+import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
+import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionInfoVO;
+import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionSimpleInfoVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
 import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicineService;
 import com.drstrong.health.product.service.medicine.MedicineUsageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,5 +55,11 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
     @Override
     public AgreementPrescriptionInfoVO queryAgreementPrescriptionInfo(Long id) {
         return baseMapper.queryAgreementPrescriptionInfo(id);
+    }
+
+    @Override
+    public PageVO<AgreementPrescriptionSimpleInfoVO> queryAgreementPrescriptionPageInfo(WesternMedicineRequest request) {
+        Page<AgreementPrescriptionSimpleInfoVO> page = baseMapper.queryPageList(new Page<>(request.getPageNo(), request.getPageSize()), request);
+        return PageVO.newBuilder().pageNo(request.getPageNo()).pageSize(request.getPageSize()).totalCount((int) page.getTotal()).result(page.getRecords()).build();
     }
 }

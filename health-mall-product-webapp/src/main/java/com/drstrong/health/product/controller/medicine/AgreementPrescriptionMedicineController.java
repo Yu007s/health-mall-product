@@ -1,7 +1,10 @@
 package com.drstrong.health.product.controller.medicine;
 
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateAgreementRequest;
+import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
+import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionInfoVO;
+import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionSimpleInfoVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.medicine.AgreementPrescriptionRemoteApi;
 import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicineService;
@@ -34,6 +37,11 @@ public class AgreementPrescriptionMedicineController implements AgreementPrescri
     @Override
     public ResultVO<AgreementPrescriptionInfoVO> queryAgreementPrescriptionInfo(Long id) {
         return ResultVO.success(agreementPrescriptionMedicineService.queryAgreementPrescriptionInfo(id));
+    }
+
+    @Override
+    public ResultVO<PageVO<AgreementPrescriptionSimpleInfoVO>> queryAgreementPrescriptionPageInfo(WesternMedicineRequest westernMedicineRequest) {
+        return ResultVO.success(agreementPrescriptionMedicineService.queryAgreementPrescriptionPageInfo(westernMedicineRequest));
     }
 }
 
