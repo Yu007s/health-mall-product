@@ -20,7 +20,7 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("pms_agreement_prescription_medicine")
-public class AgreementPrescriptionMedicineEntity extends BaseStandardEntity implements Serializable{
+public class AgreementPrescriptionMedicineEntity extends BaseStandardEntity implements Serializable {
 
 
     private static final long serialVersionUID = 3306377493572110372L;
@@ -75,6 +75,11 @@ public class AgreementPrescriptionMedicineEntity extends BaseStandardEntity impl
      * 拆分数量
      */
     private Integer splitValue;
+
+    /**
+     * 图片信息
+     */
+    private String imageInfo;
 
     /**
      * 处方

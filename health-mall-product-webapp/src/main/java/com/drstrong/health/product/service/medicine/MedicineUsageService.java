@@ -19,9 +19,9 @@ public interface MedicineUsageService extends IService<MedicineUsageEntity> {
     /**
      * 新增-修改药品规格用法用量
      *
-     * @param request
+     * @param medicineUsageRequest
      */
-    void saveOrUpdateUsage(AddOrUpdateMedicineSpecRequest request);
+    void saveOrUpdateUsage(MedicineUsageRequest medicineUsageRequest);
 
 
     /**

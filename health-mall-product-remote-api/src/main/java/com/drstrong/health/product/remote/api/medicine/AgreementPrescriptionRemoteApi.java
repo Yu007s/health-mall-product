@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
+
 
 /**
  * 协定方远程接口
@@ -30,7 +32,7 @@ public interface AgreementPrescriptionRemoteApi {
      */
     @ApiOperation("保存/修改 协定方")
     @GetMapping("/save-or-update")
-    ResultVO<Long> saveOrUpdateAgreementPrescription(@RequestBody AddOrUpdateAgreementRequest request);
+    ResultVO<Long> saveOrUpdateAgreementPrescription(@RequestBody @Valid AddOrUpdateAgreementRequest request);
 
 
     /**

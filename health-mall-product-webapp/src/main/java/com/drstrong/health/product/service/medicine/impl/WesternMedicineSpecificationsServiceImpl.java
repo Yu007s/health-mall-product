@@ -64,7 +64,7 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
         }
         saveOrUpdate(specifications);
         specRequest.getMedicineUsage().setRelationId(specifications.getId());
-        medicineUsageService.saveOrUpdateUsage(specRequest);
+        medicineUsageService.saveOrUpdateUsage(specRequest.getMedicineUsage());
         return specifications.getId();
     }
 

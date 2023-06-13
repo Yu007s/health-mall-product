@@ -1,12 +1,9 @@
 package com.drstrong.health.product.model.response.medicine;
 
-import com.drstrong.health.product.model.request.medicine.MedicineUsageRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 
@@ -35,26 +32,21 @@ public class AgreementPrescriptionInfoVO implements Serializable {
     private String packingUnitLimit;
 
     @ApiModelProperty("单位包装规格数量（24")
-    @NotNull(message = "单位包装规格数量不能为空")
     private Integer packingUnitNumber;
 
     @ApiModelProperty("规格单位（板，包，瓶）")
-    @NotEmpty(message = "规格单位不能为空")
     private String specUnit;
 
     @ApiModelProperty("规格值")
     private Integer specValue;
 
     @ApiModelProperty("处方")
-    @NotEmpty(message = "处方")
     private String prescriptions;
 
     @ApiModelProperty("功效")
-    @NotEmpty(message = "功效")
     private String efficacy;
 
     @ApiModelProperty("服法")
-    @NotEmpty(message = "服法")
     private String usageMethod;
 
     @ApiModelProperty("0：否  1：是")

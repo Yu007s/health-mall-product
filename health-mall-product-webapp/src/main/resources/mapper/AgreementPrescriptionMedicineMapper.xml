@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.drstrong.health.product.dao.mybatis.PmsAgreementPrescriptionMedicineMapper">
+<mapper namespace="com.drstrong.health.product.dao.medicine.AgreementPrescriptionMedicineMapper">
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity">
         <id column="id" property="id" />
         <result column="medicine_code" property="medicineCode" />
         <result column="medicine_name" property="medicineName" />
-        <result column="medicine_category_info" property="medicineCategoryInfo" />
+        <result column="medicine_classification_info" property="medicineClassificationInfo" />
         <result column="packing_spec" property="packingSpec" />
         <result column="packing_unit" property="packingUnit" />
         <result column="packing_unit_limit" property="packingUnitLimit" />
         <result column="packing_unit_number" property="packingUnitNumber" />
         <result column="split_unit" property="splitUnit" />
         <result column="split_value" property="splitValue" />
+        <result column="image_info" property="imageInfo" />
         <result column="prescriptions" property="prescriptions" />
         <result column="efficacy" property="efficacy" />
         <result column="usage_method" property="usageMethod" />
@@ -27,7 +28,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, medicine_code, medicine_name, medicine_category_info, packing_spec, packing_unit, packing_unit_limit, packing_unit_number, split_unit, split_value, prescriptions, efficacy, usage_method, version, del_flag, created_by, created_at, changed_by, changed_at
+        id, medicine_code, medicine_name, medicine_classification_info, packing_spec, packing_unit, packing_unit_limit, packing_unit_number, split_unit, split_value, image_info, prescriptions, efficacy, usage_method, version, del_flag, created_by, created_at, changed_by, changed_at
     </sql>
 
 </mapper>

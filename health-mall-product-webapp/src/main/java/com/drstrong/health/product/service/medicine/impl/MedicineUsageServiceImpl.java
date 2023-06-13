@@ -35,24 +35,23 @@ public class MedicineUsageServiceImpl extends ServiceImpl<MedicineUsageMapper, M
 
 
     @Override
-    public void saveOrUpdateUsage(AddOrUpdateMedicineSpecRequest request) {
-        Integer useUsageDosage = request.getUseUsageDosage();
-        MedicineUsageRequest usageRequest = request.getMedicineUsage();
+    public void saveOrUpdateUsage(MedicineUsageRequest medicineUsageRequest) {
+        Integer useUsageDosage = medicineUsageRequest.getUseUsageDosage();
         //未设置用法用量则删除
         if (ObjectUtil.isNotNull(useUsageDosage) && ObjectUtil.equals(useUsageDosage, MedicineConstant.NO_USE_USAGE_DOSAGE)) {
-            cancelMedicineUsage(usageRequest.getRelationId(), usageRequest.getRelationType());
+            cancelMedicineUsage(medicineUsageRequest.getRelationId(), medicineUsageRequest.getRelationType());
             return;
         }
-        checkParam(request.getMedicineUsage());
-        MedicineUsageEntity medicineUsage = getMedicineUsageBySpecId(usageRequest.getRelationId(), usageRequest.getRelationType());
-        MedicineUsageEntity medicineUsageEntity = BeanUtil.copyProperties(request.getMedicineUsage(), MedicineUsageEntity.class);
-        medicineUsageEntity.setRelationType(1);
+        checkParam(medicineUsageRequest);
+        MedicineUsageEntity medicineUsage = getMedicineUsageBySpecId(medicineUsageRequest.getRelationId(), medicineUsageRequest.getRelationType());
+        MedicineUsageEntity medicineUsageEntity = BeanUtil.copyProperties(medicineUsageRequest, MedicineUsageEntity.class);
+        medicineUsageEntity.setRelationType(medicineUsageRequest.getRelationType());
         medicineUsageEntity.setChangedAt(LocalDateTime.now());
-        medicineUsageEntity.setChangedBy(request.getUserId());
+        medicineUsageEntity.setChangedBy(medicineUsageRequest.getUserId());
         if (ObjectUtil.isNull(medicineUsage)) {
             //新增
             medicineUsageEntity.setCreatedAt(LocalDateTime.now());
-            medicineUsageEntity.setCreatedBy(request.getUserId());
+            medicineUsageEntity.setCreatedBy(medicineUsageRequest.getUserId());
         } else {
             //修改
             medicineUsageEntity.setId(medicineUsage.getId());
