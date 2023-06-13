@@ -35,8 +35,8 @@ public class AgreementSkuInfoVO extends ProductManageQueryVO implements Serializ
 	@ApiModelProperty("协定方预制编码")
 	private String medicineCode;
 
-	@ApiModelProperty("规格名称")
-	private String specificationName;
+	@ApiModelProperty("sku名称")
+	private String skuName;
 
 	@ApiModelProperty("店铺 id")
 	private Long storeId;

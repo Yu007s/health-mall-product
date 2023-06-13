@@ -22,9 +22,9 @@ import javax.validation.Valid;
 @FeignClient(value = "health-mall-product", path = "/inner/sku/manage")
 public interface SkuManageRemoteApi {
 
-	@ApiOperation("协定方管理页面查询")
-	@PostMapping("/agreement/manage/query")
-	ResultVO<PageVO<AgreementSkuInfoVO>> queryAgreementManageInfo(@RequestBody ProductManageQueryRequest productManageQueryRequest);
+	@ApiOperation("sku管理页面查询")
+	@PostMapping("/page/query")
+	ResultVO<PageVO<AgreementSkuInfoVO>> querySkuManageInfo(@RequestBody ProductManageQueryRequest productManageQueryRequest);
 
 	@ApiOperation("保存或更新店铺的 sku 信息(不包含中药)")
 	@PostMapping("/store/save-or-update/sku")

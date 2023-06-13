@@ -2,6 +2,7 @@ package com.drstrong.health.product.service.sku.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.sku.StoreSkuInfoMapper;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
@@ -115,9 +116,11 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
 	 * @param productManageQueryRequest
 	 * @author liuqiuyi
 	 * @date 2023/6/13 10:28
+	 * @return
 	 */
 	@Override
-	public void pageQueryByParam(ProductManageQueryRequest productManageQueryRequest) {
-
+	public Page<StoreSkuInfoEntity> pageQueryByParam(ProductManageQueryRequest productManageQueryRequest) {
+		Page<StoreSkuInfoEntity> entityPage = new Page<>(productManageQueryRequest.getPageNo(), productManageQueryRequest.getPageSize());
+		return baseMapper.pageQueryByParam(entityPage, productManageQueryRequest);
 	}
 }

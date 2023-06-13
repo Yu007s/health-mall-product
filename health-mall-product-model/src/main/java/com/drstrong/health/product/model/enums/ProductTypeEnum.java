@@ -33,4 +33,12 @@ public enum ProductTypeEnum {
 				.filter(productTypeEnum -> Objects.equals(productTypeEnum.getCode(), code))
 				.findFirst().orElse(null);
 	}
+
+	public static String getValueByCode(Integer code) {
+		return Stream.of(ProductTypeEnum.values())
+				.filter(productTypeEnum -> Objects.equals(productTypeEnum.getCode(), code))
+				.map(ProductTypeEnum::getValue)
+				.findFirst()
+				.orElse("");
+	}
 }

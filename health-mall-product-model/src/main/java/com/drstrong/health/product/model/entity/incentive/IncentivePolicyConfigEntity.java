@@ -48,8 +48,14 @@ public class IncentivePolicyConfigEntity extends BaseStandardEntity implements S
 	 */
 	private String earningName;
 
+	/**
+	 * 是否为系统默认：1-系统默认值，2-自定义
+	 */
+	private Integer systemFlag;
+
 	public static IncentivePolicyConfigEntity buildDefaultEntity(Long operatorId) {
 		IncentivePolicyConfigEntity incentivePolicyConfigEntity = new IncentivePolicyConfigEntity();
+		incentivePolicyConfigEntity.setSystemFlag(2);
 		incentivePolicyConfigEntity.setVersion(1);
 		incentivePolicyConfigEntity.setDelFlag(DelFlagEnum.UN_DELETED.getCode());
 		incentivePolicyConfigEntity.setCreatedBy(operatorId);
