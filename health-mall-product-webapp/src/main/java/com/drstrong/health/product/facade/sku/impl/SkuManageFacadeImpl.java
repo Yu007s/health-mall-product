@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.facade.sku.SkuManageFacade;
@@ -13,6 +14,7 @@ import com.drstrong.health.product.model.dto.category.CategoryDTO;
 import com.drstrong.health.product.model.dto.label.LabelDTO;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.dto.product.SupplierInfoDTO;
+import com.drstrong.health.product.model.entity.label.LabelInfoEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
@@ -43,7 +45,10 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -224,10 +229,57 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 	 * @date 2023/6/13 10:23
 	 */
 	@Override
-	public PageVO<AgreementSkuInfoVO> queryAgreementManageInfo(ProductManageQueryRequest productManageQueryRequest) {
+	public PageVO<AgreementSkuInfoVO> querySkuManageInfo(ProductManageQueryRequest productManageQueryRequest) {
+		log.info("invoke queryAgreementManageInfo(),param:{}", JSONUtil.toJsonStr(productManageQueryRequest));
 		// 1.根据入参中的条件,分页查询店铺 sku 表
-		storeSkuInfoService.pageQueryByParam(productManageQueryRequest);
+		Page<StoreSkuInfoEntity> storeSkuInfoEntityPageList = storeSkuInfoService.pageQueryByParam(productManageQueryRequest);
+		List<StoreSkuInfoEntity> pageListRecords = storeSkuInfoEntityPageList.getRecords();
+		if (CollectionUtil.isEmpty(pageListRecords)) {
+			return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(productManageQueryRequest.getPageNo()).pageSize(productManageQueryRequest.getPageSize()).build();
+		}
+		// 2.组装返回值
+		List<AgreementSkuInfoVO> agreementSkuInfoVoList = buildAgreementSkuInfoVo(pageListRecords);
+		return PageVO.newBuilder().result(agreementSkuInfoVoList).totalCount((int) storeSkuInfoEntityPageList.getTotal()).pageNo(productManageQueryRequest.getPageNo()).pageSize(productManageQueryRequest.getPageSize()).build();
+	}
 
-		return null;
+	private List<AgreementSkuInfoVO> buildAgreementSkuInfoVo(List<StoreSkuInfoEntity> pageListRecords) {
+		// 获取 id,一次循环全部取出
+		Set<Long> storeIds = Sets.newHashSet();
+		Set<Long> supplierIds = Sets.newHashSet();
+		Set<Long> labelIds = Sets.newHashSet();
+		pageListRecords.forEach(storeSkuInfoEntity -> {
+			storeIds.add(storeSkuInfoEntity.getStoreId());
+			supplierIds.addAll(storeSkuInfoEntity.getSupplierInfo());
+			labelIds.addAll(storeSkuInfoEntity.getLabelInfo());
+		});
+		// 2.查询店铺名称
+		Map<Long, String> storeIdNameMap = storeService.listByIds(storeIds).stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
+		// 3.查询供应商名称
+		Map<Long, String> supplierIdNameMap = supplierRemoteProService.getSupplierNameToMap(Lists.newArrayList(supplierIds));
+		// 4.查询标签名称
+		Map<Long, String> labelIdNameMap = labelInfoService.queryByIds(Lists.newArrayList(labelIds)).stream().collect(Collectors.toMap(LabelInfoEntity::getId, LabelInfoEntity::getLabelName, (v1, v2) -> v1));
+		// 5.组装参数
+		List<AgreementSkuInfoVO> agreementSkuInfoVoList = Lists.newArrayListWithCapacity(pageListRecords.size());
+		pageListRecords.forEach(storeSkuInfoEntity -> {
+			List<SupplierInfoDTO> supplierInfoDTOList = storeSkuInfoEntity.getSupplierInfo().stream().map(supplierId -> new SupplierInfoDTO(supplierId, supplierIdNameMap.get(supplierId), null, null)).collect(toList());
+			List<LabelDTO> labelDTOList = storeSkuInfoEntity.getLabelInfo().stream().map(labelId -> new LabelDTO(labelId, labelIdNameMap.get(labelId), null, null)).collect(toList());
+
+			AgreementSkuInfoVO skuInfoVO = AgreementSkuInfoVO.builder()
+					.skuCode(storeSkuInfoEntity.getSkuCode())
+					.medicineCode(storeSkuInfoEntity.getMedicineCode())
+					.skuName(storeSkuInfoEntity.getSkuName())
+					.storeId(storeSkuInfoEntity.getStoreId())
+					.storeName(storeIdNameMap.get(storeSkuInfoEntity.getStoreId()))
+					.supplierInfoList(supplierInfoDTOList)
+					.salePrice(BigDecimalUtil.F2Y(storeSkuInfoEntity.getPrice()))
+					.labelList(labelDTOList)
+					.skuStatus(storeSkuInfoEntity.getSkuStatus())
+					.skuStatusName(UpOffEnum.getValueByCode(storeSkuInfoEntity.getSkuStatus()))
+					.build();
+			skuInfoVO.setProductType(storeSkuInfoEntity.getSkuType());
+			skuInfoVO.setProductTypeName(ProductTypeEnum.getValueByCode(storeSkuInfoEntity.getSkuType()));
+			agreementSkuInfoVoList.add(skuInfoVO);
+		});
+		return agreementSkuInfoVoList;
 	}
 }

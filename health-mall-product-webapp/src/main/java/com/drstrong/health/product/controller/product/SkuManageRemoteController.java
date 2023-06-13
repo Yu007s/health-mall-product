@@ -31,8 +31,8 @@ public class SkuManageRemoteController implements SkuManageRemoteApi {
 	SkuManageFacade skuManageFacade;
 
 	@Override
-	public ResultVO<PageVO<AgreementSkuInfoVO>> queryAgreementManageInfo(ProductManageQueryRequest productManageQueryRequest) {
-		return ResultVO.success(skuManageFacade.queryAgreementManageInfo(productManageQueryRequest));
+	public ResultVO<PageVO<AgreementSkuInfoVO>> querySkuManageInfo(ProductManageQueryRequest productManageQueryRequest) {
+		return ResultVO.success(skuManageFacade.querySkuManageInfo(productManageQueryRequest));
 	}
 
 	@Override

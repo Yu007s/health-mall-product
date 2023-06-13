@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.sku;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.enums.UpOffEnum;
@@ -51,6 +52,7 @@ public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
 	 *
 	 * @author liuqiuyi
 	 * @date 2023/6/13 10:28
+	 * @return
 	 */
-	void pageQueryByParam(ProductManageQueryRequest productManageQueryRequest);
+	Page<StoreSkuInfoEntity> pageQueryByParam(ProductManageQueryRequest productManageQueryRequest);
 }

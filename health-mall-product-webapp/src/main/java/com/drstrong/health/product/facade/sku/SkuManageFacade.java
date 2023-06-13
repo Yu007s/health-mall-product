@@ -33,5 +33,5 @@ public interface SkuManageFacade {
 	 * @author liuqiuyi
 	 * @date 2023/6/13 10:23
 	 */
-	PageVO<AgreementSkuInfoVO> queryAgreementManageInfo(ProductManageQueryRequest productManageQueryRequest);
+	PageVO<AgreementSkuInfoVO> querySkuManageInfo(ProductManageQueryRequest productManageQueryRequest);
 }
