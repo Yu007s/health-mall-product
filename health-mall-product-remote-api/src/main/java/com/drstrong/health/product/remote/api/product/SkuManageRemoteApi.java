@@ -31,7 +31,7 @@ public interface SkuManageRemoteApi {
 	ResultVO<Void> saveOrUpdateStoreProduct(@RequestBody @Valid SaveOrUpdateStoreSkuRequest saveOrUpdateStoreProductRequest);
 
 	@ApiOperation("根据skuCode查询详情(不包含中药)")
-	@GetMapping("/store/save-or-update/sku")
+	@GetMapping("/query/by-code")
 	ResultVO<StoreSkuDetailDTO> queryDetailByCode(@RequestParam("skuCode") String skuCode);
 
 	@ApiOperation("批量上下架(不包含中药)")
