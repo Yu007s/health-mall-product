@@ -7,6 +7,8 @@ import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRe
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @author liuqiuyi
  * @date 2023/6/8 14:42
@@ -15,4 +17,6 @@ import org.apache.ibatis.annotations.Param;
 public interface StoreSkuInfoMapper extends BaseMapper<StoreSkuInfoEntity> {
 
 	Page<StoreSkuInfoEntity> pageQueryByParam(Page<StoreSkuInfoEntity> page, @Param("queryParam") ProductManageQueryRequest queryParam);
+
+	List<StoreSkuInfoEntity> listQueryByParam(@Param("queryParam") ProductManageQueryRequest queryParam);
 }

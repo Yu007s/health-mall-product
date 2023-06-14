@@ -231,16 +231,37 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 	 */
 	@Override
 	public PageVO<AgreementSkuInfoVO> querySkuManageInfo(ProductManageQueryRequest productManageQueryRequest) {
-		log.info("invoke queryAgreementManageInfo(),param:{}", JSONUtil.toJsonStr(productManageQueryRequest));
+		log.info("invoke querySkuManageInfo(),param:{}", JSONUtil.toJsonStr(productManageQueryRequest));
 		// 1.根据入参中的条件,分页查询店铺 sku 表
 		Page<StoreSkuInfoEntity> storeSkuInfoEntityPageList = storeSkuInfoService.pageQueryByParam(productManageQueryRequest);
 		List<StoreSkuInfoEntity> pageListRecords = storeSkuInfoEntityPageList.getRecords();
 		if (CollectionUtil.isEmpty(pageListRecords)) {
+			log.info("未查询到任何sku数据,参数为:{}", JSONUtil.toJsonStr(productManageQueryRequest));
 			return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(productManageQueryRequest.getPageNo()).pageSize(productManageQueryRequest.getPageSize()).build();
 		}
 		// 2.组装返回值
 		List<AgreementSkuInfoVO> agreementSkuInfoVoList = buildAgreementSkuInfoVo(pageListRecords);
 		return PageVO.newBuilder().result(agreementSkuInfoVoList).totalCount((int) storeSkuInfoEntityPageList.getTotal()).pageNo(productManageQueryRequest.getPageNo()).pageSize(productManageQueryRequest.getPageSize()).build();
+	}
+
+	/**
+	 * 协定方|西药 管理页面,所有数据查询,用于导出
+	 *
+	 * @param productManageQueryRequest
+	 * @author liuqiuyi
+	 * @date 2023/6/14 11:23
+	 */
+	@Override
+	public List<AgreementSkuInfoVO> listSkuManageInfo(ProductManageQueryRequest productManageQueryRequest) {
+		log.info("invoke listSkuManageInfo(),param:{}", JSONUtil.toJsonStr(productManageQueryRequest));
+		// 1.根据入参中的条件,查询店铺 sku 表
+		List<StoreSkuInfoEntity> storeSkuInfoEntityList = storeSkuInfoService.listQueryByParam(productManageQueryRequest);
+		if (CollectionUtil.isEmpty(storeSkuInfoEntityList)) {
+			log.info("未查询到任何sku数据,参数为:{}", JSONUtil.toJsonStr(productManageQueryRequest));
+			return Lists.newArrayList();
+		}
+		// 2.组装参数返回
+		return buildAgreementSkuInfoVo(storeSkuInfoEntityList);
 	}
 
 	private List<AgreementSkuInfoVO> buildAgreementSkuInfoVo(List<StoreSkuInfoEntity> pageListRecords) {

@@ -49,7 +49,7 @@
                 changed_by
     </sql>
 
-    <select id="pageQueryByParam" resultMap="BaseResultMap">
+    <sql id="Manage_Query_By_Param">
         select
         <include refid="Base_Column_List"/>
         from pms_store_sku_info
@@ -73,5 +73,13 @@
         <if test="queryParam.supplierId != null">
             and #{queryParam.supplierId} MEMBER OF (supplier_info)
         </if>
+    </sql>
+
+    <select id="pageQueryByParam" resultMap="BaseResultMap">
+        <include refid="Manage_Query_By_Param"/>
+    </select>
+
+    <select id="listQueryByParam" resultMap="BaseResultMap">
+        <include refid="Manage_Query_By_Param"/>
     </select>
 </mapper>

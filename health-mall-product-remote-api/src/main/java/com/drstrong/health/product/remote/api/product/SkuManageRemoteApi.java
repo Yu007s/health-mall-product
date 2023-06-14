@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Api("健康商城-商品服务-商品管理页面的远程接口")
 @FeignClient(value = "health-mall-product", path = "/inner/sku/manage")
@@ -24,7 +25,11 @@ public interface SkuManageRemoteApi {
 
 	@ApiOperation("sku管理页面查询")
 	@PostMapping("/page/query")
-	ResultVO<PageVO<AgreementSkuInfoVO>> querySkuManageInfo(@RequestBody ProductManageQueryRequest productManageQueryRequest);
+	ResultVO<PageVO<AgreementSkuInfoVO>> pageQuerySkuManageInfo(@RequestBody ProductManageQueryRequest productManageQueryRequest);
+
+	@ApiOperation("sku管理页面查询所有数据,导出需要")
+	@PostMapping("/query/all")
+	ResultVO<List<AgreementSkuInfoVO>> listSkuManageInfo(@RequestBody ProductManageQueryRequest productManageQueryRequest);
 
 	@ApiOperation("保存或更新店铺的 sku 信息(不包含中药)")
 	@PostMapping("/store/save-or-update/sku")

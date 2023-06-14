@@ -59,6 +59,15 @@ public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
 	Page<StoreSkuInfoEntity> pageQueryByParam(ProductManageQueryRequest productManageQueryRequest);
 
 	/**
+	 * 根据条件查询所有
+	 *
+	 * @return
+	 * @author liuqiuyi
+	 * @date 2023/6/13 10:28
+	 */
+	List<StoreSkuInfoEntity> listQueryByParam(ProductManageQueryRequest productManageQueryRequest);
+
+	/**
 	 * 根据类型查询所有的 sku 信息
 	 *
 	 * @author liuqiuyi
