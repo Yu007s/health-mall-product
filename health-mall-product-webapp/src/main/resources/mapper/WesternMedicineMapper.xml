@@ -90,6 +90,17 @@
                     </otherwise>
                 </choose>
             </if>
+            <if test="queryParam.defaultUsageDosage != null">
+                AND CASE WHEN mu.relation_id IS NULL THEN 0 ELSE 1
+                <choose>
+                    <when test="queryParam.defaultUsageDosage == 1">
+                        END = 1
+                    </when>
+                    <otherwise>
+                        END = 0
+                    </otherwise>
+                </choose>
+            </if>
         </where>
         order by m.id desc
     </select>

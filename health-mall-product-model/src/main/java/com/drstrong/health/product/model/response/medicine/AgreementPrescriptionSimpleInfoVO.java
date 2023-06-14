@@ -27,6 +27,9 @@ public class AgreementPrescriptionSimpleInfoVO implements Serializable {
     @ApiModelProperty("包装规格(0.25g*12片*2板/盒)")
     private String packingSpec;
 
+    @ApiModelProperty("包装单位（盒,瓶...)")
+    private String packingUnit;
+
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
