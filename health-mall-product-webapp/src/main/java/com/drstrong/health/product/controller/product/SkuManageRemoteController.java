@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * sku 管理 controller
@@ -31,8 +32,13 @@ public class SkuManageRemoteController implements SkuManageRemoteApi {
 	SkuManageFacade skuManageFacade;
 
 	@Override
-	public ResultVO<PageVO<AgreementSkuInfoVO>> querySkuManageInfo(ProductManageQueryRequest productManageQueryRequest) {
+	public ResultVO<PageVO<AgreementSkuInfoVO>> pageQuerySkuManageInfo(ProductManageQueryRequest productManageQueryRequest) {
 		return ResultVO.success(skuManageFacade.querySkuManageInfo(productManageQueryRequest));
+	}
+
+	@Override
+	public ResultVO<List<AgreementSkuInfoVO>> listSkuManageInfo(ProductManageQueryRequest productManageQueryRequest) {
+		return ResultVO.success(skuManageFacade.listSkuManageInfo(productManageQueryRequest));
 	}
 
 	@Override

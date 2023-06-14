@@ -126,6 +126,19 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
 	}
 
 	/**
+	 * 根据条件查询所有
+	 *
+	 * @param productManageQueryRequest
+	 * @return
+	 * @author liuqiuyi
+	 * @date 2023/6/13 10:28
+	 */
+	@Override
+	public List<StoreSkuInfoEntity> listQueryByParam(ProductManageQueryRequest productManageQueryRequest) {
+		return baseMapper.listQueryByParam(productManageQueryRequest);
+	}
+
+	/**
 	 * 根据类型查询所有的 sku 信息
 	 *
 	 * @param productType
