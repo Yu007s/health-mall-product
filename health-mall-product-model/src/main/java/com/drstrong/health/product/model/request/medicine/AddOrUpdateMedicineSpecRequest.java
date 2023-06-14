@@ -25,6 +25,9 @@ public class AddOrUpdateMedicineSpecRequest implements Serializable {
     @ApiModelProperty(value = "规格编码")
     private String specCode;
 
+    @ApiModelProperty(value = "规格名称")
+    private String specName;
+
     @ApiModelProperty(value = "药品编码")
     private String medicineCode;
 

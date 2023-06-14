@@ -8,6 +8,9 @@ import lombok.Data;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 @Builder
@@ -91,8 +94,8 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     }
 
     public void constructFullName() {
-        if (brandName != null || medicineName != null || commonName != null) {
-            this.fullName = brandName + medicineName + commonName;
-        }
+        this.fullName = Stream.of(brandName, medicineName, commonName)
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(" "));
     }
 }

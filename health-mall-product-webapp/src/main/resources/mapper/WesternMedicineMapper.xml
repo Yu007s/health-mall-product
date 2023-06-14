@@ -109,7 +109,7 @@
             resultType="com.drstrong.health.product.model.response.medicine.WesternMedicineSimpleInfoVO">
         SELECT m.id,
                m.medicine_code        medicineCode,
-               m.medicine_name        medicineName,
+               m.full_name        medicineName,
                mc.classification_name agentClassName
         FROM pms_western_medicine m
                  LEFT JOIN pms_medicine_classification mc
