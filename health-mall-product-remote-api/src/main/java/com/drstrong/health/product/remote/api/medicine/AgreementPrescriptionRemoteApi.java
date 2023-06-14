@@ -36,7 +36,7 @@ public interface AgreementPrescriptionRemoteApi {
      * @return
      */
     @ApiOperation("保存/修改 协定方")
-    @GetMapping("/save-or-update")
+    @PostMapping("/save-or-update")
     ResultVO<Long> saveOrUpdateAgreementPrescription(@RequestBody @Valid AddOrUpdateAgreementRequest request);
 
 

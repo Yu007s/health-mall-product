@@ -15,6 +15,7 @@ import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineSpecRequest;
+import com.drstrong.health.product.model.request.medicine.MedicineUsageRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.medicine.*;
@@ -63,9 +64,18 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
             specifications.setSpecCode(generateMedicineSpecCode(westernMedicine.getId(), westernMedicine.getMedicineCode()));
             specifications.setCreatedBy(specRequest.getUserId());
         }
+        // 保存或更新药物规格
         saveOrUpdate(specifications);
-        specRequest.getMedicineUsage().assignmentRelation(specifications.getId(), MedicineConstant.MEDICINE_SPECIFICATIONS_USAGE_DOSAGE);
-        medicineUsageService.saveOrUpdateUsage(specRequest.getMedicineUsage());
+        MedicineUsageRequest medicineUsage = specRequest.getMedicineUsage();
+        if (ObjectUtil.isNull(specRequest.getMedicineUsage())) {
+            medicineUsage = new MedicineUsageRequest(specRequest.getUseUsageDosage(), specifications.getId(), MedicineConstant.MEDICINE_SPECIFICATIONS_USAGE_DOSAGE);
+        } else {
+            medicineUsage.setRelationType(MedicineConstant.MEDICINE_SPECIFICATIONS_USAGE_DOSAGE);
+            medicineUsage.setRelationId(specifications.getId());
+            medicineUsage.setUseUsageDosage(specRequest.getUseUsageDosage());
+        }
+        //保存-更新用法用量
+        medicineUsageService.saveOrUpdateUsage(medicineUsage);
         return specifications.getId();
     }
 

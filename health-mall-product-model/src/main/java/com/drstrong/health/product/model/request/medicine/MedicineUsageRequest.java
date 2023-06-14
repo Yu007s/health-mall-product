@@ -52,9 +52,9 @@ public class MedicineUsageRequest implements Serializable {
     @ApiModelProperty(value = "操作人 姓名", hidden = true)
     private String userName;
 
-    public void assignmentRelation(Long relationId, Integer relationType) {
+    public MedicineUsageRequest(Integer useUsageDosage, Long relationId, Integer relationType) {
+        this.useUsageDosage = useUsageDosage;
         this.relationId = relationId;
         this.relationType = relationType;
     }
-
 }

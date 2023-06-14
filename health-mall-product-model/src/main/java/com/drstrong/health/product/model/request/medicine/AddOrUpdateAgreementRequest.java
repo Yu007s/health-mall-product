@@ -89,15 +89,15 @@ public class AddOrUpdateAgreementRequest implements Serializable {
         private static final long serialVersionUID = 2148769498519904439L;
 
         @ApiModelProperty(value = "剂型分类id")
-        @NotEmpty(message = "剂型分类id不能为空")
+        @NotNull(message = "剂型分类id不能为空")
         private Long agentClassificationId;
 
         @ApiModelProperty(value = "安全分类id")
-        @NotEmpty(message = "安全分类id不能为空")
+        @NotNull(message = "安全分类id不能为空")
         private Long securityClassificationId;
 
         @ApiModelProperty(value = "原料分类id")
-        @NotEmpty(message = "原料分类id不能为空")
+        @NotNull(message = "原料分类id不能为空")
         private Long materialsClassificationId;
     }
 }

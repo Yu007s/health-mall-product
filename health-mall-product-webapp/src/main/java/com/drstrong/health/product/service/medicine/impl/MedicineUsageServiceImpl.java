@@ -3,6 +3,7 @@ package com.drstrong.health.product.service.medicine.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -20,6 +21,7 @@ import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecIn
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.service.medicine.MedicineUsageService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,11 +35,13 @@ import java.time.LocalDateTime;
  * @since 2023-06-07
  */
 @Service
+@Slf4j
 public class MedicineUsageServiceImpl extends ServiceImpl<MedicineUsageMapper, MedicineUsageEntity> implements MedicineUsageService {
 
 
     @Override
     public void saveOrUpdateUsage(MedicineUsageRequest medicineUsageRequest) {
+        log.info("invoke saveOrUpdateUsage() param:{}", JSONUtil.toJsonStr(medicineUsageRequest));
         Assert.isTrue(ObjectUtil.hasEmpty(medicineUsageRequest.getRelationId(),
                 medicineUsageRequest.getRelationType()),
                 () -> new BusinessException(ErrorEnums.PARAM_TYPE_IS_ERROR));

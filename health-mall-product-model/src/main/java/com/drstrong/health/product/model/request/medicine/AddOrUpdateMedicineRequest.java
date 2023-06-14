@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -58,6 +59,7 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     private MedicineClassificationInfoRequest medicineClassificationInfo;
 
     @ApiModelProperty(value = "药品说明")
+    @Valid
     private MedicineInstructionsRequest medicineInstructions;
 
     @ApiModelProperty(value = "操作人 id", hidden = true)
