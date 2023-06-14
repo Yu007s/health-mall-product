@@ -23,6 +23,7 @@ import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.service.medicine.MedicineUsageService;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
+import com.drstrong.health.product.util.RedisKeyUtils;
 import com.naiterui.common.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -105,7 +106,7 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
 
     private String generateMedicineSpecCode(Long medicineId, String medicineCode) {
         // 生成规则：药品编码M开头 + 建码日期六位：年后两位+月份+日期（190520）+ 5位顺序码    举例：M19052000001
-        long serialNumber = RedisUtil.keyOps().incr(MedicineConstant.SPEC_SERIAL_NUMBER_REDIS_KEY + medicineId);
+        long serialNumber = RedisUtil.keyOps().incr(RedisKeyUtils.getSkuNum(medicineId));
         return medicineCode + "-" + serialNumber;
     }
 

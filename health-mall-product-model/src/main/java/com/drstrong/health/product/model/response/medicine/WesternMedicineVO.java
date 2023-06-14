@@ -32,6 +32,9 @@ public class WesternMedicineVO implements Serializable {
     @ApiModelProperty(value = "cspu药品名称")
     private String medicineName;
 
+    @ApiModelProperty(value = "品牌名")
+    private String brandName;
+
     @ApiModelProperty(value = "通用名")
     private String commonName;
 

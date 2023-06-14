@@ -1,5 +1,8 @@
 package com.drstrong.health.product.service.medicine.impl;
 
+import com.drstrong.health.product.model.enums.ProductTypeEnum;
+import com.drstrong.health.product.util.RedisKeyUtils;
+import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.google.common.collect.Lists;
 import com.drstrong.health.log.vo.HealthLogQueryVO.Sort;
 
@@ -72,7 +75,6 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
 
     @Autowired
     private LogApiServicePlus logApiService;
-
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -201,21 +203,10 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
         if (ObjectUtil.isNull(medicineRequest.getId())) {
             westernMedicine.setCreatedAt(LocalDateTime.now());
             westernMedicine.setCreatedBy(medicineRequest.getUserId());
-            westernMedicine.setMedicineCode(generateMedicineCode());
+            westernMedicine.setMedicineCode(UniqueCodeUtils.getNextSpuCode(ProductTypeEnum.MEDICINE));
         }
         westernMedicine.setChangedAt(LocalDateTime.now());
         westernMedicine.setChangedBy(medicineRequest.getUserId());
         return westernMedicine;
-    }
-
-
-    private String generateMedicineCode() {
-        // 生成规则：药品编码M开头 + 建码日期六位：年后两位+月份+日期（190520）+ 5位顺序码    举例：M19052000001
-        StringBuilder number = new StringBuilder();
-        number.append("M");
-        number.append(DateUtil.formatDate(new Date(), "yyMMdd"));
-        long serialNumber = RedisUtil.keyOps().incr(MedicineConstant.SERIAL_NUMBER_REDIS_KEY);
-        number.append(String.format("%05d", serialNumber));
-        return number.toString();
     }
 }

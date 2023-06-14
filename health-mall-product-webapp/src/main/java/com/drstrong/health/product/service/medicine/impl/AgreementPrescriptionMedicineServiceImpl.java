@@ -9,14 +9,15 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.constants.MedicineConstant;
 import com.drstrong.health.product.dao.medicine.AgreementPrescriptionMedicineMapper;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
+import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateAgreementRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionInfoVO;
 import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionSimpleInfoVO;
-import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
 import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicineService;
 import com.drstrong.health.product.service.medicine.MedicineUsageService;
+import com.drstrong.health.product.utils.UniqueCodeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +47,7 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
         prescriptionMedicineEntity.setChangedAt(LocalDateTime.now());
         if (ObjectUtil.isNull(request.getId())) {
             prescriptionMedicineEntity.setCreatedBy(request.getUserId());
+            prescriptionMedicineEntity.setMedicineCode(UniqueCodeUtils.getNextSpuCode(ProductTypeEnum.AGREEMENT));
         }
         saveOrUpdate(prescriptionMedicineEntity);
         request.getMedicineUsage().assignmentRelation(prescriptionMedicineEntity.getId(), MedicineConstant.AGREEMENT_PRESCRIPTION_USAGE_DOSAGE);

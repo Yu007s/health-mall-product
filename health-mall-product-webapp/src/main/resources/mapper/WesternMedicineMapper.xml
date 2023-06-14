@@ -33,24 +33,27 @@
     <select id="queryMedicinePageList"
             resultType="com.drstrong.health.product.model.response.medicine.WesternMedicineVO">
         SELECT DISTINCT
-            m.id id,
-            m.medicine_name medicineName,
-            m.full_name fullName,
-            m.common_name commonName,
-            m.medicine_code medicineCode,
-            m.data_integrity dataIntegrity,
-            m.created_at createdAt,
-            mi.production_enterprise productionEnterprise,
-            mc.classification_name drugClassification,
-            pmc.classification_name securityClassification,
-            CASE WHEN ms.medicine_id IS NULL THEN 0 ELSE 1 END AS relationSpec,
-            CASE WHEN mu.id IS NULL THEN 0 ELSE 1 END AS defaultUsageDosage
+        m.id id,
+        m.medicine_name medicineName,
+        m.full_name fullName,
+        m.brand_name brandName,
+        m.common_name commonName,
+        m.medicine_code medicineCode,
+        m.data_integrity dataIntegrity,
+        m.created_at createdAt,
+        mi.production_enterprise productionEnterprise,
+        mc.classification_name drugClassification,
+        pmc.classification_name securityClassification,
+        CASE WHEN ms.medicine_id IS NULL THEN 0 ELSE 1 END AS relationSpec,
+        CASE WHEN mu.id IS NULL THEN 0 ELSE 1 END AS defaultUsageDosage
         FROM
         pms_western_medicine m
         JOIN pms_western_medicine_instructions mi ON mi.medicine_id = m.id
         LEFT JOIN pms_western_medicine_specifications ms ON ms.medicine_id = m.id
-        LEFT JOIN pms_medicine_classification mc ON mc.id = json_extract(m.medicine_classification_info,'$.drugClassificationId')
-        LEFT JOIN pms_medicine_classification pmc ON pmc.id = json_extract(m.medicine_classification_info,'$.securityClassificationId')
+        LEFT JOIN pms_medicine_classification mc ON mc.id =
+        json_extract(m.medicine_classification_info,'$.drugClassificationId')
+        LEFT JOIN pms_medicine_classification pmc ON pmc.id =
+        json_extract(m.medicine_classification_info,'$.securityClassificationId')
         LEFT JOIN pms_medicine_usage mu ON mu.relation_id = ms.id AND mu.relation_type = 1 AND mu.del_flag = 0
         <where>
             m.del_flag = 0
@@ -61,11 +64,11 @@
             </if>
             <if test="queryParam.drugClassificationId != null">
                 AND JSON_EXTRACT(m.medicine_classification_info, '$.drugClassificationId') =
-                #{queryParam.drugClassificationId};
+                #{queryParam.drugClassificationId}
             </if>
             <if test="queryParam.pharmacologyClassificationId != null">
                 AND JSON_EXTRACT(m.medicine_classification_info, '$.pharmacologyClassificationId') =
-                #{queryParam.pharmacologyClassificationId};
+                #{queryParam.pharmacologyClassificationId}
             </if>
             <if test="queryParam.createStart != null">
                 AND m.created_at &gt;= #{queryParam.createStart}
@@ -74,15 +77,16 @@
                 AND m.created_at &lt;= #{queryParam.createEnd}
             </if>
             <if test="queryParam.dataIntegrity != null">
-                AND m.dataIntegrity = #{queryParam.dataIntegrity}
+                AND m.data_integrity = #{queryParam.dataIntegrity}
             </if>
             <if test="queryParam.relationSpec != null">
+                AND CASE WHEN ms.medicine_id IS NULL THEN 0 ELSE 1
                 <choose>
-                    <when test="queryParam.relationSpec == 0">
-                        AND relationSpec = 0
+                    <when test="queryParam.relationSpec == 1">
+                        END = 1
                     </when>
                     <otherwise>
-                        AND relationSpec > 0
+                        END = 0
                     </otherwise>
                 </choose>
             </if>
@@ -90,14 +94,17 @@
         order by m.id desc
     </select>
 
-    <select id="queryMedicineSimpleInfo" resultType="com.drstrong.health.product.model.response.medicine.WesternMedicineSimpleInfoVO">
+    <select id="queryMedicineSimpleInfo"
+            resultType="com.drstrong.health.product.model.response.medicine.WesternMedicineSimpleInfoVO">
         SELECT m.id,
-               m.medicine_code medicineCode,
-               m.medicine_name medicineName,
+               m.medicine_code        medicineCode,
+               m.medicine_name        medicineName,
                mc.classification_name agentClassName
         FROM pms_western_medicine m
-                 LEFT JOIN pms_medicine_classification mc ON mc.id = json_extract(m.medicine_classification_info,'$.agentClassificationId')
-        WHERE m.del_flag = 0 AND m.id = #{id}
+                 LEFT JOIN pms_medicine_classification mc
+                           ON mc.id = json_extract(m.medicine_classification_info, '$.agentClassificationId')
+        WHERE m.del_flag = 0
+          AND m.id = #{id}
     </select>
 
 
