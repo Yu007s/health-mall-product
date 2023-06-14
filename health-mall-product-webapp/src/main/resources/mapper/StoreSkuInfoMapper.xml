@@ -82,4 +82,16 @@
     <select id="listQueryByParam" resultMap="BaseResultMap">
         <include refid="Manage_Query_By_Param"/>
     </select>
+
+    <update id="batchUpdateSkuStatusByCodes">
+        update pms_store_sku_info
+        set sku_status = #{skuState},
+        changed_by = #{operatorId},
+        changed_at = now()
+        where del_flag = 0
+        and sku_code in ()
+        <foreach collection="skuCodeList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
 </mapper>

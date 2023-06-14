@@ -1,6 +1,7 @@
 package com.drstrong.health.product.facade.sku;
 
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
+import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -44,4 +45,12 @@ public interface SkuManageFacade {
 	 * @date 2023/6/14 11:23
 	 */
 	List<AgreementSkuInfoVO> listSkuManageInfo(ProductManageQueryRequest productManageQueryRequest);
+
+	/**
+	 * sku 批量上下架
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/6/14 15:36
+	 */
+	void updateSkuStatus(UpdateSkuStateRequest updateSkuStateRequest);
 }

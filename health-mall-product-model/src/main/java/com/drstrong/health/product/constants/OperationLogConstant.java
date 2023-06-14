@@ -20,6 +20,10 @@ public class OperationLogConstant {
      */
     public static final String SKU_STATUS_CHANGE = "skuStatusChange";
 
+    /**
+     * sku 定时上下架配置变更
+     */
+    public static final String SKU_SCHEDULED_CONFIG_CHANGE = "skuScheduledConfigChange";
 
     /**
      * 中药材变动

@@ -2,12 +2,14 @@ package com.drstrong.health.product.facade.sku.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.facade.sku.SkuManageFacade;
+import com.drstrong.health.product.facade.sku.SkuScheduledConfigFacade;
 import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.dto.area.AreaDTO;
 import com.drstrong.health.product.model.dto.category.CategoryDTO;
@@ -20,6 +22,7 @@ import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
+import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -51,6 +54,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author liuqiuyi
@@ -82,6 +86,9 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 
 	@Resource
 	CategoryService categoryService;
+
+	@Resource
+	SkuScheduledConfigFacade skuScheduledConfigFacade;
 
 	/**
 	 * 保存或者更新 sku 信息(目前不包括中药)
@@ -303,5 +310,43 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 			agreementSkuInfoVoList.add(skuInfoVO);
 		});
 		return agreementSkuInfoVoList;
+	}
+
+
+	/**
+	 * sku 批量上下架
+	 *
+	 * @param updateSkuStateRequest
+	 * @author liuqiuyi
+	 * @date 2023/6/14 15:36
+	 */
+	@Override
+	public void updateSkuStatus(UpdateSkuStateRequest updateSkuStateRequest) {
+		log.info("invoke updateSkuStatus param:{}", JSONUtil.toJsonStr(updateSkuStateRequest));
+		List<StoreSkuInfoEntity> storeSkuInfoEntityList = storeSkuInfoService.querySkuCodes(updateSkuStateRequest.getSkuCodeList());
+		// 1.校验 sku 是否存在
+		if (ObjectUtil.notEqual(storeSkuInfoEntityList.size(), updateSkuStateRequest.getSkuCodeList().size())) {
+			log.error("根据skuCode未找到数据,可能传入的参数中存在非法的skuCode,参数为:{}", JSONUtil.toJsonStr(updateSkuStateRequest));
+			throw new BusinessException(ErrorEnums.SKU_IS_NULL);
+		}
+		// 2.修改状态
+		storeSkuInfoService.batchUpdateSkuStatusByCodes(updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getSkuState(), updateSkuStateRequest.getOperatorId());
+		// 3.发送操作日志
+		sendSkuStatusUpdateLog(storeSkuInfoEntityList, updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getOperatorId(), updateSkuStateRequest.getOperatorName());
+		// 4.定时上下架处理
+		skuScheduledConfigFacade.batchUpdateScheduledStatusToCancelByCodes(updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getOperatorId(), updateSkuStateRequest.getOperatorName());
+	}
+
+	private void sendSkuStatusUpdateLog(List<StoreSkuInfoEntity> beforeDataList, Set<String> skuCodeList, Long operatorId, String operatorName) {
+		Map<String, StoreSkuInfoEntity> skuCodeInfoMap = storeSkuInfoService.querySkuCodes(skuCodeList)
+				.stream().collect(toMap(StoreSkuInfoEntity::getSkuCode, dto -> dto, (v1, v2) -> v1));
+		// 循环发送操作日志
+		beforeDataList.forEach(skuInfoEntity -> {
+			OperationLog operationLog = OperationLog.buildOperationLog(skuInfoEntity.getSkuCode(), OperationLogConstant.MALL_PRODUCT_SKU_CHANGE,
+					OperationLogConstant.SKU_STATUS_CHANGE, operatorId, operatorName,
+					OperateTypeEnum.CMS.getCode(), JSONUtil.toJsonStr(skuInfoEntity));
+			operationLog.setChangeAfterData(JSONUtil.toJsonStr(skuCodeInfoMap.get(skuInfoEntity.getSkuCode())));
+			operationLogSendUtil.sendOperationLog(operationLog);
+		});
 	}
 }

@@ -7,6 +7,7 @@ import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author liuqiuyi
@@ -74,4 +75,20 @@ public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
 	 * @date 2023/6/13 16:57
 	 */
 	List<StoreSkuInfoEntity> queryAllByProductType(Long storeId, Integer productType);
+
+	/**
+	 * 根据 skuCode 查询
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/6/14 15:38
+	 */
+	List<StoreSkuInfoEntity> querySkuCodes(Set<String> skuCodeList);
+
+	/**
+	 * 批量更新 sku 状态
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/6/14 15:50
+	 */
+	void batchUpdateSkuStatusByCodes(Set<String> skuCodeList, Integer skuState, Long operatorId);
 }

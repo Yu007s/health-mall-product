@@ -41,7 +41,7 @@ public interface SkuManageRemoteApi {
 
 	@ApiOperation("批量上下架(不包含中药)")
 	@PostMapping("/update/sku-status")
-	ResultVO<Void> updateSkuStatus(@RequestBody UpdateSkuStateRequest updateSkuStateRequest);
+	ResultVO<Void> updateSkuStatus(@RequestBody @Valid UpdateSkuStateRequest updateSkuStateRequest);
 
 	@ApiOperation("预约上下架(不包含中药)")
 	@PostMapping("/scheduled/up-or-down")

@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.sku.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -12,11 +13,14 @@ import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author liuqiuyi
@@ -152,5 +156,38 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
 				.eq(Objects.nonNull(storeId), StoreSkuInfoEntity::getStoreId, storeId)
 				.eq(Objects.nonNull(productType), StoreSkuInfoEntity::getSkuType, productType);
 		return baseMapper.selectList(queryWrapper);
+	}
+
+	/**
+	 * 根据 skuCode 查询
+	 *
+	 * @param skuCodeList
+	 * @author liuqiuyi
+	 * @date 2023/6/14 15:38
+	 */
+	@Override
+	public List<StoreSkuInfoEntity> querySkuCodes(Set<String> skuCodeList) {
+		if (CollectionUtil.isEmpty(skuCodeList)) {
+			return Lists.newArrayList();
+		}
+		LambdaQueryWrapper<StoreSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<StoreSkuInfoEntity>()
+				.eq(StoreSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+				.in(StoreSkuInfoEntity::getSkuCode, skuCodeList);
+		return baseMapper.selectList(queryWrapper);
+	}
+
+	/**
+	 * 批量更新 sku 状态
+	 *
+	 * @param skuCodeList
+	 * @param skuState
+	 * @param operatorId
+	 * @author liuqiuyi
+	 * @date 2023/6/14 15:50
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void batchUpdateSkuStatusByCodes(Set<String> skuCodeList, Integer skuState, Long operatorId) {
+		baseMapper.batchUpdateSkuStatusByCodes(skuCodeList, skuState, operatorId);
 	}
 }

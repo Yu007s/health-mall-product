@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author liuqiuyi
@@ -19,4 +20,6 @@ public interface StoreSkuInfoMapper extends BaseMapper<StoreSkuInfoEntity> {
 	Page<StoreSkuInfoEntity> pageQueryByParam(Page<StoreSkuInfoEntity> page, @Param("queryParam") ProductManageQueryRequest queryParam);
 
 	List<StoreSkuInfoEntity> listQueryByParam(@Param("queryParam") ProductManageQueryRequest queryParam);
+
+	int batchUpdateSkuStatusByCodes(@Param("skuCodeList") Set<String> skuCodeList, @Param("skuState") Integer skuState, @Param("operatorId") Long operatorId);
 }

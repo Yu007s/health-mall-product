@@ -54,6 +54,7 @@ public class SkuManageRemoteController implements SkuManageRemoteApi {
 
 	@Override
 	public ResultVO<Void> updateSkuStatus(UpdateSkuStateRequest updateSkuStateRequest) {
+		skuManageFacade.updateSkuStatus(updateSkuStateRequest);
 		return ResultVO.success();
 	}
 
