@@ -2,6 +2,7 @@ package com.drstrong.health.product.facade.incentive.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.drstrong.health.common.enums.OperateTypeEnum;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -217,6 +219,12 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 					.price(BigDecimalUtil.F2Y(storeSkuInfoEntity.getPrice()))
 					.costPrice(ObjectUtil.isNull(skuIncentivePolicyEntity) ? new BigDecimal("-1") : BigDecimalUtil.F2Y(skuIncentivePolicyEntity.getCostPrice()))
 					.build();
+			// 计算利润率(零售价-成本价)/成本价,只有当成本价大于 0 时才计算,避免除 0 异常
+			if (NumberUtil.isGreater(skuIncentivePolicyDetailVO.getCostPrice(), BigDecimal.ZERO)) {
+				BigDecimal profit = skuIncentivePolicyDetailVO.getPrice().subtract(skuIncentivePolicyDetailVO.getCostPrice())
+						.divide(skuIncentivePolicyDetailVO.getCostPrice(), 2, RoundingMode.HALF_UP);
+				skuIncentivePolicyDetailVO.setProfit(profit);
+			}
 
 			// 将配置的收益单元转成 map
 			Map<Long, SkuIncentivePolicyEntity.IncentivePolicyInfo> configIdPolicyInfoMap = Optional.ofNullable(skuIncentivePolicyEntity).map(SkuIncentivePolicyEntity::getIncentivePolicyInfo).orElse(Lists.newArrayList())
