@@ -19,6 +19,7 @@ public class MedicineUsageRequest implements Serializable {
     private Integer useUsageDosage;
 
     @ApiModelProperty("关联id")
+    @NotNull(message = "relationId不能为空")
     private Long relationId;
 
     @ApiModelProperty("类型 1：西药 2：协定方")
@@ -50,5 +51,10 @@ public class MedicineUsageRequest implements Serializable {
 
     @ApiModelProperty(value = "操作人 姓名", hidden = true)
     private String userName;
+
+    public void assignmentRelation(Long relationId, Integer relationType) {
+        this.relationId = relationId;
+        this.relationType = relationType;
+    }
 
 }

@@ -17,6 +17,16 @@ public class MedicineConstant {
     public static final int USE_USAGE_DOSAGE = 1;
 
     /**
+     * 西药规格用法用量
+     */
+    public static final int MEDICINE_SPECIFICATIONS_USAGE_DOSAGE = 1;
+
+    /**
+     * 协定方用法用量
+     */
+    public static final int AGREEMENT_PRESCRIPTION_USAGE_DOSAGE = 2;
+
+    /**
      * 保存药品
      */
     public static final String SAVE_WESTERN_MEDICINE = "saveWesternMedicine";

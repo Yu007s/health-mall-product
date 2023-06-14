@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service.medicine.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -11,6 +12,7 @@ import com.drstrong.health.product.model.entity.medication.MedicineUsageEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.entity.product.ProductBasicsInfoEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductStateEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineSpecRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineUsageRequest;
@@ -36,6 +38,9 @@ public class MedicineUsageServiceImpl extends ServiceImpl<MedicineUsageMapper, M
 
     @Override
     public void saveOrUpdateUsage(MedicineUsageRequest medicineUsageRequest) {
+        Assert.isTrue(ObjectUtil.hasEmpty(medicineUsageRequest.getRelationId(),
+                medicineUsageRequest.getRelationType()),
+                () -> new BusinessException(ErrorEnums.PARAM_TYPE_IS_ERROR));
         Integer useUsageDosage = medicineUsageRequest.getUseUsageDosage();
         //未设置用法用量则删除
         if (ObjectUtil.isNotNull(useUsageDosage) && ObjectUtil.equals(useUsageDosage, MedicineConstant.NO_USE_USAGE_DOSAGE)) {
@@ -92,6 +97,5 @@ public class MedicineUsageServiceImpl extends ServiceImpl<MedicineUsageMapper, M
         )) {
             throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "规格用法用量参数不能为空！");
         }
-
     }
 }

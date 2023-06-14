@@ -157,8 +157,7 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
 
     @Override
     public PageVO<WesternMedicineVO> queryMedicinePageList(WesternMedicineRequest request) {
-        Page<WesternMedicineVO> entityPage = new Page<>(request.getPageNo(), request.getPageSize());
-        Page<WesternMedicineVO> westernMedicineVOPage = baseMapper.queryMedicinePageList(entityPage, request);
+        Page<WesternMedicineVO> westernMedicineVOPage = baseMapper.queryMedicinePageList(new Page<>(request.getPageNo(), request.getPageSize()), request);
         return PageVO.newBuilder().pageNo(request.getPageNo()).pageSize(request.getPageSize()).totalCount((int) westernMedicineVOPage.getTotal()).result(westernMedicineVOPage.getRecords()).build();
     }
 

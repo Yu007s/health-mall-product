@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.drstrong.health.product.constants.MedicineConstant;
 import com.drstrong.health.product.dao.medicine.AgreementPrescriptionMedicineMapper;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateAgreementRequest;
@@ -47,7 +48,7 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
             prescriptionMedicineEntity.setCreatedBy(request.getUserId());
         }
         saveOrUpdate(prescriptionMedicineEntity);
-        request.getMedicineUsage().setRelationId(prescriptionMedicineEntity.getId());
+        request.getMedicineUsage().assignmentRelation(prescriptionMedicineEntity.getId(), MedicineConstant.AGREEMENT_PRESCRIPTION_USAGE_DOSAGE);
         medicineUsageService.saveOrUpdateUsage(request.getMedicineUsage());
         return prescriptionMedicineEntity.getId();
     }
