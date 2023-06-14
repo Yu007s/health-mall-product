@@ -118,6 +118,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 		storeSkuInfoEntity.setSupplierInfo(supplierInfos);
 		storeSkuInfoEntity.setLabelInfo(CollectionUtil.isEmpty(saveOrUpdateStoreProductRequest.getLabelIdList()) ? Lists.newArrayList() : Lists.newArrayList(saveOrUpdateStoreProductRequest.getLabelIdList()));
 		storeSkuInfoEntity.setProhibitAreaInfo(CollectionUtil.isEmpty(saveOrUpdateStoreProductRequest.getProhibitAreaIdList()) ? Lists.newArrayList() : Lists.newArrayList(saveOrUpdateStoreProductRequest.getProhibitAreaIdList()));
+		storeSkuInfoEntity.setCategoryInfo(CollectionUtil.isEmpty(saveOrUpdateStoreProductRequest.getCategoryIdList()) ? Lists.newArrayList() : Lists.newArrayList(saveOrUpdateStoreProductRequest.getCategoryIdList()));
 		storeSkuInfoService.saveOrUpdate(storeSkuInfoEntity);
 		// 3.发送操作日志
 		operationLog.setBusinessId(storeSkuInfoEntity.getSkuCode());

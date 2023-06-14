@@ -97,6 +97,7 @@ public class StoreSkuInfoEntity extends BaseStandardEntity implements Serializab
 
 	public static StoreSkuInfoEntity buildDefault(Long operatorId) {
 		StoreSkuInfoEntity storeSkuInfoEntity = new StoreSkuInfoEntity();
+		storeSkuInfoEntity.setCategoryInfo(Lists.newArrayList());
 		storeSkuInfoEntity.setSupplierInfo(Lists.newArrayList());
 		storeSkuInfoEntity.setLabelInfo(Lists.newArrayList());
 		storeSkuInfoEntity.setProhibitAreaInfo(Lists.newArrayList());

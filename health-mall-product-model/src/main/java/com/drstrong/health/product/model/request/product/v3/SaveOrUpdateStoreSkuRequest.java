@@ -56,6 +56,7 @@ public class SaveOrUpdateStoreSkuRequest extends SkuBaseDTO implements Serializa
 	private Set<Long> labelIdList;
 
 	@ApiModelProperty("分类 id")
+	@NotNull(message = "分类 ID 不能为空")
 	private Set<Long> categoryIdList;
 
 	@ApiModelProperty("禁售区域id")
