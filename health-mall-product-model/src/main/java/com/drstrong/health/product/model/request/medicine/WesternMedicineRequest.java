@@ -9,6 +9,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 
@@ -44,12 +46,12 @@ public class WesternMedicineRequest extends PageRequest implements Serializable 
     private Integer defaultUsageDosage;
 
     @ApiModelProperty("创建药品开始时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate createStart;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createStart;
 
     @ApiModelProperty("创建药品结束时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate createEnd;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createEnd;
 
     /**
      * 药品ids 导出使用
