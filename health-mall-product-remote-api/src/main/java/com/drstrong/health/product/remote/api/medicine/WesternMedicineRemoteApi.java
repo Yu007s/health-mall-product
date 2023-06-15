@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 /**
@@ -59,4 +60,9 @@ public interface WesternMedicineRemoteApi {
     @ApiOperation("西药规格分页")
     @PostMapping("/spec/page/list")
     ResultVO<WesternMedicineSimpleInfoVO> queryMedicineSpecByPage(@RequestBody WesternMedicineRequest westernMedicineRequest);
+
+
+    @ApiOperation("西药excel数据")
+    @PostMapping("/excel/data")
+    ResultVO<List<WesternMedicineExcelVO>> queryMedicineExcelData(@RequestBody WesternMedicineRequest westernMedicineRequest);
 }

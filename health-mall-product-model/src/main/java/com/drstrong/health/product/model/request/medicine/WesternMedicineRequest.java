@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 
 @ApiModel("西药搜索参数")
@@ -49,4 +50,10 @@ public class WesternMedicineRequest extends PageRequest implements Serializable 
     @ApiModelProperty("创建药品结束时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate createEnd;
+
+    /**
+     * 药品ids 导出使用
+     */
+    @ApiModelProperty(value = "药品ids，导出使用")
+    private List<Long> medicineIds;
 }

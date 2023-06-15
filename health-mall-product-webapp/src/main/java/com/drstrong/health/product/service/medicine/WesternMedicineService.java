@@ -6,9 +6,12 @@ import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineReq
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.category.CategoryProductVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineExcelVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineInfoVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineLogVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -71,4 +74,11 @@ public interface WesternMedicineService extends IService<WesternMedicineEntity> 
      */
     PageVO<WesternMedicineLogVO> queryMedicineOperationLogByPage(WesternMedicineRequest westernMedicineRequest);
 
+
+    /**
+     * 西药excel导出数据
+     * @param request
+     * @return
+     */
+    List<WesternMedicineExcelVO> queryMedicineExcelData(WesternMedicineRequest request);
 }

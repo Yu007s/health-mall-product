@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -51,7 +52,6 @@ public class AddOrUpdateMedicineSpecRequest implements Serializable {
     private Integer packingUnitNumber;
 
     @ApiModelProperty("规格单位（板，包，瓶）")
-    @NotEmpty(message = "规格单位不能为空")
     private String specUnit;
 
     @ApiModelProperty("规格值")

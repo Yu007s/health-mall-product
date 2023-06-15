@@ -1,9 +1,8 @@
 package com.drstrong.health.product.service.medicine.impl;
 
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
-import com.drstrong.health.product.util.RedisKeyUtils;
+import com.drstrong.health.product.model.response.medicine.*;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
-import com.google.common.collect.Lists;
 import com.drstrong.health.log.vo.HealthLogQueryVO.Sort;
 
 import java.time.LocalDateTime;
@@ -18,8 +17,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.common.enums.OperateTypeEnum;
-import com.drstrong.health.common.utils.DateUtil;
-import com.drstrong.health.log.api.LogFacade;
 import com.drstrong.health.log.vo.HealthLogPageQueryVO;
 import com.drstrong.health.log.vo.HealthLogVO;
 import com.drstrong.health.product.constants.MedicineConstant;
@@ -34,22 +31,16 @@ import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineReq
 import com.drstrong.health.product.model.request.medicine.MedicineInstructionsRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.medicine.MedicineInstructionsVO;
-import com.drstrong.health.product.model.response.medicine.WesternMedicineInfoVO;
-import com.drstrong.health.product.model.response.medicine.WesternMedicineLogVO;
-import com.drstrong.health.product.model.response.medicine.WesternMedicineVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.log.LogApiServicePlus;
 import com.drstrong.health.product.service.medicine.WesternMedicineInstructionsService;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
-import com.naiterui.common.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -194,6 +185,11 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
                 .totalCount(pageVO.getTotalCount())
                 .result(vo)
                 .build();
+    }
+
+    @Override
+    public List<WesternMedicineExcelVO> queryMedicineExcelData(WesternMedicineRequest request) {
+        return baseMapper.queryMedicineExcelData(request);
     }
 
     private WesternMedicineEntity buildWesternMedicineEntity(AddOrUpdateMedicineRequest medicineRequest) {

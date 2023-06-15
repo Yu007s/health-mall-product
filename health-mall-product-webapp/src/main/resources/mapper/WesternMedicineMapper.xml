@@ -117,6 +117,84 @@
         WHERE m.del_flag = 0
           AND m.id = #{id}
     </select>
+    <select id="queryMedicineExcelData"
+            resultType="com.drstrong.health.product.model.response.medicine.WesternMedicineExcelVO">
+        SELECT DISTINCT
+        m.medicine_code medicineCode,
+        ms.standard_spec_code standardSpecCode,
+        m.full_name medicineName,
+        m.common_name commonName,
+        m.brand_name brandName,
+        ms.spec_code specCode,
+        ms.spec_name specName,
+        ms.packing_spec packingSpec,
+        ms.packing_unit packingUnit,
+        mc.classification_name drugClassName,
+        m.approval_number approvalNumber,
+        mi.production_enterprise productionEnterprise,
+        mi.listing_licensee listingLicensee,
+        ms.created_at createdAt
+        FROM
+        pms_western_medicine m
+        LEFT JOIN pms_western_medicine_instructions mi ON mi.medicine_id = m.id
+        LEFT JOIN pms_medicine_classification mc ON mc.id =
+        json_extract(m.medicine_classification_info,'$.drugClassificationId')
+        LEFT JOIN pms_western_medicine_specifications ms ON ms.medicine_id = m.id
+        LEFT JOIN pms_medicine_usage mu ON mu.relation_id = ms.id AND mu.relation_type = 1 AND mu.del_flag = 0
+        <where>
+            m.del_flag = 0
+            <if test="queryParam.searchName != null and queryParam.searchName != ''">
+                AND (m.medicine_name LIKE CONCAT('%', #{queryParam.searchName}, '%')
+                OR m.common_name LIKE CONCAT('%', #{queryParam.searchName}, '%')
+                OR m.medicine_code LIKE CONCAT('%', #{queryParam.searchName}, '%'))
+            </if>
+            <if test="queryParam.drugClassificationId != null">
+                AND JSON_EXTRACT(m.medicine_classification_info, '$.drugClassificationId') =
+                #{queryParam.drugClassificationId}
+            </if>
+            <if test="queryParam.pharmacologyClassificationId != null">
+                AND JSON_EXTRACT(m.medicine_classification_info, '$.pharmacologyClassificationId') =
+                #{queryParam.pharmacologyClassificationId}
+            </if>
+            <if test="queryParam.createStart != null">
+                AND m.created_at &gt;= #{queryParam.createStart}
+            </if>
+            <if test="queryParam.createEnd != null">
+                AND m.created_at &lt;= #{queryParam.createEnd}
+            </if>
+            <if test="queryParam.dataIntegrity != null">
+                AND m.data_integrity = #{queryParam.dataIntegrity}
+            </if>
+            <if test="queryParam.relationSpec != null">
+                AND CASE WHEN ms.medicine_id IS NULL THEN 0 ELSE 1
+                <choose>
+                    <when test="queryParam.relationSpec == 1">
+                        END = 1
+                    </when>
+                    <otherwise>
+                        END = 0
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="queryParam.defaultUsageDosage != null">
+                AND CASE WHEN mu.relation_id IS NULL THEN 0 ELSE 1
+                <choose>
+                    <when test="queryParam.defaultUsageDosage == 1">
+                        END = 1
+                    </when>
+                    <otherwise>
+                        END = 0
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="queryParam.medicineIds != null and queryParam.medicineIds.size()>0">
+                AND m.id in
+                <foreach collection="queryParam.medicineIds" separator="," open="(" close=")" item="id">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
 
 
 </mapper>

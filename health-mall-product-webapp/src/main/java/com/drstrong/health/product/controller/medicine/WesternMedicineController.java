@@ -16,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
- * 西/成药品库 前端控制器
+ * 西/成药 前端控制器
  * </p>
  *
  * @author zzw
@@ -68,6 +69,11 @@ public class WesternMedicineController implements WesternMedicineRemoteApi {
     @Override
     public ResultVO<WesternMedicineSimpleInfoVO> queryMedicineSpecByPage(WesternMedicineRequest westernMedicineRequest) {
         return ResultVO.success(specificationsService.queryMedicineSpecByPage(westernMedicineRequest));
+    }
+
+    @Override
+    public ResultVO<List<WesternMedicineExcelVO>> queryMedicineExcelData(WesternMedicineRequest westernMedicineRequest) {
+        return ResultVO.success(westernMedicineService.queryMedicineExcelData(westernMedicineRequest));
     }
 }
 
