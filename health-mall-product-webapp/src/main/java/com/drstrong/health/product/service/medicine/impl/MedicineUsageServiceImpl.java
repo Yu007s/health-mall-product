@@ -42,7 +42,7 @@ public class MedicineUsageServiceImpl extends ServiceImpl<MedicineUsageMapper, M
     @Override
     public void saveOrUpdateUsage(MedicineUsageRequest medicineUsageRequest) {
         log.info("invoke saveOrUpdateUsage() param:{}", JSONUtil.toJsonStr(medicineUsageRequest));
-        Assert.isTrue(ObjectUtil.hasEmpty(medicineUsageRequest.getRelationId(),
+        Assert.isTrue(!ObjectUtil.hasEmpty(medicineUsageRequest.getRelationId(),
                 medicineUsageRequest.getRelationType()),
                 () -> new BusinessException(ErrorEnums.PARAM_TYPE_IS_ERROR));
         Integer useUsageDosage = medicineUsageRequest.getUseUsageDosage();

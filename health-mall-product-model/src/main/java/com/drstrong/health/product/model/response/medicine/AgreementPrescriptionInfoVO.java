@@ -34,11 +34,11 @@ public class AgreementPrescriptionInfoVO implements Serializable {
     @ApiModelProperty("单位包装规格数量（24")
     private Integer packingUnitNumber;
 
-    @ApiModelProperty("规格单位（板，包，瓶）")
-    private String specUnit;
+    @ApiModelProperty("拆分单位（板，包，瓶）")
+    private String splitUnit;
 
-    @ApiModelProperty("规格值")
-    private Integer specValue;
+    @ApiModelProperty("拆分数量")
+    private Integer splitValue;
 
     @ApiModelProperty("处方")
     private String prescriptions;

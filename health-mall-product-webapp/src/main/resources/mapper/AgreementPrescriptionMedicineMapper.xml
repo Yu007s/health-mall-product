@@ -36,13 +36,13 @@
         <result property="packingUnit" column="packing_unit"/>
         <result property="packingUnitLimit" column="packing_unit_limit"/>
         <result property="packingUnitNumber" column="packing_unit_number"/>
-        <result property="specUnit" column="spec_unit"/>
-        <result property="specValue" column="spec_value"/>
+        <result property="splitUnit" column="split_unit"/>
+        <result property="splitValue" column="split_value"/>
         <result property="prescriptions" column="prescriptions"/>
         <result property="efficacy" column="efficacy"/>
         <result property="usageMethod" column="usage_method"/>
-        <result property="useUsageDosage" column="use_usage_dosage"/>
-        <result property="imageInfoList" column="image_info_list"/>
+        <result property="useUsageDosage" column="useUsageDosage"/>
+        <result property="imageInfoList" column="image_info"/>
         <result property="medicineClassificationInfo" column="medicine_classification_info"/>
         <association property="medicineUsage"
                      javaType="com.drstrong.health.product.model.response.medicine.MedicineUsageVO">
@@ -65,10 +65,11 @@
     <select id="queryAgreementPrescriptionInfo"
             resultMap="agreementPrescriptionInfoWithUsageResultMap">
         SELECT pm.*,
-               mu.*
+               mu.*,
+               CASE WHEN mu.id IS NULL THEN 0 ELSE 1 END AS useUsageDosage
         FROM pms_agreement_prescription_medicine pm
-                 LEFT JOIN pms_medicine_usage mu ON pm.id = nu.relation_id AND relation_type = 2
-        WHERE pm.id = #{id}
+                 LEFT JOIN pms_medicine_usage mu ON pm.id = mu.relation_id AND mu.relation_type = 2 AND mu.del_flag = 0
+        WHERE pm.del_flag = 0 AND pm.id = #{id}
     </select>
 
     <select id="queryPageList"
