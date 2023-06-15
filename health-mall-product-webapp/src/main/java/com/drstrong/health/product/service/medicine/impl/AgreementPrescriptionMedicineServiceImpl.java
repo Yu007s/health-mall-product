@@ -49,11 +49,11 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
         //保存更新协定方
         saveOrUpdate(prescriptionMedicineEntity);
         MedicineUsageRequest medicineUsage = request.getMedicineUsage();
-        if (ObjectUtil.isNull(request.getMedicineUsage())) {
-            medicineUsage = new MedicineUsageRequest(request.getUseUsageDosage(), request.getId(), MedicineConstant.AGREEMENT_PRESCRIPTION_USAGE_DOSAGE);
+        if (ObjectUtil.isNull(medicineUsage)) {
+            medicineUsage = new MedicineUsageRequest(request.getUseUsageDosage(), prescriptionMedicineEntity.getId(), MedicineConstant.AGREEMENT_PRESCRIPTION_USAGE_DOSAGE);
         } else {
-            medicineUsage.setRelationType(MedicineConstant.MEDICINE_SPECIFICATIONS_USAGE_DOSAGE);
-            medicineUsage.setRelationId(request.getId());
+            medicineUsage.setRelationType(MedicineConstant.AGREEMENT_PRESCRIPTION_USAGE_DOSAGE);
+            medicineUsage.setRelationId(prescriptionMedicineEntity.getId());
             medicineUsage.setUseUsageDosage(request.getUseUsageDosage());
         }
         //保存更新用法用量
