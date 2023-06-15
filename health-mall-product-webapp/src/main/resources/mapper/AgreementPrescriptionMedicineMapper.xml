@@ -13,8 +13,8 @@
         <result column="packing_unit" property="packingUnit"/>
         <result column="packing_unit_limit" property="packingUnitLimit"/>
         <result column="packing_unit_number" property="packingUnitNumber"/>
-        <result column="split_unit" property="splitUnit"/>
-        <result column="split_value" property="splitValue"/>
+        <result column="spec_unit" property="specUnit"/>
+        <result column="spec_value" property="specValue"/>
         <result column="image_info" property="imageInfo"/>
         <result column="prescriptions" property="prescriptions"/>
         <result column="efficacy" property="efficacy"/>
@@ -36,8 +36,8 @@
         <result property="packingUnit" column="packing_unit"/>
         <result property="packingUnitLimit" column="packing_unit_limit"/>
         <result property="packingUnitNumber" column="packing_unit_number"/>
-        <result property="splitUnit" column="split_unit"/>
-        <result property="splitValue" column="split_value"/>
+        <result property="specUnit" column="spec_unit"/>
+        <result property="specValue" column="spec_value"/>
         <result property="prescriptions" column="prescriptions"/>
         <result property="efficacy" column="efficacy"/>
         <result property="usageMethod" column="usage_method"/>
@@ -60,7 +60,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , medicine_code, medicine_name, medicine_classification_info, packing_spec, packing_unit, packing_unit_limit, packing_unit_number, split_unit, split_value, image_info, prescriptions, efficacy, usage_method, version, del_flag, created_by, created_at, changed_by, changed_at
+        , medicine_code, medicine_name, medicine_classification_info, packing_spec, packing_unit, packing_unit_limit, packing_unit_number, spec_unit, spec_value, image_info, prescriptions, efficacy, usage_method, version, del_flag, created_by, created_at, changed_by, changed_at
     </sql>
     <select id="queryAgreementPrescriptionInfo"
             resultMap="agreementPrescriptionInfoWithUsageResultMap">

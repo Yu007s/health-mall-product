@@ -69,12 +69,12 @@ public class AgreementPrescriptionMedicineEntity extends BaseStandardEntity impl
     /**
      * 拆分单位
      */
-    private String splitUnit;
+    private String specUnit;
 
     /**
      * 拆分数量
      */
-    private Integer splitValue;
+    private Integer specValue;
 
     /**
      * 图片信息
