@@ -44,7 +44,6 @@ public class AddOrUpdateAgreementRequest implements Serializable {
     private Integer packingUnitNumber;
 
     @ApiModelProperty("规格单位（板，包，瓶）")
-    @NotEmpty(message = "规格单位不能为空")
     private String specUnit;
 
     @ApiModelProperty("规格值")
@@ -63,6 +62,7 @@ public class AddOrUpdateAgreementRequest implements Serializable {
     private String usageMethod;
 
     @ApiModelProperty("0：否  1：是")
+    @NotEmpty(message = "默认用法用量不能为空")
     private Integer useUsageDosage;
 
     @ApiModelProperty(value = "操作人 id", hidden = true)
@@ -89,15 +89,15 @@ public class AddOrUpdateAgreementRequest implements Serializable {
         private static final long serialVersionUID = 2148769498519904439L;
 
         @ApiModelProperty(value = "剂型分类id")
-        @NotNull(message = "剂型分类id不能为空")
+        @NotNull(message = "剂型分类不能为空")
         private Long agentClassificationId;
 
         @ApiModelProperty(value = "安全分类id")
-        @NotNull(message = "安全分类id不能为空")
+        @NotNull(message = "安全分类不能为空")
         private Long securityClassificationId;
 
         @ApiModelProperty(value = "原料分类id")
-        @NotNull(message = "原料分类id不能为空")
+        @NotNull(message = "原料分类不能为空")
         private Long materialsClassificationId;
     }
 }
