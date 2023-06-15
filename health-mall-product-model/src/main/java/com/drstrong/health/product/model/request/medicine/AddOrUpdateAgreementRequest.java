@@ -62,7 +62,7 @@ public class AddOrUpdateAgreementRequest implements Serializable {
     private String usageMethod;
 
     @ApiModelProperty("0：否  1：是")
-    @NotEmpty(message = "默认用法用量不能为空")
+    @NotNull(message = "默认用法用量不能为空")
     private Integer useUsageDosage;
 
     @ApiModelProperty(value = "操作人 id", hidden = true)
