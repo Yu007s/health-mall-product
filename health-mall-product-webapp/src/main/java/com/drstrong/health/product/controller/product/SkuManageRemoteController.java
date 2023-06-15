@@ -60,6 +60,7 @@ public class SkuManageRemoteController implements SkuManageRemoteApi {
 
 	@Override
 	public ResultVO<Void> scheduledSkuUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest) {
+		skuManageFacade.scheduledSkuUpDown(scheduledSkuUpDownRequest);
 		return ResultVO.success();
 	}
 }

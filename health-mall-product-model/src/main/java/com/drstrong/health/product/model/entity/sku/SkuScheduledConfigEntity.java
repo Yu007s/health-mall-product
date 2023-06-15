@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.enums.ScheduledStatusEnum;
 import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
+import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,4 +53,15 @@ public class SkuScheduledConfigEntity extends BaseStandardEntity implements Seri
 	 * 0-待处理，1-已处理，2-已取消(例如手动上架了)
 	 */
 	private int scheduledStatus;
+
+	public static SkuScheduledConfigEntity buildDefaultEntity(Long operatorId) {
+		SkuScheduledConfigEntity skuScheduledConfigEntity = new SkuScheduledConfigEntity();
+		skuScheduledConfigEntity.setVersion(1);
+		skuScheduledConfigEntity.setDelFlag(DelFlagEnum.UN_DELETED.getCode());
+		skuScheduledConfigEntity.setCreatedBy(operatorId);
+		skuScheduledConfigEntity.setChangedAt(LocalDateTime.now());
+		skuScheduledConfigEntity.setChangedAt(LocalDateTime.now());
+		skuScheduledConfigEntity.setChangedBy(operatorId);
+		return skuScheduledConfigEntity;
+	}
 }

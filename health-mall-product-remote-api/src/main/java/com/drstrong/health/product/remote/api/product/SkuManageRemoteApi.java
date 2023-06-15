@@ -45,5 +45,5 @@ public interface SkuManageRemoteApi {
 
 	@ApiOperation("预约上下架(不包含中药)")
 	@PostMapping("/scheduled/up-or-down")
-	ResultVO<Void> scheduledSkuUpDown(@RequestBody ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
+	ResultVO<Void> scheduledSkuUpDown(@RequestBody @Valid ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
 }

@@ -25,6 +25,7 @@ import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
+import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.v3.AgreementSkuInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
@@ -324,17 +325,61 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 	public void updateSkuStatus(UpdateSkuStateRequest updateSkuStateRequest) {
 		log.info("invoke updateSkuStatus param:{}", JSONUtil.toJsonStr(updateSkuStateRequest));
 		List<StoreSkuInfoEntity> storeSkuInfoEntityList = storeSkuInfoService.querySkuCodes(updateSkuStateRequest.getSkuCodeList());
-		// 1.校验 sku 是否存在
-		if (ObjectUtil.notEqual(storeSkuInfoEntityList.size(), updateSkuStateRequest.getSkuCodeList().size())) {
-			log.error("根据skuCode未找到数据,可能传入的参数中存在非法的skuCode,参数为:{}", JSONUtil.toJsonStr(updateSkuStateRequest));
-			throw new BusinessException(ErrorEnums.SKU_IS_NULL);
-		}
+		// 1.校验 sku 是否存在,并判断状态是否支持修改
+		checkSkuStatus(updateSkuStateRequest, storeSkuInfoEntityList);
 		// 2.修改状态
 		storeSkuInfoService.batchUpdateSkuStatusByCodes(updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getSkuState(), updateSkuStateRequest.getOperatorId());
 		// 3.发送操作日志
 		sendSkuStatusUpdateLog(storeSkuInfoEntityList, updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getOperatorId(), updateSkuStateRequest.getOperatorName());
 		// 4.定时上下架处理
 		skuScheduledConfigFacade.batchUpdateScheduledStatusToCancelByCodes(updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getOperatorId(), updateSkuStateRequest.getOperatorName());
+	}
+
+	/**
+	 * 校验 sku 状态,是否能进行更新
+	 */
+	private void checkSkuStatus(UpdateSkuStateRequest updateSkuStateRequest, List<StoreSkuInfoEntity> storeSkuInfoEntityList) {
+		if (CollectionUtil.isEmpty(storeSkuInfoEntityList) || ObjectUtil.notEqual(storeSkuInfoEntityList.size(), updateSkuStateRequest.getSkuCodeList().size())) {
+			log.error("根据skuCode未找到数据,可能传入的参数为空,或者存在非法的skuCode,参数为:{}", JSONUtil.toJsonStr(updateSkuStateRequest));
+			throw new BusinessException(ErrorEnums.SKU_IS_NULL);
+		}
+		// 校验状态
+		boolean allMatch = storeSkuInfoEntityList.stream().allMatch(storeSkuInfoEntity -> {
+			if (Objects.equals(UpOffEnum.UP.getCode(), updateSkuStateRequest.getSkuState())) {
+				// 如果传参是上架,则当前 sku 必须是 已下架或预约上架 状态
+				return Objects.equals(UpOffEnum.DOWN.getCode(), storeSkuInfoEntity.getSkuStatus()) || Objects.equals(UpOffEnum.SCHEDULED_UP.getCode(), storeSkuInfoEntity.getSkuStatus());
+			} else {
+				// 如果传参是下架,则当前必须是 已上架或预约下架 状态
+				return Objects.equals(UpOffEnum.UP.getCode(), storeSkuInfoEntity.getSkuStatus()) || Objects.equals(UpOffEnum.SCHEDULED_DOWN.getCode(), storeSkuInfoEntity.getSkuStatus());
+			}
+		});
+		if (!allMatch) {
+			throw new BusinessException(ErrorEnums.SKU_STATUS_ERROR);
+		}
+	}
+
+	/**
+	 * sku 预约上下架
+	 *
+	 * @param scheduledSkuUpDownRequest
+	 * @author liuqiuyi
+	 * @date 2023/6/15 09:32
+	 */
+	@Override
+	public void scheduledSkuUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest) {
+		// 1.校验 sku 是否存在
+		StoreSkuInfoEntity skuInfoEntity = storeSkuInfoService.checkSkuExistByCode(scheduledSkuUpDownRequest.getSkuCode(), null);
+		// 2.对当前状态进行校验,如果不符合要求直接抛异常
+		if (Objects.equals(UpOffEnum.UP.getCode(), skuInfoEntity.getSkuStatus()) && Objects.equals(ScheduledSkuUpDownRequest.SCHEDULED_UP, scheduledSkuUpDownRequest.getScheduledType())) {
+			throw new BusinessException(ErrorEnums.SKU_IS_UP_ERROR);
+		}
+		if (Objects.equals(UpOffEnum.DOWN.getCode(), skuInfoEntity.getSkuStatus()) && Objects.equals(ScheduledSkuUpDownRequest.SCHEDULED_DOWN, scheduledSkuUpDownRequest.getScheduledType())) {
+			throw new BusinessException(ErrorEnums.SKU_IS_DOWN_ERROR);
+		}
+		// 3.保存或者更新 sku 定时上下架配置
+		skuScheduledConfigFacade.saveOrUpdateSkuConfig(scheduledSkuUpDownRequest);
+		// 4.发送操作日志
+		sendSkuStatusUpdateLog(Lists.newArrayList(skuInfoEntity), Sets.newHashSet(scheduledSkuUpDownRequest.getSkuCode()), scheduledSkuUpDownRequest.getOperatorId(), scheduledSkuUpDownRequest.getOperatorName());
 	}
 
 	private void sendSkuStatusUpdateLog(List<StoreSkuInfoEntity> beforeDataList, Set<String> skuCodeList, Long operatorId, String operatorName) {

@@ -13,6 +13,7 @@ public enum ScheduledStatusEnum {
 	UN_COMPLETE(0, "待处理"),
 	SUCCESS(1, "已处理"),
 	CANCEL(2, "已取消"),
+	IN_PROCESS(3, "处理中"),
 	;
 
 	private final Integer code;

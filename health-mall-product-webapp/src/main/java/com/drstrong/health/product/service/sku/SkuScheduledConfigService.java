@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.sku;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.sku.SkuScheduledConfigEntity;
 
 import java.util.List;
@@ -9,7 +10,14 @@ import java.util.Set;
  * @author liuqiuyi
  * @date 2023/6/14 16:21
  */
-public interface SkuScheduledConfigService {
+public interface SkuScheduledConfigService extends IService<SkuScheduledConfigEntity> {
+	/**
+	 * 根据 skuCode 查询
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/6/14 16:54
+	 */
+	SkuScheduledConfigEntity getBySkuCode(String skuCode, Integer scheduledStatus);
 
 	/**
 	 * 根据 skuCode 查询

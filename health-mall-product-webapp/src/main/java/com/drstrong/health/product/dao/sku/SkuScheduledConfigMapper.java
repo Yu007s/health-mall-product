@@ -14,5 +14,5 @@ import java.util.Set;
 @Mapper
 public interface SkuScheduledConfigMapper extends BaseMapper<SkuScheduledConfigEntity> {
 
-	void batchUpdateScheduledStatusByCodes(@Param("skuCodeList") Set<String> skuCodeList, @Param("scheduledStatus") Integer scheduledStatus, @Param("operatorId") Long operatorId);
+	int batchUpdateScheduledStatusByCodes(@Param("skuCodeList") Set<String> skuCodeList, @Param("scheduledStatus") Integer scheduledStatus, @Param("operatorId") Long operatorId);
 }

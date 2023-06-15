@@ -8,6 +8,7 @@ import com.drstrong.health.product.model.entity.sku.SkuScheduledConfigEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.service.sku.SkuScheduledConfigService;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,13 +28,27 @@ public class SkuScheduledConfigServiceImpl extends ServiceImpl<SkuScheduledConfi
 	/**
 	 * 根据 skuCode 查询
 	 *
+	 * @param skuCode
+	 * @param scheduledStatus
+	 * @author liuqiuyi
+	 * @date 2023/6/14 16:54
+	 */
+	@Override
+	public SkuScheduledConfigEntity getBySkuCode(String skuCode, Integer scheduledStatus) {
+		List<SkuScheduledConfigEntity> scheduledConfigEntityList = listBySkuCode(Sets.newHashSet(skuCode), scheduledStatus);
+		return CollectionUtil.isEmpty(scheduledConfigEntityList) ? null : scheduledConfigEntityList.get(0);
+	}
+
+	/**
+	 * 根据 skuCode 查询
+	 *
 	 * @param skuCodeList
 	 * @author liuqiuyi
 	 * @date 2023/6/14 16:54
 	 */
 	@Override
 	public List<SkuScheduledConfigEntity> listBySkuCode(Set<String> skuCodeList, Integer scheduledStatus) {
-		if (CollectionUtil.isEmpty(skuCodeList) || Objects.isNull(scheduledStatus)) {
+		if (CollectionUtil.isEmpty(skuCodeList)) {
 			return Lists.newArrayList();
 		}
 		LambdaQueryWrapper<SkuScheduledConfigEntity> queryWrapper = new LambdaQueryWrapper<SkuScheduledConfigEntity>()
@@ -55,6 +70,9 @@ public class SkuScheduledConfigServiceImpl extends ServiceImpl<SkuScheduledConfi
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void batchUpdateScheduledStatusByCodes(Set<String> skuCodeList, Integer scheduledStatus, Long operatorId) {
-		baseMapper.batchUpdateScheduledStatusByCodes(skuCodeList, scheduledStatus, operatorId);
+		int size = baseMapper.batchUpdateScheduledStatusByCodes(skuCodeList, scheduledStatus, operatorId);
+		if (size > 0) {
+			log.info("已将skuCode列表:{} 的状态更新为:{},操作人是:{}", skuCodeList, scheduledStatus, operatorId);
+		}
 	}
 }

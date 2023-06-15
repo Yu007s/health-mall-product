@@ -30,6 +30,7 @@ public enum ErrorEnums implements IBaseResult {
 	QUERY_SIZE_TOO_BIG("100001", "查询参数过大"),
 	ADD_LOCK_ERROR("100002", "加锁失败!"),
 	REMOTE_INVOKE_ERROR("100003", "远程接口调用失败,请联系管理员!"),
+
 	PARAM_IS_NOT_NULL("11000", "参数不能为空"),
 	CATEGORY_NOT_EXIST("11100", "分类不存在"),
 	SAVE_UPDATE_NOT_EXIST("11101", "更新或者保存的数据不存在"),
@@ -47,6 +48,10 @@ public enum ErrorEnums implements IBaseResult {
 	SKU_NAME_IS_REPEAT("11113", "相同店铺下 sku 名称不能重复"),
 	MEDICINE_CODE_NOT_ASSOCIATED("11114", "药材未关联供应商"),
 	PARAM_TYPE_IS_ERROR("11115", "参数不符合要求"),
+	SKU_IS_UP_ERROR("11116", "当前sku已上架,不能设置预约上架"),
+	SKU_IS_DOWN_ERROR("11117", "当前sku已下架,不能设置预约下架"),
+	SKU_STATUS_ERROR("11118", "不能更新sku的上下架状态,请刷新页面后重新选择"),
+	SKU_SCHEDULED_IN_PROCESS("11119", "当前sku正在自动上下架中,请稍后在试"),
 
 	STORE_NAME_LENGTH("17000", "店铺名称长度不正确"),
 	STORE_NAME_REPEAT("17100", "店铺名称已存在"),
