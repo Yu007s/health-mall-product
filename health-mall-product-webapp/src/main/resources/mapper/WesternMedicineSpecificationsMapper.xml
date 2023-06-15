@@ -36,8 +36,8 @@
         SELECT
         ms.id id,
         ms.medicine_id medicineId,
-        CONCAT(m.full_name, ' ', ms.spec_code) specCode,
-        ms.spec_name specName,
+        ms.spec_code specCode,
+        CONCAT(m.full_name, ' ', ms.spec_code) specName,
         CASE
         WHEN mu.id IS NOT NULL THEN 1
         ELSE 0
