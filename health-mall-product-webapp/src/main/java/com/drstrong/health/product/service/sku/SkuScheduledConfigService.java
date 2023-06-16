@@ -25,7 +25,7 @@ public interface SkuScheduledConfigService extends IService<SkuScheduledConfigEn
 	 * @author liuqiuyi
 	 * @date 2023/6/14 16:54
 	 */
-	List<SkuScheduledConfigEntity> listBySkuCode(Set<String> skuCodeList, Integer scheduledStatus);
+	List<SkuScheduledConfigEntity> listBySkuCode(Set<String> skuCodeList, Set<Integer> scheduledStatusList);
 
 	/**
 	 * 根据 skuCode 批量更新定时任务执行状态

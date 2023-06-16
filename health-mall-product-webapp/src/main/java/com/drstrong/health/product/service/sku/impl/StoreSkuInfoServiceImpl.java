@@ -188,6 +188,9 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void batchUpdateSkuStatusByCodes(Set<String> skuCodeList, Integer skuState, Long operatorId) {
-		baseMapper.batchUpdateSkuStatusByCodes(skuCodeList, skuState, operatorId);
+		int size = baseMapper.batchUpdateSkuStatusByCodes(skuCodeList, skuState, operatorId);
+		if (size > 0) {
+			log.info("店铺sku信息表,已将skuCode列表:{} 的状态更新为:{},操作人是:{}", skuCodeList, skuState, operatorId);
+		}
 	}
 }

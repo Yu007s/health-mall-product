@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service.sku.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.sku.SkuScheduledConfigMapper;
@@ -35,7 +36,10 @@ public class SkuScheduledConfigServiceImpl extends ServiceImpl<SkuScheduledConfi
 	 */
 	@Override
 	public SkuScheduledConfigEntity getBySkuCode(String skuCode, Integer scheduledStatus) {
-		List<SkuScheduledConfigEntity> scheduledConfigEntityList = listBySkuCode(Sets.newHashSet(skuCode), scheduledStatus);
+		if (StrUtil.isBlank(skuCode)) {
+			return null;
+		}
+		List<SkuScheduledConfigEntity> scheduledConfigEntityList = listBySkuCode(Sets.newHashSet(skuCode), Objects.isNull(scheduledStatus) ? null : Sets.newHashSet(scheduledStatus));
 		return CollectionUtil.isEmpty(scheduledConfigEntityList) ? null : scheduledConfigEntityList.get(0);
 	}
 
@@ -47,13 +51,13 @@ public class SkuScheduledConfigServiceImpl extends ServiceImpl<SkuScheduledConfi
 	 * @date 2023/6/14 16:54
 	 */
 	@Override
-	public List<SkuScheduledConfigEntity> listBySkuCode(Set<String> skuCodeList, Integer scheduledStatus) {
+	public List<SkuScheduledConfigEntity> listBySkuCode(Set<String> skuCodeList, Set<Integer> scheduledStatusList) {
 		if (CollectionUtil.isEmpty(skuCodeList)) {
 			return Lists.newArrayList();
 		}
 		LambdaQueryWrapper<SkuScheduledConfigEntity> queryWrapper = new LambdaQueryWrapper<SkuScheduledConfigEntity>()
 				.eq(SkuScheduledConfigEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-				.eq(Objects.nonNull(scheduledStatus), SkuScheduledConfigEntity::getScheduledStatus, scheduledStatus)
+				.in(CollectionUtil.isNotEmpty(scheduledStatusList), SkuScheduledConfigEntity::getScheduledStatus, scheduledStatusList)
 				.in(SkuScheduledConfigEntity::getSkuCode, skuCodeList);
 		return baseMapper.selectList(queryWrapper);
 	}
@@ -72,7 +76,7 @@ public class SkuScheduledConfigServiceImpl extends ServiceImpl<SkuScheduledConfi
 	public void batchUpdateScheduledStatusByCodes(Set<String> skuCodeList, Integer scheduledStatus, Long operatorId) {
 		int size = baseMapper.batchUpdateScheduledStatusByCodes(skuCodeList, scheduledStatus, operatorId);
 		if (size > 0) {
-			log.info("已将skuCode列表:{} 的状态更新为:{},操作人是:{}", skuCodeList, scheduledStatus, operatorId);
+			log.info("定时任务配置表,已将skuCode列表:{} 的状态更新为:{},操作人是:{}", skuCodeList, scheduledStatus, operatorId);
 		}
 	}
 }

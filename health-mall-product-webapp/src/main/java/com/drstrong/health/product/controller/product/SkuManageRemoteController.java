@@ -1,5 +1,6 @@
 package com.drstrong.health.product.controller.product;
 
+import com.drstrong.health.product.enums.ScheduledStatusEnum;
 import com.drstrong.health.product.facade.sku.SkuManageFacade;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
@@ -54,6 +55,7 @@ public class SkuManageRemoteController implements SkuManageRemoteApi {
 
 	@Override
 	public ResultVO<Void> updateSkuStatus(UpdateSkuStateRequest updateSkuStateRequest) {
+		updateSkuStateRequest.setScheduledStatus(ScheduledStatusEnum.CANCEL.getCode());
 		skuManageFacade.updateSkuStatus(updateSkuStateRequest);
 		return ResultVO.success();
 	}

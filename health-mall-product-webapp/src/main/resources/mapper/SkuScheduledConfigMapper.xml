@@ -37,7 +37,6 @@
         changed_by = #{operatorId},
         changed_at = now()
         where del_flag = 0
-        and scheduled_status = 0
         and sku_code in
         <foreach collection="skuCodeList" item="item" open="(" close=")" separator=",">
             #{item}

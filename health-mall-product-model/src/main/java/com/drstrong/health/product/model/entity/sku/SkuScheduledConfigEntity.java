@@ -40,7 +40,6 @@ public class SkuScheduledConfigEntity extends BaseStandardEntity implements Seri
 
 	/**
 	 * 定时配置类型 1-定时上架，2-定时下架
-	 * {@link ScheduledStatusEnum}
 	 */
 	private int scheduledType;
 
@@ -51,6 +50,7 @@ public class SkuScheduledConfigEntity extends BaseStandardEntity implements Seri
 
 	/**
 	 * 0-待处理，1-已处理，2-已取消(例如手动上架了)
+	 * {@link ScheduledStatusEnum}
 	 */
 	private int scheduledStatus;
 

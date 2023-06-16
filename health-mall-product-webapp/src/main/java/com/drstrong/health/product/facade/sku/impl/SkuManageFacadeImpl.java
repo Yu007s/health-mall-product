@@ -44,6 +44,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -322,6 +323,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 	 * @date 2023/6/14 15:36
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void updateSkuStatus(UpdateSkuStateRequest updateSkuStateRequest) {
 		log.info("invoke updateSkuStatus param:{}", JSONUtil.toJsonStr(updateSkuStateRequest));
 		List<StoreSkuInfoEntity> storeSkuInfoEntityList = storeSkuInfoService.querySkuCodes(updateSkuStateRequest.getSkuCodeList());
@@ -332,7 +334,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 		// 3.发送操作日志
 		sendSkuStatusUpdateLog(storeSkuInfoEntityList, updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getOperatorId(), updateSkuStateRequest.getOperatorName());
 		// 4.定时上下架处理
-		skuScheduledConfigFacade.batchUpdateScheduledStatusToCancelByCodes(updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getOperatorId(), updateSkuStateRequest.getOperatorName());
+		skuScheduledConfigFacade.batchUpdateScheduledStatusByCodes(updateSkuStateRequest);
 	}
 
 	/**
