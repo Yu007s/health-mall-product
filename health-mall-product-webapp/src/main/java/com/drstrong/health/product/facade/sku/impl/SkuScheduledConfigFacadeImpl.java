@@ -181,7 +181,7 @@ public class SkuScheduledConfigFacadeImpl implements SkuScheduledConfigFacade {
 					skuScheduledConfigEntity.setChangedBy(-1L);
 					skuScheduledConfigEntity.setChangedAt(LocalDateTime.now());
 				});
-				skuScheduledConfigService.saveOrUpdateBatch(skuScheduledConfigEntityList);
+				skuScheduledConfigService.saveOrUpdateBatch(configEntityList);
 				log.info("将sku定时配置的状态修改为待处理,等待下一次定时任务执行,参数为:{}", JSONUtil.toJsonStr(skuCodes));
 			}
 		});
