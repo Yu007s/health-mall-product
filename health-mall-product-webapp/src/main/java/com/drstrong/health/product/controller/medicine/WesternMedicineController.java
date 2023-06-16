@@ -78,7 +78,7 @@ public class WesternMedicineController implements WesternMedicineRemoteApi {
 
     @Override
     public ResultVO<PageVO<WesternMedicineSpecVO>> queryMedicineSpecInfoPage(WesternMedicineRequest medicineRequest) {
-        return null;
+        return ResultVO.success(specificationsService.queryMedicineSpecInfoPage(medicineRequest));
     }
 }
 
