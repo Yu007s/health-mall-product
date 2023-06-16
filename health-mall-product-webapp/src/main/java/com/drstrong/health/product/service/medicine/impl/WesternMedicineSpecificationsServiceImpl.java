@@ -105,13 +105,22 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
             throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "药品id不能为空");
         }
         WesternMedicineSimpleInfoVO vo = westernMedicineMapper.queryMedicineSimpleInfo(request.getId());
+        vo.setSpecPageList(getMedicineSpecVOPage(request));
+        return vo;
+    }
+
+    @Override
+    public PageVO<WesternMedicineSpecVO> queryMedicineSpecInfoPage(WesternMedicineRequest request) {
+        return getMedicineSpecVOPage(request);
+    }
+
+    public PageVO<WesternMedicineSpecVO> getMedicineSpecVOPage(WesternMedicineRequest request) {
         Page<WesternMedicineSpecVO> westernMedicineSpecVOPage = baseMapper.queryMedicineSpecPageList(new Page<>(request.getPageNo(), request.getPageSize()), request);
-        vo.setSpecPageList(PageVO.newBuilder()
+        return PageVO.newBuilder()
                 .pageNo(request.getPageNo())
                 .pageSize(request.getPageSize())
                 .totalCount((int) westernMedicineSpecVOPage.getTotal())
-                .result(westernMedicineSpecVOPage.getRecords()).build());
-        return vo;
+                .result(westernMedicineSpecVOPage.getRecords()).build();
     }
 
     private String generateMedicineSpecCode(Long medicineId, String medicineCode) {

@@ -41,4 +41,13 @@ public interface WesternMedicineSpecificationsService extends IService<WesternMe
      * @return
      */
     WesternMedicineSimpleInfoVO queryMedicineSpecByPage(WesternMedicineRequest request);
+
+
+    /**
+     * 规格分页查询
+     *
+     * @param request
+     * @return
+     */
+    PageVO<WesternMedicineSpecVO> queryMedicineSpecInfoPage(WesternMedicineRequest request);
 }

@@ -75,5 +75,10 @@ public class WesternMedicineController implements WesternMedicineRemoteApi {
     public ResultVO<List<WesternMedicineExcelVO>> queryMedicineExcelData(WesternMedicineRequest westernMedicineRequest) {
         return ResultVO.success(westernMedicineService.queryMedicineExcelData(westernMedicineRequest));
     }
+
+    @Override
+    public ResultVO<PageVO<WesternMedicineSpecVO>> queryMedicineSpecInfoPage(WesternMedicineRequest medicineRequest) {
+        return null;
+    }
 }
 

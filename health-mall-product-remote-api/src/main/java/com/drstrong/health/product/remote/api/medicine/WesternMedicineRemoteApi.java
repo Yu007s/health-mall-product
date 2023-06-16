@@ -61,8 +61,11 @@ public interface WesternMedicineRemoteApi {
     @PostMapping("/spec/page/list")
     ResultVO<WesternMedicineSimpleInfoVO> queryMedicineSpecByPage(@RequestBody WesternMedicineRequest westernMedicineRequest);
 
-
     @ApiOperation("西药excel数据")
     @PostMapping("/excel/data")
     ResultVO<List<WesternMedicineExcelVO>> queryMedicineExcelData(@RequestBody WesternMedicineRequest westernMedicineRequest);
+
+    @ApiOperation("规格分页")
+    @PostMapping("/spec/info/page")
+    ResultVO<PageVO<WesternMedicineSpecVO>> queryMedicineSpecInfoPage(@RequestBody WesternMedicineRequest medicineRequest);
 }

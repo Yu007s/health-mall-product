@@ -37,7 +37,7 @@
         ms.id id,
         ms.medicine_id medicineId,
         ms.spec_code specCode,
-        CONCAT(m.full_name, ' ', ms.spec_code) specName,
+        CONCAT(m.full_name, ' ', ms.spec_name) specName,
         CASE
         WHEN mu.id IS NOT NULL THEN 1
         ELSE 0
@@ -49,6 +49,10 @@
             ms.del_flag = 0
             <if test="queryParam.id != null">
                 AND ms.medicine_id = #{queryParam.id}
+            </if>
+            <if test="queryParam.searchName != null and queryParam.searchName != ''">
+                AND (m.full_name LIKE CONCAT('%', #{queryParam.searchName}, '%')
+                OR ms.spec_name LIKE CONCAT('%', #{queryParam.searchName}, '%'))
             </if>
         </where>
     </select>
