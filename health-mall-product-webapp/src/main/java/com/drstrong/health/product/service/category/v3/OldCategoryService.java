@@ -32,7 +32,7 @@ public interface OldCategoryService extends IService<CategoryEntity> {
 	/**
 	 * 删除分类
 	 *
-	 * @param CategoryEntityId 分类ID
+	 * @param categoryEntityId 分类ID
 	 */
-	CategoryEntity deleteEntity(Long CategoryEntityId) throws BusinessException;
+	CategoryEntity deleteEntity(Long categoryEntityId) throws BusinessException;
 }
