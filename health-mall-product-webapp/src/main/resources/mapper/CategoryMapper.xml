@@ -13,4 +13,12 @@
 		update pms_category set name_path = replace(name_path, #{oldNamePath}, #{newNamePath}) where id_path like concat(#{idPath}, '%')
 	</update>
 
+    <update id="updateStatusToDeleteById">
+        update pms_category
+        set status = -1,
+            changed_by = #{changeByName},
+            changed_at = now()
+        where id = #{id}
+    </update>
+
 </mapper>

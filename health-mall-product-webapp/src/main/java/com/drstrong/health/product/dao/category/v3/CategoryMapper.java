@@ -17,4 +17,6 @@ public interface CategoryMapper extends BaseMapper<CategoryEntity> {
 
 	int updateChildrenNamePath(@Param("idPath") String idPath,
 							   @Param("oldNamePath") String oldNamePath, @Param("newNamePath") String newNamePath);
+
+	int updateStatusToDeleteById(@Param("id") Long id, @Param("changeByName") String changeByName);
 }

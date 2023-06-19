@@ -32,7 +32,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
 	CategoryService categoryService;
 
 	/**
-	 * 根据内心获取分类
+	 * 根据类型获取分类
 	 * <p>
 	 * 中西药分类的返回值中去除了 协定方
 	 * </>

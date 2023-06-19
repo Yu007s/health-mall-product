@@ -1,11 +1,13 @@
 package com.drstrong.health.product.service.category.v3.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.category.v3.CategoryMapper;
-import com.drstrong.health.product.model.BaseTree;
 import com.drstrong.health.product.model.entity.category.v3.CategoryEntity;
+import com.drstrong.health.product.model.enums.CategoryStatusEnum;
+import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.category.v3.OldCategoryService;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +17,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -29,21 +33,6 @@ import java.util.Set;
 @Slf4j
 public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, CategoryEntity> implements OldCategoryService {
 
-	@Override
-	public List<CategoryEntity> getTree(Integer level, Integer status) {
-		QueryWrapper<CategoryEntity> query = Wrappers.query();
-		query.gt("level", 0);
-		if (level != null) {
-			query.le("level", level);
-		}
-		if (status != null) {
-			query.eq("status", status);
-		}
-		query.orderByAsc("order_number").orderByAsc("id");
-		List<CategoryEntity> list = this.list(query);
-		return BaseTree.listToTree(list);
-	}
-
 	private static String toPath(String parentPath, String item) {
 		StringBuilder path = new StringBuilder();
 		if (parentPath != null) {
@@ -54,7 +43,10 @@ public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, Category
 	}
 
 	private CategoryEntity getCategory(Long categoryId) throws BusinessException {
-		CategoryEntity category = baseMapper.selectById(categoryId);
+		LambdaQueryWrapper<CategoryEntity> queryWrapper = new LambdaQueryWrapper<CategoryEntity>()
+				.ne(CategoryEntity::getStatus, CategoryStatusEnum.DELETE.getCode())
+				.eq(CategoryEntity::getId, categoryId);
+		CategoryEntity category = baseMapper.selectOne(queryWrapper);
 		if (category == null) {
 			throw new BusinessException("分类不存在,id=" + categoryId);
 		}
@@ -62,7 +54,7 @@ public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, Category
 	}
 
 	private void checkName(String name) throws BusinessException {
-		QueryWrapper<CategoryEntity> query = Wrappers.<CategoryEntity>query().eq("name", name);
+		QueryWrapper<CategoryEntity> query = Wrappers.<CategoryEntity>query().eq("name", name).ne("status", CategoryStatusEnum.DELETE.getCode());
 		if (baseMapper.selectCount(query) > 0) {
 			throw new BusinessException("分类名称已存在");
 		}
@@ -79,15 +71,30 @@ public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, Category
 		return idPathItems.length == CategoryEntity.MAX_LEVEL;
 	}
 
-	private CategoryEntity doAdd(CategoryEntity entity) {
+	private CategoryEntity doAdd(CategoryEntity entity, Integer productType) {
 		CategoryEntity parent = baseMapper.selectById(entity.getParentId());
 		boolean isTopCategory = parent == null;
-		entity.setParentId(isTopCategory ? CategoryEntity.HEALTH_PRODUCT_TOP_PARENT_ID : parent.getId());
+		// 中西药的parentId默认是0，健康用品的默认id是-2  按照之前的老逻辑来
+		Long parentId = CategoryEntity.HEALTH_PRODUCT_TOP_PARENT_ID;
+		if (isTopCategory && Objects.equals(ProductTypeEnum.MEDICINE.getCode(), productType)) {
+			parentId = CategoryEntity.MEDICINE_TOP_PARENT_ID_NEW;
+		} else if (!isTopCategory){
+			parentId = parent.getId();
+		}
+		entity.setParentId(parentId);
 		//默认启用
 		entity.setStatus(CategoryEntity.STATUS_ENABLE);
 
 		//先保存分类，以获取分类ID
+		Date date = new Date();
+		entity.setCreatedAt(date);
+		entity.setCreatedBy(entity.getChangedBy());
+		entity.setChangedAt(date);
+		entity.setChangedBy(entity.getChangedBy());
 		baseMapper.insert(entity);
+		if (Objects.equals(parentId, CategoryEntity.HEALTH_PRODUCT_TOP_PARENT_ID) || Objects.equals(parentId, CategoryEntity.MEDICINE_TOP_PARENT_ID_NEW)) {
+			return entity;
+		}
 
 		String parentNamePath = isTopCategory ? null : parent.getNamePath();
 		String parentIdPath = isTopCategory ? null : parent.getIdPath();
@@ -121,14 +128,14 @@ public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, Category
 		}
 	}
 
-	private void doRemove(CategoryEntity entity) throws BusinessException {
+	private void doRemove(CategoryEntity entity, String changeByName) throws BusinessException {
 		String[] idPathItems = StringUtils.commaDelimitedListToStringArray(entity.getIdPath());
 		if (isLeafCategory(idPathItems)) {
 			Integer pNumber = entity.getPNumber();
 			if (pNumber != null && pNumber > 0) {
 				throw new BusinessException("删除失败：" + entity.getName() + "分类下存在关联商品");
 			}
-			baseMapper.deleteById(entity.getId());
+			baseMapper.updateStatusToDeleteById(entity.getId(), changeByName);
 			updateLeafCount(idPathItems, -1);
 		} else {
 			//判断是否存在品类
@@ -141,13 +148,13 @@ public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, Category
 			if (baseMapper.selectCount(query) > 0) {
 				throw new BusinessException("删除失败：" + entity.getName() + "分类存在子分类");
 			}
-			baseMapper.deleteById(entity.getId());
+			baseMapper.updateStatusToDeleteById(entity.getId(), changeByName);
 		}
 	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public CategoryEntity saveEntity(CategoryEntity entity) throws BusinessException {
+	public CategoryEntity saveEntity(CategoryEntity entity, Integer productType) throws BusinessException {
 		Assert.notNull(entity, "Category must not be null.");
 		String name = entity.getName();
 		Assert.hasText(name, "分类名称不能为空");
@@ -155,14 +162,13 @@ public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, Category
 		Long categoryId = entity.getId();
 		if (categoryId == null) {
 			checkName(name);
-			doAdd(entity);
+			doAdd(entity,productType);
 			return entity;
 		} else {
 			CategoryEntity category = getCategory(categoryId);
 			if (!name.equals(category.getName())) {
 				checkName(name);
 				category.setName(name);
-
 				//更新路径中的名称
 				String oldNamePath = category.getNamePath();
 				String newNamePath = generateNewNamePath(name, oldNamePath);
@@ -178,9 +184,9 @@ public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, Category
 			Long parentIdParam = entity.getParentId();
 			Long parentId = category.getParentId();
 			if (isParentIdChanged(parentIdParam, parentId)) {
-				doRemove(category);
+				doRemove(category, entity.getChangedBy());
 				category.setParentId(parentIdParam);
-				doAdd(category);
+				doAdd(category, productType);
 			}
 		}
 		return entity;
@@ -202,9 +208,9 @@ public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, Category
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public CategoryEntity deleteEntity(Long categoryId) throws BusinessException {
+	public CategoryEntity deleteEntity(Long categoryId, String changedName) throws BusinessException {
 		CategoryEntity category = getCategory(categoryId);
-		doRemove(category);
+		doRemove(category, changedName);
 		return category;
 	}
 }

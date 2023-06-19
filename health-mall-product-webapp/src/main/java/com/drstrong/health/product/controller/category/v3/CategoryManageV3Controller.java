@@ -30,18 +30,15 @@ public class CategoryManageV3Controller implements CategoryManageRemoteApi {
 		return ResultVO.success(categoryFacade.queryAllCategoryByProductType(productType));
 	}
 
-
-	public ResultVO<List<CategoryEntity>> getTree(Integer level, Integer status) {
-		return ResultVO.success(oldCategoryService.getTree(level, status));
-	}
-
-	public ResultVO<Void> saveCategoryEntity(CategoryEntity entity) {
-		oldCategoryService.saveEntity(entity);
+	@Override
+	public ResultVO<Void> saveCategoryEntity(CategoryEntity entity, Integer productType) {
+		oldCategoryService.saveEntity(entity, productType);
 		return ResultVO.success();
 	}
 
-	public ResultVO<Void> deleteCategoryEntity(Long categoryId) {
-		oldCategoryService.deleteEntity(categoryId);
+	@Override
+	public ResultVO<Void> deleteCategoryEntity(Long categoryId, String changedName) {
+		oldCategoryService.deleteEntity(categoryId, changedName);
 		return ResultVO.success();
 	}
 }

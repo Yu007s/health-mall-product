@@ -2,7 +2,6 @@ package com.drstrong.health.product.model.entity.category.v3;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.model.BaseTree;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -77,10 +76,6 @@ public class CategoryEntity extends BaseTree implements Serializable {
 
 	@ApiModelProperty(value = "描述")
 	private String description;
-
-	@TableId
-	@ApiModelProperty(value = "主键ID(部门Id)")
-	private Long id;
 
 	/**
 	 * 创建时间
