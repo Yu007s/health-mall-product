@@ -40,7 +40,7 @@
         <result property="specValue" column="spec_value"/>
         <result property="prescriptions" column="prescriptions"/>
         <result property="efficacy" column="efficacy"/>
-        <result property="usageMethod" column="usage_method"/>
+        <result property="usageMethod" column="pUsageMethod"/>
         <result property="useUsageDosage" column="useUsageDosage"/>
         <result property="imageInfoList" column="image_info"/>
         <result property="medicineClassificationInfo" column="medicine_classification_info"/>
@@ -53,7 +53,7 @@
             <result property="eachDosageCount" column="each_dosage_count"/>
             <result property="eachDoseUnit" column="each_dose_unit"/>
             <result property="usageTime" column="usage_time"/>
-            <result property="usageMethod" column="usage_method"/>
+            <result property="usageMethod" column="mUsageMethod"/>
         </association>
     </resultMap>
 
@@ -66,7 +66,9 @@
             resultMap="agreementPrescriptionInfoWithUsageResultMap">
         SELECT pm.*,
                mu.*,
-               CASE WHEN mu.id IS NULL THEN 0 ELSE 1 END AS useUsageDosage
+               CASE WHEN mu.id IS NULL THEN 0 ELSE 1 END AS useUsageDosage,
+               pm.usage_method pUsageMethod,
+               mu.usage_method mUsageMethod
         FROM pms_agreement_prescription_medicine pm
                  LEFT JOIN pms_medicine_usage mu ON pm.id = mu.relation_id AND mu.relation_type = 2 AND mu.del_flag = 0
         WHERE pm.del_flag = 0 AND pm.id = #{id}
