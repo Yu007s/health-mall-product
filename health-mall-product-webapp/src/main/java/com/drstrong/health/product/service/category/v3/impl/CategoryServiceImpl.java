@@ -43,7 +43,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, CategoryEnt
 	public List<CategoryEntity> queryHealthAll() {
 		LambdaQueryWrapper<CategoryEntity> queryWrapper = new LambdaQueryWrapper<CategoryEntity>()
 				.eq(CategoryEntity::getStatus, CategoryEntity.STATUS_ENABLE)
-				.ge(CategoryEntity::getLevel, 0);
+				.gt(CategoryEntity::getLevel, 0)
+				.orderByAsc(CategoryEntity::getOrderNumber)
+				.orderByAsc(CategoryEntity::getId);
 		return baseMapper.selectList(queryWrapper);
 	}
 

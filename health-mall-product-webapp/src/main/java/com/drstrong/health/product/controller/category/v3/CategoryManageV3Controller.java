@@ -2,6 +2,7 @@ package com.drstrong.health.product.controller.category.v3;
 
 import com.drstrong.health.product.facade.category.CategoryFacade;
 import com.drstrong.health.product.model.entity.category.v3.CategoryEntity;
+import com.drstrong.health.product.model.request.category.v3.SaveCategoryRequest;
 import com.drstrong.health.product.model.response.category.v3.CategoryVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.category.v3.CategoryManageRemoteApi;
@@ -26,13 +27,13 @@ public class CategoryManageV3Controller implements CategoryManageRemoteApi {
 	OldCategoryService oldCategoryService;
 
 	@Override
-	public ResultVO<List<CategoryVO>> queryAllCategoryByProductType(Integer productType) {
-		return ResultVO.success(categoryFacade.queryAllCategoryByProductType(productType));
+	public ResultVO<List<CategoryVO>> queryAllCategoryByProductType(Integer productType, Boolean needFilter) {
+		return ResultVO.success(categoryFacade.queryAllCategoryByProductType(productType, needFilter));
 	}
 
 	@Override
-	public ResultVO<Void> saveCategoryEntity(CategoryEntity entity, Integer productType) {
-		oldCategoryService.saveEntity(entity, productType);
+	public ResultVO<Void> saveCategoryEntity(SaveCategoryRequest saveCategoryRequest, Integer productType) {
+		oldCategoryService.saveEntity(saveCategoryRequest, productType);
 		return ResultVO.success();
 	}
 

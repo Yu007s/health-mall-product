@@ -2,6 +2,7 @@ package com.drstrong.health.product.service.category.v3;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.category.v3.CategoryEntity;
+import com.drstrong.health.product.model.request.category.v3.SaveCategoryRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
 
 /**
@@ -14,9 +15,9 @@ public interface OldCategoryService extends IService<CategoryEntity> {
 	/**
 	 * 保存或更新分类
 	 *
-	 * @param entity 分类数据: id为空时新增，不为空时更新
+	 * @param saveCategoryRequest 分类数据: id为空时新增，不为空时更新
 	 */
-	CategoryEntity saveEntity(CategoryEntity entity, Integer productType) throws BusinessException;
+	CategoryEntity saveEntity(SaveCategoryRequest saveCategoryRequest, Integer productType) throws BusinessException;
 
 	/**
 	 * 删除分类

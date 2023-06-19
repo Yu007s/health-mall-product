@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.category.v3.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -8,6 +9,7 @@ import com.drstrong.health.product.dao.category.v3.CategoryMapper;
 import com.drstrong.health.product.model.entity.category.v3.CategoryEntity;
 import com.drstrong.health.product.model.enums.CategoryStatusEnum;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
+import com.drstrong.health.product.model.request.category.v3.SaveCategoryRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.category.v3.OldCategoryService;
 import lombok.extern.slf4j.Slf4j;
@@ -154,8 +156,10 @@ public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, Category
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public CategoryEntity saveEntity(CategoryEntity entity, Integer productType) throws BusinessException {
-		Assert.notNull(entity, "Category must not be null.");
+	public CategoryEntity saveEntity(SaveCategoryRequest saveCategoryRequest, Integer productType) throws BusinessException {
+		CategoryEntity entity = BeanUtil.copyProperties(saveCategoryRequest, CategoryEntity.class);
+		entity.setChangedBy(saveCategoryRequest.getOperatorName());
+
 		String name = entity.getName();
 		Assert.hasText(name, "分类名称不能为空");
 
