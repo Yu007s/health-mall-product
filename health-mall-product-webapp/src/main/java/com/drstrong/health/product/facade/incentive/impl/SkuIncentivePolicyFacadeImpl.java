@@ -207,7 +207,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 			// sku 的政策信息
 			SkuIncentivePolicyEntity skuIncentivePolicyEntity = skuCodePolicyEntityMap.get(storeSkuInfoEntity.getSkuCode());
 			// 店铺下配置的收益单元
-			Map<Long, String> policyConfigIdsMap = storePolicyConfigIdsMap.get(storeSkuInfoEntity.getStoreId());
+			Map<Long, String> policyConfigIdsMap = storePolicyConfigIdsMap.getOrDefault(storeSkuInfoEntity.getStoreId(), Maps.newHashMap());
 
 			SkuIncentivePolicyDetailVO skuIncentivePolicyDetailVO = SkuIncentivePolicyDetailVO.builder()
 					.skuCode(storeSkuInfoEntity.getSkuCode())
