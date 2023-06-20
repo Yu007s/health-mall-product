@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -30,6 +31,7 @@ public class AddOrUpdateMedicineRequest implements Serializable {
 
     @ApiModelProperty(value = "通用名")
     @NotBlank(message = "通用名不能为空")
+    @Length(max = 50, message = "通用名最大长度不能超过 50 字符")
     private String commonName;
 
     @ApiModelProperty(value = "品牌名称")
@@ -41,16 +43,20 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     @ApiModelProperty(value = "药品编号")
     private String medicineCode;
 
-    @ApiModelProperty(value = "汉语简拼")
+    @ApiModelProperty(value = "汉语拼音")
+    @Length(max = 50, message = "汉语拼音最大长度不能超过 50 字符")
     private String pinyin;
 
     @ApiModelProperty(value = "英文名")
+    @Length(max = 50, message = "英文名最大长度不能超过 50 字符")
     private String englishName;
 
     @ApiModelProperty(value = "化学名称")
+    @Length(max = 50, message = "化学名称最大长度不能超过 50 字符")
     private String chemicalName;
 
     @ApiModelProperty(value = "药品本位码")
+    @Length(max = 50, message = "药品本位码最大长度不能超过 50 字符")
     private String standardCode;
 
     @ApiModelProperty(value = "资料完整", hidden = true)
@@ -58,6 +64,7 @@ public class AddOrUpdateMedicineRequest implements Serializable {
 
     @ApiModelProperty(value = "批准文号/注册证号")
     @NotBlank(message = "批准文号/注册证号不能为空")
+    @Length(max = 50, message = "批准文号最大长度不能超过 50 字符")
     private String approvalNumber;
 
     @ApiModelProperty(value = "分类信息")

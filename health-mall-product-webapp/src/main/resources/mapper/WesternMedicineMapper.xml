@@ -45,11 +45,11 @@
         mc.classification_name drugClassification,
         pmc.classification_name securityClassification,
         CASE WHEN ms.medicine_id IS NULL THEN 0 ELSE 1 END AS relationSpec,
-        CASE WHEN mu.id IS NULL THEN 0 ELSE 1 END AS defaultUsageDosage
+        CASE WHEN count( ms.id ) = count( mu.id ) THEN 1 ELSE 0 END AS defaultUsageDosage
         FROM
         pms_western_medicine m
         JOIN pms_western_medicine_instructions mi ON mi.medicine_id = m.id
-        LEFT JOIN pms_western_medicine_specifications ms ON ms.medicine_id = m.id
+        LEFT JOIN pms_western_medicine_specifications ms ON ms.medicine_id = m.id AND ms.del_flag = 0
         LEFT JOIN pms_medicine_classification mc ON mc.id =
         json_extract(m.medicine_classification_info,'$.drugClassificationId')
         LEFT JOIN pms_medicine_classification pmc ON pmc.id =
@@ -90,19 +90,12 @@
                     </otherwise>
                 </choose>
             </if>
-            <if test="queryParam.defaultUsageDosage != null">
-                AND CASE WHEN mu.relation_id IS NULL THEN 0 ELSE 1
-                <choose>
-                    <when test="queryParam.defaultUsageDosage == 1">
-                        END = 1
-                    </when>
-                    <otherwise>
-                        END = 0
-                    </otherwise>
-                </choose>
-            </if>
         </where>
-        order by m.id desc
+        GROUP BY m.id
+        <if test="queryParam.defaultUsageDosage != null">
+            HAVING defaultUsageDosage = #{queryParam.defaultUsageDosage}
+        </if>
+        ORDER BY m.id DESC
     </select>
 
     <select id="queryMedicineSimpleInfo"

@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -41,12 +43,16 @@ public class AddOrUpdateAgreementRequest implements Serializable {
 
     @ApiModelProperty("单位包装规格数量（24")
     @NotNull(message = "单位包装规格数量不能为空")
+    @Min(value = 1, message = "单位包装不能小于1")
+    @Max(value = 9999, message = "单位包装不能大于9999")
     private Integer packingUnitNumber;
 
     @ApiModelProperty("规格单位（板，包，瓶）")
     private String specUnit;
 
     @ApiModelProperty("规格值")
+    @Min(value = 1, message = "规格值数量不能小于1")
+    @Max(value = 9999, message = "规格值数量不能大于9999")
     private Integer specValue;
 
     @ApiModelProperty("处方")
