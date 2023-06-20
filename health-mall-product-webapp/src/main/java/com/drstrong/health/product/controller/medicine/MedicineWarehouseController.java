@@ -6,6 +6,8 @@ import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQuery
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.medicine.MedicineWarehouseRemoteApi;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,13 +26,15 @@ public class MedicineWarehouseController implements MedicineWarehouseRemoteApi {
     MedicineWarehouseFacadeHolder medicineWarehouseFacadeHolder;
 
 //    @Override
-//    public PageVO<MedicineWarehouseBaseDTO> pageQuery(@Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
-//        return medicineWarehouseFacadeHolder.getMedicineWarehouseFacade(medicineWarehouseQueryRequest.getProductType()).pageQuery(medicineWarehouseQueryRequest);
-//    }
-
-
-    @Override
-    public <T extends MedicineWarehouseBaseDTO> ResultVO<PageVO<T>> pageQuery(@Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
-        return null;
+    @PostMapping({"/page/query"})
+    public ResultVO<PageVO<MedicineWarehouseBaseDTO>> pageQuery1(@RequestBody @Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
+        PageVO<MedicineWarehouseBaseDTO> baseDTOPageVO = medicineWarehouseFacadeHolder.getMedicineWarehouseFacade(medicineWarehouseQueryRequest.getProductType()).pageQuery(medicineWarehouseQueryRequest);
+        return ResultVO.success(baseDTOPageVO);
     }
+
+    //    @Override
+//    public <T extends MedicineWarehouseBaseDTO> ResultVO<PageVO<MedicineWarehouseBaseDTO>> pageQuery(@Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
+//        PageVO<MedicineWarehouseBaseDTO> medicineWarehouseBaseDTOPageVO = medicineWarehouseFacadeHolder.getMedicineWarehouseFacade(medicineWarehouseQueryRequest.getProductType()).pageQuery(medicineWarehouseQueryRequest);
+//        return ResultVO.success(medicineWarehouseBaseDTOPageVO);
+//    }
 }

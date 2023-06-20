@@ -20,12 +20,13 @@ import javax.validation.Valid;
 @Api("健康商城-安全用药-药材库的统一入口")
 @FeignClient(value = "health-mall-product", path = "/inner/product/medicine/warehouse")
 public interface MedicineWarehouseRemoteApi {
-    /**
-     * 根据类型分页查询药材库
-     *
-     * @author liuqiuyi
-     * @date 2023/6/20 11:01
-     */
-    @PostMapping("/page/query")
-    <T extends MedicineWarehouseBaseDTO> ResultVO<PageVO<T>> pageQuery(@RequestBody @Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
+//    /**
+//     * 根据类型分页查询药材库
+//     *
+//     * @author liuqiuyi
+//     * @date 2023/6/20 11:01
+//     */
+//    // TODO 这里不对 刘秋意
+//    @PostMapping("/page/query11111")
+//    <T extends MedicineWarehouseBaseDTO> ResultVO<PageVO<T>> pageQuery(@RequestBody @Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
 }
