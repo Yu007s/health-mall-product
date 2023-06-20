@@ -67,6 +67,8 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
             medicineUsage.setRelationId(prescriptionMedicineEntity.getId());
             medicineUsage.setUseUsageDosage(request.getUseUsageDosage());
         }
+        medicineUsage.setUserId(request.getUserId());
+        medicineUsage.setUserName(request.getUserName());
         //保存更新用法用量
         medicineUsageService.saveOrUpdateUsage(medicineUsage);
 

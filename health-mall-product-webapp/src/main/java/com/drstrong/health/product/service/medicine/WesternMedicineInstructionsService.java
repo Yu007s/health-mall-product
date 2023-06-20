@@ -19,9 +19,9 @@ public interface WesternMedicineInstructionsService extends IService<WesternMedi
     /**
      * 保存、更新药品说明
      *
-     * @param medicineInstructionsRequest
+     * @param medicineRequest
      */
-    void saveOrUpdateInstructions(MedicineInstructionsRequest medicineInstructionsRequest);
+    void saveOrUpdateInstructions(AddOrUpdateMedicineRequest medicineRequest);
 
 
     /**

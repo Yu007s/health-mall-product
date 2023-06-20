@@ -92,6 +92,8 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
             medicineUsage.setRelationId(specifications.getId());
             medicineUsage.setUseUsageDosage(specRequest.getUseUsageDosage());
         }
+        medicineUsage.setUserId(specRequest.getUserId());
+        medicineUsage.setUserName(specRequest.getUserName());
         //保存-更新用法用量
         medicineUsageService.saveOrUpdateUsage(medicineUsage);
         //保存规格操作日志

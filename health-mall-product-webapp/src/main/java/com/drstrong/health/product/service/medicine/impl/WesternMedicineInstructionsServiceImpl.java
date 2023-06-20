@@ -12,6 +12,8 @@ import com.drstrong.health.product.model.request.medicine.MedicineInstructionsRe
 import com.drstrong.health.product.service.medicine.WesternMedicineInstructionsService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 /**
  * <p>
  * 西/成药品说明 服务实现类
@@ -25,11 +27,17 @@ public class WesternMedicineInstructionsServiceImpl extends ServiceImpl<WesternM
 
 
     @Override
-    public void saveOrUpdateInstructions(MedicineInstructionsRequest medicineInstructionsRequest) {
-        WesternMedicineInstructionsEntity medicineInstructions = BeanUtil.copyProperties(medicineInstructionsRequest, WesternMedicineInstructionsEntity.class);
-        WesternMedicineInstructionsEntity instructions = queryByMedicineId(medicineInstructionsRequest.getMedicineId());
+    public void saveOrUpdateInstructions(AddOrUpdateMedicineRequest medicineRequest) {
+        MedicineInstructionsRequest instructionsRequest = medicineRequest.getMedicineInstructions();
+        WesternMedicineInstructionsEntity medicineInstructions = BeanUtil.copyProperties(instructionsRequest, WesternMedicineInstructionsEntity.class);
+        WesternMedicineInstructionsEntity instructions = queryByMedicineId(instructionsRequest.getMedicineId());
+        medicineInstructions.setChangedBy(medicineRequest.getUserId());
+        medicineInstructions.setChangedAt(LocalDateTime.now());
         if (ObjectUtil.isNotNull(instructions)) {
             medicineInstructions.setId(instructions.getId());
+        } else {
+            medicineInstructions.setCreatedBy(medicineRequest.getUserId());
+            medicineInstructions.setCreatedAt(LocalDateTime.now());
         }
         //保存修改西药说明
         saveOrUpdate(medicineInstructions);

@@ -89,7 +89,7 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
         saveOrUpdate(westernMedicineEntity);
         //保存修改西药说明
         addOrUpdateMedicineRequest.getMedicineInstructions().setMedicineId(westernMedicineEntity.getId());
-        westernMedicineInstructionsService.saveOrUpdateInstructions(addOrUpdateMedicineRequest.getMedicineInstructions());
+        westernMedicineInstructionsService.saveOrUpdateInstructions(addOrUpdateMedicineRequest);
         //保存操作日志
         OperationLog operationLog = OperationLog.buildOperationLog(westernMedicineEntity.getMedicineCode(), OperationLogConstant.SAVE_OR_UPDATE_WESTERN_MEDICINE,
                 buildOperateContent(updateFlag, westernMedicineEntity.getMedicineCode()), addOrUpdateMedicineRequest.getUserId(), addOrUpdateMedicineRequest.getUserName(),
