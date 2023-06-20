@@ -138,7 +138,8 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 
 	private StoreSkuInfoEntity checkSaveOrUpdateStoreSkuParam(SaveOrUpdateStoreSkuRequest saveOrUpdateStoreProductRequest, Boolean updateFlag) {
 		// 1.根据药材code校验编码是否存在
-		// TODO 等振武的接口
+
+
 //		ChineseMedicineEntity chineseMedicineEntity = chineseMedicineService.getByMedicineCode(saveOrUpdateSkuVO.getMedicineCode());
 //		if (Objects.isNull(chineseMedicineEntity)) {
 //			throw new BusinessException(ErrorEnums.CHINESE_MEDICINE_IS_NULL);

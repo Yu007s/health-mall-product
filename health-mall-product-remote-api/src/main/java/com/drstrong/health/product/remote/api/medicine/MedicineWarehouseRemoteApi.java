@@ -3,6 +3,7 @@ package com.drstrong.health.product.remote.api.medicine;
 import com.drstrong.health.product.model.dto.medicine.MedicineWarehouseBaseDTO;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,5 +27,5 @@ public interface MedicineWarehouseRemoteApi {
      * @date 2023/6/20 11:01
      */
     @PostMapping("/page/query")
-    PageVO<MedicineWarehouseBaseDTO> pageQuery(@RequestBody @Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
+    <T extends MedicineWarehouseBaseDTO> ResultVO<PageVO<T>> pageQuery(@RequestBody @Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
 }

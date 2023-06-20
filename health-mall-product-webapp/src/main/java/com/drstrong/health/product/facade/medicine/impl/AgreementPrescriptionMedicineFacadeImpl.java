@@ -76,4 +76,16 @@ public class AgreementPrescriptionMedicineFacadeImpl implements MedicineWarehous
                 .pageSize(medicineWarehouseQueryRequest.getPageSize())
                 .build();
     }
+
+    /**
+     * 根据code查询
+     *
+     * @param code
+     * @author liuqiuyi
+     * @date 2023/6/20 14:55
+     */
+    @Override
+    public MedicineWarehouseBaseDTO queryByCode(String code) {
+        return null;
+    }
 }

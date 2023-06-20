@@ -30,7 +30,7 @@ public interface CategoryManageRemoteApi {
 
     @ApiOperation("保存或者更新分类信息")
     @PostMapping("/save-or-update")
-    ResultVO<Void> saveCategoryEntity(@RequestBody @Valid SaveCategoryRequest saveCategoryRequest, @RequestParam(value = "productType") Integer productType);
+    ResultVO<Void> saveCategoryEntity(@RequestBody @Valid SaveCategoryRequest saveCategoryRequest);
 
     @ApiOperation("根据id删除分类信息")
     @PostMapping("/delete/id")

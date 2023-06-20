@@ -32,8 +32,8 @@ public class CategoryManageV3Controller implements CategoryManageRemoteApi {
 	}
 
 	@Override
-	public ResultVO<Void> saveCategoryEntity(SaveCategoryRequest saveCategoryRequest, Integer productType) {
-		oldCategoryService.saveEntity(saveCategoryRequest, productType);
+	public ResultVO<Void> saveCategoryEntity(SaveCategoryRequest saveCategoryRequest) {
+		oldCategoryService.saveEntity(saveCategoryRequest, saveCategoryRequest.getProductType());
 		return ResultVO.success();
 	}
 

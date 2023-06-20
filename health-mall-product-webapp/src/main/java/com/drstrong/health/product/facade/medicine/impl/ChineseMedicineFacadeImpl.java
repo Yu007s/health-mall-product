@@ -1,6 +1,5 @@
 package com.drstrong.health.product.facade.medicine.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
@@ -58,18 +57,40 @@ public class ChineseMedicineFacadeImpl implements MedicineWarehouseBaseFacade {
             return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(medicineWarehouseQueryRequest.getPageNo()).pageSize(medicineWarehouseQueryRequest.getPageSize()).build();
         }
         // 2.转换并返回
-        List<ChineseMedicineBaseDTO> chineseMedicineBaseDTOList = chineseMedicineEntityPage.getRecords().stream().map(chineseMedicineEntity -> {
-            ChineseMedicineBaseDTO chineseMedicineBaseDTO = ChineseMedicineBaseDTO.builder()
-                    .medicineId(chineseMedicineEntity.getId())
-                    .medicineCode(chineseMedicineEntity.getMedicineCode())
-                    .medicineName(chineseMedicineEntity.getMedicineName())
-                    .aliNames(chineseMedicineEntity.getMedicineAlias())
-                    .maxDosage(chineseMedicineEntity.getMaxDosage())
-                    .build();
-            chineseMedicineBaseDTO.setProductType(queryProductType().getCode());
-            chineseMedicineBaseDTO.setProductTypeName(queryProductType().getValue());
-            return chineseMedicineBaseDTO;
-        }).collect(Collectors.toList());
+        List<ChineseMedicineBaseDTO> chineseMedicineBaseDTOList = chineseMedicineEntityPage.getRecords().stream().map(this::buildChineseMedicineBaseDTO).collect(Collectors.toList());
         return PageVO.newBuilder().result(chineseMedicineBaseDTOList).totalCount((int) chineseMedicineEntityPage.getTotal()).pageNo(medicineWarehouseQueryRequest.getPageNo()).pageSize(medicineWarehouseQueryRequest.getPageSize()).build();
+    }
+
+    /**
+     * 根据code查询
+     *
+     * @param code
+     * @author liuqiuyi
+     * @date 2023/6/20 14:55
+     */
+    @Override
+    public MedicineWarehouseBaseDTO queryByCode(String code) {
+        ChineseMedicineEntity chineseMedicineEntity = chineseMedicineService.getByMedicineCode(code);
+        if (ObjectUtil.isNull(chineseMedicineEntity)) {
+            log.info("未查询到中药材信息，查询的参数为：{}", code);
+            return null;
+        }
+        return buildChineseMedicineBaseDTO(chineseMedicineEntity);
+    }
+
+    /**
+     * 组装返回值
+     */
+    private ChineseMedicineBaseDTO buildChineseMedicineBaseDTO(ChineseMedicineEntity chineseMedicineEntity) {
+        ChineseMedicineBaseDTO chineseMedicineBaseDTO = ChineseMedicineBaseDTO.builder()
+                .medicineId(chineseMedicineEntity.getId())
+                .medicineCode(chineseMedicineEntity.getMedicineCode())
+                .medicineName(chineseMedicineEntity.getMedicineName())
+                .aliNames(chineseMedicineEntity.getMedicineAlias())
+                .maxDosage(chineseMedicineEntity.getMaxDosage())
+                .build();
+        chineseMedicineBaseDTO.setProductType(queryProductType().getCode());
+        chineseMedicineBaseDTO.setProductTypeName(queryProductType().getValue());
+        return chineseMedicineBaseDTO;
     }
 }

@@ -29,4 +29,12 @@ public interface MedicineWarehouseBaseFacade {
      * @date 2023/6/20 10:29
      */
     PageVO<MedicineWarehouseBaseDTO> pageQuery(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
+
+    /**
+     * 根据code查询
+     *
+     * @author liuqiuyi
+     * @date 2023/6/20 14:55
+     */
+    MedicineWarehouseBaseDTO queryByCode(String code);
 }
