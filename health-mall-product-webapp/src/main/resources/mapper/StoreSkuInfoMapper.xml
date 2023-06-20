@@ -73,6 +73,9 @@
         <if test="queryParam.supplierId != null">
             and #{queryParam.supplierId} MEMBER OF (supplier_info)
         </if>
+        <if test="queryParam.productType != null">
+            and sku_type = #{queryParam.productType}
+        </if>
     </sql>
 
     <select id="pageQueryByParam" resultMap="BaseResultMap">

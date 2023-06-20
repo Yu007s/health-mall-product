@@ -29,6 +29,7 @@ import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRe
 import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
 import com.drstrong.health.product.model.response.product.v3.AgreementSkuInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.cms.CmsRemoteProService;
@@ -105,6 +106,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 	 * @date 2023/6/10 09:32
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void saveOrUpdateStoreProduct(SaveOrUpdateStoreSkuRequest saveOrUpdateStoreProductRequest) {
 		log.info("invoke saveOrUpdateStoreProduct(),param:{}", JSONUtil.toJsonStr(saveOrUpdateStoreProductRequest));
 		boolean updateFlag = StrUtil.isNotBlank(saveOrUpdateStoreProductRequest.getSkuCode());
@@ -134,11 +136,26 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 		storeSkuInfoEntity.setProhibitAreaInfo(CollectionUtil.isEmpty(saveOrUpdateStoreProductRequest.getProhibitAreaIdList()) ? Lists.newArrayList() : Lists.newArrayList(saveOrUpdateStoreProductRequest.getProhibitAreaIdList()));
 		storeSkuInfoEntity.setCategoryInfo(CollectionUtil.isEmpty(saveOrUpdateStoreProductRequest.getCategoryIdList()) ? Lists.newArrayList() : Lists.newArrayList(saveOrUpdateStoreProductRequest.getCategoryIdList()));
 		storeSkuInfoService.saveOrUpdate(storeSkuInfoEntity);
+		// 2.调用远程接口保存sku信息
+		doSaveStockInfo(storeSkuInfoEntity.getSkuCode(), storeSkuInfoEntity.getStoreId(), saveOrUpdateStoreProductRequest);
 		// 3.发送操作日志
 		operationLog.setBusinessId(storeSkuInfoEntity.getSkuCode());
 		StoreSkuInfoEntity afterEntity = storeSkuInfoService.checkSkuExistByCode(storeSkuInfoEntity.getSkuCode(), null);
 		operationLog.setChangeAfterData(JSONUtil.toJsonStr(afterEntity));
 		operationLogSendUtil.sendOperationLog(operationLog);
+	}
+
+	/**
+	 * 保存库存设置到 ware 服务
+	 */
+	private void doSaveStockInfo(String skuCode, Long storeId, SaveOrUpdateStoreSkuRequest saveOrUpdateStoreProductRequest) {
+		List<SaveOrUpdateSkuVO.SupplierInfo> supplierInfoList = BeanUtil.copyToList(saveOrUpdateStoreProductRequest.getSupplierInfoList(), SaveOrUpdateSkuVO.SupplierInfo.class);
+		SaveOrUpdateSkuVO saveOrUpdateSkuVO = new SaveOrUpdateSkuVO();
+		saveOrUpdateSkuVO.setStoreId(storeId);
+		saveOrUpdateSkuVO.setMedicineCode(saveOrUpdateStoreProductRequest.getMedicineCode());
+		saveOrUpdateSkuVO.setSupplierInfoList(supplierInfoList);
+		saveOrUpdateSkuVO.setOperatorId(saveOrUpdateStoreProductRequest.getOperatorId());
+		stockRemoteProService.saveOrUpdateStockInfo(skuCode, saveOrUpdateSkuVO);
 	}
 
 	private StoreSkuInfoEntity checkSaveOrUpdateStoreSkuParam(SaveOrUpdateStoreSkuRequest saveOrUpdateStoreProductRequest, Boolean updateFlag) {
