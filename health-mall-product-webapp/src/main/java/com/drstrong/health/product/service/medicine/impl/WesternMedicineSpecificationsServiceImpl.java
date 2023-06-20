@@ -4,12 +4,16 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.product.constants.MedicineConstant;
+import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.dao.medicine.WesternMedicineMapper;
 import com.drstrong.health.product.dao.medicine.WesternMedicineSpecificationsMapper;
+import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.entity.medication.MedicineUsageEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
@@ -26,7 +30,9 @@ import com.drstrong.health.product.service.medicine.MedicineUsageService;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
 import com.drstrong.health.product.util.RedisKeyUtils;
+import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.naiterui.common.redis.RedisUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author zzw
  * @since 2023-06-07
  */
+@Slf4j
 @Service
 public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<WesternMedicineSpecificationsMapper, WesternMedicineSpecificationsEntity> implements WesternMedicineSpecificationsService {
 
@@ -51,6 +58,10 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
 
     @Autowired
     private MedicineUsageService medicineUsageService;
+
+    @Autowired
+    private OperationLogSendUtil operationLogSendUtil;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -64,6 +75,12 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
             //新增
             specifications.setSpecCode(generateMedicineSpecCode(westernMedicine.getId(), westernMedicine.getMedicineCode()));
             specifications.setCreatedBy(specRequest.getUserId());
+        } else {
+            WesternMedicineSpecificationsEntity specificationsEntity = this.getById(specRequest.getId());
+            if (ObjectUtil.isNull(specificationsEntity)) {
+                Assert.notNull(specificationsEntity, "药品规格不存在");
+            }
+            specifications.setSpecCode(specificationsEntity.getSpecCode());
         }
         // 保存或更新药物规格
         saveOrUpdate(specifications);
@@ -77,6 +94,13 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
         }
         //保存-更新用法用量
         medicineUsageService.saveOrUpdateUsage(medicineUsage);
+        //保存规格操作日志
+        String logJsonStr = JSONUtil.toJsonStr(specifications);
+        OperationLog operationLog = OperationLog.buildOperationLog(westernMedicine.getMedicineCode(), OperationLogConstant.SAVE_OR_UPDATE_WESTERN_MEDICINE,
+                buildOperateContent(ObjectUtil.isNotNull(specRequest.getId()), specifications.getSpecCode()), specRequest.getUserId(), specRequest.getUserName(),
+                OperateTypeEnum.CMS.getCode(), logJsonStr);
+        log.info("药品规格操作日志记录,param：{}", JSON.toJSONString(operationLog));
+        operationLogSendUtil.sendOperationLog(operationLog);
         return specifications.getId();
     }
 
@@ -128,6 +152,11 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
         // 生成规则：药品编码M开头 + 建码日期六位：年后两位+月份+日期（190520）+ 5位顺序码    举例：M19052000001
         long serialNumber = RedisUtil.keyOps().incr(RedisKeyUtils.getSkuNum(medicineId));
         return medicineCode + "-" + serialNumber;
+    }
+
+    private String buildOperateContent(boolean updateFlag, String medicineCode) {
+        String action = updateFlag ? MedicineConstant.UPDATE_WESTERN_MEDICINE_SPEC : MedicineConstant.SAVE_WESTERN_MEDICINE_SPEC;
+        return String.format("%s_%s", action, medicineCode);
     }
 
     /**

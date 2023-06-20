@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -71,12 +72,16 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
     @Transactional(rollbackFor = Exception.class)
     public Long saveOrUpdateMedicine(AddOrUpdateMedicineRequest addOrUpdateMedicineRequest) {
         log.info("invoke saveOrUpdateMedicine() param：{}", JSON.toJSONString(addOrUpdateMedicineRequest));
-        boolean updateFlag = ObjectUtil.isAllNotEmpty(addOrUpdateMedicineRequest.getId(), addOrUpdateMedicineRequest.getMedicineCode());
+        boolean updateFlag = ObjectUtil.isNotNull(addOrUpdateMedicineRequest.getId());
         WesternMedicineEntity westernMedicineEntity = buildWesternMedicineEntity(addOrUpdateMedicineRequest);
         String logJsonStr = JSONUtil.toJsonStr(westernMedicineEntity);
         if (updateFlag) {
-            WesternMedicineEntity westernMedicine = queryByMedicineCode(addOrUpdateMedicineRequest.getMedicineCode());
+            WesternMedicineEntity westernMedicine = queryByMedicineId(addOrUpdateMedicineRequest.getId());
+            if (ObjectUtil.isNull(westernMedicine)) {
+                throw new BusinessException("药品不存在");
+            }
             westernMedicineEntity.setId(westernMedicine.getId());
+            westernMedicineEntity.setMedicineCode(westernMedicine.getMedicineCode());
             logJsonStr = JSONUtil.toJsonStr(westernMedicine);
         }
         westernMedicineEntity.setDataIntegrity(checkDataIntegrity(addOrUpdateMedicineRequest));
@@ -87,11 +92,13 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
         westernMedicineInstructionsService.saveOrUpdateInstructions(addOrUpdateMedicineRequest.getMedicineInstructions());
         //保存操作日志
         OperationLog operationLog = OperationLog.buildOperationLog(westernMedicineEntity.getMedicineCode(), OperationLogConstant.SAVE_OR_UPDATE_WESTERN_MEDICINE,
-                updateFlag ? MedicineConstant.SAVE_WESTERN_MEDICINE : MedicineConstant.UPDATE_WESTERN_MEDICINE, addOrUpdateMedicineRequest.getUserId(), addOrUpdateMedicineRequest.getUserName(),
+                buildOperateContent(updateFlag, westernMedicineEntity.getMedicineCode()), addOrUpdateMedicineRequest.getUserId(), addOrUpdateMedicineRequest.getUserName(),
                 OperateTypeEnum.CMS.getCode(), logJsonStr);
+        log.info("药品操作日志记录,param：{}", JSON.toJSONString(operationLog));
         operationLogSendUtil.sendOperationLog(operationLog);
         return westernMedicineEntity.getId();
     }
+
 
     private Integer checkDataIntegrity(AddOrUpdateMedicineRequest medicine) {
         MedicineInstructionsRequest instructions = medicine.getMedicineInstructions();
@@ -156,7 +163,9 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
 
     @Override
     public PageVO<WesternMedicineLogVO> queryMedicineOperationLogByPage(WesternMedicineRequest westernMedicineRequest) {
-        Assert.notNull(westernMedicineRequest.getMedicineCode(), () -> new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL));
+        if (ObjectUtil.hasEmpty(westernMedicineRequest.getMedicineCode(), westernMedicineRequest.getSearchLogType())) {
+            throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
+        }
         int pageNo = westernMedicineRequest.getPageNo();
         int pageSize = westernMedicineRequest.getPageSize();
         HealthLogPageQueryVO request = new HealthLogPageQueryVO();
@@ -174,7 +183,8 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
                             .medicineCode(s.getBusinessId())
                             .operationTime(s.getCreatedAt())
                             .operationAccount(s.getCreatedBy())
-                            .operationType(ObjectUtil.equals(operateContent, MedicineConstant.SAVE_WESTERN_MEDICINE) ? 0 : 1)
+                            .operationType(operateContent.startsWith("s") ? 0 : 1)
+                            .operationBehavior(getOperationBehavior(westernMedicineRequest.getSearchLogType(), s.getContentMaps()))
                             .build() : null;
                 })
                 .filter(Objects::nonNull)
@@ -185,6 +195,38 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
                 .totalCount(pageVO.getTotalCount())
                 .result(vo)
                 .build();
+    }
+
+
+    private String buildOperateContent(boolean updateFlag, String medicineCode) {
+        String action = updateFlag ? MedicineConstant.UPDATE_WESTERN_MEDICINE : MedicineConstant.SAVE_WESTERN_MEDICINE;
+        return String.format("%s_%s", action, medicineCode);
+    }
+
+    private String getOperationBehavior(Integer searchLogType, Map<String, String> contentMaps) {
+        String operationBehavior = StrUtil.EMPTY;
+        if (!ObjectUtil.equals(searchLogType, 1)) {
+            return operationBehavior;
+        }
+        String operateContent = contentMaps.get("operateContent");
+        String[] splitContent = operateContent.split("_");
+        String behaviorType = splitContent[0];
+        String code = splitContent[1];
+        switch (behaviorType) {
+            case MedicineConstant.SAVE_WESTERN_MEDICINE:
+                operationBehavior = String.format("新建药品【%s】", code);
+                break;
+            case MedicineConstant.UPDATE_WESTERN_MEDICINE:
+                operationBehavior = String.format("编辑药品【%s】", code);
+                break;
+            case MedicineConstant.SAVE_WESTERN_MEDICINE_SPEC:
+                operationBehavior = String.format("新建规格【%s】", code);
+                break;
+            default:
+                operationBehavior = String.format("编辑规格【%s】", code);
+                break;
+        }
+        return operationBehavior;
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.drstrong.health.product.remote.api.medicine.WesternMedicineRemoteApi;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -37,7 +38,7 @@ public class WesternMedicineController implements WesternMedicineRemoteApi {
     private WesternMedicineSpecificationsService specificationsService;
 
     @Override
-    public ResultVO<Long> saveOrUpdateMedicine(@Valid AddOrUpdateMedicineRequest medicineRequest) {
+    public ResultVO<Long> saveOrUpdateMedicine(@RequestBody @Valid AddOrUpdateMedicineRequest medicineRequest) {
         return ResultVO.success(westernMedicineService.saveOrUpdateMedicine(medicineRequest));
     }
 

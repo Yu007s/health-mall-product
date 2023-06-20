@@ -58,4 +58,10 @@ public class WesternMedicineRequest extends PageRequest implements Serializable 
      */
     @ApiModelProperty(value = "药品ids，导出使用")
     private List<Long> medicineIds;
+
+    /**
+     * 日志查询类型
+     */
+    @ApiModelProperty(value = "1:西药,2:协定方")
+    private Integer searchLogType;
 }

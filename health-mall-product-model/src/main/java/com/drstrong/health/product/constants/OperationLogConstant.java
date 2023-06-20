@@ -59,4 +59,9 @@ public class OperationLogConstant {
      * 更新或者新增 WesternMedicine
      */
     public static final String SAVE_OR_UPDATE_WESTERN_MEDICINE = "saveOrUpdateWesternMedicine";
+
+    /**
+     * 更新或者新增协定方 AgreementPrescription
+     */
+    public static final String SAVE_OR_UPDATE_AGREEMENT_PRESCRIPTION_MEDICINE = "saveOrUpdateAgreementPrescriptionMedicine";
 }

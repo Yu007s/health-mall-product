@@ -7,8 +7,11 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.product.constants.MedicineConstant;
+import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.dao.medicine.AgreementPrescriptionMedicineMapper;
+import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
@@ -23,7 +26,9 @@ import com.drstrong.health.product.model.response.medicine.AgreementPrescription
 import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionSimpleInfoVO;
 import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicineService;
 import com.drstrong.health.product.service.medicine.MedicineUsageService;
+import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,11 +43,15 @@ import java.time.LocalDateTime;
  * @author zzw
  * @since 2023-06-13
  */
+@Slf4j
 @Service
 public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<AgreementPrescriptionMedicineMapper, AgreementPrescriptionMedicineEntity> implements AgreementPrescriptionMedicineService {
 
     @Autowired
     private MedicineUsageService medicineUsageService;
+
+    @Autowired
+    private OperationLogSendUtil operationLogSendUtil;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -60,6 +69,14 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
         }
         //保存更新用法用量
         medicineUsageService.saveOrUpdateUsage(medicineUsage);
+
+        //保存操作日志
+        String logJsonStr = JSONUtil.toJsonStr(prescriptionMedicineEntity);
+        OperationLog operationLog = OperationLog.buildOperationLog(prescriptionMedicineEntity.getMedicineCode(), OperationLogConstant.SAVE_OR_UPDATE_WESTERN_MEDICINE,
+                ObjectUtil.isNotNull(request.getId()) ? MedicineConstant.UPDATE_AGREEMENT_PRESCRIPTION_MEDICINE : MedicineConstant.SAVE_AGREEMENT_PRESCRIPTION_MEDICINE, request.getUserId(), request.getUserName(),
+                OperateTypeEnum.CMS.getCode(), logJsonStr);
+        log.info("协定方操作日志记录,param：{}", JSON.toJSONString(operationLog));
+        operationLogSendUtil.sendOperationLog(operationLog);
         return prescriptionMedicineEntity.getId();
     }
 

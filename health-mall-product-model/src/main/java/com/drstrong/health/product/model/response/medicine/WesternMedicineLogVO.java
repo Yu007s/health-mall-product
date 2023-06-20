@@ -37,4 +37,7 @@ public class WesternMedicineLogVO {
     @ApiModelProperty(value = "药品编码")
     private String medicineCode;
 
+    @ApiModelProperty(value = "操作行为：新建药品[药品编码]")
+    private String operationBehavior;
+
 }

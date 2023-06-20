@@ -36,4 +36,24 @@ public class MedicineConstant {
      */
     public static final String UPDATE_WESTERN_MEDICINE = "updateWesternMedicine";
 
+    /**
+     * 保存药品规格
+     */
+    public static final String SAVE_WESTERN_MEDICINE_SPEC = "saveWesternMedicineSpec";
+
+    /**
+     * 更新药品规格
+     */
+    public static final String UPDATE_WESTERN_MEDICINE_SPEC = "updateWesternMedicineSpec";
+
+    /**
+     * 保存协定方
+     */
+    public static final String SAVE_AGREEMENT_PRESCRIPTION_MEDICINE = "saveAgreementPrescriptionMedicine";
+
+    /**
+     * 更新协定方
+     */
+    public static final String UPDATE_AGREEMENT_PRESCRIPTION_MEDICINE = "updateAgreementPrescriptionMedicine";
+
 }

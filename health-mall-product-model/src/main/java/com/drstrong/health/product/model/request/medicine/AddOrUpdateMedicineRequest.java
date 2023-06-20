@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -23,11 +25,11 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     private Long id;
 
     @ApiModelProperty(value = "cspu药品名称")
-    @NotNull(message = "药品名称不能为空")
+    @NotBlank(message = "药品名称不能为空")
     private String medicineName;
 
     @ApiModelProperty(value = "通用名")
-    @NotNull(message = "通用名不能为空")
+    @NotBlank(message = "通用名不能为空")
     private String commonName;
 
     @ApiModelProperty(value = "品牌名称")
@@ -55,10 +57,11 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     private Integer dataIntegrity;
 
     @ApiModelProperty(value = "批准文号/注册证号")
-    @NotNull(message = "批准文号/注册证号不能为空")
+    @NotBlank(message = "批准文号/注册证号不能为空")
     private String approvalNumber;
 
     @ApiModelProperty(value = "分类信息")
+    @Valid
     private MedicineClassificationInfoRequest medicineClassificationInfo;
 
     @ApiModelProperty(value = "药品说明")
@@ -78,18 +81,22 @@ public class AddOrUpdateMedicineRequest implements Serializable {
         private static final long serialVersionUID = -4277079128548673211L;
 
         @ApiModelProperty(value = "药品分类id")
+        @NotNull(message = "药品分类不能为空")
         private Long drugClassificationId;
 
         @ApiModelProperty(value = "药理分类id")
         private Long pharmacologyClassificationId;
 
         @ApiModelProperty(value = "剂型分类id")
+        @NotNull(message = "剂型分类不能为空")
         private Long agentClassificationId;
 
         @ApiModelProperty(value = "安全分类id")
+        @NotNull(message = "安全分类不能为空")
         private Long securityClassificationId;
 
         @ApiModelProperty(value = "原料分类id")
+        @NotNull(message = "原料分类不能为空")
         private Long materialsClassificationId;
     }
 
