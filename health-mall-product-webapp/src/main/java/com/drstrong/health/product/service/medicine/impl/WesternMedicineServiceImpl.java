@@ -205,27 +205,33 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
 
     private String getOperationBehavior(Integer searchLogType, Map<String, String> contentMaps) {
         String operationBehavior = StrUtil.EMPTY;
-        if (!ObjectUtil.equals(searchLogType, 1)) {
-            return operationBehavior;
-        }
         String operateContent = contentMaps.get("operateContent");
         String[] splitContent = operateContent.split("_");
         String behaviorType = splitContent[0];
         String code = splitContent[1];
-        switch (behaviorType) {
-            case MedicineConstant.SAVE_WESTERN_MEDICINE:
-                operationBehavior = String.format("新建药品【%s】", code);
-                break;
-            case MedicineConstant.UPDATE_WESTERN_MEDICINE:
-                operationBehavior = String.format("编辑药品【%s】", code);
-                break;
-            case MedicineConstant.SAVE_WESTERN_MEDICINE_SPEC:
-                operationBehavior = String.format("新建规格【%s】", code);
-                break;
-            default:
-                operationBehavior = String.format("编辑规格【%s】", code);
-                break;
+        if (ObjectUtil.equals(searchLogType, 1)) {
+            switch (behaviorType) {
+                case MedicineConstant.SAVE_WESTERN_MEDICINE:
+                    operationBehavior = "新建药品";
+                    break;
+                case MedicineConstant.UPDATE_WESTERN_MEDICINE:
+                    operationBehavior = "编辑药品";
+                    break;
+                case MedicineConstant.SAVE_WESTERN_MEDICINE_SPEC:
+                    operationBehavior = "新建规格";
+                    break;
+                default:
+                    operationBehavior = "编辑规格";
+                    break;
+            }
+        } else {
+            if (ObjectUtil.equals(MedicineConstant.SAVE_AGREEMENT_PRESCRIPTION_MEDICINE, behaviorType)) {
+                operationBehavior = "新建协定方";
+            } else {
+                operationBehavior = "编辑协定方";
+            }
         }
+        operationBehavior = String.format("%s【%s】", operationBehavior, code);
         return operationBehavior;
     }
 

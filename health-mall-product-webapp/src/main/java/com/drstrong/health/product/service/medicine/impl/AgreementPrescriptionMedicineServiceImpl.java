@@ -73,11 +73,16 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
         //保存操作日志
         String logJsonStr = JSONUtil.toJsonStr(prescriptionMedicineEntity);
         OperationLog operationLog = OperationLog.buildOperationLog(prescriptionMedicineEntity.getMedicineCode(), OperationLogConstant.SAVE_OR_UPDATE_WESTERN_MEDICINE,
-                ObjectUtil.isNotNull(request.getId()) ? MedicineConstant.UPDATE_AGREEMENT_PRESCRIPTION_MEDICINE : MedicineConstant.SAVE_AGREEMENT_PRESCRIPTION_MEDICINE, request.getUserId(), request.getUserName(),
+                buildOperateContent(ObjectUtil.isNotNull(request.getId()), prescriptionMedicineEntity.getMedicineCode()), request.getUserId(), request.getUserName(),
                 OperateTypeEnum.CMS.getCode(), logJsonStr);
         log.info("协定方操作日志记录,param：{}", JSON.toJSONString(operationLog));
         operationLogSendUtil.sendOperationLog(operationLog);
         return prescriptionMedicineEntity.getId();
+    }
+
+    private String buildOperateContent(boolean updateFlag, String medicineCode) {
+        String action = updateFlag ? MedicineConstant.UPDATE_AGREEMENT_PRESCRIPTION_MEDICINE : MedicineConstant.SAVE_AGREEMENT_PRESCRIPTION_MEDICINE;
+        return String.format("%s_%s", action, medicineCode);
     }
 
     @Override
