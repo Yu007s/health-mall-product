@@ -39,7 +39,7 @@ public class MedicineClassificationServiceImpl extends ServiceImpl<MedicineClass
         LambdaQueryWrapper<MedicineClassificationEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(MedicineClassificationEntity::getClassificationType, classificationType)
                 .eq(MedicineClassificationEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .orderByDesc(MedicineClassificationEntity::getCreatedAt);
+                .orderByAsc(MedicineClassificationEntity::getCreatedAt);
         List<MedicineClassificationEntity> medicineClassificationList = list(queryWrapper);
         if (CollectionUtils.isEmpty(medicineClassificationList)) {
             return Lists.newArrayList();
