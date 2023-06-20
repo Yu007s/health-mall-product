@@ -4,6 +4,7 @@ import com.drstrong.health.product.facade.medicine.MedicineWarehouseFacadeHolder
 import com.drstrong.health.product.model.dto.medicine.MedicineWarehouseBaseDTO;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.medicine.MedicineWarehouseRemoteApi;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +23,14 @@ public class MedicineWarehouseController implements MedicineWarehouseRemoteApi {
     @Resource
     MedicineWarehouseFacadeHolder medicineWarehouseFacadeHolder;
 
+//    @Override
+//    public PageVO<MedicineWarehouseBaseDTO> pageQuery(@Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
+//        return medicineWarehouseFacadeHolder.getMedicineWarehouseFacade(medicineWarehouseQueryRequest.getProductType()).pageQuery(medicineWarehouseQueryRequest);
+//    }
+
+
     @Override
-    public PageVO<MedicineWarehouseBaseDTO> pageQuery(@Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
-        return medicineWarehouseFacadeHolder.getMedicineWarehouseFacade(medicineWarehouseQueryRequest.getProductType()).pageQuery(medicineWarehouseQueryRequest);
+    public <T extends MedicineWarehouseBaseDTO> ResultVO<PageVO<T>> pageQuery(@Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
+        return null;
     }
 }
