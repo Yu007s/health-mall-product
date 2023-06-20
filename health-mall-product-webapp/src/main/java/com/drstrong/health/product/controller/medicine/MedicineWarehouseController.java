@@ -1,13 +1,12 @@
 package com.drstrong.health.product.controller.medicine;
 
 import com.drstrong.health.product.facade.medicine.MedicineWarehouseFacadeHolder;
-import com.drstrong.health.product.model.dto.medicine.MedicineWarehouseBaseDTO;
+import com.drstrong.health.product.model.dto.medicine.AgreementPrescriptionMedicineBaseDTO;
+import com.drstrong.health.product.model.dto.medicine.WesternMedicineBaseDTO;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.medicine.MedicineWarehouseRemoteApi;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,16 +24,15 @@ public class MedicineWarehouseController implements MedicineWarehouseRemoteApi {
     @Resource
     MedicineWarehouseFacadeHolder medicineWarehouseFacadeHolder;
 
-//    @Override
-    @PostMapping({"/page/query"})
-    public ResultVO<PageVO<MedicineWarehouseBaseDTO>> pageQuery1(@RequestBody @Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
-        PageVO<MedicineWarehouseBaseDTO> baseDTOPageVO = medicineWarehouseFacadeHolder.getMedicineWarehouseFacade(medicineWarehouseQueryRequest.getProductType()).pageQuery(medicineWarehouseQueryRequest);
-        return ResultVO.success(baseDTOPageVO);
+    @Override
+    public ResultVO<PageVO<WesternMedicineBaseDTO>> pageWesternQuery(@Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
+        return ResultVO.success(medicineWarehouseFacadeHolder.getMedicineWarehouseFacade(medicineWarehouseQueryRequest.getProductType())
+                .pageQuery(medicineWarehouseQueryRequest));
     }
 
-    //    @Override
-//    public <T extends MedicineWarehouseBaseDTO> ResultVO<PageVO<MedicineWarehouseBaseDTO>> pageQuery(@Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
-//        PageVO<MedicineWarehouseBaseDTO> medicineWarehouseBaseDTOPageVO = medicineWarehouseFacadeHolder.getMedicineWarehouseFacade(medicineWarehouseQueryRequest.getProductType()).pageQuery(medicineWarehouseQueryRequest);
-//        return ResultVO.success(medicineWarehouseBaseDTOPageVO);
-//    }
+    @Override
+    public ResultVO<PageVO<AgreementPrescriptionMedicineBaseDTO>> pageAgreementQuery(@Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
+        return ResultVO.success(medicineWarehouseFacadeHolder.getMedicineWarehouseFacade(medicineWarehouseQueryRequest.getProductType())
+                .pageQuery(medicineWarehouseQueryRequest));
+    }
 }

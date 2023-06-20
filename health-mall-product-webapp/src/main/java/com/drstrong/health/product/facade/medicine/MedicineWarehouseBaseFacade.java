@@ -28,7 +28,7 @@ public interface MedicineWarehouseBaseFacade {
      * @author liuqiuyi
      * @date 2023/6/20 10:29
      */
-    PageVO<MedicineWarehouseBaseDTO> pageQuery(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
+    <T extends MedicineWarehouseBaseDTO> PageVO<T> pageQuery(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
 
     /**
      * 根据code查询

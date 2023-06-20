@@ -49,7 +49,7 @@ public class ChineseMedicineFacadeImpl implements MedicineWarehouseBaseFacade {
      * @date 2023/6/20 10:29
      */
     @Override
-    public PageVO<MedicineWarehouseBaseDTO> pageQuery(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
+    public <T extends MedicineWarehouseBaseDTO> PageVO<T> pageQuery(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
         // 1.调用原有方法，查询数据
         Page<ChineseMedicineEntity> chineseMedicineEntityPage = chineseMedicineService.pageQueryByRequest(medicineWarehouseQueryRequest);
         if (ObjectUtil.isNull(chineseMedicineEntityPage) || CollectionUtil.isEmpty(chineseMedicineEntityPage.getRecords())) {

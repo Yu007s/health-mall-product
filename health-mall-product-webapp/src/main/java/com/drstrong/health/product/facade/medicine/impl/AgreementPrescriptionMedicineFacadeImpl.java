@@ -51,7 +51,7 @@ public class AgreementPrescriptionMedicineFacadeImpl implements MedicineWarehous
      * @date 2023/6/20 10:29
      */
     @Override
-    public PageVO<MedicineWarehouseBaseDTO> pageQuery(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
+    public <T extends MedicineWarehouseBaseDTO> PageVO<T> pageQuery(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
         // 1.调用接口查询
         Page<AgreementPrescriptionMedicineEntity> agreementPrescriptionMedicineEntityPage = agreementPrescriptionMedicineService.pageQueryByRequest(medicineWarehouseQueryRequest);
         // 2.组装结果返回

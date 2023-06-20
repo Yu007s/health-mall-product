@@ -1,6 +1,7 @@
 package com.drstrong.health.product.remote.api.medicine;
 
-import com.drstrong.health.product.model.dto.medicine.MedicineWarehouseBaseDTO;
+import com.drstrong.health.product.model.dto.medicine.AgreementPrescriptionMedicineBaseDTO;
+import com.drstrong.health.product.model.dto.medicine.WesternMedicineBaseDTO;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -20,13 +21,21 @@ import javax.validation.Valid;
 @Api("健康商城-安全用药-药材库的统一入口")
 @FeignClient(value = "health-mall-product", path = "/inner/product/medicine/warehouse")
 public interface MedicineWarehouseRemoteApi {
-//    /**
-//     * 根据类型分页查询药材库
-//     *
-//     * @author liuqiuyi
-//     * @date 2023/6/20 11:01
-//     */
-//    // TODO 这里不对 刘秋意
-//    @PostMapping("/page/query11111")
-//    <T extends MedicineWarehouseBaseDTO> ResultVO<PageVO<T>> pageQuery(@RequestBody @Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
+    /**
+     * 查询西药材库
+     *
+     * @author liuqiuyi
+     * @date 2023/6/20 11:01
+     */
+    @PostMapping("/page/western/query")
+    ResultVO<PageVO<WesternMedicineBaseDTO>> pageWesternQuery(@RequestBody @Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
+
+    /**
+     * 查询协定方库
+     *
+     * @author liuqiuyi
+     * @date 2023/6/20 11:01
+     */
+    @PostMapping("/page/agreement/query")
+    ResultVO<PageVO<AgreementPrescriptionMedicineBaseDTO>> pageAgreementQuery(@RequestBody @Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
 }
