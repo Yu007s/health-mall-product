@@ -5,6 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.common.enums.OperateTypeEnum;
@@ -12,12 +13,10 @@ import com.drstrong.health.product.constants.MedicineConstant;
 import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.dao.medicine.AgreementPrescriptionMedicineMapper;
 import com.drstrong.health.product.model.OperationLog;
-import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
-import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
+import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateAgreementRequest;
-import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineUsageRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
@@ -123,5 +122,20 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
     public Page<AgreementPrescriptionMedicineEntity> pageQueryByRequest(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
         Page<AgreementPrescriptionMedicineEntity> entityPage = new Page<>(medicineWarehouseQueryRequest.getPageNo(), medicineWarehouseQueryRequest.getPageSize());
         return baseMapper.pageQueryByRequest(entityPage, medicineWarehouseQueryRequest);
+    }
+
+    /**
+     * 根据药材code查询
+     *
+     * @param medicineCode
+     * @author liuqiuyi
+     * @date 2023/6/20 19:13
+     */
+    @Override
+    public AgreementPrescriptionMedicineEntity queryByCode(String medicineCode) {
+        LambdaQueryWrapper<AgreementPrescriptionMedicineEntity> queryWrapper = new LambdaQueryWrapper<AgreementPrescriptionMedicineEntity>()
+                .eq(AgreementPrescriptionMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .eq(AgreementPrescriptionMedicineEntity::getMedicineCode, medicineCode);
+        return baseMapper.selectOne(queryWrapper);
     }
 }

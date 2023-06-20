@@ -194,12 +194,12 @@ public class StorePostageFacadeImpl implements StorePostageFacade {
 			});
 			// 获取供应商的包邮邮费设置
 			StorePostageEntity.SupplierFreePostageInfo supplierFreePostageInfo = supplierIdFreePostageMap.get(supplierId);
+			SupplierInfoDTO supplierInfoToMapOrDefault = supplierInfoToMap.getOrDefault(supplierId, new SupplierInfoDTO());
 			// 组装供应商的邮费返回值
 			StorePostageVO.StoreSupplierPostageVO storeSupplierPostageVO = StorePostageVO.StoreSupplierPostageVO.builder()
 					.supplierId(supplierId)
-					.supplierName(supplierInfoToMap.getOrDefault(supplierId, new SupplierInfoDTO()).getSupplierName())
-					// TODO liuqiuyi 等振武修改供应商接口后补充
-//					.supplierTypeName()
+					.supplierName(supplierInfoToMapOrDefault.getSupplierName())
+					.supplierTypeName(supplierInfoToMapOrDefault.getSupplierName())
 					.freePostage(Objects.isNull(supplierFreePostageInfo) ? new BigDecimal("-1") : BigDecimalUtil.F2Y(supplierFreePostageInfo.getFreePostage()))
 					.storeSupplierAreaPostageList(areaPostageVOList)
 					.build();

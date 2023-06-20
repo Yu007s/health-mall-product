@@ -52,6 +52,7 @@ public enum ErrorEnums implements IBaseResult {
 	SKU_IS_DOWN_ERROR("11117", "当前sku已下架,不能设置预约下架"),
 	SKU_STATUS_ERROR("11118", "不能更新sku的上下架状态,请刷新页面后重新选择"),
 	SKU_SCHEDULED_IN_PROCESS("11119", "当前sku正在自动上下架中,请稍后在试"),
+	MEDICINE_IS_NULL("11120", "关联的药材不存在"),
 
 	STORE_NAME_LENGTH("17000", "店铺名称长度不正确"),
 	STORE_NAME_REPEAT("17100", "店铺名称已存在"),

@@ -1,6 +1,7 @@
 package com.drstrong.health.product.facade.medicine.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.facade.medicine.MedicineWarehouseBaseFacade;
@@ -59,15 +60,7 @@ public class WesternMedicineSpecificationFacadeImpl implements MedicineWarehouse
             log.info("未查询到西药信息，查询的参数为：{}", JSONUtil.toJsonStr(medicineWarehouseQueryRequest));
             return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(medicineWarehouseQueryRequest.getPageNo()).pageSize(medicineWarehouseQueryRequest.getPageSize()).build();
         }
-        List<WesternMedicineBaseDTO> westernMedicineBaseDTOList = westernMedicineEntityPage.getRecords().stream().map(westernMedicineSpecificationsEntity -> {
-            WesternMedicineBaseDTO westernMedicineBaseDTO = WesternMedicineBaseDTO.builder()
-                    .medicineCode(westernMedicineSpecificationsEntity.getSpecCode())
-                    .medicineName(westernMedicineSpecificationsEntity.getSpecName())
-                    .build();
-            westernMedicineBaseDTO.setProductType(queryProductType().getCode());
-            westernMedicineBaseDTO.setProductTypeName(queryProductType().getValue());
-            return westernMedicineBaseDTO;
-        }).collect(Collectors.toList());
+        List<WesternMedicineBaseDTO> westernMedicineBaseDTOList = westernMedicineEntityPage.getRecords().stream().map(this::buildWesternMedicineBaseDTO).collect(Collectors.toList());
 
         return PageVO.newBuilder().result(westernMedicineBaseDTOList)
                 .totalCount((int) westernMedicineEntityPage.getTotal())
@@ -85,6 +78,21 @@ public class WesternMedicineSpecificationFacadeImpl implements MedicineWarehouse
      */
     @Override
     public MedicineWarehouseBaseDTO queryByCode(String code) {
-        return null;
+        WesternMedicineSpecificationsEntity westernMedicineSpecificationsEntity = westernMedicineSpecificationsService.queryByCode(code);
+        if (ObjectUtil.isNull(westernMedicineSpecificationsEntity)) {
+            log.info("未查询到西药信息，查询的参数为：{}", code);
+            return null;
+        }
+        return buildWesternMedicineBaseDTO(westernMedicineSpecificationsEntity);
+    }
+
+    private WesternMedicineBaseDTO buildWesternMedicineBaseDTO(WesternMedicineSpecificationsEntity westernMedicineSpecificationsEntity) {
+        WesternMedicineBaseDTO westernMedicineBaseDTO = WesternMedicineBaseDTO.builder()
+                .medicineCode(westernMedicineSpecificationsEntity.getSpecCode())
+                .medicineName(westernMedicineSpecificationsEntity.getSpecName())
+                .build();
+        westernMedicineBaseDTO.setProductType(queryProductType().getCode());
+        westernMedicineBaseDTO.setProductTypeName(queryProductType().getValue());
+        return westernMedicineBaseDTO;
     }
 }

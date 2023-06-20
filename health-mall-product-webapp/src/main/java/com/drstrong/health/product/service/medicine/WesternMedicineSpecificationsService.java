@@ -60,4 +60,12 @@ public interface WesternMedicineSpecificationsService extends IService<WesternMe
      * @date 2023/6/20 14:05
      */
     Page<WesternMedicineSpecificationsEntity> pageQueryByRequest(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
+
+    /**
+     * 根据code查询西药规格
+     *
+     * @author liuqiuyi
+     * @date 2023/6/20 19:18
+     */
+    WesternMedicineSpecificationsEntity queryByCode(String code);
 }

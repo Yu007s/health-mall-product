@@ -8,12 +8,14 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.product.constants.OperationLogConstant;
+import com.drstrong.health.product.facade.medicine.MedicineWarehouseFacadeHolder;
 import com.drstrong.health.product.facade.sku.SkuManageFacade;
 import com.drstrong.health.product.facade.sku.SkuScheduledConfigFacade;
 import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.dto.area.AreaDTO;
 import com.drstrong.health.product.model.dto.category.CategoryDTO;
 import com.drstrong.health.product.model.dto.label.LabelDTO;
+import com.drstrong.health.product.model.dto.medicine.MedicineWarehouseBaseDTO;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.dto.product.SupplierInfoDTO;
 import com.drstrong.health.product.model.entity.label.LabelInfoEntity;
@@ -92,6 +94,9 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 	@Resource
 	SkuScheduledConfigFacade skuScheduledConfigFacade;
 
+	@Resource
+	MedicineWarehouseFacadeHolder medicineWarehouseFacadeHolder;
+
 	/**
 	 * 保存或者更新 sku 信息(目前不包括中药)
 	 *
@@ -138,28 +143,25 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 
 	private StoreSkuInfoEntity checkSaveOrUpdateStoreSkuParam(SaveOrUpdateStoreSkuRequest saveOrUpdateStoreProductRequest, Boolean updateFlag) {
 		// 1.根据药材code校验编码是否存在
-
-
-//		ChineseMedicineEntity chineseMedicineEntity = chineseMedicineService.getByMedicineCode(saveOrUpdateSkuVO.getMedicineCode());
-//		if (Objects.isNull(chineseMedicineEntity)) {
-//			throw new BusinessException(ErrorEnums.CHINESE_MEDICINE_IS_NULL);
-//		}
+		MedicineWarehouseBaseDTO medicineWarehouseBaseDTO = medicineWarehouseFacadeHolder.getMedicineWarehouseFacade(saveOrUpdateStoreProductRequest.getProductType()).queryByCode(saveOrUpdateStoreProductRequest.getMedicineCode());
+		if (Objects.isNull(medicineWarehouseBaseDTO)) {
+			throw new BusinessException(ErrorEnums.MEDICINE_IS_NULL);
+		}
 		// 2.校验店铺是否存在
 		List<StoreEntity> storeEntityList = storeService.listByIds(Sets.newHashSet(saveOrUpdateStoreProductRequest.getStoreId()));
 		if (CollectionUtils.isEmpty(storeEntityList)) {
 			throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
 		}
 		// 3.校验药材是否关联了供应商
-		// TODO 等振武的接口
-//		List<com.drstrong.health.ware.model.response.SupplierInfoDTO> supplierInfoDTOList = supplierRemoteProService.searchSupplierByCode(saveOrUpdateStoreProductRequest.getMedicineCode());
-//		if (CollectionUtils.isEmpty(supplierInfoDTOList)) {
-//			throw new BusinessException(ErrorEnums.MEDICINE_CODE_NOT_ASSOCIATED);
-//		}
-//		List<Long> supplierIds = supplierInfoDTOList.stream().map(com.drstrong.health.ware.model.response.SupplierInfoDTO::getSupplierId).collect(toList());
-//		boolean supplierFlag = saveOrUpdateStoreProductRequest.getSupplierInfoList().stream().anyMatch(supplierInfo -> !supplierIds.contains(supplierInfo.getSupplierId()));
-//		if (supplierFlag) {
-//			throw new BusinessException(ErrorEnums.SUPPLIER_IS_NULL);
-//		}
+		List<com.drstrong.health.ware.model.response.SupplierInfoDTO> supplierInfoDTOList = supplierRemoteProService.searchSupplierByCode(saveOrUpdateStoreProductRequest.getMedicineCode());
+		if (CollectionUtils.isEmpty(supplierInfoDTOList)) {
+			throw new BusinessException(ErrorEnums.MEDICINE_CODE_NOT_ASSOCIATED);
+		}
+		List<Long> supplierIds = supplierInfoDTOList.stream().map(com.drstrong.health.ware.model.response.SupplierInfoDTO::getSupplierId).collect(toList());
+		boolean supplierFlag = saveOrUpdateStoreProductRequest.getSupplierInfoList().stream().anyMatch(supplierInfo -> !supplierIds.contains(supplierInfo.getSupplierId()));
+		if (supplierFlag) {
+			throw new BusinessException(ErrorEnums.SUPPLIER_IS_NULL);
+		}
 		// 4.如果是更新sku，校验skuCode是否存在，否则校验重复添加
 		if (updateFlag) {
 			StoreSkuInfoEntity storeSkuInfoEntity = storeSkuInfoService.checkSkuExistByCode(saveOrUpdateStoreProductRequest.getSkuCode(), null);

@@ -52,4 +52,12 @@ public interface AgreementPrescriptionMedicineService extends IService<Agreement
      * @date 2023/6/20 13:53
      */
     Page<AgreementPrescriptionMedicineEntity> pageQueryByRequest(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
+
+    /**
+     * 根据药材code查询
+     *
+     * @author liuqiuyi
+     * @date 2023/6/20 19:13
+     */
+    AgreementPrescriptionMedicineEntity queryByCode(String medicineCode);
 }

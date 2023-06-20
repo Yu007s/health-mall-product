@@ -1,6 +1,7 @@
 package com.drstrong.health.product.facade.medicine.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.facade.medicine.MedicineWarehouseBaseFacade;
@@ -59,16 +60,7 @@ public class AgreementPrescriptionMedicineFacadeImpl implements MedicineWarehous
             log.info("未查询到协定方信息，查询的参数为：{}", JSONUtil.toJsonStr(medicineWarehouseQueryRequest));
             return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(medicineWarehouseQueryRequest.getPageNo()).pageSize(medicineWarehouseQueryRequest.getPageSize()).build();
         }
-        List<AgreementPrescriptionMedicineBaseDTO> agreementPrescriptionMedicineBaseDTOList = agreementPrescriptionMedicineEntityPage.getRecords().stream().map(agreementPrescriptionMedicineEntity -> {
-            AgreementPrescriptionMedicineBaseDTO agreementPrescriptionMedicineBaseDTO = AgreementPrescriptionMedicineBaseDTO.builder()
-                    .medicineId(agreementPrescriptionMedicineEntity.getId())
-                    .medicineCode(agreementPrescriptionMedicineEntity.getMedicineCode())
-                    .medicineName(agreementPrescriptionMedicineEntity.getMedicineName())
-                    .build();
-            agreementPrescriptionMedicineBaseDTO.setProductType(queryProductType().getCode());
-            agreementPrescriptionMedicineBaseDTO.setProductTypeName(queryProductType().getValue());
-            return agreementPrescriptionMedicineBaseDTO;
-        }).collect(Collectors.toList());
+        List<AgreementPrescriptionMedicineBaseDTO> agreementPrescriptionMedicineBaseDTOList = agreementPrescriptionMedicineEntityPage.getRecords().stream().map(this::buildAgreementPrescriptionMedicineBaseDTO).collect(Collectors.toList());
 
         return PageVO.newBuilder().result(agreementPrescriptionMedicineBaseDTOList)
                 .totalCount((int) agreementPrescriptionMedicineEntityPage.getTotal())
@@ -86,6 +78,22 @@ public class AgreementPrescriptionMedicineFacadeImpl implements MedicineWarehous
      */
     @Override
     public MedicineWarehouseBaseDTO queryByCode(String code) {
-        return null;
+        AgreementPrescriptionMedicineEntity agreementPrescriptionMedicineEntity = agreementPrescriptionMedicineService.queryByCode(code);
+        if (ObjectUtil.isNull(agreementPrescriptionMedicineEntity)) {
+            log.info("未查询到协定方信息，查询的参数为：{}", code);
+            return null;
+        }
+        return buildAgreementPrescriptionMedicineBaseDTO(agreementPrescriptionMedicineEntity);
+    }
+
+    private AgreementPrescriptionMedicineBaseDTO buildAgreementPrescriptionMedicineBaseDTO(AgreementPrescriptionMedicineEntity agreementPrescriptionMedicineEntity) {
+        AgreementPrescriptionMedicineBaseDTO agreementPrescriptionMedicineBaseDTO = AgreementPrescriptionMedicineBaseDTO.builder()
+                .medicineId(agreementPrescriptionMedicineEntity.getId())
+                .medicineCode(agreementPrescriptionMedicineEntity.getMedicineCode())
+                .medicineName(agreementPrescriptionMedicineEntity.getMedicineName())
+                .build();
+        agreementPrescriptionMedicineBaseDTO.setProductType(queryProductType().getCode());
+        agreementPrescriptionMedicineBaseDTO.setProductTypeName(queryProductType().getValue());
+        return agreementPrescriptionMedicineBaseDTO;
     }
 }

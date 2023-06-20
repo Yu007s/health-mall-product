@@ -173,4 +173,19 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
         Page<WesternMedicineSpecificationsEntity> entityPage = new Page<>(medicineWarehouseQueryRequest.getPageNo(), medicineWarehouseQueryRequest.getPageSize());
         return baseMapper.pageQueryByRequest(entityPage, medicineWarehouseQueryRequest);
     }
+
+    /**
+     * 根据code查询西药规格
+     *
+     * @param code
+     * @author liuqiuyi
+     * @date 2023/6/20 19:18
+     */
+    @Override
+    public WesternMedicineSpecificationsEntity queryByCode(String code) {
+        LambdaQueryWrapper<WesternMedicineSpecificationsEntity> queryWrapper = new LambdaQueryWrapper<WesternMedicineSpecificationsEntity>()
+                .eq(WesternMedicineSpecificationsEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .eq(WesternMedicineSpecificationsEntity::getSpecCode, code);
+        return baseMapper.selectOne(queryWrapper);
+    }
 }

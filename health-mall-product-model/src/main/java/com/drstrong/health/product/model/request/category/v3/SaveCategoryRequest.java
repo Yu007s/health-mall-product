@@ -47,4 +47,7 @@ public class SaveCategoryRequest extends OperatorUserInfo implements Serializabl
 
     @ApiModelProperty("id，更新必传")
     private Long id;
+
+    @ApiModelProperty("描述")
+    private String description;
 }
