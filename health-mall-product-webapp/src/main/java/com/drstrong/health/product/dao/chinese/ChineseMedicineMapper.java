@@ -1,7 +1,10 @@
 package com.drstrong.health.product.dao.chinese;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
+import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
+import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -30,4 +33,6 @@ public interface ChineseMedicineMapper extends BaseMapper<ChineseMedicineEntity>
 	void insertBatch(@Param("chineseMedicines") List<ChineseMedicineEntity> chineseMedicines);
 
 	ChineseMedicineEntity getByMedicineCodeIgnoreDel(@Param("medicineCode") String medicineCode);
+
+    Page<ChineseMedicineEntity> pageQueryByRequest(Page<ChineseSkuInfoEntity> entityPage, @Param("queryParam") MedicineWarehouseQueryRequest queryParam);
 }

@@ -4,6 +4,7 @@ package com.drstrong.health.product.dao.medicine;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
+import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionInfoVO;
 import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionSimpleInfoVO;
@@ -40,4 +41,5 @@ public interface AgreementPrescriptionMedicineMapper extends BaseMapper<Agreemen
      */
     Page<AgreementPrescriptionSimpleInfoVO> queryPageList(Page<AgreementPrescriptionSimpleInfoVO> medicinePage, @Param("queryParam") WesternMedicineRequest queryParam);
 
+    Page<AgreementPrescriptionMedicineEntity> pageQueryByRequest(Page<AgreementPrescriptionMedicineEntity> entityPage, @Param("queryParam") MedicineWarehouseQueryRequest queryParam);
 }

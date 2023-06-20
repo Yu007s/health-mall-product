@@ -16,8 +16,10 @@ import com.drstrong.health.product.dao.chinese.ChineseMedicineMapper;
 import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
+import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchVO;
@@ -238,6 +240,19 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         chineseMedicineSearchVO.setTotal((int) total);
         chineseMedicineSearchVO.setMedicineResponses(chineseMedicineResponses);
         return chineseMedicineSearchVO;
+    }
+
+    /**
+     * 根据条件分页查询
+     *
+     * @param warehouseQueryRequest
+     * @author liuqiuyi
+     * @date 2023/6/20 11:31
+     */
+    @Override
+    public Page<ChineseMedicineEntity> pageQueryByRequest(MedicineWarehouseQueryRequest warehouseQueryRequest) {
+        Page<ChineseSkuInfoEntity> entityPage = new Page<>(warehouseQueryRequest.getPageNo(), warehouseQueryRequest.getPageSize());
+        return baseMapper.pageQueryByRequest(entityPage, warehouseQueryRequest);
     }
 
     @Override

@@ -1,8 +1,10 @@
 package com.drstrong.health.product.service.medicine;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateAgreementRequest;
+import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionInfoVO;
@@ -42,4 +44,12 @@ public interface AgreementPrescriptionMedicineService extends IService<Agreement
      * @return
      */
     PageVO<AgreementPrescriptionSimpleInfoVO> queryAgreementPrescriptionPageInfo(WesternMedicineRequest request);
+
+    /**
+     * 根据条件查询协定方规格信息
+     *
+     * @author liuqiuyi
+     * @date 2023/6/20 13:53
+     */
+    Page<AgreementPrescriptionMedicineEntity> pageQueryByRequest(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
 }

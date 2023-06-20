@@ -56,5 +56,14 @@
             </if>
         </where>
     </select>
+    <select id="pageQueryByRequest"
+            resultType="com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity">
+        select CONCAT(pwm.full_name, ' ', pwms.spec_name) as specName,pwms.spec_code
+        from pms_western_medicine_specifications pwms
+        left join pms_western_medicine pwm on pwms.medicine_id = pwm.id
+        where pwms.del_flag = 0
+        and pwm.del_flag = 0
+        and (pwms.spec_code = #{queryParam.searchKey} or pwm.full_name like concat('%',#{queryParam.searchKey},'%'))
+    </select>
 
 </mapper>

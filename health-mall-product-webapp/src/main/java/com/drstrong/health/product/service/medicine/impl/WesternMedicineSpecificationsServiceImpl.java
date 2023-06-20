@@ -16,6 +16,7 @@ import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecif
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineSpecRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineUsageRequest;
+import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.medicine.*;
@@ -129,4 +130,16 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
         return medicineCode + "-" + serialNumber;
     }
 
+    /**
+     * 按条件分页查询规格信息，返回基本信息
+     *
+     * @param medicineWarehouseQueryRequest
+     * @author liuqiuyi
+     * @date 2023/6/20 14:05
+     */
+    @Override
+    public Page<WesternMedicineSpecificationsEntity> pageQueryByRequest(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
+        Page<WesternMedicineSpecificationsEntity> entityPage = new Page<>(medicineWarehouseQueryRequest.getPageNo(), medicineWarehouseQueryRequest.getPageSize());
+        return baseMapper.pageQueryByRequest(entityPage, medicineWarehouseQueryRequest);
+    }
 }
