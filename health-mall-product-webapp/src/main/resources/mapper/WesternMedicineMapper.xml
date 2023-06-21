@@ -101,34 +101,32 @@
     <select id="queryMedicineSimpleInfo"
             resultType="com.drstrong.health.product.model.response.medicine.WesternMedicineSimpleInfoVO">
         SELECT m.id,
-               m.medicine_code        medicineCode,
-               m.full_name        medicineName,
+               m.medicine_code medicineCode,
+               m.full_name medicineName,
                mc.classification_name agentClassName
         FROM pms_western_medicine m
-                 LEFT JOIN pms_medicine_classification mc
-                           ON mc.id = json_extract(m.medicine_classification_info, '$.agentClassificationId')
-        WHERE m.del_flag = 0
-          AND m.id = #{id}
+        LEFT JOIN pms_medicine_classification mc ON mc.id = json_extract(m.medicine_classification_info, '$.agentClassificationId')
+        WHERE m.del_flag = 0 AND m.id = #{id}
     </select>
     <select id="queryMedicineExcelData"
             resultType="com.drstrong.health.product.model.response.medicine.WesternMedicineExcelVO">
-        SELECT DISTINCT
-        m.medicine_code medicineCode,
-        ms.standard_spec_code standardSpecCode,
-        m.full_name medicineName,
-        m.common_name commonName,
-        m.brand_name brandName,
-        ms.spec_code specCode,
-        ms.spec_name specName,
-        ms.packing_spec packingSpec,
-        ms.packing_unit packingUnit,
-        mc.classification_name drugClassName,
-        m.approval_number approvalNumber,
-        mi.production_enterprise productionEnterprise,
-        mi.listing_licensee listingLicensee,
-        ms.created_at createdAt
+        SELECT
+            m.medicine_code medicineCode,
+            ms.standard_spec_code standardSpecCode,
+            m.full_name medicineName,
+            m.common_name commonName,
+            m.brand_name brandName,
+            ms.spec_code specCode,
+            CONCAT(m.full_name, ms.spec_name) specName,
+            ms.packing_spec packingSpec,
+            ms.packing_unit packingUnit,
+            mc.classification_name drugClassName,
+            m.approval_number approvalNumber,
+            mi.production_enterprise productionEnterprise,
+            mi.listing_licensee listingLicensee,
+            ms.created_at createdAt
         FROM
-        pms_western_medicine m
+            pms_western_medicine m
         LEFT JOIN pms_western_medicine_instructions mi ON mi.medicine_id = m.id
         LEFT JOIN pms_medicine_classification mc ON mc.id =
         json_extract(m.medicine_classification_info,'$.drugClassificationId')

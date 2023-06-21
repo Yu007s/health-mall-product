@@ -59,9 +59,9 @@ public class AddOrUpdateMedicineSpecRequest implements Serializable {
     private String specUnit;
 
     @ApiModelProperty("规格值")
-    @Min(value = 1, message = "规格值数量不能小于1")
+    @Min(value = 0, message = "规格值数量不能小于0")
     @Max(value = 9999, message = "规格值数量不能大于9999")
-    private Integer specValue;
+    private Integer specValue = 0;
 
     @ApiModelProperty("规格")
     private String specification;

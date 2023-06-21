@@ -38,7 +38,7 @@
         ms.medicine_id medicineId,
         ms.spec_code specCode,
         CONCAT(m.full_name, ' ', ms.spec_name) specName,
-        CASE WHEN count( ms.id ) = count( mu.id ) THEN 1 ELSE 0 END AS defaultUsageDosage
+        CASE WHEN mu.id IS NOT NULL THEN 1 ELSE 0 END AS useUsageDosage
         FROM pms_western_medicine_specifications ms
         JOIN pms_western_medicine m ON m.id = ms.medicine_id
         LEFT JOIN pms_medicine_usage mu ON mu.relation_id = ms.id AND mu.relation_type = 1 AND mu.del_flag = 0
