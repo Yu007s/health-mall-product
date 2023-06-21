@@ -47,4 +47,7 @@ public class CategoryVO extends BaseTree {
 
 	@ApiModelProperty(value = "节子结点数量")
 	private Integer leafCount = 0;
+
+	@ApiModelProperty("路径ID列表，以逗号分隔")
+	private String idPath;
 }
