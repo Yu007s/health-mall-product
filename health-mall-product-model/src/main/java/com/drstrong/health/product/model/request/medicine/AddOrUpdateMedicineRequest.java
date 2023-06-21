@@ -25,8 +25,7 @@ public class AddOrUpdateMedicineRequest implements Serializable {
     @ApiModelProperty(value = "药品id")
     private Long id;
 
-    @ApiModelProperty(value = "cspu药品名称")
-    @NotBlank(message = "药品名称不能为空")
+    @ApiModelProperty(value = "商品名(cspu药品名称)")
     private String medicineName;
 
     @ApiModelProperty(value = "通用名")
