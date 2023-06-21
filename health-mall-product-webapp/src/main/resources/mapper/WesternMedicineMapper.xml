@@ -58,8 +58,7 @@
         <where>
             m.del_flag = 0
             <if test="queryParam.searchName != null and queryParam.searchName != ''">
-                AND (m.medicine_name LIKE CONCAT('%', #{queryParam.searchName}, '%')
-                OR m.common_name LIKE CONCAT('%', #{queryParam.searchName}, '%')
+                AND (m.full_name LIKE CONCAT('%', #{queryParam.searchName}, '%')
                 OR m.medicine_code LIKE CONCAT('%', #{queryParam.searchName}, '%'))
             </if>
             <if test="queryParam.drugClassificationId != null">
