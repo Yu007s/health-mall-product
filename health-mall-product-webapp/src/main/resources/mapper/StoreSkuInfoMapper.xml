@@ -68,7 +68,7 @@
             and sku_status = #{queryParam.skuStatus}
         </if>
         <if test="queryParam.storeId != null">
-            and sku.store_id = #{queryParam.storeId}
+            and store_id = #{queryParam.storeId}
         </if>
         <if test="queryParam.supplierId != null">
             and #{queryParam.supplierId} MEMBER OF (supplier_info)
