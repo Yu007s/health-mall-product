@@ -44,4 +44,7 @@ public class CategoryVO extends BaseTree {
 
 	@ApiModelProperty(value = "状态：1-启用，0-禁用, -1-删除")
 	private Integer status;
+
+	@ApiModelProperty(value = "节子结点数量")
+	private Integer leafCount = 0;
 }
