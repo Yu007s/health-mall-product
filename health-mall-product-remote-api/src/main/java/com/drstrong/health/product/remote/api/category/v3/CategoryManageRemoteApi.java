@@ -1,6 +1,8 @@
 package com.drstrong.health.product.remote.api.category.v3;
 
 import com.drstrong.health.product.model.request.category.v3.SaveCategoryRequest;
+import com.drstrong.health.product.model.request.category.v3.SearchCategoryRequest;
+import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.category.v3.CategoryVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
@@ -35,4 +37,12 @@ public interface CategoryManageRemoteApi {
     @ApiOperation("根据id删除分类信息")
     @PostMapping("/delete/id")
     ResultVO<Void> deleteCategoryEntity(@RequestParam(value = "categoryId") Long categoryId, @RequestParam(value = "changedName") String changedName);
+
+    @ApiOperation("查询健康用品列表详情信息")
+    @PostMapping("/page/health/info")
+    ResultVO<PageVO<CategoryVO>> pageSearch(@RequestBody SearchCategoryRequest searchCategoryRequest);
+
+    @ApiOperation("更新分类状态")
+    @PostMapping("/update/status")
+    ResultVO<Void> updateCategoryStatus(@RequestParam(value = "categoryId") Long categoryId, @RequestParam(value = "status") Integer status, @RequestParam(value = "changedName") String changedName);
 }

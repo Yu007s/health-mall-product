@@ -21,4 +21,7 @@
         where id = #{id}
     </update>
 
+    <update id="updateStatusById">
+		update pms_category set `status` = #{status},changed_by = #{changedName},changed_at = now() where id = #{categoryId}
+	</update>
 </mapper>

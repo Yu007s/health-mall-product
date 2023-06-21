@@ -38,4 +38,10 @@ public class CategoryVO extends BaseTree {
 
 	@ApiModelProperty("描述")
 	private String description;
+
+	@ApiModelProperty(value = "路径名称列表，以逗号分隔")
+	private String namePath;
+
+	@ApiModelProperty(value = "状态：1-启用，0-禁用, -1-删除")
+	private Integer status;
 }

@@ -1,8 +1,9 @@
 package com.drstrong.health.product.controller.category.v3;
 
 import com.drstrong.health.product.facade.category.CategoryFacade;
-import com.drstrong.health.product.model.entity.category.v3.CategoryEntity;
 import com.drstrong.health.product.model.request.category.v3.SaveCategoryRequest;
+import com.drstrong.health.product.model.request.category.v3.SearchCategoryRequest;
+import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.category.v3.CategoryVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.category.v3.CategoryManageRemoteApi;
@@ -40,6 +41,18 @@ public class CategoryManageV3Controller implements CategoryManageRemoteApi {
 	@Override
 	public ResultVO<Void> deleteCategoryEntity(Long categoryId, String changedName) {
 		oldCategoryService.deleteEntity(categoryId, changedName);
+		return ResultVO.success();
+	}
+
+	@Override
+	public ResultVO<PageVO<CategoryVO>> pageSearch(SearchCategoryRequest searchCategoryRequest) {
+		PageVO<CategoryVO> categoryPageVo = oldCategoryService.pageSearch(searchCategoryRequest);
+		return ResultVO.success(categoryPageVo);
+	}
+
+	@Override
+	public ResultVO<Void> updateCategoryStatus(Long categoryId, Integer status, String changedName) {
+		oldCategoryService.updateCategoryStatus(categoryId, status, changedName);
 		return ResultVO.success();
 	}
 }
