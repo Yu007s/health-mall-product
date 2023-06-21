@@ -105,9 +105,6 @@ public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, Category
 		entity.setChangedAt(date);
 		entity.setChangedBy(entity.getChangedBy());
 		baseMapper.insert(entity);
-		if (Objects.equals(parentId, CategoryEntity.HEALTH_PRODUCT_TOP_PARENT_ID) || Objects.equals(parentId, CategoryEntity.MEDICINE_TOP_PARENT_ID_NEW)) {
-			return entity;
-		}
 
 		String parentNamePath = isTopCategory ? null : parent.getNamePath();
 		String parentIdPath = isTopCategory ? null : parent.getIdPath();
