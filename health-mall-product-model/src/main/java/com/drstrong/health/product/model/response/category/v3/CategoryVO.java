@@ -50,4 +50,10 @@ public class CategoryVO extends BaseTree {
 
 	@ApiModelProperty("路径ID列表，以逗号分隔")
 	private String idPath;
+
+	@ApiModelProperty("排序号")
+	private Integer orderNumber = 0;
+
+	@ApiModelProperty("已关联商品数量")
+	private Integer pNumber = 0;
 }
