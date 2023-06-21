@@ -9,6 +9,7 @@ import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.response.category.v3.CategoryVO;
 import com.drstrong.health.product.service.category.v3.CategoryService;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author liuqiuyi
@@ -24,6 +26,13 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class CategoryFacadeImpl implements CategoryFacade {
+    /**
+     * 需要查询 中西药/协定方 分类的商品类型
+     */
+    private static final Set<Integer> CHINESE_WESTERN_AGREEMENT = Sets.newHashSet(ProductTypeEnum.CHINESE.getCode(),
+            ProductTypeEnum.MEDICINE.getCode(),
+            ProductTypeEnum.AGREEMENT.getCode());
+
 	/**
 	 * 西药分类中,需要过滤的id,目前仅有协定方不展示在西药分类中
 	 */
@@ -45,8 +54,8 @@ public class CategoryFacadeImpl implements CategoryFacade {
 	 */
 	@Override
 	public List<CategoryVO> queryAllCategoryByProductType(Integer productType, Boolean needFilter) {
-		// 1.查询中西药分类,并根据条件是否过滤掉协定方
-		if (ObjectUtil.equals(ProductTypeEnum.CHINESE.getCode(), productType) || ObjectUtil.equals(ProductTypeEnum.MEDICINE.getCode(), productType)) {
+		// 1.查询 中西药/协定方 分类,并根据条件是否过滤掉协定方
+		if (CHINESE_WESTERN_AGREEMENT.contains(productType)) {
 			List<CategoryEntity> westernCategoryList = categoryService.queryWesternAll();
 			if (Objects.equals(Boolean.TRUE, needFilter)) {
 				westernCategoryList.removeIf(categoryEntity -> ObjectUtil.equals(categoryEntity.getId(), westernFilterId));
