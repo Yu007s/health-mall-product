@@ -117,6 +117,12 @@ public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, Category
 		String[] idPathItems = StringUtils.commaDelimitedListToStringArray(entity.getIdPath());
 		//设置分类级别
 		entity.setLevel(idPathItems.length);
+
+		// 如果是健康用品，level默认要设置为1 ，如果是中西药品， level默认要设置为0，否则会影响查询
+		if (Objects.equals(ProductTypeEnum.HEALTH.getCode(), productType) && idPathItems.length == 0) {
+			entity.setLevel(1);
+		}
+
 		baseMapper.updateById(entity);
 
 		//更新父分类叶子节点数量
