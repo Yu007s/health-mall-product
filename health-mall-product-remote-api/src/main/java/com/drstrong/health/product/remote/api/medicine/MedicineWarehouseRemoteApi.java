@@ -1,6 +1,7 @@
 package com.drstrong.health.product.remote.api.medicine;
 
 import com.drstrong.health.product.model.dto.medicine.AgreementPrescriptionMedicineBaseDTO;
+import com.drstrong.health.product.model.dto.medicine.ChineseMedicineBaseDTO;
 import com.drstrong.health.product.model.dto.medicine.WesternMedicineBaseDTO;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -38,4 +39,13 @@ public interface MedicineWarehouseRemoteApi {
      */
     @PostMapping("/page/agreement/query")
     ResultVO<PageVO<AgreementPrescriptionMedicineBaseDTO>> pageAgreementQuery(@RequestBody @Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
+
+    /**
+     * 查询中药材库
+     *
+     * @author liuqiuyi
+     * @date 2023/6/20 11:01
+     */
+    @PostMapping("/page/chinese/query")
+    ResultVO<PageVO<ChineseMedicineBaseDTO>> pageChineseQuery(@RequestBody @Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
 }
