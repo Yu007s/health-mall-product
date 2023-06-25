@@ -44,7 +44,7 @@ public class SkuManageRemoteController implements SkuManageRemoteApi {
 
 	@Override
 	public ResultVO<Void> saveOrUpdateStoreProduct(SaveOrUpdateStoreSkuRequest saveOrUpdateStoreSkuRequest) {
-		skuManageFacade.saveOrUpdateStoreProduct(saveOrUpdateStoreSkuRequest);
+		skuManageFacade.addLockSaveOrUpdateStoreProduct(saveOrUpdateStoreSkuRequest, saveOrUpdateStoreSkuRequest.getMedicineCode() + saveOrUpdateStoreSkuRequest.getStoreId());
 		return ResultVO.success();
 	}
 

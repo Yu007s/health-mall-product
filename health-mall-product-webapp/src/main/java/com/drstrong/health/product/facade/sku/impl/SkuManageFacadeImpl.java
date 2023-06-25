@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.common.enums.OperateTypeEnum;
@@ -40,12 +41,14 @@ import com.drstrong.health.product.service.label.LabelInfoService;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
+import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.drstrong.health.ware.model.response.SkuStockResponse;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.klock.annotation.Dlock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -97,6 +100,19 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 
 	@Resource
 	MedicineWarehouseFacadeHolder medicineWarehouseFacadeHolder;
+
+    /**
+     * 添加分布式锁，确保更新或者修改sku时不重复添加
+     *
+     * @param lockKey 分布式锁的key，这里使用入参中的 medicineCode 和 storeId 加锁
+     * @author liuqiuyi
+     * @date 2023/6/25 11:09
+     */
+    @Override
+    @Dlock(prefix = RedisKeyUtils.SAVE_OR_UPDATE_SKU, name = "#lockKey", waitTime = 3, leaseTime = 5)
+    public void addLockSaveOrUpdateStoreProduct(SaveOrUpdateStoreSkuRequest saveOrUpdateStoreProductRequest, String lockKey) {
+        SpringUtil.getBean(SkuManageFacade.class).saveOrUpdateStoreProduct(saveOrUpdateStoreProductRequest);
+    }
 
 	/**
 	 * 保存或者更新 sku 信息(目前不包括中药)

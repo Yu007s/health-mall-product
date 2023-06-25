@@ -15,6 +15,16 @@ import java.util.List;
  * @date 2023/6/10 09:25
  */
 public interface SkuManageFacade {
+
+    /**
+     * 添加分布式锁，确保更新或者修改sku时不重复添加
+     *
+	 * @param lockKey 分布式锁的key，这里使用入参中的 medicineCode 和 storeId 加锁
+     * @author liuqiuyi
+     * @date 2023/6/25 11:09
+     */
+    void addLockSaveOrUpdateStoreProduct(SaveOrUpdateStoreSkuRequest saveOrUpdateStoreProductRequest, String lockKey);
+
 	/**
 	 * 保存或者更新 sku 信息(目前不包括中药)
 	 *
