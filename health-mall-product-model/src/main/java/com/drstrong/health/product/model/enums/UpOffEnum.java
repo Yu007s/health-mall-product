@@ -12,7 +12,7 @@ public enum UpOffEnum {
 	/**
 	 *
 	 */
-	DOWN(0, "未上架"),
+	DOWN(0, "已下架"),
 	UP(1, "已上架"),
 	SCHEDULED_UP(2, "预约上架中"),
 	SCHEDULED_DOWN(3, "预约下架中");
