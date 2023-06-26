@@ -11,9 +11,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.category.v3.CategoryMapper;
-import com.drstrong.health.product.model.dto.SupplierChineseSkuDTO;
 import com.drstrong.health.product.model.entity.category.v3.CategoryEntity;
+import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.enums.CategoryStatusEnum;
+import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.category.v3.SaveCategoryRequest;
 import com.drstrong.health.product.model.request.category.v3.SearchCategoryRequest;
@@ -21,6 +22,7 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.category.v3.CategoryVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.category.v3.OldCategoryService;
+import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -45,6 +48,9 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, CategoryEntity> implements OldCategoryService {
+
+	@Resource
+	StoreSkuInfoService storeSkuInfoService;
 
 	private static String toPath(String parentPath, String item) {
 		StringBuilder path = new StringBuilder();
@@ -228,7 +234,12 @@ public class OldCategoryServiceImpl extends ServiceImpl<CategoryMapper, Category
     @Transactional(rollbackFor = Exception.class)
     public CategoryEntity deleteEntity(Long categoryId, String changedName) throws BusinessException {
         CategoryEntity category = getCategory(categoryId);
-        doRemove(category, changedName);
+        // 供应链三期-商品上架迭代，删除分类之前增加校验，分类如果关联了商品，则无法删除（之前的删除校验是针对三级分类的，但现在中西药是一级分类）
+		StoreSkuInfoEntity storeSkuInfoEntity = storeSkuInfoService.checkSkuExistByCategoryId(categoryId);
+		if (Objects.nonNull(storeSkuInfoEntity)) {
+			throw new BusinessException(ErrorEnums.CATEGORY_DELETED_ERROR);
+		}
+		doRemove(category, changedName);
         return category;
     }
 

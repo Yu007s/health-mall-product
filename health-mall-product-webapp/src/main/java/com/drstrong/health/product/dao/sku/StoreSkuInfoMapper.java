@@ -22,4 +22,6 @@ public interface StoreSkuInfoMapper extends BaseMapper<StoreSkuInfoEntity> {
 	List<StoreSkuInfoEntity> listQueryByParam(@Param("queryParam") ProductManageQueryRequest queryParam);
 
 	int batchUpdateSkuStatusByCodes(@Param("skuCodeList") Set<String> skuCodeList, @Param("skuState") Integer skuState, @Param("operatorId") Long operatorId);
+
+	StoreSkuInfoEntity selectOneByCategoryId(@Param("categoryId") Long categoryId);
 }

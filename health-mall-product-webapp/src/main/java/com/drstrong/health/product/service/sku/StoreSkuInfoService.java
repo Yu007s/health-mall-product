@@ -35,6 +35,14 @@ public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
 	StoreSkuInfoEntity checkSkuExistByCode(String skuCode, Integer skuStatus);
 
 	/**
+	 * 根据分类校验sku是否存在
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/6/26 9:58
+	 */
+	StoreSkuInfoEntity checkSkuExistByCategoryId(Long categoryId);
+
+	/**
 	 * 校验店铺下 skuName 是否重复
 	 *
 	 * @author liuqiuyi

@@ -69,6 +69,11 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
 		return storeSkuInfoEntity;
 	}
 
+	@Override
+	public StoreSkuInfoEntity checkSkuExistByCategoryId(Long categoryId) {
+		return baseMapper.selectOneByCategoryId(categoryId);
+	}
+
 	/**
 	 * 校验店铺下 skuName 是否重复
 	 *
