@@ -37,8 +37,8 @@ public class SaveEarningNameRequest extends OperatorUserInfo implements Serializ
 	@NotNull(message = "配置目标类型不能为空")
 	private Integer configGoalType;
 
-	@ApiModelProperty("收益名称,同店铺同类型下不能重复")
-	@NotBlank(message = "收益名称不能为空")
-	@Length(max = 20, message = "收益名称长度不能超过20字符")
+	@ApiModelProperty("收益单元,同店铺同类型下不能重复")
+	@NotBlank(message = "收益单元不能为空")
+	@Length(max = 20, message = "收益单元长度不能超过20字符")
 	private String earningName;
 }
