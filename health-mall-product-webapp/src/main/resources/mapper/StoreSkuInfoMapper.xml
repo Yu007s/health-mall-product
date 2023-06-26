@@ -76,6 +76,7 @@
         <if test="queryParam.productType != null">
             and sku_type = #{queryParam.productType}
         </if>
+        order by id desc
     </sql>
 
     <select id="pageQueryByParam" resultMap="BaseResultMap">

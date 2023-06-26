@@ -381,19 +381,6 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 			log.error("根据skuCode未找到数据,可能传入的参数为空,或者存在非法的skuCode,参数为:{}", JSONUtil.toJsonStr(updateSkuStateRequest));
 			throw new BusinessException(ErrorEnums.SKU_IS_NULL);
 		}
-		// 校验状态
-		boolean allMatch = storeSkuInfoEntityList.stream().allMatch(storeSkuInfoEntity -> {
-			if (Objects.equals(UpOffEnum.UP.getCode(), updateSkuStateRequest.getSkuState())) {
-				// 如果传参是上架,则当前 sku 必须是 已下架或预约上架 状态
-				return Objects.equals(UpOffEnum.DOWN.getCode(), storeSkuInfoEntity.getSkuStatus()) || Objects.equals(UpOffEnum.SCHEDULED_UP.getCode(), storeSkuInfoEntity.getSkuStatus());
-			} else {
-				// 如果传参是下架,则当前必须是 已上架或预约下架 状态
-				return Objects.equals(UpOffEnum.UP.getCode(), storeSkuInfoEntity.getSkuStatus()) || Objects.equals(UpOffEnum.SCHEDULED_DOWN.getCode(), storeSkuInfoEntity.getSkuStatus());
-			}
-		});
-		if (!allMatch) {
-			throw new BusinessException(ErrorEnums.SKU_STATUS_ERROR);
-		}
 	}
 
 	/**
