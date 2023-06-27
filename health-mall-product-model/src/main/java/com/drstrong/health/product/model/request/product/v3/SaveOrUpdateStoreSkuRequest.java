@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
@@ -40,6 +41,7 @@ public class SaveOrUpdateStoreSkuRequest extends SkuBaseDTO implements Serializa
 
 	@ApiModelProperty("sku名称")
 	@NotBlank(message = "sku 名称不能为空")
+	@Length(max = 50, message = "sku名称不能超过50字符")
 	private String skuName;
 
 	@ApiModelProperty("销售价格,单位:元")
