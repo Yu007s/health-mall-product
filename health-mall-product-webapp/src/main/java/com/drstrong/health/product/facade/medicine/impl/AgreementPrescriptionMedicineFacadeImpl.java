@@ -91,6 +91,7 @@ public class AgreementPrescriptionMedicineFacadeImpl implements MedicineWarehous
                 .medicineId(agreementPrescriptionMedicineEntity.getId())
                 .medicineCode(agreementPrescriptionMedicineEntity.getMedicineCode())
                 .medicineName(agreementPrescriptionMedicineEntity.getMedicineName())
+                .fullName(agreementPrescriptionMedicineEntity.getFullName())
                 .build();
         agreementPrescriptionMedicineBaseDTO.setProductType(queryProductType().getCode());
         agreementPrescriptionMedicineBaseDTO.setProductTypeName(queryProductType().getValue());

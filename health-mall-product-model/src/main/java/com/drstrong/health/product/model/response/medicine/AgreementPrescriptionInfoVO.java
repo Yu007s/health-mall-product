@@ -16,6 +16,9 @@ public class AgreementPrescriptionInfoVO implements Serializable {
     @ApiModelProperty(value = "协定方id")
     private Long id;
 
+    @ApiModelProperty(value = "协定方完整名称")
+    private String fullName;
+
     @ApiModelProperty(value = "协定方名称")
     private String medicineName;
 

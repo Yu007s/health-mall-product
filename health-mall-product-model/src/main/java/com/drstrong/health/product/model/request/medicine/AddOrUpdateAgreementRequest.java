@@ -57,6 +57,10 @@ public class AddOrUpdateAgreementRequest implements Serializable {
     @Max(value = 9999, message = "规格值数量不能大于9999")
     private Integer specValue = 0;
 
+    @ApiModelProperty("规格名称")
+    @NotNull(message = "规格名称不能为空")
+    private String specName;
+
     @ApiModelProperty("处方")
     @NotEmpty(message = "处方")
     @Length(max = 500, message = "处方最大长度不能超过 500 字符")

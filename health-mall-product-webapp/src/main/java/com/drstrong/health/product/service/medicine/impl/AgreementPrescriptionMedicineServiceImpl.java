@@ -99,6 +99,7 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
 
     private AgreementPrescriptionMedicineEntity buildAgreementPrescriptionEntity(AddOrUpdateAgreementRequest request) {
         AgreementPrescriptionMedicineEntity prescriptionMedicine = BeanUtil.copyProperties(request, AgreementPrescriptionMedicineEntity.class);
+        prescriptionMedicine.setFullName(request.getMedicineName() + request.getSpecName());
         prescriptionMedicine.setMedicineClassificationInfo(JSON.toJSONString(request.getClassificationInfo()));
         prescriptionMedicine.setImageInfo(JSONUtil.parse(request.getImageInfoList()).toString());
         if (ObjectUtil.isNull(prescriptionMedicine.getId())) {

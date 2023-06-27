@@ -25,4 +25,7 @@ public class AgreementPrescriptionMedicineBaseDTO extends MedicineWarehouseBaseD
 
     @ApiModelProperty("协定方名称")
     private String medicineName;
+
+    @ApiModelProperty("协定方完整名称")
+    private String fullName;
 }

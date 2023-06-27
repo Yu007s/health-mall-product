@@ -56,7 +56,7 @@
         where
         del_flag = 0
         <if test="queryParam.medicineCode != null and queryParam.medicineCode != ''">
-            and medicine_code = #{queryParam.medicineCode}
+            and medicine_code LIKE concat('%',#{queryParam.medicineCode},'%')
         </if>
         <if test="queryParam.skuCode != null and queryParam.skuCode != ''">
             and sku_code = #{queryParam.skuCode}

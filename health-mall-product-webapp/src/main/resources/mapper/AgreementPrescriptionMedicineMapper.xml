@@ -8,6 +8,7 @@
         <id column="id" property="id"/>
         <result column="medicine_code" property="medicineCode"/>
         <result column="medicine_name" property="medicineName"/>
+        <result column="full_name" property="fullName"/>
         <result column="medicine_classification_info" property="medicineClassificationInfo"/>
         <result column="packing_spec" property="packingSpec"/>
         <result column="packing_unit" property="packingUnit"/>
@@ -30,6 +31,7 @@
     <resultMap id="agreementPrescriptionInfoWithUsageResultMap"
                type="com.drstrong.health.product.model.response.medicine.AgreementPrescriptionInfoVO">
         <id property="id" column="id"/>
+        <result property="fullName" column="full_name"/>
         <result property="medicineName" column="medicine_name"/>
         <result property="medicineCode" column="medicine_code"/>
         <result property="packingSpec" column="packing_spec"/>
@@ -60,7 +62,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , medicine_code, medicine_name, medicine_classification_info, packing_spec, packing_unit, packing_unit_limit, packing_unit_number, spec_unit, spec_value, image_info, prescriptions, efficacy, usage_method, version, del_flag, created_by, created_at, changed_by, changed_at
+        , medicine_code, medicine_name, full_name, medicine_classification_info, packing_spec, packing_unit, packing_unit_limit, packing_unit_number, spec_unit, spec_value, image_info, prescriptions, efficacy, usage_method, version, del_flag, created_by, created_at, changed_by, changed_at
     </sql>
     <select id="queryAgreementPrescriptionInfo"
             resultMap="agreementPrescriptionInfoWithUsageResultMap">
@@ -78,6 +80,7 @@
             resultType="com.drstrong.health.product.model.response.medicine.AgreementPrescriptionSimpleInfoVO">
         SELECT m.id,
             m.medicine_code,
+            m.full_name,
             m.medicine_name,
             m.packing_spec packingSpec,
             m.packing_unit packingUnit,

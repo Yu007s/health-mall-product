@@ -42,6 +42,11 @@ public class AgreementPrescriptionMedicineEntity extends BaseStandardEntity impl
     private String medicineName;
 
     /**
+     * 协定方完整名称 拼接规则：协定方名称+【每袋*包】最小包装单位/包装单位
+     */
+    private String fullName;
+
+    /**
      * 分类信息，json
      */
     private String medicineClassificationInfo;
