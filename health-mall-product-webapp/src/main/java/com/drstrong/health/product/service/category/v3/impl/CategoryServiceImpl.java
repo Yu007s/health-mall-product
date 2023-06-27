@@ -29,7 +29,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, CategoryEnt
 	public List<CategoryEntity> queryWesternAll() {
 		LambdaQueryWrapper<CategoryEntity> queryWrapper = new LambdaQueryWrapper<CategoryEntity>()
 				.eq(CategoryEntity::getStatus, CategoryEntity.STATUS_ENABLE)
-				.eq(CategoryEntity::getParentId, 0);
+				.eq(CategoryEntity::getParentId, 0)
+				.orderByAsc(CategoryEntity::getOrderNumber)
+				.orderByAsc(CategoryEntity::getId);
 		return baseMapper.selectList(queryWrapper);
 	}
 
