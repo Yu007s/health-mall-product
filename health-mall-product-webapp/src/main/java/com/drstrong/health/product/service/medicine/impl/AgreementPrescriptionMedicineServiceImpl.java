@@ -2,6 +2,7 @@ package com.drstrong.health.product.service.medicine.impl;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
@@ -99,7 +100,7 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
 
     private AgreementPrescriptionMedicineEntity buildAgreementPrescriptionEntity(AddOrUpdateAgreementRequest request) {
         AgreementPrescriptionMedicineEntity prescriptionMedicine = BeanUtil.copyProperties(request, AgreementPrescriptionMedicineEntity.class);
-        prescriptionMedicine.setFullName(request.getMedicineName() + request.getSpecName());
+        prescriptionMedicine.setFullName(request.getMedicineName() + CharSequenceUtil.SPACE + request.getSpecName());
         prescriptionMedicine.setMedicineClassificationInfo(JSON.toJSONString(request.getClassificationInfo()));
         prescriptionMedicine.setImageInfo(JSONUtil.parse(request.getImageInfoList()).toString());
         if (ObjectUtil.isNull(prescriptionMedicine.getId())) {
