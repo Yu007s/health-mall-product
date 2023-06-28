@@ -136,6 +136,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 		if (Objects.isNull(storeSkuInfoEntity)) {
 			storeSkuInfoEntity = StoreSkuInfoEntity.buildDefault(saveOrUpdateStoreProductRequest.getOperatorId());
 			storeSkuInfoEntity.setSkuCode(createSkuCode(saveOrUpdateStoreProductRequest.getProductType(), saveOrUpdateStoreProductRequest.getStoreId()));
+			storeSkuInfoEntity.setSkuStatus(UpOffEnum.DOWN.getCode());
 		} else {
 			storeSkuInfoEntity.setChangedBy(saveOrUpdateStoreProductRequest.getOperatorId());
 			storeSkuInfoEntity.setChangedAt(LocalDateTime.now());
@@ -146,7 +147,6 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 		storeSkuInfoEntity.setMedicineCode(saveOrUpdateStoreProductRequest.getMedicineCode());
 		storeSkuInfoEntity.setStoreId(saveOrUpdateStoreProductRequest.getStoreId());
 		storeSkuInfoEntity.setPrice(BigDecimalUtil.Y2F(saveOrUpdateStoreProductRequest.getSalePrice()));
-		storeSkuInfoEntity.setSkuStatus(UpOffEnum.DOWN.getCode());
 		storeSkuInfoEntity.setSupplierInfo(supplierInfos);
 		storeSkuInfoEntity.setLabelInfo(CollectionUtil.isEmpty(saveOrUpdateStoreProductRequest.getLabelIdList()) ? Lists.newArrayList() : Lists.newArrayList(saveOrUpdateStoreProductRequest.getLabelIdList()));
 		storeSkuInfoEntity.setProhibitAreaInfo(CollectionUtil.isEmpty(saveOrUpdateStoreProductRequest.getProhibitAreaIdList()) ? Lists.newArrayList() : Lists.newArrayList(saveOrUpdateStoreProductRequest.getProhibitAreaIdList()));
