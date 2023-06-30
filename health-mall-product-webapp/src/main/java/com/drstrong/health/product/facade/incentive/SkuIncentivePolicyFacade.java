@@ -40,5 +40,5 @@ public interface SkuIncentivePolicyFacade {
 	 * @author liuqiuyi
 	 * @date 2023/6/13 16:54
 	 */
-	SkuIncentivePolicyDetailExcelVO querySkuPolicyDetailToExcelVO(Integer productType);
+	SkuIncentivePolicyDetailExcelVO querySkuPolicyDetailToExcelVO(Long storeId, Integer productType);
 }

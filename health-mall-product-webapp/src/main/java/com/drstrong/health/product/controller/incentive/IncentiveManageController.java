@@ -44,7 +44,7 @@ public class IncentiveManageController implements IncentiveManageRemoteApi {
 	}
 
 	@Override
-	public ResultVO<SkuIncentivePolicyDetailExcelVO> queryAllSkuPolicyDetailToExcelVO(Integer productType) {
-		return ResultVO.success(skuIncentivePolicyFacade.querySkuPolicyDetailToExcelVO(productType));
+	public ResultVO<SkuIncentivePolicyDetailExcelVO> queryAllSkuPolicyDetailToExcelVO(Long storeId, Integer productType) {
+		return ResultVO.success(skuIncentivePolicyFacade.querySkuPolicyDetailToExcelVO(storeId, productType));
 	}
 }

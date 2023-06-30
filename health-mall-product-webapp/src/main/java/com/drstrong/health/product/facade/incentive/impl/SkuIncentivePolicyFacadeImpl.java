@@ -155,9 +155,9 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	 * @date 2023/6/13 16:54
 	 */
 	@Override
-	public SkuIncentivePolicyDetailExcelVO querySkuPolicyDetailToExcelVO(Integer productType) {
+	public SkuIncentivePolicyDetailExcelVO querySkuPolicyDetailToExcelVO(Long storeId, Integer productType) {
 		// 1.获取所有的 sku 信息
-		List<StoreSkuInfoEntity> storeSkuInfoEntityList = storeSkuInfoService.queryAllByProductType(null, productType);
+		List<StoreSkuInfoEntity> storeSkuInfoEntityList = storeSkuInfoService.queryAllByProductType(storeId, productType);
 		if (CollectionUtil.isEmpty(storeSkuInfoEntityList)) {
 			log.info("没有查询到sku信息,不处理");
 			return SkuIncentivePolicyDetailExcelVO.builder().skuIncentivePolicyDetailVOList(Lists.newArrayList()).storePolicyConfigIdsMap(Maps.newHashMap()).build();

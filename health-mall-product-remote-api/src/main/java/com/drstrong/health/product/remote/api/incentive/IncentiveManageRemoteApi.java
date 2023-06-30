@@ -33,5 +33,5 @@ public interface IncentiveManageRemoteApi {
 
 	@ApiOperation("查询所有sku的激励政策,用于excel导出")
 	@GetMapping("/query/all/sku/policy")
-	ResultVO<SkuIncentivePolicyDetailExcelVO> queryAllSkuPolicyDetailToExcelVO(@RequestParam("productType") Integer productType);
+	ResultVO<SkuIncentivePolicyDetailExcelVO> queryAllSkuPolicyDetailToExcelVO(@RequestParam("storeId") Long storeId, @RequestParam("productType") Integer productType);
 }
