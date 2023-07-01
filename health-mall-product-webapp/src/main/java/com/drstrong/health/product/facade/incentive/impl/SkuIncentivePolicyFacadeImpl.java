@@ -223,7 +223,8 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 			if (NumberUtil.isGreater(skuIncentivePolicyDetailVO.getCostPrice(), BigDecimal.ZERO)) {
 				BigDecimal profit = skuIncentivePolicyDetailVO.getPrice().subtract(skuIncentivePolicyDetailVO.getCostPrice())
 						.divide(skuIncentivePolicyDetailVO.getCostPrice(), 2, RoundingMode.HALF_UP);
-				skuIncentivePolicyDetailVO.setProfit(profit);
+				// 乘以 100,得到最终利润率
+				skuIncentivePolicyDetailVO.setProfit(profit.multiply(new BigDecimal("100")));
 			}
 
 			// 将配置的收益单元转成 map

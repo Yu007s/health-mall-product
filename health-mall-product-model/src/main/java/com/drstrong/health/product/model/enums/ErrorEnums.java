@@ -40,7 +40,7 @@ public enum ErrorEnums implements IBaseResult {
 	CATEGORY_DELETED_ERROR("11105", "分类下存在商品,不允许删除"),
 	PRICE_IS_ERROR("11106", "商品金额必须大于 1"),
 	CATEGORY_LEVEL_IS_ERROR("11107", "商品必须关联最小子分类"),
-	CHINESE_IS_REPEAT("11108", "同一店铺下相同药材不能重复添加"),
+	CHINESE_IS_REPEAT("11108", "同一医院下相同药品/商品不能重复添加"),
 	SKU_IS_NULL("11109", "sku不存在或已下架"),
 	CHINESE_MEDICINE_IS_NULL("11110", "中药材不存在"),
 	SUPPLIER_IS_NULL("11111", "供应商不存在或未建立关联"),
