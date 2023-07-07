@@ -20,5 +20,7 @@ public interface ActivityPackageManageFacade {
 
     void addLocksaveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest, String skuCode);
 
+    void saveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest);
+
     ActivityPackageDetailDTO queryDetailByCode(String activityPackageCode);
 }

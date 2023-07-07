@@ -23,6 +23,7 @@ public enum ProductTypeEnum {
 	CHINESE(2, "中药", "Z"),
 	AGREEMENT(3, "协定方(预制)", "X"),
 	HEALTH(4, "健康用品", "H"),
+	PACKAGE(5, "活动套餐", "T"),
 	;
 
 	private final Integer code;

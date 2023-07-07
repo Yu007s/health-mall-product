@@ -11,6 +11,11 @@ public class OperationLogConstant {
     public static final String MALL_PRODUCT_SKU_CHANGE = "mallProductSkuChange";
 
     /**
+     * package 变动
+     */
+    public static final String MALL_PRODUCT_PACKAGE_CHANGE = "mallProductPackageChange";
+
+    /**
      * 更新或者新增 sku
      */
     public static final String SAVE_UPDATE_SKU = "saveOrUpdateSku";

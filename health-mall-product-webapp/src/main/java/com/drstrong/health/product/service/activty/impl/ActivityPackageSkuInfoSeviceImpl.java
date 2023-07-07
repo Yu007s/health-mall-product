@@ -28,7 +28,7 @@ import java.util.Objects;
 public class ActivityPackageSkuInfoSeviceImpl extends ServiceImpl<ActivityPackageSkuInfoMapper, ActivityPackageSkuInfoEntity> implements ActivityPackageSkuInfoSevice {
 
     /**
-     * 目前套餐限制的sku药品种类
+     * 目前套餐限制的sku药品种类数量
      */
     private final static Integer LIMITED_NUMBER_OF_PACHAGES_SKUS = 1;
 
