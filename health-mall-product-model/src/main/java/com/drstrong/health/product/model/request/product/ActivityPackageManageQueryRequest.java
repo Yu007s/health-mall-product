@@ -28,9 +28,15 @@ public class ActivityPackageManageQueryRequest extends PageRequest implements Se
     @ApiModelProperty("店铺id")
     private Long storeId;
 
-    @ApiModelProperty("套餐上架时间")
+    /**
+     * 套餐上下架状态；0-已下架，1-已上架, 2-预约上架中, 3-预约下架中
+     */
+    @ApiModelProperty("套餐状态")
+    private int activityStatus;
+
+/*    @ApiModelProperty("套餐上架时间")
     private Date activityPackageStartAt;
 
     @ApiModelProperty("套餐下架时间")
-    private Date activityPackageEndAt;
+    private Date activityPackageEndAt;*/
 }

@@ -42,7 +42,7 @@ public class ActivityPackageInfoVO implements Serializable {
     private String storeName;
 
     @ApiModelProperty("套餐状态(0-已下架，1-已上架, 2-预约上架中, 3-预约下架中)")
-    private Integer skuStatus;
+    private Integer activityStatus;
 
     @ApiModelProperty("原价格")
     private BigDecimal originalPrice;
@@ -52,15 +52,6 @@ public class ActivityPackageInfoVO implements Serializable {
 
     @ApiModelProperty("是否展示原价(0不展示,1展示)")
     private Integer originalAmountDisplay;
-
-    @ApiModelProperty("活动套餐的图片信息")
-    private List<String> activityPackageImageInfo;
-
-    @ApiModelProperty("活动套餐介绍")
-    private String activityPackageIntroduce;
-
-    @ApiModelProperty("活动套餐备注")
-    private String activityPackageRemark;
 
     @ApiModelProperty("创建时间")
     private Date createdAt;

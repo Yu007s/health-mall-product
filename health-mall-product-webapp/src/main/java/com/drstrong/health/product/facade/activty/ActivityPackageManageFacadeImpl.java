@@ -1,9 +1,11 @@
 package com.drstrong.health.product.facade.activty;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.facade.incentive.SkuIncentivePolicyFacade;
@@ -34,6 +36,7 @@ import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
@@ -46,10 +49,8 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * huangpeng
@@ -77,14 +78,69 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
     @Autowired
     private OperationLogSendUtil operationLogSendUtil;
 
+    /**
+     * 条件分页列表查询
+     *
+     * @param activityPackageManageQueryRequest
+     * @return
+     */
     @Override
-    public PageVO<ActivityPackageInfoVO> queryActivityPackageManageInfo(ActivityPackageManageQueryRequest productManageQueryRequest) {
-        return null;
+    public PageVO<ActivityPackageInfoVO> queryActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
+        log.info("queryActivityPackageManageInfo(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
+        Page<ActivityPackageInfoEntity> activityPackageInfoEntityPage = activityPackageInfoService.pageQueryByParam(activityPackageManageQueryRequest);
+        List<ActivityPackageInfoEntity> pageListRecords = activityPackageInfoEntityPage.getRecords();
+        if (CollectionUtil.isEmpty(pageListRecords)) {
+            log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
+            return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(activityPackageManageQueryRequest.getPageNo()).pageSize(activityPackageManageQueryRequest.getPageSize()).build();
+        }
+        List<ActivityPackageInfoVO> activityPackageInfoVOList = buildAgreementActivityPackageInfoVo(pageListRecords);
+        return PageVO.newBuilder().result(activityPackageInfoVOList).totalCount((int) activityPackageInfoEntityPage.getTotal()).pageNo(activityPackageManageQueryRequest.getPageNo()).pageSize(activityPackageManageQueryRequest.getPageSize()).build();
     }
 
+    /**
+     * 组装列表信息
+     *
+     * @param pageListRecords
+     * @return
+     */
+    private List<ActivityPackageInfoVO> buildAgreementActivityPackageInfoVo(List<ActivityPackageInfoEntity> pageListRecords) {
+        List<ActivityPackageInfoVO> activityPackageInfoVOList = new ArrayList<>();
+        Set<Long> storeIds = pageListRecords.stream().map(ActivityPackageInfoEntity::getStoreId).collect(Collectors.toSet());
+        Map<Long, String> storeIdNameMap = storeService.listByIds(storeIds).stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
+        for (ActivityPackageInfoEntity record : pageListRecords) {
+            ActivityPackageInfoVO activityPackageInfoVO = ActivityPackageInfoVO.builder()
+                    .activityPackageName(record.getActivityPackageName())
+                    .activityPackageCode(record.getActivityPackageCode())
+                    .productType(record.getProductType())
+                    .storeId(record.getStoreId())
+                    .storeName(storeIdNameMap.get(record.getStoreId()))
+                    .activityStatus(record.getActivityStatus())
+                    .originalPrice(BigDecimalUtil.F2Y(record.getOriginalPrice()))
+                    .preferentialPrice(BigDecimalUtil.F2Y(record.getPreferentialPrice()))
+                    .originalAmountDisplay(record.getOriginalAmountDisplay()).build();
+            activityPackageInfoVOList.add(activityPackageInfoVO);
+            //活动时间是否展示 待确定 todo
+        }
+        return activityPackageInfoVOList;
+    }
+
+    /**
+     * 列表数据导出
+     *
+     * @param activityPackageManageQueryRequest
+     * @return
+     */
     @Override
     public List<ActivityPackageInfoVO> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
-        return null;
+        log.info("queryActivityPackageManageInfo(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
+        List<ActivityPackageInfoEntity> activityPackageInfoEntityList = activityPackageInfoService.listQueryByParam(activityPackageManageQueryRequest);
+
+        if (CollectionUtil.isEmpty(activityPackageInfoEntityList)) {
+            log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageInfoEntityList));
+            return Lists.newArrayList();
+        }
+        List<ActivityPackageInfoVO> activityPackageInfoVOList = buildAgreementActivityPackageInfoVo(activityPackageInfoEntityList);
+        return activityPackageInfoVOList;
     }
 
     /**
@@ -163,7 +219,7 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
             activityPackageSkuInfoEntity.setCreatedBy(saveOrUpdateActivityPackageRequest.getOperatorId());
             activityPackageSkuInfoSevice.save(activityPackageSkuInfoEntity);
         }
-        //更新/新增政策信息
+        //更新/新增政策信息 可能和西药保持一致，只通过按钮来编辑政策  todo
         skuIncentivePolicyFacade.saveOrUpdateSkuPolicy(saveOrUpdateActivityPackageRequest.getSaveOrUpdateSkuPolicyRequest());
         //组装操作日志
         OperationLog operationLog = OperationLog.buildOperationLog(null, OperationLogConstant.MALL_PRODUCT_PACKAGE_CHANGE,
