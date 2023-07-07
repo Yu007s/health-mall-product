@@ -20,6 +20,6 @@ public interface ActivityPackageInfoMapper extends BaseMapper<ActivityPackageInf
 
     Page<ActivityPackageInfoEntity> pageQueryByParam(Page<ActivityPackageInfoEntity> entityPage, @Param("queryParam") ActivityPackageManageQueryRequest queryParam);
 
-    List<ActivityPackageInfoEntity> listQueryByParam(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
+    List<ActivityPackageInfoEntity> listQueryByParam(@Param("queryParam") ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 
 }
