@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.sku.SkuScheduledConfigMapper;
 import com.drstrong.health.product.model.entity.sku.SkuScheduledConfigEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.sku.SkuScheduledConfigService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -42,6 +44,27 @@ public class SkuScheduledConfigServiceImpl extends ServiceImpl<SkuScheduledConfi
 		List<SkuScheduledConfigEntity> scheduledConfigEntityList = listBySkuCode(Sets.newHashSet(skuCode), Objects.isNull(scheduledStatus) ? null : Sets.newHashSet(scheduledStatus));
 		return CollectionUtil.isEmpty(scheduledConfigEntityList) ? null : scheduledConfigEntityList.get(0);
 	}
+
+	/**
+	 * 根据activityPackageCode查询
+	 * @param activityPackageCode
+	 * @param scheduledStatus
+	 * @return
+	 */
+	@Override
+	public List<SkuScheduledConfigEntity> getByActivityPackageCode(String activityPackageCode, Integer scheduledStatus) {
+		if (StrUtil.isBlank(activityPackageCode)) {
+			return null;
+		}
+		List<SkuScheduledConfigEntity> scheduledConfigEntityList = listBySkuCode(Sets.newHashSet(activityPackageCode), Objects.isNull(scheduledStatus) ? null : Sets.newHashSet(scheduledStatus));
+		if (scheduledConfigEntityList.size() != 2 ||
+				!scheduledConfigEntityList.stream().anyMatch(SkuScheduledConfigEntity -> SkuScheduledConfigEntity.getScheduledType() == 1) ||
+				!scheduledConfigEntityList.stream().anyMatch(SkuScheduledConfigEntity -> SkuScheduledConfigEntity.getScheduledType() == 2)) {
+			throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SCHEDULED_TIME_ERROE);
+		}
+		return scheduledConfigEntityList;
+	}
+
 
 	/**
 	 * 根据 skuCode 查询

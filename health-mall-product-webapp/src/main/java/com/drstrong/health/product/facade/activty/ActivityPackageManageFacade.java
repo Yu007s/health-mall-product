@@ -1,5 +1,6 @@
 package com.drstrong.health.product.facade.activty;
 
+import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -18,4 +19,6 @@ public interface ActivityPackageManageFacade {
     List<ActivityPackageInfoVO> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 
     void addLocksaveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest, String skuCode);
+
+    ActivityPackageDetailDTO queryDetailByCode(String activityPackageCode);
 }

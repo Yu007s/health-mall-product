@@ -20,6 +20,14 @@ public interface SkuScheduledConfigService extends IService<SkuScheduledConfigEn
 	SkuScheduledConfigEntity getBySkuCode(String skuCode, Integer scheduledStatus);
 
 	/**
+	 * 根据activityPackageCode查询
+	 * @param activityPackageCode
+	 * @param scheduledStatus
+	 * @return
+	 */
+	List<SkuScheduledConfigEntity> getByActivityPackageCode(String activityPackageCode, Integer scheduledStatus);
+
+	/**
 	 * 根据 skuCode 查询
 	 *
 	 * @author liuqiuyi

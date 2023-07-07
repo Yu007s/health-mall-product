@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.request.product;
 
+import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -87,9 +88,9 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
     @ApiModelProperty("套餐下架时间")
     private Date activityPackageEndAt;
 
-    //@ApiModelProperty("套餐激励政策")
-    //@NotBlank(message = "套餐激励政策不能为空")
-    //private SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest;
+    @ApiModelProperty("套餐激励政策")
+    @NotBlank(message = "套餐激励政策不能为空")
+    private SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest;
 
     @ApiModelProperty(value = "操作人id", hidden = true)
     private Long operatorId;

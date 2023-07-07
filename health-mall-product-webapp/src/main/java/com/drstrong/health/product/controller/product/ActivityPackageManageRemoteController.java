@@ -1,6 +1,8 @@
 package com.drstrong.health.product.controller.product;
 
 import com.drstrong.health.product.facade.activty.ActivityPackageManageFacade;
+import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
+import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
@@ -32,7 +34,6 @@ public class ActivityPackageManageRemoteController {
      * @return
      */
     public ResultVO<PageVO<ActivityPackageInfoVO>> pageQuerySkuManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
-
         return ResultVO.success(activityPackageManageFacade.queryActivityPackageManageInfo(activityPackageManageQueryRequest));
     }
 
@@ -53,6 +54,15 @@ public class ActivityPackageManageRemoteController {
     public ResultVO<Void> saveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest) {
         activityPackageManageFacade.addLocksaveOrUpdateActivityPackage(saveOrUpdateActivityPackageRequest, saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0).getSkuCode());
         return ResultVO.success();
+    }
+
+    /**
+     * 查询套餐详情
+     * @param activityPackageCode
+     * @return
+     */
+    public ResultVO<ActivityPackageDetailDTO> queryDetailByCode(String activityPackageCode) {
+        return ResultVO.success(activityPackageManageFacade.queryDetailByCode(activityPackageCode));
     }
 
 }

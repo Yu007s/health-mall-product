@@ -69,7 +69,11 @@ public enum ErrorEnums implements IBaseResult {
 	STORE_LABEL_REPEAT("13001", "店铺下标签名称重复"),
 	STORE_LABEL_NOT_EXIST("13002", "店铺下标签不存在"),
 
-	INCENTIVE_POLICY_CONFIG_REPEAT("14001", "店铺下收益名称重复")
+	INCENTIVE_POLICY_CONFIG_REPEAT("14001", "店铺下收益名称重复"),
+	ACTIVTY_PACKAGE_IS_NULL("14002", "套餐不存在或已下架"),
+	ACTIVTY_PACKAGE_SKU_IS_NULL("14003", "套餐sku不存在或已下架"),
+	ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE("14004", "套餐sku商品超过一个"),
+	ACTIVTY_PACKAGE_SCHEDULED_TIME_ERROE("14005", "套餐的上下架时间错误"),
 	;
 
 	private String code;
