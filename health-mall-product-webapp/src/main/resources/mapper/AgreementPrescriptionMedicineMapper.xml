@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.medicine.AgreementPrescriptionMedicineMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity">
+        <id column="id" property="id"/>
+        <result column="medicine_code" property="medicineCode"/>
+        <result column="medicine_name" property="medicineName"/>
+        <result column="full_name" property="fullName"/>
+        <result column="medicine_classification_info" property="medicineClassificationInfo"/>
+        <result column="packing_spec" property="packingSpec"/>
+        <result column="packing_unit" property="packingUnit"/>
+        <result column="packing_unit_limit" property="packingUnitLimit"/>
+        <result column="packing_unit_number" property="packingUnitNumber"/>
+        <result column="spec_unit" property="specUnit"/>
+        <result column="spec_value" property="specValue"/>
+        <result column="image_info" property="imageInfo"/>
+        <result column="prescriptions" property="prescriptions"/>
+        <result column="efficacy" property="efficacy"/>
+        <result column="usage_method" property="usageMethod"/>
+        <result column="version" property="version"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="changed_by" property="changedBy"/>
+        <result column="changed_at" property="changedAt"/>
+    </resultMap>
+
+    <resultMap id="agreementPrescriptionInfoWithUsageResultMap"
+               type="com.drstrong.health.product.model.response.medicine.AgreementPrescriptionInfoVO">
+        <id property="id" column="id"/>
+        <result property="fullName" column="full_name"/>
+        <result property="medicineName" column="medicine_name"/>
+        <result property="medicineCode" column="medicine_code"/>
+        <result property="packingSpec" column="packing_spec"/>
+        <result property="packingUnit" column="packing_unit"/>
+        <result property="packingUnitLimit" column="packing_unit_limit"/>
+        <result property="packingUnitNumber" column="packing_unit_number"/>
+        <result property="specUnit" column="spec_unit"/>
+        <result property="specValue" column="spec_value"/>
+        <result property="prescriptions" column="prescriptions"/>
+        <result property="efficacy" column="efficacy"/>
+        <result property="usageMethod" column="pUsageMethod"/>
+        <result property="useUsageDosage" column="useUsageDosage"/>
+        <result property="imageInfoList" column="image_info"/>
+        <result property="medicineClassificationInfo" column="medicine_classification_info"/>
+        <association property="medicineUsage"
+                     javaType="com.drstrong.health.product.model.response.medicine.MedicineUsageVO">
+            <id property="id" column="id"/>
+            <result property="relationId" column="relation_id"/>
+            <result property="relationType" column="relation_type"/>
+            <result property="medicationFrequency" column="medication_frequency"/>
+            <result property="eachDosageCount" column="each_dosage_count"/>
+            <result property="eachDoseUnit" column="each_dose_unit"/>
+            <result property="usageTime" column="usage_time"/>
+            <result property="usageMethod" column="mUsageMethod"/>
+        </association>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , medicine_code, medicine_name, full_name, medicine_classification_info, packing_spec, packing_unit, packing_unit_limit, packing_unit_number, spec_unit, spec_value, image_info, prescriptions, efficacy, usage_method, version, del_flag, created_by, created_at, changed_by, changed_at
+    </sql>
+    <select id="queryAgreementPrescriptionInfo"
+            resultMap="agreementPrescriptionInfoWithUsageResultMap">
+        SELECT pm.*,
+               mu.*,
+               CASE WHEN mu.id IS NULL THEN 0 ELSE 1 END AS useUsageDosage,
+               pm.usage_method pUsageMethod,
+               mu.usage_method mUsageMethod
+        FROM pms_agreement_prescription_medicine pm
+                 LEFT JOIN pms_medicine_usage mu ON pm.id = mu.relation_id AND mu.relation_type = 2 AND mu.del_flag = 0
+        WHERE pm.del_flag = 0 AND pm.id = #{id}
+    </select>
+
+    <select id="queryPageList"
+            resultType="com.drstrong.health.product.model.response.medicine.AgreementPrescriptionSimpleInfoVO">
+        SELECT m.id,
+            m.medicine_code,
+            m.full_name,
+            m.medicine_name,
+            m.packing_spec packingSpec,
+            m.packing_unit packingUnit,
+            m.created_at createdAt,
+            CASE
+            WHEN u.id IS NOT NULL THEN 1
+            ELSE 0
+            END AS useUsageDosage
+        FROM pms_agreement_prescription_medicine m
+        LEFT JOIN pms_medicine_usage u ON u.relation_id = m.id AND u.relation_type = 2 AND u.del_flag = 0
+        <where>
+            <if test="queryParam.searchName != null and queryParam.searchName != ''">
+                AND (m.full_name LIKE CONCAT('%', #{queryParam.searchName}, '%')
+                OR m.medicine_code LIKE CONCAT('%', #{queryParam.searchName}, '%'))
+            </if>
+            <if test="queryParam.createStart != null">
+                AND m.created_at &gt;= #{queryParam.createStart}
+            </if>
+            <if test="queryParam.createEnd != null">
+                AND m.created_at &lt;= #{queryParam.createEnd}
+            </if>
+            <if test="queryParam.defaultUsageDosage != null">
+                AND CASE WHEN u.relation_id IS NULL THEN 0 ELSE 1
+                <choose>
+                    <when test="queryParam.defaultUsageDosage == 1">
+                        END = 1
+                    </when>
+                    <otherwise>
+                        END = 0
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+        ORDER BY m.id DESC
+    </select>
+    <select id="pageQueryByRequest"
+            resultType="com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_agreement_prescription_medicine
+        where del_flag = 0 and
+        (medicine_code = #{queryParam.searchKey} or full_name like concat('%',#{queryParam.searchKey},'%'))
+    </select>
+</mapper>

@@ -1,0 +1,63 @@
+package com.drstrong.health.product.service.medicine;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
+import com.drstrong.health.product.model.request.medicine.AddOrUpdateAgreementRequest;
+import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
+import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
+import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionInfoVO;
+import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionSimpleInfoVO;
+
+/**
+ * <p>
+ * 协定方(预制) 服务类
+ * </p>
+ *
+ * @author zzw
+ * @since 2023-06-13
+ */
+public interface AgreementPrescriptionMedicineService extends IService<AgreementPrescriptionMedicineEntity> {
+
+    /**
+     * 保存/修改协定方
+     *
+     * @param request
+     */
+    Long saveOrUpdateAgreementPrescription(AddOrUpdateAgreementRequest request);
+
+
+    /**
+     * 协定方详情
+     *
+     * @param id
+     * @return
+     */
+    AgreementPrescriptionInfoVO queryAgreementPrescriptionInfo(Long id);
+
+
+    /**
+     * 协定方分页列表
+     *
+     * @param request
+     * @return
+     */
+    PageVO<AgreementPrescriptionSimpleInfoVO> queryAgreementPrescriptionPageInfo(WesternMedicineRequest request);
+
+    /**
+     * 根据条件查询协定方规格信息
+     *
+     * @author liuqiuyi
+     * @date 2023/6/20 13:53
+     */
+    Page<AgreementPrescriptionMedicineEntity> pageQueryByRequest(MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
+
+    /**
+     * 根据药材code查询
+     *
+     * @author liuqiuyi
+     * @date 2023/6/20 19:13
+     */
+    AgreementPrescriptionMedicineEntity queryByCode(String medicineCode);
+}

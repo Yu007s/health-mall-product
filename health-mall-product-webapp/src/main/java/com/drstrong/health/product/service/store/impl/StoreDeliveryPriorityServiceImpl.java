@@ -1,13 +1,14 @@
 package com.drstrong.health.product.service.store.impl;
 
-import cn.hutool.core.stream.CollectorUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.model.entity.store.DeliveryPriorityEntity;
 import com.drstrong.health.product.dao.store.StoreDeliveryPriorityMapper;
+import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
+import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.request.store.DeliveryPriRequest;
 import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
 import com.drstrong.health.product.model.response.area.AreaInfoResponse;
@@ -19,9 +20,12 @@ import com.drstrong.health.product.model.response.store.delievy.DeliveryPriority
 import com.drstrong.health.product.service.area.AreaService;
 import com.drstrong.health.product.service.store.StoreDeliveryPriorityService;
 import com.drstrong.health.product.service.store.StoreLinkSupplierService;
+import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.drstrong.health.ware.model.result.ResultVO;
 import com.drstrong.health.ware.remote.api.SupplierManageRemoteApi;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,11 +48,15 @@ public class StoreDeliveryPriorityServiceImpl extends ServiceImpl<StoreDeliveryP
 
     @Resource
     StoreLinkSupplierService storeLinkSupplierService;
+
     @Resource
     AreaService areaService;
 
     @Resource
     SupplierManageRemoteApi supplierManageRemoteApi;
+
+    @Resource
+    StoreService storeService;
 
     @Override
     @Transactional(readOnly = true)
@@ -191,6 +199,64 @@ public class StoreDeliveryPriorityServiceImpl extends ServiceImpl<StoreDeliveryP
             //编辑配送优先级
             saveBatch(collect);
         }
+    }
+
+    /**
+     * 保存店铺配送优先级
+     *
+     * @param saveDeliveryRequest
+     * @param userId
+     * @author liuqiuyi
+     * @date 2023/6/9 13:45
+     */
+    @Override
+    public void saveDeliveryInfoV3(SaveDeliveryRequest saveDeliveryRequest, Long userId) {
+        // 1.判断店铺是否存在
+        StoreEntity storeEntity = storeService.getById(saveDeliveryRequest.getStoreId());
+        if (Objects.isNull(storeEntity)) {
+            throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
+        }
+        // 2.保存默认优先级
+        DeliveryPriorityEntity defaultEntity = DeliveryPriorityEntity.buildDefault(userId);
+        defaultEntity.setStoreId(saveDeliveryRequest.getStoreId());
+        defaultEntity.setAreaId(areaService.queryCountryId().getAreaId());
+        defaultEntity.setPriorities(saveDeliveryRequest.getDefaultDelPriority().stream().map(String::valueOf).collect(Collectors.joining(",")));
+        // 2.校验入参中的区域ID是否重复
+        List<DeliveryPriorityEntity> deliveryPriorityEntityList = buildAreaDeliveryPriority(saveDeliveryRequest.getDeliveryPriorities(), userId, saveDeliveryRequest.getStoreId());
+        deliveryPriorityEntityList.add(defaultEntity);
+        // 3.删除先前的优先级设置,在保存所有的,参照之前的写法
+        LambdaUpdateWrapper<DeliveryPriorityEntity> deleteWrapper = new LambdaUpdateWrapper<>();
+        deleteWrapper.eq(DeliveryPriorityEntity::getStoreId, saveDeliveryRequest.getStoreId())
+                .eq(DeliveryPriorityEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode()).
+                set(DeliveryPriorityEntity::getDelFlag, DelFlagEnum.IS_DELETED.getCode());
+        update(deleteWrapper);
+        saveBatch(deliveryPriorityEntityList);
+    }
+
+    private List<DeliveryPriorityEntity> buildAreaDeliveryPriority(List<DeliveryPriRequest> deliveryPriorities, Long userId, Long storeId) {
+        if (CollectionUtils.isEmpty(deliveryPriorities)) {
+            return Lists.newArrayList();
+        }
+        List<DeliveryPriorityEntity> deliveryPriorityEntityList = Lists.newArrayListWithCapacity(deliveryPriorities.size());
+        // 去重判断
+        Set<String> duplicateCheckSet = Sets.newHashSetWithExpectedSize(deliveryPriorities.size());
+        // 组装区域优先级
+        for (DeliveryPriRequest deliveryPriority : deliveryPriorities) {
+            String priorities = deliveryPriority.getSupplierIds().stream().map(String::valueOf).collect(Collectors.joining(","));
+            deliveryPriority.getAreaInfoList().forEach(areaInfo -> {
+                if (duplicateCheckSet.contains(areaInfo.getAreaId().toString() + areaInfo.getParentAreaId())) {
+                    throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "不能重复设置同一个地区");
+                }
+                DeliveryPriorityEntity priorityEntity = DeliveryPriorityEntity.buildDefault(userId);
+                priorityEntity.setStoreId(storeId);
+                priorityEntity.setAreaId(areaInfo.getAreaId());
+                priorityEntity.setParentAreaId(areaInfo.getParentAreaId());
+                priorityEntity.setPriorities(priorities);
+                deliveryPriorityEntityList.add(priorityEntity);
+                duplicateCheckSet.add(areaInfo.getAreaId().toString() + areaInfo.getParentAreaId());
+            });
+        }
+        return deliveryPriorityEntityList;
     }
 
     private DeliveryPriResponse buildDeliveryResponse(DeliveryPriorityEntity deliveryPriorityEntity) {

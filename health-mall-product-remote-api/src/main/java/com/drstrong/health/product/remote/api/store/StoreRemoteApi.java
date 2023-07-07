@@ -1,11 +1,14 @@
 package com.drstrong.health.product.remote.api.store;
 
+import com.drstrong.health.product.model.request.store.SaveStorePostageRequest;
+import com.drstrong.health.product.model.request.store.SaveStoreSupplierPostageRequest;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreQueryResponse;
+import com.drstrong.health.product.model.response.store.v3.StorePostageVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -71,4 +74,16 @@ public interface StoreRemoteApi {
     @ApiOperation("根据店铺 id 集合查询店铺基本信息")
     @PostMapping("/query/ids")
     ResultVO<List<StoreInfoResponse>> queryByIds(@RequestBody Set<Long> storeIds);
+
+    @ApiOperation("根据店铺 id 查询店铺的配送费信息")
+    @GetMapping("/query/postage")
+    ResultVO<StorePostageVO> queryStorePostage(@RequestParam("storeId") @NotNull(message = "店铺id不能为空") Long storeId);
+
+    @ApiOperation("保存店铺包邮金额")
+    @PostMapping("/save/free-postage")
+    ResultVO<Void> saveStorePostage(@RequestBody @Valid SaveStorePostageRequest saveStorePostageRequest);
+
+    @ApiOperation("保存店铺下供应商的包邮金额")
+    @PostMapping("/save/supplier-postage")
+    ResultVO<Void> saveStoreSupplierPostage(@RequestBody @Valid SaveStoreSupplierPostageRequest saveStoreSupplierPostageRequest);
 }

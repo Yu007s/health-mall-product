@@ -14,13 +14,9 @@ import com.drstrong.health.product.model.response.result.IBaseResult;
  * 			10：通用
  * 			001：参数格式校验失败
  * 			11：商品
- * 			12：订单
- * 			13：购物车
- * 			14：物流
- * 			15：优惠券
- * 			16：用户
- * 			17:店铺
- * 			20：库存
+ * 			12: 配送费
+ * 		    13: 标签
+ * 		    14: 激励政策
  * 			21:导入导出
  * </p>
  *
@@ -34,6 +30,7 @@ public enum ErrorEnums implements IBaseResult {
 	QUERY_SIZE_TOO_BIG("100001", "查询参数过大"),
 	ADD_LOCK_ERROR("100002", "加锁失败!"),
 	REMOTE_INVOKE_ERROR("100003", "远程接口调用失败,请联系管理员!"),
+
 	PARAM_IS_NOT_NULL("11000", "参数不能为空"),
 	CATEGORY_NOT_EXIST("11100", "分类不存在"),
 	SAVE_UPDATE_NOT_EXIST("11101", "更新或者保存的数据不存在"),
@@ -43,7 +40,7 @@ public enum ErrorEnums implements IBaseResult {
 	CATEGORY_DELETED_ERROR("11105", "分类下存在商品,不允许删除"),
 	PRICE_IS_ERROR("11106", "商品金额必须大于 1"),
 	CATEGORY_LEVEL_IS_ERROR("11107", "商品必须关联最小子分类"),
-	CHINESE_IS_REPEAT("11108", "同一店铺下相同药材不能重复添加"),
+	CHINESE_IS_REPEAT("11108", "同一医院下相同药品/商品不能重复添加"),
 	SKU_IS_NULL("11109", "sku不存在或已下架"),
 	CHINESE_MEDICINE_IS_NULL("11110", "中药材不存在"),
 	SUPPLIER_IS_NULL("11111", "供应商不存在或未建立关联"),
@@ -51,6 +48,11 @@ public enum ErrorEnums implements IBaseResult {
 	SKU_NAME_IS_REPEAT("11113", "相同店铺下 sku 名称不能重复"),
 	MEDICINE_CODE_NOT_ASSOCIATED("11114", "药材未关联供应商"),
 	PARAM_TYPE_IS_ERROR("11115", "参数不符合要求"),
+	SKU_IS_UP_ERROR("11116", "当前sku已上架,不能设置预约上架"),
+	SKU_IS_DOWN_ERROR("11117", "当前sku已下架,不能设置预约下架"),
+	SKU_STATUS_ERROR("11118", "不能更新sku的上下架状态,请刷新页面后重新选择"),
+	SKU_SCHEDULED_IN_PROCESS("11119", "当前sku正在自动上下架中,请稍后在试"),
+	MEDICINE_IS_NULL("11120", "关联的药材不存在"),
 
 	STORE_NAME_LENGTH("17000", "店铺名称长度不正确"),
 	STORE_NAME_REPEAT("17100", "店铺名称已存在"),
@@ -61,6 +63,13 @@ public enum ErrorEnums implements IBaseResult {
 
 	EXCEL_EXPORT_ERROR("21000", "文档导出错误"),
 	EXCEL_IMPORT_ERROR("21100", "文档导入错误"),
+
+	STORE_POSTAGE_IS_NULL("12001", "配送费信息不存在"),
+
+	STORE_LABEL_REPEAT("13001", "店铺下标签名称重复"),
+	STORE_LABEL_NOT_EXIST("13002", "店铺下标签不存在"),
+
+	INCENTIVE_POLICY_CONFIG_REPEAT("14001", "店铺下收益名称重复")
 	;
 
 	private String code;

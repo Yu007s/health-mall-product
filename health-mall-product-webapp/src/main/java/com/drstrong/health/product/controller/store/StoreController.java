@@ -2,8 +2,11 @@ package com.drstrong.health.product.controller.store;
 
 import com.drstrong.health.product.dao.store.OldFreightPostageMapper;
 import com.drstrong.health.product.dao.store.StoreLinkSupplierMapper;
+import com.drstrong.health.product.facade.postage.StorePostageFacade;
 import com.drstrong.health.product.model.entity.store.OldAreaFreight;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.request.store.SaveStorePostageRequest;
+import com.drstrong.health.product.model.request.store.SaveStoreSupplierPostageRequest;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.request.store.StoreSearchRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
@@ -11,6 +14,7 @@ import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
 import com.drstrong.health.product.model.response.store.StoreQueryResponse;
+import com.drstrong.health.product.model.response.store.v3.StorePostageVO;
 import com.drstrong.health.product.remote.api.store.StoreFacade;
 import com.drstrong.health.product.remote.api.store.StoreRemoteApi;
 import com.drstrong.health.product.service.store.StoreService;
@@ -43,12 +47,16 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
     @Resource
     private OldFreightPostageMapper oldFreightPostageMapper;
 
+    @Resource
+    StorePostageFacade storePostageFacade;
+
 
     @Override
     public ResultVO<String> savaStore(@RequestBody @Valid StoreInfoDetailSaveRequest store)  {
         String msg;
         if (store.getStoreId() == null) {
-            storeService.save(store);
+            Long storeId = storeService.save(store);
+            storeService.saveStoreDefaultPostage(store.getSupplierIds(), storeId);
             msg = "新增店铺成功";
         } else {
             storeService.update(store);
@@ -107,5 +115,22 @@ public class StoreController implements StoreFacade, StoreRemoteApi {
             responseList.add(storeInfoResponse);
         });
         return ResultVO.success(responseList);
+    }
+
+    @Override
+    public ResultVO<StorePostageVO> queryStorePostage(@NotNull(message = "店铺id不能为空") Long storeId) {
+        return ResultVO.success(storePostageFacade.queryStorePostage(storeId));
+    }
+
+    @Override
+    public ResultVO<Void> saveStorePostage(@RequestBody @Valid SaveStorePostageRequest saveStorePostageRequest) {
+        storePostageFacade.saveStorePostage(saveStorePostageRequest);
+        return ResultVO.success();
+    }
+
+    @Override
+    public ResultVO<Void> saveStoreSupplierPostage(@RequestBody @Valid SaveStoreSupplierPostageRequest saveStoreSupplierPostageRequest) {
+        storePostageFacade.saveStoreSupplierPostage(saveStoreSupplierPostageRequest);
+        return ResultVO.success();
     }
 }

@@ -41,42 +41,36 @@ public class StoreInfoDetailSaveRequest implements Serializable {
     @ApiModelProperty("关联互联网医院名字")
     private Long agencyName;
 
-    @NotNull
+    @ApiModelProperty("是否存在发票信息 0-不存在 1-存在")
+    private Integer hasInvoiceInfo;
+
     @ApiModelProperty("企业税号  最长50位  只有英文、数字")
     private String enterpriseTaxNumber;
 
-    @NotNull
     @ApiModelProperty("企业开户行、银行账号")
     private String enterpriseBankAccount;
 
-    @NotNull
     @ApiModelProperty("企业电话")
     private String enterpriseTelNumber;
 
-    @NotNull
     @ApiModelProperty("企业地址")
     private String enterpriseAddress;
 
     @ApiModelProperty("开票员")
     private String drawer;
 
-    @NotNull
     @ApiModelProperty("收款人")
     private String payee;
 
-    @NotNull
     @ApiModelProperty("复核人")
     private String checker;
 
-    @NotNull
     @ApiModelProperty("应用密钥")
     private String appSecret;
 
-    @NotNull
     @ApiModelProperty("应用key")
     private String appKey;
 
     @ApiModelProperty("用户id")
     private Long userId;
-
 }

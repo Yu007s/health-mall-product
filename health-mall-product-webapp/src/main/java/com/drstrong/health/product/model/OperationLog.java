@@ -41,6 +41,24 @@ public class OperationLog implements Serializable {
 	@ApiModelProperty("操作人id")
 	private Long operationUserId;
 
+	@ApiModelProperty("操作人名称")
+	private String operationUserName;
+
 	@ApiModelProperty("操作人类型,请见 common 包的 OperateTypeEnum 类")
 	private Integer operationUserType;
+
+	public static OperationLog buildOperationLog(String businessId, String operationType,
+												 String operateContent, Long operationUserId,
+												 String operationUserName, Integer operationUserType,
+												 String changeBeforeData) {
+		OperationLog operationLog = new OperationLog();
+		operationLog.setChangeBeforeData(changeBeforeData);
+		operationLog.setBusinessId(businessId);
+		operationLog.setOperationType(operationType);
+		operationLog.setOperateContent(operateContent);
+		operationLog.setOperationUserId(operationUserId);
+		operationLog.setOperationUserName(operationUserName);
+		operationLog.setOperationUserType(operationUserType);
+		return operationLog;
+	}
 }

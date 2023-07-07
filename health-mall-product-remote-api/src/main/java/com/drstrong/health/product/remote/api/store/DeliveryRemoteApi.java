@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -43,13 +44,26 @@ public interface DeliveryRemoteApi {
                                      @RequestParam("areaId") @NotNull(message = "区域id不能为空") Long areaId);
 
     /**
+     * 这个接口后续将废弃,为了暂时兼容老逻辑,等供应链三期正式上线后可以去除
+     *
+     *
      * 保存店铺配送优先级
      * @param saveDeliveryRequest 配送优先级请求数据
      * @param userId 用户id
      * @return 相关信息
      */
     @PostMapping("/save")
+    @Deprecated
     ResultVO<String> saveDeliveryInfo(@RequestBody SaveDeliveryRequest saveDeliveryRequest, @RequestParam("userId") @NotNull(message = "用户id不能为空") Long userId);
+
+    /**
+     * 保存店铺配送优先级,参照之前接口的出入参
+     *
+     * @author liuqiuyi
+     * @date 2023/6/9 11:25
+     */
+    @PostMapping("/v3/save")
+    ResultVO<String> saveDeliveryInfoV3(@RequestBody @Valid SaveDeliveryRequest saveDeliveryRequest, @RequestParam("userId") @NotNull(message = "用户id不能为空") Long userId);
 
     /**
      * 查询所有的省市信息

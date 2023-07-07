@@ -12,15 +12,16 @@ public enum UpOffEnum {
 	/**
 	 *
 	 */
-	DOWN(0, "未上架"),
+	DOWN(0, "已下架"),
 	UP(1, "已上架"),
-	;
+	SCHEDULED_UP(2, "预约上架中"),
+	SCHEDULED_DOWN(3, "预约下架中");
 
 	private Integer code;
 
 	private String value;
 
-	public static UpOffEnum getEnumByCode(Integer code){
+	public static UpOffEnum getEnumByCode(Integer code) {
 		if (Objects.isNull(code)) {
 			return null;
 		}
@@ -32,7 +33,7 @@ public enum UpOffEnum {
 		return null;
 	}
 
-	public static String getValueByCode(Integer code){
+	public static String getValueByCode(Integer code) {
 		for (UpOffEnum upOffEnum : UpOffEnum.values()) {
 			if (Objects.equals(upOffEnum.getCode(), code)) {
 				return upOffEnum.getValue();

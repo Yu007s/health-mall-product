@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.medicine.MedicineUsageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.medication.MedicineUsageEntity">
+        <id column="id" property="id"/>
+        <result column="relation_id" property="relationId"/>
+        <result column="relation_type" property="relationType"/>
+        <result column="medication_frequency" property="medicationFrequency"/>
+        <result column="each_dosage_count" property="eachDosageCount"/>
+        <result column="each_dose_unit" property="eachDoseUnit"/>
+        <result column="usage_method" property="usageMethod"/>
+        <result column="usage_time" property="usageTime"/>
+        <result column="version" property="version"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="changed_at" property="changedAt"/>
+        <result column="changed_by" property="changedBy"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, relation_id, relation_type, medication_frequency, each_dosage_count, each_dose_unit, usage_method, usage_time, version, created_at, created_by, changed_at, changed_by
+    </sql>
+
+</mapper>

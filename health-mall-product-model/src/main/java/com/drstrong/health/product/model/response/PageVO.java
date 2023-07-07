@@ -164,6 +164,10 @@ public class PageVO<T> implements Serializable {
 		return PageVO.newBuilder().pageNo(pageNo).pageSize(pageSize).totalCount((int) totalCount).result(result).build();
 	}
 
+	public void setResult(List<T> result) {
+		this.result = result;
+	}
+
 	public int getPageNo() {
 		return this.pageNo;
 	}

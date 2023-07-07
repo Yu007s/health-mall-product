@@ -11,6 +11,7 @@ import com.drstrong.health.product.service.store.StoreDeliveryPriorityService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -39,6 +40,12 @@ public class DeliveryController implements DeliveryRemoteApi {
     @Override
     public ResultVO<String> saveDeliveryInfo(@RequestBody SaveDeliveryRequest saveDeliveryRequest, @RequestParam("userId") @NotNull(message = "用户id")  Long userId){
         storeDeliveryPriorityService.save(saveDeliveryRequest,userId);
+        return ResultVO.success();
+    }
+
+    @Override
+    public ResultVO<String> saveDeliveryInfoV3(@RequestBody @Valid SaveDeliveryRequest saveDeliveryRequest, @NotNull(message = "用户id不能为空") Long userId) {
+        storeDeliveryPriorityService.saveDeliveryInfoV3(saveDeliveryRequest, userId);
         return ResultVO.success();
     }
 

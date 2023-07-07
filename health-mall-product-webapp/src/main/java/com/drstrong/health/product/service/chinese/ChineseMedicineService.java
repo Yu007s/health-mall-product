@@ -1,8 +1,10 @@
 package com.drstrong.health.product.service.chinese;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.controller.datasync.model.ChineseMedicineAlias;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.entity.chinese.OldChineseMedicine;
+import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineSearchVO;
@@ -35,6 +37,14 @@ public interface ChineseMedicineService {
 	 * @return 查询所得列表
 	 */
     ChineseMedicineSearchVO queryPage(String medicineCode, String medicineName, Integer pageNo, Integer pageSize);
+
+    /**
+     * 根据条件分页查询
+     *
+     * @author liuqiuyi
+     * @date 2023/6/20 11:31
+     */
+	Page<ChineseMedicineEntity> pageQueryByRequest(MedicineWarehouseQueryRequest warehouseQueryRequest);
 
     /**
      * 查询中药材 根据药材编码列表查找

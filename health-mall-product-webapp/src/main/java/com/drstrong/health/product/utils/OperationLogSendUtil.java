@@ -1,5 +1,9 @@
 package com.drstrong.health.product.utils;
 
+import cn.hutool.core.lang.UUID;
+import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.drstrong.health.common.log.HealthLog;
 import com.drstrong.health.common.mq.BaseMessage;
@@ -33,6 +37,7 @@ public class OperationLogSendUtil extends MqMessageUtil {
 	public void sendOperationLog(OperationLog operationLog) {
 		try {
 			Map<String, String> contentMaps = new HashMap<>(8);
+			contentMaps.put("operateContentType", operationLog.getOperationType());
 			contentMaps.put("operateContent", operationLog.getOperateContent());
 			contentMaps.put("changeBeforeData", operationLog.getChangeBeforeData());
 			contentMaps.put("changeAfterData", operationLog.getChangeAfterData());
@@ -41,11 +46,12 @@ public class OperationLogSendUtil extends MqMessageUtil {
 					.source(operationLog.getOperationType())
 					.tag(mqTopicConfig.getLogTag())
 					.businessId(operationLog.getBusinessId())
-					.createdBy("")
-					.createdById(operationLog.getOperationUserId().toString())
+					.createdBy(StrUtil.blankToDefault(operationLog.getOperationUserName(), CharSequenceUtil.EMPTY))
+					.createdById(ObjectUtil.isNull(operationLog.getOperationUserId()) ? "" : operationLog.getOperationUserId().toString())
 					.uploaderType(operationLog.getOperationUserType())
 					.createdAt(new Date())
 					.contentMaps(contentMaps)
+					.objectId(UUID.randomUUID().toString())
 					.build();
 			String content = JSONUtil.toJsonStr(healthLog);
 

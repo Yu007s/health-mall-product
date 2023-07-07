@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.sku.SkuScheduledConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.sku.SkuScheduledConfigEntity">
+        <result column="id" property="id"/>
+        <result column="sku_code" property="skuCode"/>
+        <result column="scheduled_type" property="scheduledType"/>
+        <result column="scheduled_date_time" property="scheduledDateTime"/>
+        <result column="scheduled_status" property="scheduledStatus"/>
+        <result column="version" property="version"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="changed_by" property="changedBy"/>
+        <result column="changed_at" property="changedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                id,
+                sku_code,
+                scheduled_type,
+                scheduled_date_time,
+                scheduled_status,
+                version,
+                del_flag,
+                created_by,
+                created_at,
+                changed_by,
+                changed_at
+    </sql>
+
+    <update id="batchUpdateScheduledStatusByCodes">
+        update pms_sku_scheduled_config
+        set scheduled_status = #{scheduledStatus},
+        changed_by = #{operatorId},
+        changed_at = now()
+        where del_flag = 0
+        and sku_code in
+        <foreach collection="skuCodeList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+</mapper>
