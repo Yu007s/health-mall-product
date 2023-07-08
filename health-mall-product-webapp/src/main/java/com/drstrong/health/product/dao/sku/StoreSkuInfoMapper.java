@@ -28,4 +28,6 @@ public interface StoreSkuInfoMapper extends BaseMapper<StoreSkuInfoEntity> {
 	StoreSkuInfoEntity selectOneByCategoryId(@Param("categoryId") Long categoryId);
 
     PageVO<StoreSkuInfoEntity> pageQueryStoreSkuInfo(Page<StoreSkuInfoEntity> entityPage, @Param("queryParam")QueryStoreSkuInfoRequest queryStoreSkuInfoRequest);
+
+    List<StoreSkuInfoEntity> queryStoreSkuInfoByCategory(@Param("skuStatus")Integer skuStatus, @Param("categoryId")Long categoryId);
 }

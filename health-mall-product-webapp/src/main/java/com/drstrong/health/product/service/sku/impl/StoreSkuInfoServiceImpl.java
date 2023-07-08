@@ -217,4 +217,19 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
             log.info("店铺sku信息表,已将skuCode列表:{} 的状态更新为:{},操作人是:{}", skuCodeList, skuState, operatorId);
         }
     }
+
+    /**
+     * 根据sku类型和分类获取列表
+     *
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<StoreSkuInfoEntity> queryStoreSkuInfoByCategory(Long categoryId) {
+        if (categoryId == null) {
+            return Lists.newArrayList();
+        }
+        return baseMapper.queryStoreSkuInfoByCategory(UpOffEnum.UP.getCode(), categoryId);
+    }
+
 }

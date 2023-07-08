@@ -123,4 +123,14 @@
         order by id desc
     </select>
 
+    <select id="queryStoreSkuInfoByCategory" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_store_sku_info
+        where del_flag = 0
+        and sku_status = #{skuStatus}
+        and FIND_IN_SET(#{categoryId},REPLACE(REPLACE(JSON_UNQUOTE(category_info), '[', ''), ']', '') ) > 0;
+        order by id desc
+    </select>
+
 </mapper>

@@ -55,4 +55,9 @@ public class CategoryManageV3Controller implements CategoryManageRemoteApi {
 		oldCategoryService.updateCategoryStatus(categoryId, status, changedName);
 		return ResultVO.success();
 	}
+
+	@Override
+	public ResultVO<List<CategoryVO>> queryCategoryByProductType(Integer productType) {
+		return ResultVO.success(categoryFacade.queryCategoryByProductType(productType));
+	}
 }
