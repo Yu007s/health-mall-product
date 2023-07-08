@@ -1,6 +1,7 @@
 package com.drstrong.health.product.facade.activty;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
@@ -10,6 +11,7 @@ import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.facade.incentive.SkuIncentivePolicyFacade;
 import com.drstrong.health.product.facade.sku.SkuManageFacade;
+import com.drstrong.health.product.facade.sku.SkuScheduledConfigFacade;
 import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
@@ -21,9 +23,11 @@ import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
+import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
 import com.drstrong.health.product.model.request.product.ActivityPackageSkuRequest;
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
+import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDetailVO;
 import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
@@ -52,6 +56,8 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toMap;
+
 /**
  * huangpeng
  * 2023/7/5 17:51
@@ -77,6 +83,9 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
 
     @Autowired
     private OperationLogSendUtil operationLogSendUtil;
+
+    @Autowired
+    private SkuScheduledConfigFacade skuScheduledConfigFacade;
 
     /**
      * 条件分页列表查询
@@ -242,6 +251,12 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
         return UniqueCodeUtils.getNextSkuCode(nextSpuCode, storeId);
     }
 
+    /**
+     * 查询套餐详情
+     *
+     * @param activityPackageCode
+     * @return
+     */
     @Override
     public ActivityPackageDetailDTO queryDetailByCode(String activityPackageCode) {
         //根据activityPackageCode查询套餐
@@ -276,5 +291,77 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
                 .skuIncentivePolicyDetailVO(skuIncentivePolicyDetailVO)
                 .build();
         return activityPackageDetailDTO;
+    }
+
+    /**
+     * 上下架处理
+     *
+     * @param updateSkuStateRequest
+     */
+    @Override
+    public void updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest) {
+        log.info("invoke updateActivityPackageStatus param:{}", JSONUtil.toJsonStr(updateSkuStateRequest));
+        List<ActivityPackageInfoEntity> activityPackageInfoEntityList = activityPackageInfoService.queryByActivityPackageCode(updateSkuStateRequest.getSkuCodeList());
+        //信息校验
+        checkActivityPackageStatus(updateSkuStateRequest, activityPackageInfoEntityList);
+        //修改状态
+        activityPackageInfoService.batchUpdateActivityStatusByCodes(updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getSkuState(), updateSkuStateRequest.getOperatorId());
+        // 操作日志
+        sendActivityStatusUpdateLog(activityPackageInfoEntityList, updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getOperatorId(), updateSkuStateRequest.getOperatorName());
+        //定时上下架处理
+        skuScheduledConfigFacade.batchUpdateScheduledStatusByCodes(updateSkuStateRequest);
+    }
+
+    /**
+     * 预约上下架处理
+     *
+     * @param scheduledSkuUpDownRequest
+     */
+    @Override
+    public void scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest) {
+        //校验套餐是否存在
+        ActivityPackageInfoEntity packageInfoEntity = activityPackageInfoService.findPackageByCode(scheduledSkuUpDownRequest.getSkuCode(), null);
+        //状态校验
+        if (Objects.equals(UpOffEnum.UP.getCode(), packageInfoEntity.getActivityStatus()) && Objects.equals(ScheduledSkuUpDownRequest.SCHEDULED_UP, scheduledSkuUpDownRequest.getScheduledType())) {
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_IS_UP_ERROR);
+        }
+        if (Objects.equals(UpOffEnum.DOWN.getCode(), packageInfoEntity.getActivityStatus()) && Objects.equals(ScheduledSkuUpDownRequest.SCHEDULED_DOWN, scheduledSkuUpDownRequest.getScheduledType())) {
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_IS_DOWN_ERROR);
+        }
+        // 操作日志
+        sendActivityStatusUpdateLog(Lists.newArrayList(packageInfoEntity), Sets.newHashSet(scheduledSkuUpDownRequest.getSkuCode()), scheduledSkuUpDownRequest.getOperatorId(), scheduledSkuUpDownRequest.getOperatorName());
+        //定时上下架处理
+        skuScheduledConfigFacade.saveOrUpdateSkuConfig(scheduledSkuUpDownRequest);
+    }
+
+    /**
+     * 发送套餐状态更新日志
+     *
+     * @param beforeDataList
+     * @param skuCodeList
+     * @param operatorId
+     * @param operatorName
+     */
+    private void sendActivityStatusUpdateLog(List<ActivityPackageInfoEntity> beforeDataList, Set<String> skuCodeList, Long operatorId, String operatorName) {
+        Map<String, ActivityPackageInfoEntity> skuCodeInfoMap = activityPackageInfoService.queryByActivityPackageCode(skuCodeList)
+                .stream().collect(toMap(ActivityPackageInfoEntity::getActivityPackageCode, dto -> dto, (v1, v2) -> v1));
+        //循环发送操作日志
+        beforeDataList.forEach(activityPackageInfoEntity -> {
+            OperationLog operationLog = OperationLog.buildOperationLog(activityPackageInfoEntity.getActivityPackageCode(), OperationLogConstant.MALL_PRODUCT_PACKAGE_CHANGE,
+                    OperationLogConstant.SKU_STATUS_CHANGE, operatorId, operatorName,
+                    OperateTypeEnum.CMS.getCode(), JSONUtil.toJsonStr(activityPackageInfoEntity));
+            operationLog.setChangeAfterData(JSONUtil.toJsonStr(skuCodeInfoMap.get(activityPackageInfoEntity.getActivityPackageCode())));
+            operationLogSendUtil.sendOperationLog(operationLog);
+        });
+    }
+
+    /**
+     * 校验ActivityPackage状态,是否能进行更新
+     */
+    private void checkActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest, List<ActivityPackageInfoEntity> activityPackageInfoEntityList) {
+        if (CollectionUtil.isEmpty(activityPackageInfoEntityList) || ObjectUtil.notEqual(activityPackageInfoEntityList.size(), updateSkuStateRequest.getSkuCodeList().size())) {
+            log.error("根据activityPackageCode未找到数据,可能传入的参数为空,或者存在非法的activityPackageCode,参数为:{}", JSONUtil.toJsonStr(updateSkuStateRequest));
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_IS_NULL);
+        }
     }
 }

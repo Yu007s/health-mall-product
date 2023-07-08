@@ -1,11 +1,13 @@
 package com.drstrong.health.product.controller.product;
 
+import com.drstrong.health.product.enums.ScheduledStatusEnum;
 import com.drstrong.health.product.facade.activty.ActivityPackageManageFacade;
 import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
+import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -30,6 +32,7 @@ public class ActivityPackageManageRemoteController {
 
     /**
      * 关键字列表分页查询
+     *
      * @param activityPackageManageQueryRequest
      * @return
      */
@@ -39,6 +42,7 @@ public class ActivityPackageManageRemoteController {
 
     /**
      * 关键词搜索数据导出
+     *
      * @param activityPackageManageQueryRequest
      * @return
      */
@@ -48,6 +52,7 @@ public class ActivityPackageManageRemoteController {
 
     /**
      * 套餐新增/编辑
+     *
      * @param saveOrUpdateActivityPackageRequest
      * @return
      */
@@ -58,11 +63,35 @@ public class ActivityPackageManageRemoteController {
 
     /**
      * 查询套餐详情
+     *
      * @param activityPackageCode
      * @return
      */
     public ResultVO<ActivityPackageDetailDTO> queryDetailByCode(String activityPackageCode) {
         return ResultVO.success(activityPackageManageFacade.queryDetailByCode(activityPackageCode));
+    }
+
+    /**
+     * 上下架
+     *
+     * @param updateSkuStateRequest
+     * @return
+     */
+    public ResultVO<Void> updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest) {
+        updateSkuStateRequest.setScheduledStatus(ScheduledStatusEnum.CANCEL.getCode());
+        activityPackageManageFacade.updateActivityPackageStatus(updateSkuStateRequest);
+        return ResultVO.success();
+    }
+
+    /**
+     * 预约上下架
+     *
+     * @param scheduledSkuUpDownRequest
+     * @return
+     */
+    public ResultVO<Void> scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest) {
+        activityPackageManageFacade.scheduledActivityPackageUpDown(scheduledSkuUpDownRequest);
+        return ResultVO.success();
     }
 
 }

@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * huangpeng
@@ -22,4 +23,5 @@ public interface ActivityPackageInfoMapper extends BaseMapper<ActivityPackageInf
 
     List<ActivityPackageInfoEntity> listQueryByParam(@Param("queryParam") ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 
+    int batchUpdateActivityStatusByCodes(@Param("activityPackageCodeList") Set<String> activityPackageCodeList, @Param("activityStatus") Integer skuState, @Param("operatorId") Long operatorId);
 }

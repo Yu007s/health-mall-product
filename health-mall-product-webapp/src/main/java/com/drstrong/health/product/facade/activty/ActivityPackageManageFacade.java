@@ -1,8 +1,10 @@
 package com.drstrong.health.product.facade.activty;
 
 import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
+import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
+import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
 
@@ -23,4 +25,8 @@ public interface ActivityPackageManageFacade {
     void saveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest);
 
     ActivityPackageDetailDTO queryDetailByCode(String activityPackageCode);
+
+    void updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest);
+
+    void scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
 }

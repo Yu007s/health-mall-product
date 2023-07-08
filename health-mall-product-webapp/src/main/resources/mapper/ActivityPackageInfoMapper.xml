@@ -69,4 +69,16 @@
         <include refid="Manage_Query_By_Param"/>
     </select>
 
+    <update id="batchUpdateActivityStatusByCodes">
+        update pms_activity_package_manage
+        set activity_status = #{activityStatus},
+        changed_by = #{operatorId},
+        changed_at = now()
+        where del_flag = 0
+        and activity_package_code in
+        <foreach collection="activityPackageCodeList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
 </mapper>
