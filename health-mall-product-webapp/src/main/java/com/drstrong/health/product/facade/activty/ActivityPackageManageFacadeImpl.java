@@ -34,6 +34,7 @@ import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.activty.ActivityPackageInfoService;
 import com.drstrong.health.product.service.activty.ActivityPackageSkuInfoSevice;
+import com.drstrong.health.product.service.activty.impl.ActivityPackageSkuInfoSeviceImpl;
 import com.drstrong.health.product.service.sku.SkuScheduledConfigService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
@@ -95,14 +96,13 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
      */
     @Override
     public PageVO<ActivityPackageInfoVO> queryActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
-        log.info("queryActivityPackageManageInfo(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
+        log.info("invoke queryActivityPackageManageInfo(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
         Page<ActivityPackageInfoEntity> activityPackageInfoEntityPage = activityPackageInfoService.pageQueryByParam(activityPackageManageQueryRequest);
-        List<ActivityPackageInfoEntity> pageListRecords = activityPackageInfoEntityPage.getRecords();
-        if (CollectionUtil.isEmpty(pageListRecords)) {
+        if (activityPackageInfoEntityPage == null || CollectionUtil.isEmpty(activityPackageInfoEntityPage.getRecords())) {
             log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
             return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(activityPackageManageQueryRequest.getPageNo()).pageSize(activityPackageManageQueryRequest.getPageSize()).build();
         }
-        List<ActivityPackageInfoVO> activityPackageInfoVOList = buildAgreementActivityPackageInfoVo(pageListRecords);
+        List<ActivityPackageInfoVO> activityPackageInfoVOList = buildAgreementActivityPackageInfoVo(activityPackageInfoEntityPage.getRecords());
         return PageVO.newBuilder().result(activityPackageInfoVOList).totalCount((int) activityPackageInfoEntityPage.getTotal()).pageNo(activityPackageManageQueryRequest.getPageNo()).pageSize(activityPackageManageQueryRequest.getPageSize()).build();
     }
 
@@ -113,9 +113,10 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
      * @return
      */
     private List<ActivityPackageInfoVO> buildAgreementActivityPackageInfoVo(List<ActivityPackageInfoEntity> pageListRecords) {
-        List<ActivityPackageInfoVO> activityPackageInfoVOList = new ArrayList<>();
+        //店铺信息
         Set<Long> storeIds = pageListRecords.stream().map(ActivityPackageInfoEntity::getStoreId).collect(Collectors.toSet());
         Map<Long, String> storeIdNameMap = storeService.listByIds(storeIds).stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
+        List<ActivityPackageInfoVO> activityPackageInfoVOList = new ArrayList<>();
         for (ActivityPackageInfoEntity record : pageListRecords) {
             ActivityPackageInfoVO activityPackageInfoVO = ActivityPackageInfoVO.builder()
                     .activityPackageName(record.getActivityPackageName())
@@ -126,7 +127,9 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
                     .activityStatus(record.getActivityStatus())
                     .originalPrice(BigDecimalUtil.F2Y(record.getOriginalPrice()))
                     .preferentialPrice(BigDecimalUtil.F2Y(record.getPreferentialPrice()))
-                    .originalAmountDisplay(record.getOriginalAmountDisplay()).build();
+                    .originalAmountDisplay(record.getOriginalAmountDisplay())
+                    .createdAt(Date.from(record.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant()))
+                    .build();
             activityPackageInfoVOList.add(activityPackageInfoVO);
             //活动时间是否展示 待确定 todo
         }
@@ -141,9 +144,8 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
      */
     @Override
     public List<ActivityPackageInfoVO> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
-        log.info("queryActivityPackageManageInfo(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
+        log.info("invoke queryActivityPackageManageInfo(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
         List<ActivityPackageInfoEntity> activityPackageInfoEntityList = activityPackageInfoService.listQueryByParam(activityPackageManageQueryRequest);
-
         if (CollectionUtil.isEmpty(activityPackageInfoEntityList)) {
             log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageInfoEntityList));
             return Lists.newArrayList();
@@ -171,10 +173,15 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest) {
-        log.info(" saveOrUpdateActivityPackage(),param:{}", JSONUtil.toJsonStr(saveOrUpdateActivityPackageRequest));
+        log.info("invoke saveOrUpdateActivityPackage(),param:{}", JSONUtil.toJsonStr(saveOrUpdateActivityPackageRequest));
         boolean updateFlag = StrUtil.isNotBlank(saveOrUpdateActivityPackageRequest.getActivityPackageCode());
         List<ActivityPackageSkuRequest> activityPackageSkuList = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList();
-        if (activityPackageSkuList.size() != 1) {
+        if (CollectionUtils.isEmpty(activityPackageSkuList)) {
+            log.error("套餐至少包含一种药品种类。");
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_AT_LEAST_ONE);
+        }
+        if (activityPackageSkuList.size() != ActivityPackageSkuInfoEntity.LIMITED_NUMBER_OF_PACHAGES_SKUS) {
+            log.error("目前套餐药品种类大于支持的药品种类数量。");
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE);
         }
         ActivityPackageSkuRequest activityPackageSkuRequest = activityPackageSkuList.get(0);
@@ -263,13 +270,13 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
         ActivityPackageInfoEntity activityPackageInfoEntity = activityPackageInfoService.findPackageByCode(activityPackageCode, null);
         //套餐关联的店铺信息
         StoreEntity storeEntity = storeService.getById(activityPackageInfoEntity.getStoreId());
-        //套餐上下架时间
+        //套餐上下架时间 待确定 TODO
         List<SkuScheduledConfigEntity> skuScheduledConfigEntityList = skuScheduledConfigService.getByActivityPackageCode(activityPackageInfoEntity.getActivityPackageCode(), null);
         Optional<SkuScheduledConfigEntity> scheduledUp = skuScheduledConfigEntityList.stream().filter(SkuScheduledConfigEntity -> SkuScheduledConfigEntity.getScheduledType() == 1).findFirst();
         Optional<SkuScheduledConfigEntity> scheduledDown = skuScheduledConfigEntityList.stream().filter(SkuScheduledConfigEntity -> SkuScheduledConfigEntity.getScheduledType() == 2).findFirst();
         //套餐sku信息
         List<ActivityPackageSkuInfoEntity> packageSkuInfoEntityList = activityPackageSkuInfoSevice.findPackageByCode(activityPackageCode);
-        //激励政策
+        //激励政策 待确定 TODO
         SkuIncentivePolicyDetailVO skuIncentivePolicyDetailVO = skuIncentivePolicyFacade.queryPolicyDetailBySkuCode(activityPackageInfoEntity.getActivityPackageCode());
         //组装数据
         ActivityPackageDetailDTO activityPackageDetailDTO = ActivityPackageDetailDTO.builder()

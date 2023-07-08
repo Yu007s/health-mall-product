@@ -28,11 +28,6 @@ import java.util.Objects;
 public class ActivityPackageSkuInfoSeviceImpl extends ServiceImpl<ActivityPackageSkuInfoMapper, ActivityPackageSkuInfoEntity> implements ActivityPackageSkuInfoSevice {
 
     /**
-     * 目前套餐限制的sku药品种类数量
-     */
-    private final static Integer LIMITED_NUMBER_OF_PACHAGES_SKUS = 1;
-
-    /**
      * 根据套餐编码获取套餐sku列表信息
      *
      * @param activityPackageCode
@@ -48,9 +43,9 @@ public class ActivityPackageSkuInfoSeviceImpl extends ServiceImpl<ActivityPackag
                 .eq(ActivityPackageSkuInfoEntity::getActivityPackageCode, activityPackageCode);
         List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = baseMapper.selectList(queryWrapper);
         if (CollectionUtils.isEmpty(activityPackageSkuInfoEntities)) {
-            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_IS_NULL);
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_AT_LEAST_ONE);
         }
-        if (activityPackageSkuInfoEntities.size() > LIMITED_NUMBER_OF_PACHAGES_SKUS) {
+        if (activityPackageSkuInfoEntities.size() > ActivityPackageSkuInfoEntity.LIMITED_NUMBER_OF_PACHAGES_SKUS) {
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE);
         }
         return activityPackageSkuInfoEntities;

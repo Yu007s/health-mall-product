@@ -24,6 +24,11 @@ public class ActivityPackageSkuInfoEntity  extends BaseStandardEntity implements
 
     private static final long serialVersionUID = 3946900633740078345L;
 
+    /**
+     * 目前套餐限制的sku药品种类数量
+     */
+    public final static Integer LIMITED_NUMBER_OF_PACHAGES_SKUS = 1;
+
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 

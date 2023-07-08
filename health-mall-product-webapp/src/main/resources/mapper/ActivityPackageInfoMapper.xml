@@ -55,6 +55,9 @@
         <if test="queryParam.activityPackageName != null and queryParam.activityPackageName != ''">
             and activity_package_name LIKE concat('%',#{queryParam.activityPackageName},'%')
         </if>
+        <if test="queryParam.activityPackageCode != null and queryParam.activityPackageCode != ''">
+            and activity_package_code LIKE concat('%',#{queryParam.activityPackageCode},'%')
+        </if>
         <if test="queryParam.activityStatus != null">
             and activity_status = #{queryParam.activityStatus}
         </if>

@@ -72,10 +72,11 @@ public enum ErrorEnums implements IBaseResult {
 	INCENTIVE_POLICY_CONFIG_REPEAT("14001", "店铺下收益名称重复"),
 	ACTIVTY_PACKAGE_IS_NULL("14002", "套餐不存在或已下架"),
 	ACTIVTY_PACKAGE_SKU_IS_NULL("14003", "套餐sku不存在或已下架"),
-	ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE("14004", "套餐sku商品超过一个"),
+	ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE("14004", "套餐sku商品超过种类一个"),
 	ACTIVTY_PACKAGE_SCHEDULED_TIME_ERROE("14005", "套餐的上下架时间错误"),
 	ACTIVTY_PACKAGE_IS_UP_ERROR("14006", "当前sku已上架,不能设置预约上架"),
 	ACTIVTY_PACKAGE_IS_DOWN_ERROR("14007", "当前sku已下架,不能设置预约下架"),
+	ACTIVTY_PACKAGE_SKU_AT_LEAST_ONE("14008", "套餐sku商品种类至少一个"),
 	;
 
 	private String code;
