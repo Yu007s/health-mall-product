@@ -29,4 +29,6 @@ public interface ActivityPackageManageFacade {
     void updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest);
 
     void scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
+
+    ActivityPackageDetailDTO queryDetailById(Long activityPackageId);
 }

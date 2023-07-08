@@ -342,6 +342,36 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
     }
 
     /**
+     * 根据套餐ID获取详情
+     *
+     * @param activityPackageId
+     * @return
+     */
+    @Override
+    public ActivityPackageDetailDTO queryDetailById(Long activityPackageId) {
+        //根据activityPackageCode查询套餐
+        ActivityPackageInfoEntity activityPackageInfoEntity = activityPackageInfoService.findPackageById(activityPackageId);
+        //套餐关联的店铺信息
+        StoreEntity storeEntity = storeService.getById(activityPackageInfoEntity.getStoreId());
+        //组装数据
+        ActivityPackageDetailDTO activityPackageDetailDTO = ActivityPackageDetailDTO.builder()
+                .activityPackageName(activityPackageInfoEntity.getActivityPackageName())
+                .activityPackageCode(activityPackageInfoEntity.getActivityPackageCode())
+                .productType(activityPackageInfoEntity.getProductType())
+                .storeId(storeEntity.getId())
+                .storeName(storeEntity.getStoreName())
+                .activityStatus(activityPackageInfoEntity.getActivityStatus())
+                .originalPrice(BigDecimalUtil.F2Y(activityPackageInfoEntity.getOriginalPrice()))
+                .preferentialPrice(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPreferentialPrice()))
+                .originalAmountDisplay(activityPackageInfoEntity.getOriginalAmountDisplay())
+                .activityPackageImageInfo(activityPackageInfoEntity.getActivityPackageImageInfo())
+                .activityPackageIntroduce(activityPackageInfoEntity.getActivityPackageIntroduce())
+                .activityPackageRemark(activityPackageInfoEntity.getActivityPackageRemark())
+                .build();
+        return activityPackageDetailDTO;
+    }
+
+    /**
      * 发送套餐状态更新日志
      *
      * @param beforeDataList

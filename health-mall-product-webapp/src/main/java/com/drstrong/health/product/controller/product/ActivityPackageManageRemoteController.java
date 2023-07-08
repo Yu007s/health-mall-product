@@ -11,6 +11,8 @@ import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRe
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
+import com.drstrong.health.product.remote.api.activty.ActivityPackageRemoteApi;
+import com.drstrong.health.product.remote.api.product.SkuManageRemoteApi;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/inner/activityPackage/manage")
-public class ActivityPackageManageRemoteController {
+public class ActivityPackageManageRemoteController implements ActivityPackageRemoteApi {
 
     @Autowired
     private ActivityPackageManageFacade activityPackageManageFacade;
@@ -36,6 +38,7 @@ public class ActivityPackageManageRemoteController {
      * @param activityPackageManageQueryRequest
      * @return
      */
+    @Override
     public ResultVO<PageVO<ActivityPackageInfoVO>> pageQuerySkuManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
         return ResultVO.success(activityPackageManageFacade.queryActivityPackageManageInfo(activityPackageManageQueryRequest));
     }
@@ -46,6 +49,7 @@ public class ActivityPackageManageRemoteController {
      * @param activityPackageManageQueryRequest
      * @return
      */
+    @Override
     public ResultVO<List<ActivityPackageInfoVO>> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
         return ResultVO.success(activityPackageManageFacade.listActivityPackageManageInfo(activityPackageManageQueryRequest));
     }
@@ -56,19 +60,32 @@ public class ActivityPackageManageRemoteController {
      * @param saveOrUpdateActivityPackageRequest
      * @return
      */
+    @Override
     public ResultVO<Void> saveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest) {
         activityPackageManageFacade.addLocksaveOrUpdateActivityPackage(saveOrUpdateActivityPackageRequest, saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0).getSkuCode());
         return ResultVO.success();
     }
 
     /**
-     * 查询套餐详情
+     * 查询套餐详情(根据套餐编码)
      *
      * @param activityPackageCode
      * @return
      */
+    @Override
     public ResultVO<ActivityPackageDetailDTO> queryDetailByCode(String activityPackageCode) {
         return ResultVO.success(activityPackageManageFacade.queryDetailByCode(activityPackageCode));
+    }
+
+    /**
+     * 查询套餐(根据套餐ID)
+     *
+     * @param activityPackageId
+     * @return
+     */
+    @Override
+    public ResultVO<ActivityPackageDetailDTO> queryDetailById(Long activityPackageId) {
+        return ResultVO.success(activityPackageManageFacade.queryDetailById(activityPackageId));
     }
 
     /**
@@ -77,6 +94,7 @@ public class ActivityPackageManageRemoteController {
      * @param updateSkuStateRequest
      * @return
      */
+    @Override
     public ResultVO<Void> updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest) {
         updateSkuStateRequest.setScheduledStatus(ScheduledStatusEnum.CANCEL.getCode());
         activityPackageManageFacade.updateActivityPackageStatus(updateSkuStateRequest);
@@ -89,6 +107,7 @@ public class ActivityPackageManageRemoteController {
      * @param scheduledSkuUpDownRequest
      * @return
      */
+    @Override
     public ResultVO<Void> scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest) {
         activityPackageManageFacade.scheduledActivityPackageUpDown(scheduledSkuUpDownRequest);
         return ResultVO.success();
