@@ -26,4 +26,6 @@ public interface ActivityPackageInfoService extends IService<ActivityPackageInfo
     void batchUpdateActivityStatusByCodes(Set<String> skuCodeList, Integer skuState, Long operatorId);
 
     ActivityPackageInfoEntity findPackageById(Long activityPackageId);
+
+    List<ActivityPackageInfoEntity> queryAllByProductType(Long storeId, Integer productType);
 }

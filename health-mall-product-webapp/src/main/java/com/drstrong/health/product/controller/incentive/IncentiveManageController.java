@@ -3,7 +3,9 @@ package com.drstrong.health.product.controller.incentive;
 import com.drstrong.health.product.facade.incentive.SkuIncentivePolicyFacade;
 import com.drstrong.health.product.model.request.incentive.SaveEarningNameRequest;
 import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
+import com.drstrong.health.product.model.response.incentive.PackageIncentivePolicyDetailVO;
 import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDetailVO;
+import com.drstrong.health.product.model.response.incentive.excel.PackageIncentivePolicyDetailExcelVO;
 import com.drstrong.health.product.model.response.incentive.excel.SkuIncentivePolicyDetailExcelVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.incentive.IncentiveManageRemoteApi;
@@ -47,4 +49,15 @@ public class IncentiveManageController implements IncentiveManageRemoteApi {
 	public ResultVO<SkuIncentivePolicyDetailExcelVO> queryAllSkuPolicyDetailToExcelVO(Long storeId, Integer productType) {
 		return ResultVO.success(skuIncentivePolicyFacade.querySkuPolicyDetailToExcelVO(storeId, productType));
 	}
+
+	@Override
+	public ResultVO<PackageIncentivePolicyDetailVO> queryPolicyDetailByPackageCode(String packageCode) {
+		return ResultVO.success(skuIncentivePolicyFacade.queryPolicyDetailByPackageCode(packageCode));
+	}
+
+	@Override
+	public ResultVO<PackageIncentivePolicyDetailExcelVO> queryAllPackagePolicyDetailToExcelVO(Long storeId, Integer productType) {
+		return ResultVO.success(skuIncentivePolicyFacade.queryPackagePolicyDetailToExcelVO(storeId, productType));
+	}
+
 }

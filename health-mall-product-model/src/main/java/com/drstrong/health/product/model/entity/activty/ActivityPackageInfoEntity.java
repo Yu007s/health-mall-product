@@ -23,6 +23,11 @@ public class ActivityPackageInfoEntity extends BaseStandardEntity implements Ser
 
     private static final long serialVersionUID = 3946900622740078345L;
 
+    /**
+     * 套餐种类：目前仅支持 1-西成药
+     */
+    public static final Integer PACKAGE_TYPE = 1;
+
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
