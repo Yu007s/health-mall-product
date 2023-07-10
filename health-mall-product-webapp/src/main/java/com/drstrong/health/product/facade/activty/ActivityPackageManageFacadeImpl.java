@@ -327,6 +327,11 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
      */
     @Override
     public void scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest) {
+        //时间校验
+        long time = Date.from(scheduledSkuUpDownRequest.getScheduledDateTime().atZone(ZoneId.systemDefault()).toInstant()).getTime();
+        if (time < System.currentTimeMillis()) {
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_ERROR);
+        }
         //校验套餐是否存在
         ActivityPackageInfoEntity packageInfoEntity = activityPackageInfoService.findPackageByCode(scheduledSkuUpDownRequest.getSkuCode(), null);
         //状态校验

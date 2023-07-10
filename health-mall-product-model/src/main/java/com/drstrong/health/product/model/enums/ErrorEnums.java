@@ -77,6 +77,7 @@ public enum ErrorEnums implements IBaseResult {
 	ACTIVTY_PACKAGE_IS_UP_ERROR("14006", "当前sku已上架,不能设置预约上架"),
 	ACTIVTY_PACKAGE_IS_DOWN_ERROR("14007", "当前sku已下架,不能设置预约下架"),
 	ACTIVTY_PACKAGE_SKU_AT_LEAST_ONE("14008", "套餐sku商品种类至少一个"),
+	ACTIVTY_PACKAGE_TIME_ERROR("14009", "套餐上下架时间不能选择过去时间"),
 	;
 
 	private String code;
