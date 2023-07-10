@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drstrong.health.product.dao.sku.StoreSkuRecommendMapper">
+
+    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.sku.StoreSkuRecommendEntity">
+        <result column="id" property="id"/>
+        <result column="store_id" property="storeId"/>
+        <result column="sku_code" property="skuCode"/>
+        <result column="recommend_detail_info" property="recommendDetailInfoList"
+                typeHandler="com.drstrong.health.product.handler.mybatis.RecommendDetailInfoTypeHandler"/>
+        <result column="version" property="version"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="changed_by" property="changedBy"/>
+        <result column="changed_at" property="changedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                id,
+                store_id,
+                sku_code,
+                recommend_detail_info,
+                version,
+                del_flag,
+                created_by,
+                created_at,
+                changed_by,
+                changed_at
+    </sql>
+
+    <select id="pageQueryByParam"
+            resultType="com.drstrong.health.product.model.entity.sku.StoreSkuRecommendEntity">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_store_sku_recommend
+        where del_flag = 0
+        <if test="queryParam.storeId != null">
+            and store_id = #{queryParam.storeId}
+        </if>
+        <if test="queryParam.skuCode != null and queryParam.skuCode != ''">
+            and sku_code = #{queryParam.skuCode}
+        </if>
+        <if test="queryParam.keyword != null and queryParam.keyword != ''">
+            #{queryParam.keyword} MEMBER OF (recommend_detail_info_pinyin_array)
+            or
+            #{queryParam.keyword} MEMBER OF (recommend_detail_info_keyword_array)
+        </if>
+    </select>
+</mapper>

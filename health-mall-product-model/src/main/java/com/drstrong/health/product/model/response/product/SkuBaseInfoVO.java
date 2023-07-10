@@ -14,6 +14,7 @@ import java.math.BigDecimal;
  * @date 2021/12/6 21:09
  */
 @Data
+@Deprecated
 @ApiModel("sku 基础信息")
 public class SkuBaseInfoVO implements Serializable {
 	private static final long serialVersionUID = -5089413355055401869L;

@@ -6,6 +6,7 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.drstrong.health.product.facade.ChineseAuthFacade;
 import com.drstrong.health.product.facade.ChineseRemoteFacade;
+import com.drstrong.health.product.model.dto.stock.SkuCanStockDTO;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineConflictEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
@@ -163,7 +164,7 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 		// 4.获取 spu 信息
 		Map<String, SkuInfoEntity> skuCodeSkuInfoMap = skuInfoService.getBySkuCodesToMap(skuCodes);
 		// 5.判断是否需要查询库存信息
-		Map<String, List<SkuCanStockResponse>> skuCodeStockMap = null;
+		Map<String, List<SkuCanStockDTO>> skuCodeStockMap = null;
 		if (Objects.equals(Boolean.TRUE, chineseSkuRequest.getNeedQueryStock())) {
 			skuCodeStockMap = stockRemoteProService.getStockToMap(skuCodes);
 		}
@@ -326,7 +327,7 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 	}
 
 	private List<ChineseSkuInfoExtendVO> buildChineseSkuExtendVOList(String storeName, List<ChineseSkuInfoEntity> skuInfoEntityList,
-																	 Map<String, ChineseMedicineEntity> medicineCodeAndEntityMap, Map<String, List<SkuCanStockResponse>> skuCodeStockMap,
+																	 Map<String, ChineseMedicineEntity> medicineCodeAndEntityMap, Map<String, List<SkuCanStockDTO>> skuCodeStockMap,
 																	 Map<String, SkuInfoEntity> skuCodeSkuInfoMap) {
 		List<ChineseSkuInfoExtendVO> chineseSkuInfoExtendVOList = Lists.newArrayListWithCapacity(skuInfoEntityList.size());
 		skuInfoEntityList.forEach(chineseSkuInfoEntity -> {
@@ -347,7 +348,7 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 			chineseSkuInfoExtendVO.setMaxDosage(chineseMedicineEntity.getMaxDosage());
 			// 设置库存信息
 			if (!CollectionUtils.isEmpty(skuCodeStockMap) && skuCodeStockMap.containsKey(chineseSkuInfoEntity.getSkuCode())) {
-				List<SkuCanStockResponse> stockResponseList = skuCodeStockMap.get(chineseSkuInfoEntity.getSkuCode());
+				List<SkuCanStockDTO> stockResponseList = skuCodeStockMap.get(chineseSkuInfoEntity.getSkuCode());
 				List<ChineseSkuInfoExtendVO.StockInfoVO> stockInfoVOList = Lists.newArrayListWithCapacity(stockResponseList.size());
 				stockResponseList.forEach(skuCanStockResponse -> {
 					ChineseSkuInfoExtendVO.StockInfoVO stockInfoVO = new ChineseSkuInfoExtendVO.StockInfoVO();

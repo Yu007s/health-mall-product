@@ -1,6 +1,8 @@
 package com.drstrong.health.product.remote.pro;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
+import com.drstrong.health.product.model.dto.stock.SkuCanStockDTO;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.response.chinese.SaveOrUpdateSkuVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
@@ -66,14 +68,15 @@ public class StockRemoteProService {
 	 * @author liuqiuyi
 	 * @date 2022/8/9 15:36
 	 */
-	public Map<String, List<SkuCanStockResponse>> getStockToMap(List<String> skuCodes){
+	public Map<String, List<SkuCanStockDTO>> getStockToMap(List<String> skuCodes){
 		List<SkuCanStockResponse> skuCanStockResponseList = getStockBySkuCodes(skuCodes);
 		if (CollectionUtils.isEmpty(skuCanStockResponseList)) {
 			return Maps.newHashMap();
 		}
-		return skuCanStockResponseList.stream()
+        List<SkuCanStockDTO> skuCanStockDTOList = BeanUtil.copyToList(skuCanStockResponseList, SkuCanStockDTO.class);
+        return skuCanStockDTOList.stream()
 				.filter(skuCanStockResponse -> StringUtils.isNotBlank(skuCanStockResponse.getSkuCode()))
-				.collect(groupingBy(SkuCanStockResponse::getSkuCode));
+				.collect(groupingBy(SkuCanStockDTO::getSkuCode));
 	}
 
 	/**
