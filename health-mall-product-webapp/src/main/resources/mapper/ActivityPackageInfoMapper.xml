@@ -35,7 +35,7 @@
         <result column="preferential_price" property="preferentialPrice"/>
         <result column="original_amount_display" property="originalAmountDisplay"/>
         <result column="activity_package_image_info" property="activityPackageImageInfo"
-                typeHandler="com.drstrong.health.product.handler.mybatis.LongListTypeHandler"/>
+                typeHandler="com.drstrong.health.product.handler.mybatis.StringListTypeHandler"/>
         <result column="activity_package_introduce" property="activityPackageIntroduce"/>
         <result column="activity_package_remark" property="activityPackageRemark"/>
         <result column="version" property="version"/>

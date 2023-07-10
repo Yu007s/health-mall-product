@@ -1,8 +1,11 @@
 package com.drstrong.health.product.model.entity.activty;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.drstrong.health.product.handler.mybatis.LongListTypeHandler;
+import com.drstrong.health.product.handler.mybatis.StringListTypeHandler;
 import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -74,6 +77,7 @@ public class ActivityPackageInfoEntity extends BaseStandardEntity implements Ser
     /**
      * 活动套餐的图片信息(json存储)
      */
+    @TableField(value = "activity_package_image_info", typeHandler = StringListTypeHandler.class)
     private List<String> activityPackageImageInfo;
 
     /**
