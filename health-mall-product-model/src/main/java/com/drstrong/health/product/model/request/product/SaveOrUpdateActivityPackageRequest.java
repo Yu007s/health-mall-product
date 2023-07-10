@@ -35,7 +35,6 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
     @Length(max = 50, message = "套餐名称不能超过50字符")
     private String activityPackageName;
 
-    @NotBlank(message = "套餐编码不能为空")
     @ApiModelProperty("套餐编码")
     private String activityPackageCode;
 
@@ -78,13 +77,6 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
     @ApiModelProperty("活动套餐备注")
     @Length(max = 500, message = "活动套餐备注不能超过500字符")
     private String activityPackageRemark;
-
-    @ApiModelProperty("创建时间")
-    private Date createdAt;
-
-    @ApiModelProperty("套餐激励政策")
-    @NotBlank(message = "套餐激励政策不能为空")
-    private SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest;
 
     @ApiModelProperty(value = "操作人id", hidden = true)
     private Long operatorId;
