@@ -65,16 +65,7 @@ public class ActivityPackageDetailDTO implements Serializable {
     @ApiModelProperty("活动套餐备注")
     private String activityPackageRemark;
 
-    @ApiModelProperty("套餐预约上架时间")
-    private Date activityPackageStartAt;
-
-    @ApiModelProperty("套餐预约下架时间")
-    private Date activityPackageEndAt;
-
     @ApiModelProperty("套餐商品列表")
     private List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntityList;
-
-    @ApiModelProperty("套餐激励政策")
-    private SkuIncentivePolicyDetailVO skuIncentivePolicyDetailVO;
 
 }

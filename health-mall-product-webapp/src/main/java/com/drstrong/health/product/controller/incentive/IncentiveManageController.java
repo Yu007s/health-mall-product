@@ -25,6 +25,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/inner/incentive/manage")
 public class IncentiveManageController implements IncentiveManageRemoteApi {
+
 	@Resource
 	SkuIncentivePolicyFacade skuIncentivePolicyFacade;
 
@@ -48,6 +49,12 @@ public class IncentiveManageController implements IncentiveManageRemoteApi {
 	@Override
 	public ResultVO<SkuIncentivePolicyDetailExcelVO> queryAllSkuPolicyDetailToExcelVO(Long storeId, Integer productType) {
 		return ResultVO.success(skuIncentivePolicyFacade.querySkuPolicyDetailToExcelVO(storeId, productType));
+	}
+
+	@Override
+	public ResultVO<Void> saveOrUpdatePackagePolicy(@RequestBody @Valid SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest) {
+		skuIncentivePolicyFacade.saveOrUpdatePackagePolicy(saveOrUpdateSkuPolicyRequest);
+		return ResultVO.success();
 	}
 
 	@Override

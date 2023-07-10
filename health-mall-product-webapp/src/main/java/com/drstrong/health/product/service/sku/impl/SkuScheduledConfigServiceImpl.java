@@ -46,27 +46,6 @@ public class SkuScheduledConfigServiceImpl extends ServiceImpl<SkuScheduledConfi
 	}
 
 	/**
-	 * 根据activityPackageCode查询
-	 * @param activityPackageCode
-	 * @param scheduledStatus
-	 * @return
-	 */
-	@Override
-	public List<SkuScheduledConfigEntity> getByActivityPackageCode(String activityPackageCode, Integer scheduledStatus) {
-		if (StrUtil.isBlank(activityPackageCode)) {
-			return null;
-		}
-		List<SkuScheduledConfigEntity> scheduledConfigEntityList = listBySkuCode(Sets.newHashSet(activityPackageCode), Objects.isNull(scheduledStatus) ? null : Sets.newHashSet(scheduledStatus));
-		if (scheduledConfigEntityList.size() != 2 ||
-				!scheduledConfigEntityList.stream().anyMatch(SkuScheduledConfigEntity -> SkuScheduledConfigEntity.getScheduledType() == 1) ||
-				!scheduledConfigEntityList.stream().anyMatch(SkuScheduledConfigEntity -> SkuScheduledConfigEntity.getScheduledType() == 2)) {
-			throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SCHEDULED_TIME_ERROE);
-		}
-		return scheduledConfigEntityList;
-	}
-
-
-	/**
 	 * 根据 skuCode 查询
 	 *
 	 * @param skuCodeList

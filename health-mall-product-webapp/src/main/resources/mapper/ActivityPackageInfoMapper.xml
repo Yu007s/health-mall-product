@@ -61,6 +61,9 @@
         <if test="queryParam.activityStatus != null">
             and activity_status = #{queryParam.activityStatus}
         </if>
+        <if test="queryParam.createdAt != null">
+            and created_at = #{queryParam.createdAt}
+        </if>
         order by id desc
     </sql>
 

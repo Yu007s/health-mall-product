@@ -103,7 +103,12 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
             return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(activityPackageManageQueryRequest.getPageNo()).pageSize(activityPackageManageQueryRequest.getPageSize()).build();
         }
         List<ActivityPackageInfoVO> activityPackageInfoVOList = buildAgreementActivityPackageInfoVo(activityPackageInfoEntityPage.getRecords());
-        return PageVO.newBuilder().result(activityPackageInfoVOList).totalCount((int) activityPackageInfoEntityPage.getTotal()).pageNo(activityPackageManageQueryRequest.getPageNo()).pageSize(activityPackageManageQueryRequest.getPageSize()).build();
+        return PageVO.newBuilder()
+                .result(activityPackageInfoVOList)
+                .totalCount((int) activityPackageInfoEntityPage.getTotal())
+                .pageNo(activityPackageManageQueryRequest.getPageNo())
+                .pageSize(activityPackageManageQueryRequest.getPageSize())
+                .build();
     }
 
     /**
@@ -132,7 +137,6 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
                     .createdAt(Date.from(record.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant()))
                     .build();
             activityPackageInfoVOList.add(activityPackageInfoVO);
-            //活动时间是否展示 待确定 todo
         }
         return activityPackageInfoVOList;
     }
@@ -186,6 +190,7 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE);
         }
         ActivityPackageSkuRequest activityPackageSkuRequest = activityPackageSkuList.get(0);
+        LocalDateTime dateTime = LocalDateTime.now();
         //套餐
         ActivityPackageInfoEntity packageInfoEntity = ActivityPackageInfoEntity.builder()
                 .activityPackageName(saveOrUpdateActivityPackageRequest.getActivityPackageName())
@@ -200,7 +205,7 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
                 .activityPackageIntroduce(saveOrUpdateActivityPackageRequest.getActivityPackageIntroduce())
                 .activityPackageRemark(saveOrUpdateActivityPackageRequest.getActivityPackageRemark())
                 .build();
-        packageInfoEntity.setChangedAt(LocalDateTime.now());
+        packageInfoEntity.setChangedAt(dateTime);
         packageInfoEntity.setChangedBy(saveOrUpdateActivityPackageRequest.getOperatorId());
         //套餐sku信息
         ActivityPackageSkuInfoEntity activityPackageSkuInfoEntity = ActivityPackageSkuInfoEntity.builder()
@@ -211,33 +216,33 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
                 .preferentialPrice(activityPackageSkuRequest.getPreferential_price().longValue())
                 .amount(activityPackageSkuRequest.getAmount())
                 .build();
-        activityPackageSkuInfoEntity.setChangedAt(LocalDateTime.now());
+        activityPackageSkuInfoEntity.setChangedAt(dateTime);
         activityPackageSkuInfoEntity.setChangedBy(saveOrUpdateActivityPackageRequest.getOperatorId());
         if (updateFlag) {
             //套餐更新
             LambdaQueryWrapper<ActivityPackageInfoEntity> updateActivityPackageWrapper = new LambdaQueryWrapper<ActivityPackageInfoEntity>()
+                    .eq(ActivityPackageInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                     .eq(ActivityPackageInfoEntity::getActivityPackageCode, packageInfoEntity.getActivityPackageCode());
             activityPackageInfoService.update(packageInfoEntity, updateActivityPackageWrapper);
             //套餐sku更新
-            activityPackageSkuInfoEntity.setChangedAt(LocalDateTime.now());
+            activityPackageSkuInfoEntity.setChangedAt(dateTime);
             activityPackageSkuInfoEntity.setChangedBy(saveOrUpdateActivityPackageRequest.getOperatorId());
             LambdaQueryWrapper<ActivityPackageSkuInfoEntity> updateActivityPackageSkuWrapper = new LambdaQueryWrapper<ActivityPackageSkuInfoEntity>()
+                    .eq(ActivityPackageSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                     .eq(ActivityPackageSkuInfoEntity::getActivityPackageCode, packageInfoEntity.getActivityPackageCode());
             activityPackageSkuInfoSevice.update(activityPackageSkuInfoEntity, updateActivityPackageSkuWrapper);
         } else {
             //新增套餐
             packageInfoEntity.setActivityPackageCode(createSkuCode(saveOrUpdateActivityPackageRequest.getStoreId()));
-            packageInfoEntity.setCreatedAt(LocalDateTime.now());
+            packageInfoEntity.setCreatedAt(dateTime);
             packageInfoEntity.setCreatedBy(saveOrUpdateActivityPackageRequest.getOperatorId());
             activityPackageInfoService.save(packageInfoEntity);
             //新增套餐sku
             activityPackageSkuInfoEntity.setActivityPackageCode(packageInfoEntity.getActivityPackageCode());
-            activityPackageSkuInfoEntity.setCreatedAt(LocalDateTime.now());
+            activityPackageSkuInfoEntity.setCreatedAt(dateTime);
             activityPackageSkuInfoEntity.setCreatedBy(saveOrUpdateActivityPackageRequest.getOperatorId());
             activityPackageSkuInfoSevice.save(activityPackageSkuInfoEntity);
         }
-        //更新/新增政策信息 可能和西药保持一致，只通过按钮来编辑政策  todo
-        skuIncentivePolicyFacade.saveOrUpdateSkuPolicy(saveOrUpdateActivityPackageRequest.getSaveOrUpdateSkuPolicyRequest());
         //组装操作日志
         OperationLog operationLog = OperationLog.buildOperationLog(null, OperationLogConstant.MALL_PRODUCT_PACKAGE_CHANGE,
                 OperationLogConstant.SAVE_UPDATE_SKU, saveOrUpdateActivityPackageRequest.getOperatorId(), saveOrUpdateActivityPackageRequest.getOperatorName(),
@@ -271,14 +276,8 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
         ActivityPackageInfoEntity activityPackageInfoEntity = activityPackageInfoService.findPackageByCode(activityPackageCode, null);
         //套餐关联的店铺信息
         StoreEntity storeEntity = storeService.getById(activityPackageInfoEntity.getStoreId());
-        //套餐上下架时间 待确定 TODO
-        List<SkuScheduledConfigEntity> skuScheduledConfigEntityList = skuScheduledConfigService.getByActivityPackageCode(activityPackageInfoEntity.getActivityPackageCode(), null);
-        Optional<SkuScheduledConfigEntity> scheduledUp = skuScheduledConfigEntityList.stream().filter(SkuScheduledConfigEntity -> SkuScheduledConfigEntity.getScheduledType() == 1).findFirst();
-        Optional<SkuScheduledConfigEntity> scheduledDown = skuScheduledConfigEntityList.stream().filter(SkuScheduledConfigEntity -> SkuScheduledConfigEntity.getScheduledType() == 2).findFirst();
         //套餐sku信息
         List<ActivityPackageSkuInfoEntity> packageSkuInfoEntityList = activityPackageSkuInfoSevice.findPackageByCode(activityPackageCode);
-        //激励政策 待确定 TODO
-        SkuIncentivePolicyDetailVO skuIncentivePolicyDetailVO = skuIncentivePolicyFacade.queryPolicyDetailBySkuCode(activityPackageInfoEntity.getActivityPackageCode());
         //组装数据
         ActivityPackageDetailDTO activityPackageDetailDTO = ActivityPackageDetailDTO.builder()
                 .activityPackageName(activityPackageInfoEntity.getActivityPackageName())
@@ -293,10 +292,7 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
                 .activityPackageImageInfo(activityPackageInfoEntity.getActivityPackageImageInfo())
                 .activityPackageIntroduce(activityPackageInfoEntity.getActivityPackageIntroduce())
                 .activityPackageRemark(activityPackageInfoEntity.getActivityPackageRemark())
-                .activityPackageStartAt(Date.from(scheduledUp.get().getScheduledDateTime().atZone(ZoneId.systemDefault()).toInstant()))
-                .activityPackageEndAt(Date.from(scheduledDown.get().getScheduledDateTime().atZone(ZoneId.systemDefault()).toInstant()))
                 .activityPackageSkuInfoEntityList(packageSkuInfoEntityList)
-                .skuIncentivePolicyDetailVO(skuIncentivePolicyDetailVO)
                 .build();
         return activityPackageDetailDTO;
     }
@@ -340,36 +336,6 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
         sendActivityStatusUpdateLog(Lists.newArrayList(packageInfoEntity), Sets.newHashSet(scheduledSkuUpDownRequest.getSkuCode()), scheduledSkuUpDownRequest.getOperatorId(), scheduledSkuUpDownRequest.getOperatorName());
         //定时上下架处理
         skuScheduledConfigFacade.saveOrUpdateSkuConfig(scheduledSkuUpDownRequest);
-    }
-
-    /**
-     * 根据套餐ID获取详情
-     *
-     * @param activityPackageId
-     * @return
-     */
-    @Override
-    public ActivityPackageDetailDTO queryDetailById(Long activityPackageId) {
-        //根据activityPackageCode查询套餐
-        ActivityPackageInfoEntity activityPackageInfoEntity = activityPackageInfoService.findPackageById(activityPackageId);
-        //套餐关联的店铺信息
-        StoreEntity storeEntity = storeService.getById(activityPackageInfoEntity.getStoreId());
-        //组装数据
-        ActivityPackageDetailDTO activityPackageDetailDTO = ActivityPackageDetailDTO.builder()
-                .activityPackageName(activityPackageInfoEntity.getActivityPackageName())
-                .activityPackageCode(activityPackageInfoEntity.getActivityPackageCode())
-                .productType(activityPackageInfoEntity.getProductType())
-                .storeId(storeEntity.getId())
-                .storeName(storeEntity.getStoreName())
-                .activityStatus(activityPackageInfoEntity.getActivityStatus())
-                .originalPrice(BigDecimalUtil.F2Y(activityPackageInfoEntity.getOriginalPrice()))
-                .preferentialPrice(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPreferentialPrice()))
-                .originalAmountDisplay(activityPackageInfoEntity.getOriginalAmountDisplay())
-                .activityPackageImageInfo(activityPackageInfoEntity.getActivityPackageImageInfo())
-                .activityPackageIntroduce(activityPackageInfoEntity.getActivityPackageIntroduce())
-                .activityPackageRemark(activityPackageInfoEntity.getActivityPackageRemark())
-                .build();
-        return activityPackageDetailDTO;
     }
 
     /**

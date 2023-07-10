@@ -45,10 +45,6 @@ public interface ActivityPackageRemoteApi {
     @GetMapping("/query/by-code")
     ResultVO<ActivityPackageDetailDTO> queryDetailByCode(String activityPackageCode);
 
-    @ApiOperation("根据ID查询套餐详情")
-    @GetMapping("/query/by-id")
-    ResultVO<ActivityPackageDetailDTO> queryDetailById(Long activityPackageId);
-
     @ApiOperation("批量上下架")
     @PostMapping("/update/sku-status")
     ResultVO<Void> updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest);

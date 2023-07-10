@@ -82,12 +82,6 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
     @ApiModelProperty("创建时间")
     private Date createdAt;
 
-    @ApiModelProperty("套餐上架时间")
-    private Date activityPackageStartAt;
-
-    @ApiModelProperty("套餐下架时间")
-    private Date activityPackageEndAt;
-
     @ApiModelProperty("套餐激励政策")
     @NotBlank(message = "套餐激励政策不能为空")
     private SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest;

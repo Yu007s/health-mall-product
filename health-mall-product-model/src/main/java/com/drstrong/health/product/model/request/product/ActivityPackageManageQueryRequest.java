@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -25,9 +26,6 @@ public class ActivityPackageManageQueryRequest extends PageRequest implements Se
     @ApiModelProperty("套餐名称")
     private String activityPackageName;
 
-    @ApiModelProperty("套餐编码")
-    private String activityPackageCode;
-
     @ApiModelProperty("店铺id")
     private Long storeId;
 
@@ -35,11 +33,10 @@ public class ActivityPackageManageQueryRequest extends PageRequest implements Se
      * 套餐上下架状态；0-已下架，1-已上架, 2-预约上架中, 3-预约下架中
      */
     @ApiModelProperty("套餐状态")
-    private int activityStatus;
+    private Integer activityStatus;
 
-/*    @ApiModelProperty("套餐上架时间")
-    private Date activityPackageStartAt;
+    @ApiModelProperty("套餐创建时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createdAt;
 
-    @ApiModelProperty("套餐下架时间")
-    private Date activityPackageEndAt;*/
 }

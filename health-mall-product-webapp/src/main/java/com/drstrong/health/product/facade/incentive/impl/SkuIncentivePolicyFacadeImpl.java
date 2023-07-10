@@ -119,7 +119,36 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	 */
 	@Override
 	public void saveOrUpdateSkuPolicy(SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest) {
-		// 校验 skuCode 是否存在
+		//校验 skuCode 是否存在
+		storeSkuInfoService.checkSkuExistByCode(saveOrUpdateSkuPolicyRequest.getSkuCode(), null);
+		//判断是保存还是更新激励政策
+		SkuIncentivePolicyEntity skuIncentivePolicyEntity = skuIncentivePolicyService.queryBySkuCode(saveOrUpdateSkuPolicyRequest.getSkuCode());
+		//记录日志
+		OperationLog operationLog = OperationLog.buildOperationLog(saveOrUpdateSkuPolicyRequest.getSkuCode(), OperationLogConstant.MALL_PRODUCT_SKU_CHANGE,
+				OperationLogConstant.SKU_INCENTIVE_POLICY_CHANGE, saveOrUpdateSkuPolicyRequest.getOperatorId(), saveOrUpdateSkuPolicyRequest.getOperatorName(),
+				OperateTypeEnum.CMS.getCode(), JSONUtil.toJsonStr(skuIncentivePolicyEntity));
+		if (Objects.isNull(skuIncentivePolicyEntity)) {
+			skuIncentivePolicyEntity = SkuIncentivePolicyEntity.buildDefaultEntity(saveOrUpdateSkuPolicyRequest.getOperatorId());
+		}
+		skuIncentivePolicyEntity.setStoreId(saveOrUpdateSkuPolicyRequest.getStoreId());
+		skuIncentivePolicyEntity.setSkuCode(saveOrUpdateSkuPolicyRequest.getSkuCode());
+		skuIncentivePolicyEntity.setCostPrice(BigDecimalUtil.Y2F(saveOrUpdateSkuPolicyRequest.getCostPrice()));
+		skuIncentivePolicyEntity.setIncentivePolicyInfo(BeanUtil.copyToList(saveOrUpdateSkuPolicyRequest.getSkuIncentivePolicyList(), SkuIncentivePolicyEntity.IncentivePolicyInfo.class));
+		skuIncentivePolicyEntity.setChangedBy(saveOrUpdateSkuPolicyRequest.getOperatorId());
+		skuIncentivePolicyEntity.setChangedAt(LocalDateTime.now());
+		skuIncentivePolicyService.saveOrUpdate(skuIncentivePolicyEntity);
+		// 保存操作日志
+		operationLogSendUtil.sendOperationLog(operationLog);
+	}
+
+	/**
+	 * 修改/报错套餐激励政策
+	 * @param saveOrUpdateSkuPolicyRequest
+	 */
+	@Override
+	public void saveOrUpdatePackagePolicy(SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest) {
+		// 校验套餐
+		ActivityPackageInfoEntity packageByCode = activityPackageInfoService.findPackageByCode(saveOrUpdateSkuPolicyRequest.getSkuCode(), null);
 		storeSkuInfoService.checkSkuExistByCode(saveOrUpdateSkuPolicyRequest.getSkuCode(), null);
 		// 1.判断是保存还是更新激励政策
 		SkuIncentivePolicyEntity skuIncentivePolicyEntity = skuIncentivePolicyService.queryBySkuCode(saveOrUpdateSkuPolicyRequest.getSkuCode());
@@ -139,6 +168,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 		skuIncentivePolicyService.saveOrUpdate(skuIncentivePolicyEntity);
 		// 2.保存操作日志
 		operationLogSendUtil.sendOperationLog(operationLog);
+
 	}
 
 	/**

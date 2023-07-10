@@ -30,5 +30,4 @@ public interface ActivityPackageManageFacade {
 
     void scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
 
-    ActivityPackageDetailDTO queryDetailById(Long activityPackageId);
 }

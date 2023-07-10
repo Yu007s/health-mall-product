@@ -78,17 +78,6 @@ public class ActivityPackageManageRemoteController implements ActivityPackageRem
     }
 
     /**
-     * 查询套餐(根据套餐ID)
-     *
-     * @param activityPackageId
-     * @return
-     */
-    @Override
-    public ResultVO<ActivityPackageDetailDTO> queryDetailById(Long activityPackageId) {
-        return ResultVO.success(activityPackageManageFacade.queryDetailById(activityPackageId));
-    }
-
-    /**
      * 上下架
      *
      * @param updateSkuStateRequest

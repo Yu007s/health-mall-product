@@ -47,4 +47,7 @@ public interface SkuIncentivePolicyFacade {
 	PackageIncentivePolicyDetailExcelVO queryPackagePolicyDetailToExcelVO(Long storeId, Integer productType);
 
 	PackageIncentivePolicyDetailVO queryPolicyDetailByPackageCode(String packageCode);
+
+    void saveOrUpdatePackagePolicy(SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest);
+
 }
