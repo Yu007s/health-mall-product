@@ -63,6 +63,7 @@ public class SkuManageRemoteController implements SkuManageRemoteApi {
 		return ResultVO.success();
 	}
 
+
 /*	public ResultVO<Void> searchSkuList(SearchSkuListRequest searchSkuListRequest) {
 		List<>  =skuManageFacade.searchSkuList(searchSkuListRequest);
 		return ResultVO.success();

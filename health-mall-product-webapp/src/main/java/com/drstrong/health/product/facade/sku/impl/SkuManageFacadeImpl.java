@@ -252,6 +252,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 				.map(skuProhibitAreaVO -> new AreaDTO(skuProhibitAreaVO.getId(), skuProhibitAreaVO.getName())).collect(toList());
 		// 组装参数
 		StoreSkuDetailDTO storeSkuDetailDTO = StoreSkuDetailDTO.builder()
+				.id(skuInfoEntity.getId())
 				.medicineCode(skuInfoEntity.getMedicineCode())
 				.storeName(storeEntity.getStoreName())
 				.skuName(skuInfoEntity.getSkuName())
@@ -286,7 +287,11 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 		}
 		// 2.组装返回值
 		List<AgreementSkuInfoVO> agreementSkuInfoVoList = buildAgreementSkuInfoVo(pageListRecords);
-		return PageVO.newBuilder().result(agreementSkuInfoVoList).totalCount((int) storeSkuInfoEntityPageList.getTotal()).pageNo(productManageQueryRequest.getPageNo()).pageSize(productManageQueryRequest.getPageSize()).build();
+		return PageVO.newBuilder()
+				.result(agreementSkuInfoVoList)
+				.totalCount((int) storeSkuInfoEntityPageList.getTotal())
+				.pageNo(productManageQueryRequest.getPageNo())
+				.pageSize(productManageQueryRequest.getPageSize()).build();
 	}
 
 	/**

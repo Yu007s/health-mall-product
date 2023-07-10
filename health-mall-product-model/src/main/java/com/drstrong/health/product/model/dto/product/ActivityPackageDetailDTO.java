@@ -26,6 +26,9 @@ public class ActivityPackageDetailDTO implements Serializable {
 
     private static final long serialVersionUID = 1234893513730756544L;
 
+    @ApiModelProperty("套餐ID")
+    private Long id;
+
     @ApiModelProperty("套餐名称")
     private String activityPackageName;
 

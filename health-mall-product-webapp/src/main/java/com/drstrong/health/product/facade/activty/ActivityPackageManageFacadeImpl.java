@@ -119,6 +119,7 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
         List<ActivityPackageInfoVO> activityPackageInfoVOList = new ArrayList<>();
         for (ActivityPackageInfoEntity record : pageListRecords) {
             ActivityPackageInfoVO activityPackageInfoVO = ActivityPackageInfoVO.builder()
+                    .id(record.getId())
                     .activityPackageName(record.getActivityPackageName())
                     .activityPackageCode(record.getActivityPackageCode())
                     .productType(record.getProductType())

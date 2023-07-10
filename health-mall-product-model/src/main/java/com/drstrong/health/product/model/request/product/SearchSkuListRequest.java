@@ -22,9 +22,10 @@ public class SearchSkuListRequest extends PageRequest implements Serializable {
     @ApiModelProperty("搜索条件")
     private String key;
 
+    @ApiModelProperty("商品类型")
+    private Integer productType;
+
     @ApiModelProperty("商品分类")
     private Long categoryId;
 
-    @ApiModelProperty("商品类型")
-    private Integer productType;
 }

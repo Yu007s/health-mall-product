@@ -30,6 +30,9 @@ import java.util.List;
 public class StoreSkuDetailDTO extends SkuBaseDTO implements Serializable {
 	private static final long serialVersionUID = 1956893513730756544L;
 
+	@ApiModelProperty("SkuID")
+	private Long id;
+
 	@ApiModelProperty("店铺名称")
 	private String storeName;
 

@@ -26,6 +26,13 @@ public class ActivityPackageInfoVO implements Serializable {
 
     private static final long serialVersionUID = 1700078824601387245L;
 
+    public static final int MEDICATION_BOX_TAG_YEAH = 1;
+
+    public static final int MEDICATION_BOX_TAG_NO = 0;
+
+    @ApiModelProperty("套餐ID")
+    private Long id;
+
     @ApiModelProperty("套餐名称")
     private String activityPackageName;
 
@@ -61,4 +68,11 @@ public class ActivityPackageInfoVO implements Serializable {
 
     @ApiModelProperty("套餐下架时间")
     private Date activityPackageEndAt;
+
+    /**
+     * 常用药标识：0，否；1，是
+     * 仅医生端使用
+     */
+    @ApiModelProperty(value = "常用药标识：0，否；1，是")
+    private Integer boxTag;
 }
