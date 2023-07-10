@@ -1,8 +1,11 @@
 package com.drstrong.health.product.dao.sku;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.entity.sku.StoreSkuRecommendEntity;
+import com.drstrong.health.product.model.request.sku.recommend.PageSkuRecommendRequest;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @author liuqiuyi
@@ -10,4 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface StoreSkuRecommendMapper extends BaseMapper<StoreSkuRecommendEntity> {
+
+    Page<StoreSkuRecommendEntity> pageQueryByParam(Page<StoreSkuRecommendEntity> entityPage, @Param("queryParam") PageSkuRecommendRequest pageSkuRecommendRequest);
 }

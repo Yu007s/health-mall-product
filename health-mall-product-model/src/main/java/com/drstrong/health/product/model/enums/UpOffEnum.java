@@ -21,6 +21,14 @@ public enum UpOffEnum {
 
 	private String value;
 
+    public static Boolean checkIsUp(Integer code) {
+		return Objects.equals(UP.code, code) || Objects.equals(SCHEDULED_DOWN.code, code);
+    }
+
+    public static Boolean checkIsDown(Integer code) {
+        return Objects.equals(DOWN.code, code) || Objects.equals(SCHEDULED_UP.code, code);
+    }
+
 	public static UpOffEnum getEnumByCode(Integer code) {
 		if (Objects.isNull(code)) {
 			return null;
