@@ -63,12 +63,6 @@ public class ActivityPackageInfoVO implements Serializable {
     @ApiModelProperty("创建时间")
     private Date createdAt;
 
-    @ApiModelProperty("套餐上架时间")
-    private Date activityPackageStartAt;
-
-    @ApiModelProperty("套餐下架时间")
-    private Date activityPackageEndAt;
-
     /**
      * 常用药标识：0，否；1，是
      * 仅医生端使用

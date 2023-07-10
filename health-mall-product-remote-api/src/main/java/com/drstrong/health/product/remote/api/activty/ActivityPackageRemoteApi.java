@@ -33,7 +33,7 @@ public interface ActivityPackageRemoteApi {
     @PostMapping("/page/query")
     ResultVO<PageVO<ActivityPackageInfoVO>> pageQuerySkuManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 
-    @ApiOperation("sku管理页面查询所有数据,导出需要")
+    @ApiOperation("管理页面查询所有数据,导出需要")
     @PostMapping("/query/all")
     ResultVO<List<ActivityPackageInfoVO>> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 
@@ -46,7 +46,7 @@ public interface ActivityPackageRemoteApi {
     ResultVO<ActivityPackageDetailDTO> queryDetailByCode(String activityPackageCode);
 
     @ApiOperation("批量上下架")
-    @PostMapping("/update/sku-status")
+    @PostMapping("/update/status")
     ResultVO<Void> updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest);
 
     @ApiOperation("预约上下架")

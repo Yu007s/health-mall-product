@@ -32,6 +32,7 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDetailVO;
 import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.service.activty.ActivityPackageInfoService;
 import com.drstrong.health.product.service.activty.ActivityPackageSkuInfoSevice;
 import com.drstrong.health.product.service.activty.impl.ActivityPackageSkuInfoSeviceImpl;
@@ -276,6 +277,9 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
         ActivityPackageInfoEntity activityPackageInfoEntity = activityPackageInfoService.findPackageByCode(activityPackageCode, null);
         //套餐关联的店铺信息
         StoreEntity storeEntity = storeService.getById(activityPackageInfoEntity.getStoreId());
+        if (storeEntity == null) {
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "错误的店铺类型名称");
+        }
         //套餐sku信息
         List<ActivityPackageSkuInfoEntity> packageSkuInfoEntityList = activityPackageSkuInfoSevice.findPackageByCode(activityPackageCode);
         //组装数据
