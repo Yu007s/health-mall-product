@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
+import com.drstrong.health.product.model.request.product.PackageBussinessQueryListRequest;
 
 import java.util.List;
 import java.util.Set;
@@ -29,5 +30,5 @@ public interface ActivityPackageInfoService extends IService<ActivityPackageInfo
 
     List<ActivityPackageInfoEntity> queryAllByProductType(Long storeId, Integer productType);
 
-    Page<ActivityPackageInfoEntity> pageQueryByStoreIds(String activityPackageName, List<Long> storeIds, Integer pageNo, Integer pageSize);
+    Page<ActivityPackageInfoEntity> pageQueryList(PackageBussinessQueryListRequest packageBussinessQueryListRequest);
 }

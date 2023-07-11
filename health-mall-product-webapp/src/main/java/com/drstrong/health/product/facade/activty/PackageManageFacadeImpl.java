@@ -31,7 +31,7 @@ import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPac
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDetailVO;
-import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
+import com.drstrong.health.product.model.response.product.PackageManageListVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
@@ -95,7 +95,6 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     private StockRemoteProService stockRemoteProService;
 
 
-
     /**
      * 条件分页列表查询
      *
@@ -103,14 +102,14 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
      * @return
      */
     @Override
-    public PageVO<ActivityPackageInfoVO> queryActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
+    public PageVO<PackageManageListVO> queryActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
         log.info("invoke queryActivityPackageManageInfo(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
         Page<ActivityPackageInfoEntity> activityPackageInfoEntityPage = activityPackageInfoService.pageQueryByParam(activityPackageManageQueryRequest);
         if (activityPackageInfoEntityPage == null || CollectionUtil.isEmpty(activityPackageInfoEntityPage.getRecords())) {
             log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
             return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(activityPackageManageQueryRequest.getPageNo()).pageSize(activityPackageManageQueryRequest.getPageSize()).build();
         }
-        List<ActivityPackageInfoVO> activityPackageInfoVOList = buildAgreementActivityPackageInfoVo(activityPackageInfoEntityPage.getRecords());
+        List<PackageManageListVO> activityPackageInfoVOList = buildAgreementActivityPackageInfoVo(activityPackageInfoEntityPage.getRecords());
         return PageVO.newBuilder()
                 .result(activityPackageInfoVOList)
                 .totalCount((int) activityPackageInfoEntityPage.getTotal())
@@ -125,13 +124,13 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
      * @param pageListRecords
      * @return
      */
-    private List<ActivityPackageInfoVO> buildAgreementActivityPackageInfoVo(List<ActivityPackageInfoEntity> pageListRecords) {
+    private List<PackageManageListVO> buildAgreementActivityPackageInfoVo(List<ActivityPackageInfoEntity> pageListRecords) {
         //店铺信息
         Set<Long> storeIds = pageListRecords.stream().map(ActivityPackageInfoEntity::getStoreId).collect(Collectors.toSet());
         Map<Long, String> storeIdNameMap = storeService.listByIds(storeIds).stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
-        List<ActivityPackageInfoVO> activityPackageInfoVOList = new ArrayList<>();
+        List<PackageManageListVO> activityPackageInfoVOList = new ArrayList<>();
         for (ActivityPackageInfoEntity record : pageListRecords) {
-            ActivityPackageInfoVO activityPackageInfoVO = ActivityPackageInfoVO.builder()
+            PackageManageListVO activityPackageInfoVO = PackageManageListVO.builder()
                     .id(record.getId())
                     .activityPackageName(record.getActivityPackageName())
                     .activityPackageCode(record.getActivityPackageCode())
@@ -156,14 +155,14 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
      * @return
      */
     @Override
-    public List<ActivityPackageInfoVO> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
+    public List<PackageManageListVO> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
         log.info("invoke queryActivityPackageManageInfo(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
         List<ActivityPackageInfoEntity> activityPackageInfoEntityList = activityPackageInfoService.listQueryByParam(activityPackageManageQueryRequest);
         if (CollectionUtil.isEmpty(activityPackageInfoEntityList)) {
             log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageInfoEntityList));
             return Lists.newArrayList();
         }
-        List<ActivityPackageInfoVO> activityPackageInfoVOList = buildAgreementActivityPackageInfoVo(activityPackageInfoEntityList);
+        List<PackageManageListVO> activityPackageInfoVOList = buildAgreementActivityPackageInfoVo(activityPackageInfoEntityList);
         return activityPackageInfoVOList;
     }
 

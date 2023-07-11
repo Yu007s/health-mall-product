@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
+import com.drstrong.health.product.model.request.product.PackageBussinessQueryListRequest;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -25,5 +26,5 @@ public interface ActivityPackageInfoMapper extends BaseMapper<ActivityPackageInf
 
     int batchUpdateActivityStatusByCodes(@Param("activityPackageCodeList") Set<String> activityPackageCodeList, @Param("activityStatus") Integer skuState, @Param("operatorId") Long operatorId);
 
-    Page<ActivityPackageInfoEntity> pageQueryByStoreIds(Page<ActivityPackageInfoEntity> entityPage, @Param("activityPackageName") String activityPackageName, @Param("storeIds") List<Long> storeIds, @Param("activityStatus") Integer activityStatus);
+    Page<ActivityPackageInfoEntity> pageQueryList(Page<ActivityPackageInfoEntity> entityPage, @Param("queryParam")  PackageBussinessQueryListRequest queryParam);
 }

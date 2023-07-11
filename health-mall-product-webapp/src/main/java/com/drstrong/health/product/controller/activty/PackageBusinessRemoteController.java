@@ -6,10 +6,11 @@ import com.drstrong.health.product.facade.activty.PackageManageFacade;
 import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
+import com.drstrong.health.product.model.request.product.PackageBussinessQueryListRequest;
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
+import com.drstrong.health.product.model.response.product.PackageBussinessListVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.activty.PackageBussinessRemoteApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +43,13 @@ public class PackageBusinessRemoteController implements PackageBussinessRemoteAp
     }
 
     /**
-     * 医生端套餐列表查询
+     * 医生端套餐条件列表查询
      *
-     * @param activityPackageManageQueryRequest
+     * @param packageBussinessQueryListRequest
      * @return
      */
     @Override
-    public ResultVO<PageVO<ActivityPackageInfoVO>> queryActivityPackageList(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
-        return ResultVO.success(packageBussinessFacade.queryActivityPackageList(activityPackageManageQueryRequest));
+    public ResultVO<PageVO<PackageBussinessListVO>> queryActivityPackageList(PackageBussinessQueryListRequest packageBussinessQueryListRequest) {
+        return ResultVO.success(packageBussinessFacade.queryActivityPackageList(packageBussinessQueryListRequest));
     }
 }

@@ -22,7 +22,7 @@ import java.util.List;
 @Data
 @Builder
 @ApiModel("活动套餐信息")
-public class ActivityPackageInfoVO implements Serializable {
+public class PackageManageListVO implements Serializable {
 
     private static final long serialVersionUID = 1700078824601387245L;
 
@@ -62,11 +62,4 @@ public class ActivityPackageInfoVO implements Serializable {
 
     @ApiModelProperty("创建时间")
     private Date createdAt;
-
-    /**
-     * 常用药标识：0，否；1，是
-     * 仅医生端使用
-     */
-    @ApiModelProperty(value = "常用药标识：0，否；1，是")
-    private Integer boxTag;
 }

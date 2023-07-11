@@ -86,16 +86,16 @@
         </foreach>
     </update>
 
-    <select id="pageQueryByStoreIds" resultMap="BaseResultMap">
+    <select id="pageQueryList" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from pms_activity_package_manage
         where del_flag = 0
         and store_id in
-        <foreach collection="storeIds" item="item" open="(" close=")" separator=",">
+        <foreach collection="queryParam.storeIds" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
-        <if test="activityPackageName != null and activityPackageName != ''">
+        <if test="queryParam.activityPackageName != null and queryParam.activityPackageName != ''">
             and activity_package_name LIKE concat('%',#{queryParam.activityPackageName},'%')
         </if>
         <if test="activityStatus != null">

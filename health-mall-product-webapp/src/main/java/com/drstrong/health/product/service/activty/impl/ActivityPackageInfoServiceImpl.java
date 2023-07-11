@@ -13,6 +13,7 @@ import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
+import com.drstrong.health.product.model.request.product.PackageBussinessQueryListRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.activty.ActivityPackageInfoService;
 import com.google.common.collect.Lists;
@@ -135,14 +136,13 @@ public class ActivityPackageInfoServiceImpl extends ServiceImpl<ActivityPackageI
 
     /**
      * 医生端的列表套餐搜索
-     *
-     * @param activityPackageName
-     * @param storeIds
+     * @param packageBussinessQueryListRequest
      * @return
      */
     @Override
-    public Page<ActivityPackageInfoEntity> pageQueryByStoreIds(String activityPackageName, List<Long> storeIds, Integer pageNo, Integer pageSize) {
-        Page<ActivityPackageInfoEntity> entityPage = new Page<>(pageNo, pageSize);
-        return baseMapper.pageQueryByStoreIds(entityPage, activityPackageName, storeIds, UpOffEnum.UP.getCode());
+    public Page<ActivityPackageInfoEntity> pageQueryList(PackageBussinessQueryListRequest packageBussinessQueryListRequest) {
+        Page<ActivityPackageInfoEntity> entityPage = new Page<>(packageBussinessQueryListRequest.getPageNo(), packageBussinessQueryListRequest.getPageSize());
+        return baseMapper.pageQueryList(entityPage, packageBussinessQueryListRequest);
     }
+
 }

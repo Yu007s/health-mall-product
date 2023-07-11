@@ -7,9 +7,11 @@ import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
+import com.drstrong.health.product.model.request.product.PackageBussinessQueryListRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
+import com.drstrong.health.product.model.response.product.PackageBussinessListVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.service.activty.ActivityPackageInfoService;
@@ -35,7 +37,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class PackageBussinessFacadeImpl implements PackageBussinessFacade{
+public class PackageBussinessFacadeImpl implements PackageBussinessFacade {
 
     @Autowired
     private StoreService storeService;
@@ -45,7 +47,6 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade{
 
     @Autowired
     private ActivityPackageSkuInfoSevice activityPackageSkuInfoSevice;
-
 
     /**
      * 查询套餐详情
@@ -85,25 +86,27 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade{
 
     /**
      * 医生端的列表套餐搜索
-     * @param activityPackageManageQueryRequest
+     *
+     * @param packageBussinessQueryListRequest
      * @return
      */
     @Override
-    public PageVO<ActivityPackageInfoVO> queryActivityPackageList(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
-        log.info("invoke queryActivityPackageList(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
+    public PageVO<PackageBussinessListVO> queryActivityPackageList(PackageBussinessQueryListRequest packageBussinessQueryListRequest) {
+        log.info("invoke queryActivityPackageList(),param:{}", JSONUtil.toJsonStr(packageBussinessQueryListRequest));
         //店铺信息
-        List<StoreEntity> storeEntityList = storeService.getStoreByAgencyIds(Sets.newHashSet(Long.valueOf(activityPackageManageQueryRequest.getAgencyId())));
+        List<StoreEntity> storeEntityList = storeService.getStoreByAgencyIds(Sets.newHashSet(Long.valueOf(packageBussinessQueryListRequest.getAgencyId())));
         List<Long> storeIds = storeEntityList.stream().map(StoreEntity::getId).collect(Collectors.toList());
         Map<Long, String> storeIdNameMap = storeEntityList.stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
-
-        Page<ActivityPackageInfoEntity> activityPackageInfoEntityPage = activityPackageInfoService.pageQueryByStoreIds(activityPackageManageQueryRequest.getActivityPackageName(), storeIds,activityPackageManageQueryRequest.getPageNo(),activityPackageManageQueryRequest.getPageSize());
+        packageBussinessQueryListRequest.setStoreIds(storeIds);
+        packageBussinessQueryListRequest.setActivityStatus(UpOffEnum.UP.getCode());
+        Page<ActivityPackageInfoEntity> activityPackageInfoEntityPage = activityPackageInfoService.pageQueryList(packageBussinessQueryListRequest);
         if (activityPackageInfoEntityPage == null || CollectionUtil.isEmpty(activityPackageInfoEntityPage.getRecords())) {
-            log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
-            return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(activityPackageManageQueryRequest.getPageNo()).pageSize(activityPackageManageQueryRequest.getPageSize()).build();
+            log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(packageBussinessQueryListRequest));
+            return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(packageBussinessQueryListRequest.getPageNo()).pageSize(packageBussinessQueryListRequest.getPageSize()).build();
         }
-        List<ActivityPackageInfoVO> activityPackageInfoVOList = new ArrayList<>();
+        List<PackageBussinessListVO> activityPackageInfoVOList = new ArrayList<>();
         for (ActivityPackageInfoEntity record : activityPackageInfoEntityPage.getRecords()) {
-            ActivityPackageInfoVO activityPackageInfoVO = ActivityPackageInfoVO.builder()
+            PackageBussinessListVO activityPackageInfoVO = PackageBussinessListVO.builder()
                     .id(record.getId())
                     .activityPackageName(record.getActivityPackageName())
                     .activityPackageCode(record.getActivityPackageCode())
@@ -121,8 +124,8 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade{
         return PageVO.newBuilder()
                 .result(activityPackageInfoVOList)
                 .totalCount((int) activityPackageInfoEntityPage.getTotal())
-                .pageNo(activityPackageManageQueryRequest.getPageNo())
-                .pageSize(activityPackageManageQueryRequest.getPageSize())
+                .pageNo(packageBussinessQueryListRequest.getPageNo())
+                .pageSize(packageBussinessQueryListRequest.getPageSize())
                 .build();
     }
 }

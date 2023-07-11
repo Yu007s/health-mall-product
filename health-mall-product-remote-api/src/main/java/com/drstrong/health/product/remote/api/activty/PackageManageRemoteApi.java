@@ -10,7 +10,7 @@ import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRe
 import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
+import com.drstrong.health.product.model.response.product.PackageManageListVO;
 import com.drstrong.health.product.model.response.product.v3.AgreementSkuInfoVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.Api;
@@ -31,11 +31,11 @@ public interface PackageManageRemoteApi {
 
     @ApiOperation("套餐管理页面查询")
     @PostMapping("/page/query")
-    ResultVO<PageVO<ActivityPackageInfoVO>> pageQuerySkuManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
+    ResultVO<PageVO<PackageManageListVO>> pageQuerySkuManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 
     @ApiOperation("管理页面查询所有数据,导出需要")
     @PostMapping("/query/all")
-    ResultVO<List<ActivityPackageInfoVO>> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
+    ResultVO<List<PackageManageListVO>> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 
     @ApiOperation("保存或更新店铺的套餐信息")
     @PostMapping("/store/save-or-update/package")

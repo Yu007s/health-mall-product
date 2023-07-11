@@ -8,7 +8,7 @@ import com.drstrong.health.product.model.request.product.ActivityPackageManageQu
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
+import com.drstrong.health.product.model.response.product.PackageManageListVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.activty.PackageManageRemoteApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class PackageManageRemoteController implements PackageManageRemoteApi {
      * @return
      */
     @Override
-    public ResultVO<PageVO<ActivityPackageInfoVO>> pageQuerySkuManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
+    public ResultVO<PageVO<PackageManageListVO>> pageQuerySkuManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
         return ResultVO.success(packageManageFacade.queryActivityPackageManageInfo(activityPackageManageQueryRequest));
     }
 
@@ -47,7 +47,7 @@ public class PackageManageRemoteController implements PackageManageRemoteApi {
      * @return
      */
     @Override
-    public ResultVO<List<ActivityPackageInfoVO>> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
+    public ResultVO<List<PackageManageListVO>> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
         return ResultVO.success(packageManageFacade.listActivityPackageManageInfo(activityPackageManageQueryRequest));
     }
 

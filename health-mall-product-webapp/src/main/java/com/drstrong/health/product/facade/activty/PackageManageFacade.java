@@ -6,7 +6,7 @@ import com.drstrong.health.product.model.request.product.ActivityPackageManageQu
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
+import com.drstrong.health.product.model.response.product.PackageManageListVO;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ import java.util.List;
  */
 public interface PackageManageFacade {
 
-    PageVO<ActivityPackageInfoVO> queryActivityPackageManageInfo(ActivityPackageManageQueryRequest productManageQueryRequest);
+    PageVO<PackageManageListVO> queryActivityPackageManageInfo(ActivityPackageManageQueryRequest productManageQueryRequest);
 
-    List<ActivityPackageInfoVO> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
+    List<PackageManageListVO> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 
     void addLocksaveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest, String skuCode);
 
