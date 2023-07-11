@@ -239,11 +239,11 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
      * @return
      */
     @Override
-    public List<StoreSkuInfoEntity> queryStoreSkuInfoByCategoryAndCityId(Long categoryId, Integer cityId, List<Long> storeIds) {
+    public List<StoreSkuInfoEntity> queryStoreSkuInfoByCategoryAndCityId(String key, Long categoryId, Integer cityId, List<Long> storeIds) {
         if (categoryId == null) {
             return Lists.newArrayList();
         }
-        return baseMapper.queryStoreSkuInfoByCategoryAndType(UpOffEnum.UP.getCode(), categoryId,cityId,storeIds);
+        return baseMapper.queryStoreSkuInfoByCategoryAndType(key, UpOffEnum.UP.getCode(), categoryId, cityId, storeIds);
     }
 
 }

@@ -107,5 +107,5 @@ public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
 
 	List<StoreSkuInfoEntity> queryStoreSkuInfoByCategory(Long categoryId);
 
-	List<StoreSkuInfoEntity> queryStoreSkuInfoByCategoryAndCityId(Long categoryId, Integer cityId, List<Long> storeIds);
+	List<StoreSkuInfoEntity> queryStoreSkuInfoByCategoryAndCityId(String key, Long categoryId, Integer cityId, List<Long> storeIds);
 }

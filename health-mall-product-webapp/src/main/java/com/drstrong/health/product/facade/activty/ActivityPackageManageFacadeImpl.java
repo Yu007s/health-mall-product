@@ -14,6 +14,7 @@ import com.drstrong.health.product.facade.sku.SkuManageFacade;
 import com.drstrong.health.product.facade.sku.SkuScheduledConfigFacade;
 import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
+import com.drstrong.health.product.model.dto.stock.SkuCanStockDTO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
 import com.drstrong.health.product.model.entity.sku.SkuScheduledConfigEntity;
@@ -33,6 +34,7 @@ import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDe
 import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultStatus;
+import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.service.activty.ActivityPackageInfoService;
 import com.drstrong.health.product.service.activty.ActivityPackageSkuInfoSevice;
 import com.drstrong.health.product.service.activty.impl.ActivityPackageSkuInfoSeviceImpl;
@@ -88,6 +90,9 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
 
     @Autowired
     private SkuScheduledConfigFacade skuScheduledConfigFacade;
+
+    @Autowired
+    private StockRemoteProService stockRemoteProService;
 
     /**
      * 医生端的列表套餐搜索
@@ -233,7 +238,14 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
             log.error("目前套餐药品种类大于支持的药品种类数量。");
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE);
         }
-        //sku库存校验 TODO
+        //sku库存校验
+        String skuCode = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0).getSkuCode();
+        Integer amount = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0).getAmount();
+        Map<String, List<SkuCanStockDTO>> stockToMap = stockRemoteProService.getStockToMap(Lists.newArrayList(skuCode));
+        if(CollectionUtils.isEmpty(stockToMap.get(skuCode))||stockToMap.get(skuCode).get(0).getAvailableQuantity()<amount){
+            log.error("套餐内的药品库存不足。");
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_LOCK_INWENTORY);
+        }
 
         ActivityPackageSkuRequest activityPackageSkuRequest = activityPackageSkuList.get(0);
         LocalDateTime dateTime = LocalDateTime.now();

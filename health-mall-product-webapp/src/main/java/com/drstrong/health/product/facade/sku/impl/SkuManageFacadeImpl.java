@@ -421,13 +421,11 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 
 	@Override
 	public List<WesternProductInfoVO> searchWesternList(SearchWesternRequestParamBO searchWesternRequestParamBO) {
-		//已上架/非禁售/高于阈值  StockRemoteProService.getStockToMap
-
 		//店铺信息sku信息
 		List<StoreEntity> storeEntityList = storeService.getStoreByAgencyIds(Sets.newHashSet(Long.valueOf(searchWesternRequestParamBO.getAgencyId())));
 		List<Long> storeIds = storeEntityList.stream().map(StoreEntity::getId).collect(Collectors.toList());
 		Map<Long, String> storeIdNameMap = storeEntityList.stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
-		List<StoreSkuInfoEntity> storeSkuInfoEntityList = storeSkuInfoService.queryStoreSkuInfoByCategoryAndCityId(searchWesternRequestParamBO.getCategoryId(), searchWesternRequestParamBO.getCityId(), storeIds);
+		List<StoreSkuInfoEntity> storeSkuInfoEntityList = storeSkuInfoService.queryStoreSkuInfoByCategoryAndCityId(searchWesternRequestParamBO.getKey(), searchWesternRequestParamBO.getCategoryId(), searchWesternRequestParamBO.getCityId(), storeIds);
 		if (CollectionUtils.isEmpty(storeSkuInfoEntityList)) {
 			return null;
 		}
@@ -443,6 +441,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 		//规格信息
 		List<String> skuMedicineCodeList = storeSkuInfoEntities.stream().map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
 		Map<String, String> specificationsEntityListMap = westernMedicineSpecificationsService.queryByCodeList(skuMedicineCodeList).stream().collect(Collectors.toMap(WesternMedicineSpecificationsEntity::getSpecCode, WesternMedicineSpecificationsEntity::getSpecImageInfo, (v1, v2) -> v1));
+
 		//组装返回信息
 		List<WesternProductInfoVO> result = new ArrayList<>();
 		for (StoreSkuInfoEntity storeSkuInfoEntity : storeSkuInfoEntities) {
