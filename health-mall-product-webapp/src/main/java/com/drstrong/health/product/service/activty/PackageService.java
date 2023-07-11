@@ -14,7 +14,7 @@ import java.util.Set;
  * huangpeng
  * 2023/7/7 11:50
  */
-public interface ActivityPackageInfoService extends IService<ActivityPackageInfoEntity> {
+public interface PackageService extends IService<ActivityPackageInfoEntity> {
 
     ActivityPackageInfoEntity findPackageByCode(String activityPackageCode, Integer activityStatus);
 

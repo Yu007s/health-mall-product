@@ -14,8 +14,8 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.PackageBussinessListVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultStatus;
-import com.drstrong.health.product.service.activty.ActivityPackageInfoService;
 import com.drstrong.health.product.service.activty.ActivityPackageSkuInfoSevice;
+import com.drstrong.health.product.service.activty.PackageService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.google.common.collect.Lists;
@@ -43,7 +43,7 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade {
     private StoreService storeService;
 
     @Autowired
-    private ActivityPackageInfoService activityPackageInfoService;
+    private PackageService packageService;
 
     @Autowired
     private ActivityPackageSkuInfoSevice activityPackageSkuInfoSevice;
@@ -57,7 +57,7 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade {
     @Override
     public ActivityPackageDetailDTO queryDetailByCode(String activityPackageCode) {
         //根据activityPackageCode查询套餐
-        ActivityPackageInfoEntity activityPackageInfoEntity = activityPackageInfoService.findPackageByCode(activityPackageCode, null);
+        ActivityPackageInfoEntity activityPackageInfoEntity = packageService.findPackageByCode(activityPackageCode, null);
         //套餐关联的店铺信息
         StoreEntity storeEntity = storeService.getById(activityPackageInfoEntity.getStoreId());
         if (storeEntity == null) {
@@ -99,7 +99,7 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade {
         Map<Long, String> storeIdNameMap = storeEntityList.stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
         packageBussinessQueryListRequest.setStoreIds(storeIds);
         packageBussinessQueryListRequest.setActivityStatus(UpOffEnum.UP.getCode());
-        Page<ActivityPackageInfoEntity> activityPackageInfoEntityPage = activityPackageInfoService.pageQueryList(packageBussinessQueryListRequest);
+        Page<ActivityPackageInfoEntity> activityPackageInfoEntityPage = packageService.pageQueryList(packageBussinessQueryListRequest);
         if (activityPackageInfoEntityPage == null || CollectionUtil.isEmpty(activityPackageInfoEntityPage.getRecords())) {
             log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(packageBussinessQueryListRequest));
             return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(packageBussinessQueryListRequest.getPageNo()).pageSize(packageBussinessQueryListRequest.getPageSize()).build();

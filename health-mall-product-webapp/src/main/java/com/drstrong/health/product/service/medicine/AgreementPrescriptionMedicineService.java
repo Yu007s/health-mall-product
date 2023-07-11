@@ -10,6 +10,8 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionInfoVO;
 import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionSimpleInfoVO;
 
+import java.util.List;
+
 /**
  * <p>
  * 协定方(预制) 服务类
@@ -60,4 +62,6 @@ public interface AgreementPrescriptionMedicineService extends IService<Agreement
      * @date 2023/6/20 19:13
      */
     AgreementPrescriptionMedicineEntity queryByCode(String medicineCode);
+
+    List<AgreementPrescriptionMedicineEntity> queryByCodeList(List<String> medicineCode);
 }

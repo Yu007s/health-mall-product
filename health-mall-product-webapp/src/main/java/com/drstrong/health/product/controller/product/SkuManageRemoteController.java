@@ -2,8 +2,8 @@ package com.drstrong.health.product.controller.product;
 
 import com.drstrong.health.product.enums.ScheduledStatusEnum;
 import com.drstrong.health.product.facade.sku.SkuManageFacade;
+import com.drstrong.health.product.model.dto.product.ProductListInfoVO;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
-import com.drstrong.health.product.model.dto.product.WesternProductInfoVO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.SearchWesternRequestParamBO;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
@@ -65,8 +65,8 @@ public class SkuManageRemoteController implements SkuManageRemoteApi {
 	}
 
 	@Override
-	public ResultVO<List<WesternProductInfoVO>> searchWesternList(SearchWesternRequestParamBO searchWesternRequestParamBO) {
-		return ResultVO.success(skuManageFacade.searchWesternList(searchWesternRequestParamBO));
+	public ResultVO<List<ProductListInfoVO>> searchProductList(SearchWesternRequestParamBO searchWesternRequestParamBO) {
+		return ResultVO.success(skuManageFacade.searchProductList(searchWesternRequestParamBO));
 	}
 
 }

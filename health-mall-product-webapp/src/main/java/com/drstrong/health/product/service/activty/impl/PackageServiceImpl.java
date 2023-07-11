@@ -15,7 +15,7 @@ import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
 import com.drstrong.health.product.model.request.product.PackageBussinessQueryListRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
-import com.drstrong.health.product.service.activty.ActivityPackageInfoService;
+import com.drstrong.health.product.service.activty.PackageService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ import java.util.Set;
  */
 @Slf4j
 @Service
-public class ActivityPackageInfoServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, ActivityPackageInfoEntity> implements ActivityPackageInfoService {
+public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, ActivityPackageInfoEntity> implements PackageService {
 
     /**
      * 套餐编码查询套餐信息

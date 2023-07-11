@@ -1,7 +1,7 @@
 package com.drstrong.health.product.remote.api.product;
 
+import com.drstrong.health.product.model.dto.product.ProductListInfoVO;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
-import com.drstrong.health.product.model.dto.product.WesternProductInfoVO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.SearchWesternRequestParamBO;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
@@ -50,6 +50,6 @@ public interface SkuManageRemoteApi {
 	ResultVO<Void> scheduledSkuUpDown(@RequestBody @Valid ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
 
 	@ApiOperation("空中药房的药品列表搜索")
-	@PostMapping("/query/westernList")
-	ResultVO<List<WesternProductInfoVO>> searchWesternList(@RequestBody @Valid SearchWesternRequestParamBO searchWesternRequestParamBO);
+	@PostMapping("/query/productList")
+	ResultVO<List<ProductListInfoVO>> searchProductList(@RequestBody @Valid SearchWesternRequestParamBO searchWesternRequestParamBO);
 }

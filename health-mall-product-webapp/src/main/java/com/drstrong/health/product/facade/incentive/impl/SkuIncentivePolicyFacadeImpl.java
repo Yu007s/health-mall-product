@@ -28,7 +28,7 @@ import com.drstrong.health.product.model.response.incentive.excel.SkuIncentivePo
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.store.v3.SupplierInfoVO;
 import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
-import com.drstrong.health.product.service.activty.ActivityPackageInfoService;
+import com.drstrong.health.product.service.activty.PackageService;
 import com.drstrong.health.product.service.incentive.IncentivePolicyConfigService;
 import com.drstrong.health.product.service.incentive.SkuIncentivePolicyService;
 import com.drstrong.health.product.service.label.LabelInfoService;
@@ -85,7 +85,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	LabelInfoService labelInfoService;
 
 	@Autowired
-	private ActivityPackageInfoService activityPackageInfoService;
+	private PackageService packageService;
 
 	/**
 	 * 保存店铺下的收益名称
@@ -148,7 +148,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	@Override
 	public void saveOrUpdatePackagePolicy(SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest) {
 		// 校验套餐
-		ActivityPackageInfoEntity packageByCode = activityPackageInfoService.findPackageByCode(saveOrUpdateSkuPolicyRequest.getSkuCode(), null);
+		ActivityPackageInfoEntity packageByCode = packageService.findPackageByCode(saveOrUpdateSkuPolicyRequest.getSkuCode(), null);
 		storeSkuInfoService.checkSkuExistByCode(saveOrUpdateSkuPolicyRequest.getSkuCode(), null);
 		// 1.判断是保存还是更新激励政策
 		SkuIncentivePolicyEntity skuIncentivePolicyEntity = skuIncentivePolicyService.queryBySkuCode(saveOrUpdateSkuPolicyRequest.getSkuCode());
@@ -196,7 +196,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	@Override
 	public PackageIncentivePolicyDetailVO queryPolicyDetailByPackageCode(String packageCode) {
 		//查询套餐是否存在
-		ActivityPackageInfoEntity packageInfoEntity = activityPackageInfoService.findPackageByCode(packageCode, null);
+		ActivityPackageInfoEntity packageInfoEntity = packageService.findPackageByCode(packageCode, null);
 		//组装返回值
 		List<PackageIncentivePolicyDetailVO> packageIncentivePolicyDetailVOS = buildPackageIncentivePolicyDetailVO(Lists.newArrayList(packageInfoEntity), packageInfoEntity.getProductType(), null, null);
 		return CollectionUtil.isEmpty(packageIncentivePolicyDetailVOS) ? null : packageIncentivePolicyDetailVOS.get(0);
@@ -232,7 +232,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	@Override
 	public PackageIncentivePolicyDetailExcelVO queryPackagePolicyDetailToExcelVO(Long storeId, Integer productType) {
 		//获取店铺下所有的套餐信息
-		List<ActivityPackageInfoEntity> activityPackageInfoEntityList = activityPackageInfoService.queryAllByProductType(storeId, productType);
+		List<ActivityPackageInfoEntity> activityPackageInfoEntityList = packageService.queryAllByProductType(storeId, productType);
 		if (CollectionUtils.isEmpty(activityPackageInfoEntityList)) {
 			log.info("没有查询到套餐信息,不处理");
 			return PackageIncentivePolicyDetailExcelVO.builder()

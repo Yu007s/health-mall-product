@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * huangpeng
@@ -18,7 +19,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WesternProductInfoVO implements Serializable {
+public class ProductListInfoVO implements Serializable {
 
     private static final long serialVersionUID = 3791913589559446114L;
 
@@ -56,7 +57,7 @@ public class WesternProductInfoVO implements Serializable {
      * 商品封面图片
      */
     @ApiModelProperty(value = "商品封面图片")
-    private String icon;
+    private String imageInfo;
 
     /**
      * 售价

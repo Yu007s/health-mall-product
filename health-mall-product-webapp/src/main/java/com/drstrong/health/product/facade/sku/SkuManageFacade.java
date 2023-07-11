@@ -1,7 +1,7 @@
 package com.drstrong.health.product.facade.sku;
 
+import com.drstrong.health.product.model.dto.product.ProductListInfoVO;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
-import com.drstrong.health.product.model.dto.product.WesternProductInfoVO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.SearchWesternRequestParamBO;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
@@ -75,5 +75,5 @@ public interface SkuManageFacade {
 	 */
 	void scheduledSkuUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
 
-	List<WesternProductInfoVO>  searchWesternList(SearchWesternRequestParamBO searchWesternRequestParamBO);
+	List<ProductListInfoVO> searchProductList(SearchWesternRequestParamBO searchWesternRequestParamBO);
 }

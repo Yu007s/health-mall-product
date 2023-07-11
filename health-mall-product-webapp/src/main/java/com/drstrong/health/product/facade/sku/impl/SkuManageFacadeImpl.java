@@ -2,10 +2,12 @@ package com.drstrong.health.product.facade.sku.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.product.constants.OperationLogConstant;
@@ -17,12 +19,13 @@ import com.drstrong.health.product.model.dto.area.AreaDTO;
 import com.drstrong.health.product.model.dto.category.CategoryDTO;
 import com.drstrong.health.product.model.dto.label.LabelDTO;
 import com.drstrong.health.product.model.dto.medicine.MedicineWarehouseBaseDTO;
+import com.drstrong.health.product.model.dto.product.ProductListInfoVO;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.dto.product.SupplierInfoDTO;
-import com.drstrong.health.product.model.dto.product.WesternProductInfoVO;
 import com.drstrong.health.product.model.dto.stock.SkuCanStockDTO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.label.LabelInfoEntity;
+import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
@@ -43,6 +46,7 @@ import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
 import com.drstrong.health.product.service.category.v3.CategoryService;
 import com.drstrong.health.product.service.label.LabelInfoService;
+import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicineService;
 import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import com.drstrong.health.product.service.store.StoreService;
@@ -51,9 +55,11 @@ import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.drstrong.health.ware.model.response.SkuStockResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.klock.annotation.Dlock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,6 +113,9 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 
 	@Resource
 	private WesternMedicineSpecificationsService westernMedicineSpecificationsService;
+
+	@Autowired
+	private AgreementPrescriptionMedicineService agreementPrescriptionMedicineService;
 
     /**
      * 添加分布式锁，确保更新或者修改sku时不重复添加
@@ -420,7 +429,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 	}
 
 	@Override
-	public List<WesternProductInfoVO> searchWesternList(SearchWesternRequestParamBO searchWesternRequestParamBO) {
+	public List<ProductListInfoVO> searchProductList(SearchWesternRequestParamBO searchWesternRequestParamBO) {
 		//店铺信息sku信息
 		List<StoreEntity> storeEntityList = storeService.getStoreByAgencyIds(Sets.newHashSet(Long.valueOf(searchWesternRequestParamBO.getAgencyId())));
 		List<Long> storeIds = storeEntityList.stream().map(StoreEntity::getId).collect(Collectors.toList());
@@ -438,23 +447,44 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 			return null;
 		}
 
-		//规格信息
-		List<String> skuMedicineCodeList = storeSkuInfoEntities.stream().map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
-		Map<String, String> specificationsEntityListMap = westernMedicineSpecificationsService.queryByCodeList(skuMedicineCodeList).stream().collect(Collectors.toMap(WesternMedicineSpecificationsEntity::getSpecCode, WesternMedicineSpecificationsEntity::getSpecImageInfo, (v1, v2) -> v1));
+		//西药规格信息
+		List<String> skuMedicineCodeList = storeSkuInfoEntities.stream()
+				.filter(StoreSkuInfoEntity -> ProductTypeEnum.MEDICINE.equals(StoreSkuInfoEntity.getSkuType()))
+				.map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
+		Map<String, String> medicineSpecificationsEntityListMap = new HashMap<>();
+		if (CollectionUtil.isNotEmpty(skuMedicineCodeList)) {
+			medicineSpecificationsEntityListMap = westernMedicineSpecificationsService.queryByCodeList(skuMedicineCodeList).stream()
+					.collect(Collectors.toMap(WesternMedicineSpecificationsEntity::getSpecCode, WesternMedicineSpecificationsEntity::getSpecImageInfo, (v1, v2) -> v1));
+		}
+
+		//协定方规格信息
+		List<String> skuAgreementCodeList = storeSkuInfoEntities.stream()
+				.filter(StoreSkuInfoEntity -> ProductTypeEnum.AGREEMENT.equals(StoreSkuInfoEntity.getSkuType()))
+				.map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
+		Map<String, String> agreementSpecificationsEntityListMap = new HashMap<>();
+		if (CollectionUtil.isNotEmpty(skuAgreementCodeList)) {
+			agreementSpecificationsEntityListMap = agreementPrescriptionMedicineService.queryByCodeList(skuAgreementCodeList).stream().collect(toMap(AgreementPrescriptionMedicineEntity::getMedicineCode, AgreementPrescriptionMedicineEntity::getImageInfo, (v1, v2) -> v1));
+		}
 
 		//组装返回信息
-		List<WesternProductInfoVO> result = new ArrayList<>();
+		List<ProductListInfoVO> result = new ArrayList<>();
 		for (StoreSkuInfoEntity storeSkuInfoEntity : storeSkuInfoEntities) {
-			WesternProductInfoVO westernProductInfoVO = WesternProductInfoVO.builder()
+			String imageInfo = null;
+			if (ProductTypeEnum.MEDICINE.getCode().equals(storeSkuInfoEntity.getSkuType()) && MapUtil.isNotEmpty(medicineSpecificationsEntityListMap)) {
+				imageInfo = medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode());
+			} else if (ProductTypeEnum.AGREEMENT.getCode().equals(storeSkuInfoEntity.getSkuType()) && MapUtil.isNotEmpty(medicineSpecificationsEntityListMap)) {
+				imageInfo = agreementSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode());
+			}
+			ProductListInfoVO productListInfoVO = ProductListInfoVO.builder()
 					.skuName(storeSkuInfoEntity.getSkuName())
 					.skuCode(storeSkuInfoEntity.getSkuCode())
 					.skuType(storeSkuInfoEntity.getSkuType())
 					.storeId(storeSkuInfoEntity.getStoreId())
 					.storeName(storeIdNameMap.get(storeSkuInfoEntity.getStoreId()))
 					.salePrice(storeSkuInfoEntity.getPrice().toString())
-					.icon(specificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()))
+					.imageInfo(imageInfo)
 					.build();
-			result.add(westernProductInfoVO);
+			result.add(productListInfoVO);
 		}
 		return result;
 	}

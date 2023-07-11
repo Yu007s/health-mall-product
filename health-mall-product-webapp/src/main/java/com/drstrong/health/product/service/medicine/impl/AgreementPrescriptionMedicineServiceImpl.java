@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -139,5 +140,18 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
                 .eq(AgreementPrescriptionMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(AgreementPrescriptionMedicineEntity::getMedicineCode, medicineCode);
         return baseMapper.selectOne(queryWrapper);
+    }
+
+    /**
+     * 根据药材codes查询
+     * @param medicineCode
+     * @return
+     */
+    @Override
+    public List<AgreementPrescriptionMedicineEntity> queryByCodeList(List<String> medicineCode) {
+        LambdaQueryWrapper<AgreementPrescriptionMedicineEntity> queryWrapper = new LambdaQueryWrapper<AgreementPrescriptionMedicineEntity>()
+                .eq(AgreementPrescriptionMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(AgreementPrescriptionMedicineEntity::getMedicineCode,medicineCode);
+        return baseMapper.selectList(queryWrapper);
     }
 }

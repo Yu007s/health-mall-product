@@ -35,8 +35,8 @@ import com.drstrong.health.product.model.response.product.PackageManageListVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
-import com.drstrong.health.product.service.activty.ActivityPackageInfoService;
 import com.drstrong.health.product.service.activty.ActivityPackageSkuInfoSevice;
+import com.drstrong.health.product.service.activty.PackageService;
 import com.drstrong.health.product.service.activty.impl.ActivityPackageSkuInfoSeviceImpl;
 import com.drstrong.health.product.service.sku.SkuScheduledConfigService;
 import com.drstrong.health.product.service.store.StoreService;
@@ -74,7 +74,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     private StoreService storeService;
 
     @Autowired
-    private ActivityPackageInfoService activityPackageInfoService;
+    private PackageService packageService;
 
     @Autowired
     private ActivityPackageSkuInfoSevice activityPackageSkuInfoSevice;
@@ -104,7 +104,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     @Override
     public PageVO<PackageManageListVO> queryActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
         log.info("invoke queryActivityPackageManageInfo(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
-        Page<ActivityPackageInfoEntity> activityPackageInfoEntityPage = activityPackageInfoService.pageQueryByParam(activityPackageManageQueryRequest);
+        Page<ActivityPackageInfoEntity> activityPackageInfoEntityPage = packageService.pageQueryByParam(activityPackageManageQueryRequest);
         if (activityPackageInfoEntityPage == null || CollectionUtil.isEmpty(activityPackageInfoEntityPage.getRecords())) {
             log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
             return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(activityPackageManageQueryRequest.getPageNo()).pageSize(activityPackageManageQueryRequest.getPageSize()).build();
@@ -157,7 +157,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     @Override
     public List<PackageManageListVO> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
         log.info("invoke queryActivityPackageManageInfo(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
-        List<ActivityPackageInfoEntity> activityPackageInfoEntityList = activityPackageInfoService.listQueryByParam(activityPackageManageQueryRequest);
+        List<ActivityPackageInfoEntity> activityPackageInfoEntityList = packageService.listQueryByParam(activityPackageManageQueryRequest);
         if (CollectionUtil.isEmpty(activityPackageInfoEntityList)) {
             log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageInfoEntityList));
             return Lists.newArrayList();
@@ -239,7 +239,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             LambdaQueryWrapper<ActivityPackageInfoEntity> updateActivityPackageWrapper = new LambdaQueryWrapper<ActivityPackageInfoEntity>()
                     .eq(ActivityPackageInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                     .eq(ActivityPackageInfoEntity::getActivityPackageCode, packageInfoEntity.getActivityPackageCode());
-            activityPackageInfoService.update(packageInfoEntity, updateActivityPackageWrapper);
+            packageService.update(packageInfoEntity, updateActivityPackageWrapper);
             //套餐sku更新
             activityPackageSkuInfoEntity.setChangedAt(dateTime);
             activityPackageSkuInfoEntity.setChangedBy(saveOrUpdateActivityPackageRequest.getOperatorId());
@@ -252,7 +252,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             packageInfoEntity.setActivityPackageCode(createSkuCode(saveOrUpdateActivityPackageRequest.getStoreId()));
             packageInfoEntity.setCreatedAt(dateTime);
             packageInfoEntity.setCreatedBy(saveOrUpdateActivityPackageRequest.getOperatorId());
-            activityPackageInfoService.save(packageInfoEntity);
+            packageService.save(packageInfoEntity);
             //新增套餐sku
             activityPackageSkuInfoEntity.setActivityPackageCode(packageInfoEntity.getActivityPackageCode());
             activityPackageSkuInfoEntity.setCreatedAt(dateTime);
@@ -264,7 +264,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 OperationLogConstant.SAVE_UPDATE_SKU, saveOrUpdateActivityPackageRequest.getOperatorId(), saveOrUpdateActivityPackageRequest.getOperatorName(),
                 OperateTypeEnum.CMS.getCode(), JSONUtil.toJsonStr(packageInfoEntity));
         operationLog.setBusinessId(packageInfoEntity.getActivityPackageCode());
-        ActivityPackageInfoEntity afterEntity = activityPackageInfoService.findPackageByCode(packageInfoEntity.getActivityPackageCode(), null);
+        ActivityPackageInfoEntity afterEntity = packageService.findPackageByCode(packageInfoEntity.getActivityPackageCode(), null);
         operationLog.setChangeAfterData(JSONUtil.toJsonStr(afterEntity));
         operationLogSendUtil.sendOperationLog(operationLog);
     }
@@ -289,7 +289,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     @Override
     public ActivityPackageDetailDTO queryDetailByCode(String activityPackageCode) {
         //根据activityPackageCode查询套餐
-        ActivityPackageInfoEntity activityPackageInfoEntity = activityPackageInfoService.findPackageByCode(activityPackageCode, null);
+        ActivityPackageInfoEntity activityPackageInfoEntity = packageService.findPackageByCode(activityPackageCode, null);
         //套餐关联的店铺信息
         StoreEntity storeEntity = storeService.getById(activityPackageInfoEntity.getStoreId());
         if (storeEntity == null) {
@@ -324,11 +324,11 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     @Override
     public void updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest) {
         log.info("invoke updateActivityPackageStatus param:{}", JSONUtil.toJsonStr(updateSkuStateRequest));
-        List<ActivityPackageInfoEntity> activityPackageInfoEntityList = activityPackageInfoService.queryByActivityPackageCode(updateSkuStateRequest.getSkuCodeList());
+        List<ActivityPackageInfoEntity> activityPackageInfoEntityList = packageService.queryByActivityPackageCode(updateSkuStateRequest.getSkuCodeList());
         //信息校验
         checkActivityPackageStatus(updateSkuStateRequest, activityPackageInfoEntityList);
         //修改状态
-        activityPackageInfoService.batchUpdateActivityStatusByCodes(updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getSkuState(), updateSkuStateRequest.getOperatorId());
+        packageService.batchUpdateActivityStatusByCodes(updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getSkuState(), updateSkuStateRequest.getOperatorId());
         // 操作日志
         sendActivityStatusUpdateLog(activityPackageInfoEntityList, updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getOperatorId(), updateSkuStateRequest.getOperatorName());
         //定时上下架处理
@@ -348,7 +348,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_ERROR);
         }
         //校验套餐是否存在
-        ActivityPackageInfoEntity packageInfoEntity = activityPackageInfoService.findPackageByCode(scheduledSkuUpDownRequest.getSkuCode(), null);
+        ActivityPackageInfoEntity packageInfoEntity = packageService.findPackageByCode(scheduledSkuUpDownRequest.getSkuCode(), null);
         //状态校验
         if (Objects.equals(UpOffEnum.UP.getCode(), packageInfoEntity.getActivityStatus()) && Objects.equals(ScheduledSkuUpDownRequest.SCHEDULED_UP, scheduledSkuUpDownRequest.getScheduledType())) {
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_IS_UP_ERROR);
@@ -371,7 +371,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
      * @param operatorName
      */
     private void sendActivityStatusUpdateLog(List<ActivityPackageInfoEntity> beforeDataList, Set<String> skuCodeList, Long operatorId, String operatorName) {
-        Map<String, ActivityPackageInfoEntity> skuCodeInfoMap = activityPackageInfoService.queryByActivityPackageCode(skuCodeList)
+        Map<String, ActivityPackageInfoEntity> skuCodeInfoMap = packageService.queryByActivityPackageCode(skuCodeList)
                 .stream().collect(toMap(ActivityPackageInfoEntity::getActivityPackageCode, dto -> dto, (v1, v2) -> v1));
         //循环发送操作日志
         beforeDataList.forEach(activityPackageInfoEntity -> {
