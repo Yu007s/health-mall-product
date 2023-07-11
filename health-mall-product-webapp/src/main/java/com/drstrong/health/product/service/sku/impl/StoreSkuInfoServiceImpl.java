@@ -232,4 +232,18 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
         return baseMapper.queryStoreSkuInfoByCategory(UpOffEnum.UP.getCode(), categoryId);
     }
 
+    /**
+     * 根据sku类型和分类获取列表
+     *
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<StoreSkuInfoEntity> queryStoreSkuInfoByCategoryAndCityId(Long categoryId, Integer cityId, List<Long> storeIds) {
+        if (categoryId == null) {
+            return Lists.newArrayList();
+        }
+        return baseMapper.queryStoreSkuInfoByCategoryAndType(UpOffEnum.UP.getCode(), categoryId,cityId,storeIds);
+    }
+
 }

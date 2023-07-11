@@ -11,6 +11,8 @@ import com.drstrong.health.product.model.response.medicine.WesternMedicineSimple
 import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecInfoVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecVO;
 
+import java.util.List;
+
 /**
  * <p>
  * 西药药品规格 服务类
@@ -68,4 +70,12 @@ public interface WesternMedicineSpecificationsService extends IService<WesternMe
      * @date 2023/6/20 19:18
      */
     WesternMedicineSpecificationsEntity queryByCode(String code);
+
+    /**
+     * 根据code查询西药规格
+     *
+     * @author liuqiuyi
+     * @date 2023/6/20 19:18
+     */
+    List<WesternMedicineSpecificationsEntity> queryByCodeList(List<String> codeList);
 }

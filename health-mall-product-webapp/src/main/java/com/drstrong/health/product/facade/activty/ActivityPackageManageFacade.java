@@ -30,4 +30,6 @@ public interface ActivityPackageManageFacade {
 
     void scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
 
+    PageVO<ActivityPackageInfoVO> queryActivityPackageList(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
+
 }

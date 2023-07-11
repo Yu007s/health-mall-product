@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * huangpeng
- * 活动套餐管理(cms)
+ * 活动套餐入口
  * 2023/7/5 17:44
  */
 @RestController
@@ -100,6 +100,17 @@ public class ActivityPackageManageRemoteController implements ActivityPackageRem
     public ResultVO<Void> scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest) {
         activityPackageManageFacade.scheduledActivityPackageUpDown(scheduledSkuUpDownRequest);
         return ResultVO.success();
+    }
+
+    /**
+     * 医生端套餐列表查询
+     *
+     * @param activityPackageManageQueryRequest
+     * @return
+     */
+    @Override
+    public ResultVO<PageVO<ActivityPackageInfoVO>> queryActivityPackageList(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
+        return ResultVO.success(activityPackageManageFacade.queryActivityPackageList(activityPackageManageQueryRequest));
     }
 
 }

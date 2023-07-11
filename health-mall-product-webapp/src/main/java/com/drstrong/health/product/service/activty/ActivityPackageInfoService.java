@@ -28,4 +28,6 @@ public interface ActivityPackageInfoService extends IService<ActivityPackageInfo
     ActivityPackageInfoEntity findPackageById(Long activityPackageId);
 
     List<ActivityPackageInfoEntity> queryAllByProductType(Long storeId, Integer productType);
+
+    Page<ActivityPackageInfoEntity> pageQueryByStoreIds(String activityPackageName, List<Long> storeIds, Integer pageNo, Integer pageSize);
 }

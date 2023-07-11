@@ -29,6 +29,9 @@ public class ActivityPackageManageQueryRequest extends PageRequest implements Se
     @ApiModelProperty("店铺id")
     private Long storeId;
 
+    @ApiModelProperty("医生所在互联网医院的ID")
+    private Integer agencyId;
+
     /**
      * 套餐上下架状态；0-已下架，1-已上架, 2-预约上架中, 3-预约下架中
      */

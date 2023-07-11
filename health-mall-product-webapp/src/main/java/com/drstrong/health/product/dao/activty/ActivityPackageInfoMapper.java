@@ -24,4 +24,6 @@ public interface ActivityPackageInfoMapper extends BaseMapper<ActivityPackageInf
     List<ActivityPackageInfoEntity> listQueryByParam(@Param("queryParam") ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 
     int batchUpdateActivityStatusByCodes(@Param("activityPackageCodeList") Set<String> activityPackageCodeList, @Param("activityStatus") Integer skuState, @Param("operatorId") Long operatorId);
+
+    Page<ActivityPackageInfoEntity> pageQueryByStoreIds(Page<ActivityPackageInfoEntity> entityPage, @Param("activityPackageName") String activityPackageName, @Param("storeIds") List<Long> storeIds, @Param("activityStatus") Integer activityStatus);
 }

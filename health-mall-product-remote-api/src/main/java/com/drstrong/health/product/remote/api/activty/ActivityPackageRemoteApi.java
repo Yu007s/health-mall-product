@@ -52,4 +52,8 @@ public interface ActivityPackageRemoteApi {
     @ApiOperation("预约上下架")
     @PostMapping("/scheduled/up-or-down")
     ResultVO<Void> scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
+
+    @ApiOperation("医生端套餐列表查询")
+    @PostMapping("/page/queryList")
+    ResultVO<PageVO<ActivityPackageInfoVO>> queryActivityPackageList(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 }

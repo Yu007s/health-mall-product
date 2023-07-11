@@ -106,4 +106,6 @@ public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
 	void batchUpdateSkuStatusByCodes(Set<String> skuCodeList, Integer skuState, Long operatorId);
 
 	List<StoreSkuInfoEntity> queryStoreSkuInfoByCategory(Long categoryId);
+
+	List<StoreSkuInfoEntity> queryStoreSkuInfoByCategoryAndCityId(Long categoryId, Integer cityId, List<Long> storeIds);
 }

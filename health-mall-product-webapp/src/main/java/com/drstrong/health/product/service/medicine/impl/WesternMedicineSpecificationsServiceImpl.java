@@ -37,6 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 /**
  * <p>
@@ -187,5 +189,20 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
                 .eq(WesternMedicineSpecificationsEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(WesternMedicineSpecificationsEntity::getSpecCode, code);
         return baseMapper.selectOne(queryWrapper);
+    }
+
+    /**
+     * 根据code查询西药规格
+     *
+     * @param codeList
+     * @author liuqiuyi
+     * @date 2023/6/20 19:18
+     */
+    @Override
+    public List<WesternMedicineSpecificationsEntity> queryByCodeList(List<String> codeList) {
+        LambdaQueryWrapper<WesternMedicineSpecificationsEntity> queryWrapper = new LambdaQueryWrapper<WesternMedicineSpecificationsEntity>()
+                .eq(WesternMedicineSpecificationsEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(WesternMedicineSpecificationsEntity::getSpecCode, codeList);
+        return baseMapper.selectList(queryWrapper);
     }
 }
