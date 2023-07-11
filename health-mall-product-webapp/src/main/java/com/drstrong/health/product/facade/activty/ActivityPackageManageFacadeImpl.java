@@ -90,6 +90,49 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
     private SkuScheduledConfigFacade skuScheduledConfigFacade;
 
     /**
+     * 医生端的列表套餐搜索
+     * @param activityPackageManageQueryRequest
+     * @return
+     */
+    @Override
+    public PageVO<ActivityPackageInfoVO> queryActivityPackageList(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
+        log.info("invoke queryActivityPackageList(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
+        //店铺信息
+        List<StoreEntity> storeEntityList = storeService.getStoreByAgencyIds(Sets.newHashSet(Long.valueOf(activityPackageManageQueryRequest.getAgencyId())));
+        List<Long> storeIds = storeEntityList.stream().map(StoreEntity::getId).collect(Collectors.toList());
+        Map<Long, String> storeIdNameMap = storeEntityList.stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
+
+        Page<ActivityPackageInfoEntity> activityPackageInfoEntityPage = activityPackageInfoService.pageQueryByStoreIds(activityPackageManageQueryRequest.getActivityPackageName(), storeIds,activityPackageManageQueryRequest.getPageNo(),activityPackageManageQueryRequest.getPageSize());
+        if (activityPackageInfoEntityPage == null || CollectionUtil.isEmpty(activityPackageInfoEntityPage.getRecords())) {
+            log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
+            return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(activityPackageManageQueryRequest.getPageNo()).pageSize(activityPackageManageQueryRequest.getPageSize()).build();
+        }
+        List<ActivityPackageInfoVO> activityPackageInfoVOList = new ArrayList<>();
+        for (ActivityPackageInfoEntity record : activityPackageInfoEntityPage.getRecords()) {
+            ActivityPackageInfoVO activityPackageInfoVO = ActivityPackageInfoVO.builder()
+                    .id(record.getId())
+                    .activityPackageName(record.getActivityPackageName())
+                    .activityPackageCode(record.getActivityPackageCode())
+                    .productType(record.getProductType())
+                    .storeId(record.getStoreId())
+                    .storeName(storeIdNameMap.get(record.getStoreId()))
+                    .activityStatus(record.getActivityStatus())
+                    .originalPrice(BigDecimalUtil.F2Y(record.getOriginalPrice()))
+                    .preferentialPrice(BigDecimalUtil.F2Y(record.getPreferentialPrice()))
+                    .originalAmountDisplay(record.getOriginalAmountDisplay())
+                    .createdAt(Date.from(record.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant()))
+                    .build();
+            activityPackageInfoVOList.add(activityPackageInfoVO);
+        }
+        return PageVO.newBuilder()
+                .result(activityPackageInfoVOList)
+                .totalCount((int) activityPackageInfoEntityPage.getTotal())
+                .pageNo(activityPackageManageQueryRequest.getPageNo())
+                .pageSize(activityPackageManageQueryRequest.getPageSize())
+                .build();
+    }
+
+    /**
      * 条件分页列表查询
      *
      * @param activityPackageManageQueryRequest
@@ -190,6 +233,8 @@ public class ActivityPackageManageFacadeImpl implements ActivityPackageManageFac
             log.error("目前套餐药品种类大于支持的药品种类数量。");
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE);
         }
+        //sku库存校验 TODO
+
         ActivityPackageSkuRequest activityPackageSkuRequest = activityPackageSkuList.get(0);
         LocalDateTime dateTime = LocalDateTime.now();
         //套餐

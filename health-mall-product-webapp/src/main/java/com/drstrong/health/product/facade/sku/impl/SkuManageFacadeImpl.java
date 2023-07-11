@@ -19,13 +19,18 @@ import com.drstrong.health.product.model.dto.label.LabelDTO;
 import com.drstrong.health.product.model.dto.medicine.MedicineWarehouseBaseDTO;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.dto.product.SupplierInfoDTO;
+import com.drstrong.health.product.model.dto.product.WesternProductInfoVO;
+import com.drstrong.health.product.model.dto.stock.SkuCanStockDTO;
+import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.label.LabelInfoEntity;
+import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
+import com.drstrong.health.product.model.request.product.SearchWesternRequestParamBO;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
@@ -38,6 +43,7 @@ import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
 import com.drstrong.health.product.service.category.v3.CategoryService;
 import com.drstrong.health.product.service.label.LabelInfoService;
+import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
@@ -55,11 +61,9 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -100,6 +104,9 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 
 	@Resource
 	MedicineWarehouseFacadeHolder medicineWarehouseFacadeHolder;
+
+	@Resource
+	private WesternMedicineSpecificationsService westernMedicineSpecificationsService;
 
     /**
      * 添加分布式锁，确保更新或者修改sku时不重复添加
@@ -410,6 +417,47 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 		skuScheduledConfigFacade.saveOrUpdateSkuConfig(scheduledSkuUpDownRequest);
 		// 4.发送操作日志
 		sendSkuStatusUpdateLog(Lists.newArrayList(skuInfoEntity), Sets.newHashSet(scheduledSkuUpDownRequest.getSkuCode()), scheduledSkuUpDownRequest.getOperatorId(), scheduledSkuUpDownRequest.getOperatorName());
+	}
+
+	@Override
+	public List<WesternProductInfoVO> searchWesternList(SearchWesternRequestParamBO searchWesternRequestParamBO) {
+		//已上架/非禁售/高于阈值  StockRemoteProService.getStockToMap
+
+		//店铺信息sku信息
+		List<StoreEntity> storeEntityList = storeService.getStoreByAgencyIds(Sets.newHashSet(Long.valueOf(searchWesternRequestParamBO.getAgencyId())));
+		List<Long> storeIds = storeEntityList.stream().map(StoreEntity::getId).collect(Collectors.toList());
+		Map<Long, String> storeIdNameMap = storeEntityList.stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
+		List<StoreSkuInfoEntity> storeSkuInfoEntityList = storeSkuInfoService.queryStoreSkuInfoByCategoryAndCityId(searchWesternRequestParamBO.getCategoryId(), searchWesternRequestParamBO.getCityId(), storeIds);
+		if (CollectionUtils.isEmpty(storeSkuInfoEntityList)) {
+			return null;
+		}
+
+		//限制库存高于阈值
+		List<String> skuCodeList = storeSkuInfoEntityList.stream().map(StoreSkuInfoEntity::getSkuCode).collect(Collectors.toList());
+		Set<String> skuCodeSet = stockRemoteProService.getStockToMap(skuCodeList).keySet();
+		List<StoreSkuInfoEntity> storeSkuInfoEntities = storeSkuInfoEntityList.stream().filter(StoreSkuInfoEntity -> skuCodeSet.contains(StoreSkuInfoEntity.getSkuCode())).collect(toList());
+		if (CollectionUtils.isEmpty(storeSkuInfoEntities)) {
+			return null;
+		}
+
+		//规格信息
+		List<String> skuMedicineCodeList = storeSkuInfoEntities.stream().map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
+		Map<String, String> specificationsEntityListMap = westernMedicineSpecificationsService.queryByCodeList(skuMedicineCodeList).stream().collect(Collectors.toMap(WesternMedicineSpecificationsEntity::getSpecCode, WesternMedicineSpecificationsEntity::getSpecImageInfo, (v1, v2) -> v1));
+		//组装返回信息
+		List<WesternProductInfoVO> result = new ArrayList<>();
+		for (StoreSkuInfoEntity storeSkuInfoEntity : storeSkuInfoEntities) {
+			WesternProductInfoVO westernProductInfoVO = WesternProductInfoVO.builder()
+					.skuName(storeSkuInfoEntity.getSkuName())
+					.skuCode(storeSkuInfoEntity.getSkuCode())
+					.skuType(storeSkuInfoEntity.getSkuType())
+					.storeId(storeSkuInfoEntity.getStoreId())
+					.storeName(storeIdNameMap.get(storeSkuInfoEntity.getStoreId()))
+					.salePrice(storeSkuInfoEntity.getPrice().toString())
+					.icon(specificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()))
+					.build();
+			result.add(westernProductInfoVO);
+		}
+		return result;
 	}
 
 	private void sendSkuStatusUpdateLog(List<StoreSkuInfoEntity> beforeDataList, Set<String> skuCodeList, Long operatorId, String operatorName) {

@@ -30,6 +30,22 @@ public enum ProductTypeEnum {
 	private final String value;
 	private final String mark;
 
+	/**
+	 * 检查商品类型(不包含健康用品和活动套餐)
+	 * @param productType
+	 * @return
+	 */
+	public static Boolean checkWesternProduct(Integer productType) {
+		if(productType==null){
+			return false;
+		}
+		if(PRODUCT.getCode().equals(productType)||MEDICINE.getCode().equals(productType)
+				||CHINESE.getCode().equals(productType)||AGREEMENT.getCode().equals(productType)){
+			return true;
+		}
+		return false;
+	}
+
 	public static ProductTypeEnum getEnumByCode(Integer code) {
 		return Stream.of(ProductTypeEnum.values())
 				.filter(productTypeEnum -> Objects.equals(productTypeEnum.getCode(), code))
