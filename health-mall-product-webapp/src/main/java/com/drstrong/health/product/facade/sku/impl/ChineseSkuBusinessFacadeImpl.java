@@ -6,18 +6,20 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.drstrong.health.product.facade.ChineseManagerFacade;
 import com.drstrong.health.product.facade.sku.SkuBusinessBaseFacade;
+import com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO;
 import com.drstrong.health.product.model.dto.sku.SkuInfoSummaryDTO;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
 import com.drstrong.health.product.model.request.sku.SkuQueryRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.utils.Lists;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -68,5 +70,11 @@ public class ChineseSkuBusinessFacadeImpl implements SkuBusinessBaseFacade {
     public SkuInfoSummaryDTO queryBySkuCode(String skuCode) {
         SkuQueryRequest skuQueryRequest = SkuQueryRequest.builder().skuCode(skuCode).build();
         return SpringUtil.getBean(ChineseSkuBusinessFacadeImpl.class).querySkuByParam(skuQueryRequest);
+    }
+
+    @Override
+    public List<MedicineUsageDTO> queryMedicineUsageBySkuCode(Set<String> skuCodes) {
+        log.info("中药暂无用法用量，不处理");
+        return Lists.newArrayList();
     }
 }

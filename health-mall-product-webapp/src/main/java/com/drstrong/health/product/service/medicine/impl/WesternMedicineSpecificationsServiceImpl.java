@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service.medicine.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
@@ -14,6 +15,7 @@ import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.dao.medicine.WesternMedicineMapper;
 import com.drstrong.health.product.dao.medicine.WesternMedicineSpecificationsMapper;
 import com.drstrong.health.product.model.OperationLog;
+import com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO;
 import com.drstrong.health.product.model.entity.medication.MedicineUsageEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
@@ -23,7 +25,10 @@ import com.drstrong.health.product.model.request.medicine.MedicineUsageRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.medicine.*;
+import com.drstrong.health.product.model.response.medicine.MedicineUsageVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineSimpleInfoVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecInfoVO;
+import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.service.medicine.MedicineUsageService;
@@ -31,6 +36,7 @@ import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
 import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
+import com.google.common.collect.Lists;
 import com.naiterui.common.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -204,5 +211,13 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
                 .eq(WesternMedicineSpecificationsEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .in(WesternMedicineSpecificationsEntity::getSpecCode, codeList);
         return baseMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<MedicineUsageDTO> queryMedicineUsageBySpecCodes(Set<String> specCodes) {
+        if (CollectionUtil.isEmpty(specCodes)) {
+            return Lists.newArrayList();
+        }
+        return baseMapper.queryMedicineUsageBySpecCodes(specCodes);
     }
 }

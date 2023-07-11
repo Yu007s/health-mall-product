@@ -1,9 +1,17 @@
 package com.drstrong.health.product.facade.sku;
 
 
+import cn.hutool.core.bean.BeanUtil;
+import com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO;
 import com.drstrong.health.product.model.dto.sku.SkuInfoSummaryDTO;
+import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.sku.SkuQueryRequest;
+import com.google.common.collect.Lists;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * sku的公共方法入口，根据不同的商品类型交给不同的实现类处理
@@ -36,4 +44,38 @@ public interface SkuBusinessBaseFacade {
      * @date 2023/6/20 14:55
      */
     SkuInfoSummaryDTO queryBySkuCode(String skuCode);
+
+    /**
+     * 根据skuCode查询用法用量
+     *
+     * @author liuqiuyi
+     * @date 2023/7/11 10:03
+     */
+    List<MedicineUsageDTO> queryMedicineUsageBySkuCode(Set<String> skuCodes);
+
+    /**
+     * 组装用法用量的方法值
+     *
+     * @author liuqiuyi
+     * @date 2023/7/11 17:44
+     */
+    default List<MedicineUsageDTO> buildMedicineCodeUsageDto(List<StoreSkuInfoEntity> storeSkuInfoEntityList, Map<String, MedicineUsageDTO> medicineCodeUsageDtoMap) {
+        List<MedicineUsageDTO> medicineUsageDTOList = Lists.newArrayListWithCapacity(medicineCodeUsageDtoMap.size());
+        for (StoreSkuInfoEntity storeSkuInfoEntity : storeSkuInfoEntityList) {
+            String skuCode = storeSkuInfoEntity.getSkuCode();
+            String skuName = storeSkuInfoEntity.getSkuName();
+            String medicineCode = storeSkuInfoEntity.getMedicineCode();
+
+            MedicineUsageDTO usageDTO = MedicineUsageDTO.builder()
+                    .skuCode(skuCode)
+                    .skuName(skuName)
+                    .build();
+            if (medicineCodeUsageDtoMap.containsKey(medicineCode)) {
+                MedicineUsageDTO medicineUsageDTO = medicineCodeUsageDtoMap.get(medicineCode);
+                BeanUtil.copyProperties(medicineUsageDTO, usageDTO);
+            }
+            medicineUsageDTOList.add(usageDTO);
+        }
+        return medicineUsageDTOList;
+    }
 }
