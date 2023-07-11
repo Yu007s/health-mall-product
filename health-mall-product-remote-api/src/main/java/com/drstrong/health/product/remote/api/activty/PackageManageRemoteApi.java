@@ -27,7 +27,7 @@ import java.util.List;
  */
 @Api("健康商城-套餐服务-套餐管理页面的远程接口")
 @FeignClient(value = "health-mall-product", path = "/inner/package/manage")
-public interface ActivityPackageRemoteApi {
+public interface PackageManageRemoteApi {
 
     @ApiOperation("套餐管理页面查询")
     @PostMapping("/page/query")
@@ -52,8 +52,4 @@ public interface ActivityPackageRemoteApi {
     @ApiOperation("预约上下架")
     @PostMapping("/scheduled/up-or-down")
     ResultVO<Void> scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
-
-    @ApiOperation("医生端套餐列表查询")
-    @PostMapping("/page/queryList")
-    ResultVO<PageVO<ActivityPackageInfoVO>> queryActivityPackageList(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 }

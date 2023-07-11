@@ -1,0 +1,128 @@
+package com.drstrong.health.product.facade.activty;
+
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
+import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
+import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
+import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
+import com.drstrong.health.product.model.response.PageVO;
+import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
+import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.model.response.result.ResultStatus;
+import com.drstrong.health.product.service.activty.ActivityPackageInfoService;
+import com.drstrong.health.product.service.activty.ActivityPackageSkuInfoSevice;
+import com.drstrong.health.product.service.store.StoreService;
+import com.drstrong.health.product.util.BigDecimalUtil;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * huangpeng
+ * 2023/7/11 18:09
+ */
+@Slf4j
+@Service
+public class PackageBussinessFacadeImpl implements PackageBussinessFacade{
+
+    @Autowired
+    private StoreService storeService;
+
+    @Autowired
+    private ActivityPackageInfoService activityPackageInfoService;
+
+    @Autowired
+    private ActivityPackageSkuInfoSevice activityPackageSkuInfoSevice;
+
+
+    /**
+     * 查询套餐详情
+     *
+     * @param activityPackageCode
+     * @return
+     */
+    @Override
+    public ActivityPackageDetailDTO queryDetailByCode(String activityPackageCode) {
+        //根据activityPackageCode查询套餐
+        ActivityPackageInfoEntity activityPackageInfoEntity = activityPackageInfoService.findPackageByCode(activityPackageCode, null);
+        //套餐关联的店铺信息
+        StoreEntity storeEntity = storeService.getById(activityPackageInfoEntity.getStoreId());
+        if (storeEntity == null) {
+            throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "错误的店铺类型名称");
+        }
+        //套餐sku信息
+        List<ActivityPackageSkuInfoEntity> packageSkuInfoEntityList = activityPackageSkuInfoSevice.findPackageByCode(activityPackageCode);
+        //组装数据
+        ActivityPackageDetailDTO activityPackageDetailDTO = ActivityPackageDetailDTO.builder()
+                .activityPackageName(activityPackageInfoEntity.getActivityPackageName())
+                .activityPackageCode(activityPackageInfoEntity.getActivityPackageCode())
+                .productType(activityPackageInfoEntity.getProductType())
+                .storeId(storeEntity.getId())
+                .storeName(storeEntity.getStoreName())
+                .activityStatus(activityPackageInfoEntity.getActivityStatus())
+                .originalPrice(BigDecimalUtil.F2Y(activityPackageInfoEntity.getOriginalPrice()))
+                .preferentialPrice(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPreferentialPrice()))
+                .originalAmountDisplay(activityPackageInfoEntity.getOriginalAmountDisplay())
+                .activityPackageImageInfo(activityPackageInfoEntity.getActivityPackageImageInfo())
+                .activityPackageIntroduce(activityPackageInfoEntity.getActivityPackageIntroduce())
+                .activityPackageRemark(activityPackageInfoEntity.getActivityPackageRemark())
+                .activityPackageSkuInfoEntityList(packageSkuInfoEntityList)
+                .build();
+        return activityPackageDetailDTO;
+    }
+
+    /**
+     * 医生端的列表套餐搜索
+     * @param activityPackageManageQueryRequest
+     * @return
+     */
+    @Override
+    public PageVO<ActivityPackageInfoVO> queryActivityPackageList(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
+        log.info("invoke queryActivityPackageList(),param:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
+        //店铺信息
+        List<StoreEntity> storeEntityList = storeService.getStoreByAgencyIds(Sets.newHashSet(Long.valueOf(activityPackageManageQueryRequest.getAgencyId())));
+        List<Long> storeIds = storeEntityList.stream().map(StoreEntity::getId).collect(Collectors.toList());
+        Map<Long, String> storeIdNameMap = storeEntityList.stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
+
+        Page<ActivityPackageInfoEntity> activityPackageInfoEntityPage = activityPackageInfoService.pageQueryByStoreIds(activityPackageManageQueryRequest.getActivityPackageName(), storeIds,activityPackageManageQueryRequest.getPageNo(),activityPackageManageQueryRequest.getPageSize());
+        if (activityPackageInfoEntityPage == null || CollectionUtil.isEmpty(activityPackageInfoEntityPage.getRecords())) {
+            log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
+            return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(activityPackageManageQueryRequest.getPageNo()).pageSize(activityPackageManageQueryRequest.getPageSize()).build();
+        }
+        List<ActivityPackageInfoVO> activityPackageInfoVOList = new ArrayList<>();
+        for (ActivityPackageInfoEntity record : activityPackageInfoEntityPage.getRecords()) {
+            ActivityPackageInfoVO activityPackageInfoVO = ActivityPackageInfoVO.builder()
+                    .id(record.getId())
+                    .activityPackageName(record.getActivityPackageName())
+                    .activityPackageCode(record.getActivityPackageCode())
+                    .productType(record.getProductType())
+                    .storeId(record.getStoreId())
+                    .storeName(storeIdNameMap.get(record.getStoreId()))
+                    .activityStatus(record.getActivityStatus())
+                    .originalPrice(BigDecimalUtil.F2Y(record.getOriginalPrice()))
+                    .preferentialPrice(BigDecimalUtil.F2Y(record.getPreferentialPrice()))
+                    .originalAmountDisplay(record.getOriginalAmountDisplay())
+                    .createdAt(Date.from(record.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant()))
+                    .build();
+            activityPackageInfoVOList.add(activityPackageInfoVO);
+        }
+        return PageVO.newBuilder()
+                .result(activityPackageInfoVOList)
+                .totalCount((int) activityPackageInfoEntityPage.getTotal())
+                .pageNo(activityPackageManageQueryRequest.getPageNo())
+                .pageSize(activityPackageManageQueryRequest.getPageSize())
+                .build();
+    }
+}

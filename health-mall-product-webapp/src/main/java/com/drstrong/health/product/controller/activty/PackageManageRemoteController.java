@@ -1,9 +1,8 @@
-package com.drstrong.health.product.controller.product;
+package com.drstrong.health.product.controller.activty;
 
 import com.drstrong.health.product.enums.ScheduledStatusEnum;
-import com.drstrong.health.product.facade.activty.ActivityPackageManageFacade;
+import com.drstrong.health.product.facade.activty.PackageManageFacade;
 import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
-import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
@@ -11,9 +10,7 @@ import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRe
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.ActivityPackageInfoVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
-import com.drstrong.health.product.remote.api.activty.ActivityPackageRemoteApi;
-import com.drstrong.health.product.remote.api.product.SkuManageRemoteApi;
-import org.checkerframework.checker.units.qual.A;
+import com.drstrong.health.product.remote.api.activty.PackageManageRemoteApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,11 +23,11 @@ import java.util.List;
  * 2023/7/5 17:44
  */
 @RestController
-@RequestMapping("/inner/activityPackage/manage")
-public class ActivityPackageManageRemoteController implements ActivityPackageRemoteApi {
+@RequestMapping("/inner/package/manage")
+public class PackageManageRemoteController implements PackageManageRemoteApi {
 
     @Autowired
-    private ActivityPackageManageFacade activityPackageManageFacade;
+    private PackageManageFacade packageManageFacade;
 
     /**
      * 关键字列表分页查询
@@ -40,7 +37,7 @@ public class ActivityPackageManageRemoteController implements ActivityPackageRem
      */
     @Override
     public ResultVO<PageVO<ActivityPackageInfoVO>> pageQuerySkuManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
-        return ResultVO.success(activityPackageManageFacade.queryActivityPackageManageInfo(activityPackageManageQueryRequest));
+        return ResultVO.success(packageManageFacade.queryActivityPackageManageInfo(activityPackageManageQueryRequest));
     }
 
     /**
@@ -51,7 +48,7 @@ public class ActivityPackageManageRemoteController implements ActivityPackageRem
      */
     @Override
     public ResultVO<List<ActivityPackageInfoVO>> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
-        return ResultVO.success(activityPackageManageFacade.listActivityPackageManageInfo(activityPackageManageQueryRequest));
+        return ResultVO.success(packageManageFacade.listActivityPackageManageInfo(activityPackageManageQueryRequest));
     }
 
     /**
@@ -62,7 +59,7 @@ public class ActivityPackageManageRemoteController implements ActivityPackageRem
      */
     @Override
     public ResultVO<Void> saveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest) {
-        activityPackageManageFacade.addLocksaveOrUpdateActivityPackage(saveOrUpdateActivityPackageRequest, saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0).getSkuCode());
+        packageManageFacade.addLocksaveOrUpdateActivityPackage(saveOrUpdateActivityPackageRequest, saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0).getSkuCode());
         return ResultVO.success();
     }
 
@@ -74,7 +71,7 @@ public class ActivityPackageManageRemoteController implements ActivityPackageRem
      */
     @Override
     public ResultVO<ActivityPackageDetailDTO> queryDetailByCode(String activityPackageCode) {
-        return ResultVO.success(activityPackageManageFacade.queryDetailByCode(activityPackageCode));
+        return ResultVO.success(packageManageFacade.queryDetailByCode(activityPackageCode));
     }
 
     /**
@@ -86,7 +83,7 @@ public class ActivityPackageManageRemoteController implements ActivityPackageRem
     @Override
     public ResultVO<Void> updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest) {
         updateSkuStateRequest.setScheduledStatus(ScheduledStatusEnum.CANCEL.getCode());
-        activityPackageManageFacade.updateActivityPackageStatus(updateSkuStateRequest);
+        packageManageFacade.updateActivityPackageStatus(updateSkuStateRequest);
         return ResultVO.success();
     }
 
@@ -98,19 +95,8 @@ public class ActivityPackageManageRemoteController implements ActivityPackageRem
      */
     @Override
     public ResultVO<Void> scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest) {
-        activityPackageManageFacade.scheduledActivityPackageUpDown(scheduledSkuUpDownRequest);
+        packageManageFacade.scheduledActivityPackageUpDown(scheduledSkuUpDownRequest);
         return ResultVO.success();
-    }
-
-    /**
-     * 医生端套餐列表查询
-     *
-     * @param activityPackageManageQueryRequest
-     * @return
-     */
-    @Override
-    public ResultVO<PageVO<ActivityPackageInfoVO>> queryActivityPackageList(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
-        return ResultVO.success(activityPackageManageFacade.queryActivityPackageList(activityPackageManageQueryRequest));
     }
 
 }

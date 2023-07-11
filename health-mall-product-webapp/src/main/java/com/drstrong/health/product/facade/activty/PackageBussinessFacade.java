@@ -14,21 +14,9 @@ import java.util.List;
  * huangpeng
  * 2023/7/5 17:49
  */
-public interface ActivityPackageManageFacade {
-
-    PageVO<ActivityPackageInfoVO> queryActivityPackageManageInfo(ActivityPackageManageQueryRequest productManageQueryRequest);
-
-    List<ActivityPackageInfoVO> listActivityPackageManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
-
-    void addLocksaveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest, String skuCode);
-
-    void saveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest);
+public interface PackageBussinessFacade {
 
     ActivityPackageDetailDTO queryDetailByCode(String activityPackageCode);
-
-    void updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest);
-
-    void scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
 
     PageVO<ActivityPackageInfoVO> queryActivityPackageList(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 
