@@ -64,4 +64,27 @@
         and (pwms.spec_code = #{queryParam.searchKey} or pwm.full_name like concat('%',#{queryParam.searchKey},'%'))
     </select>
 
+    <select id="queryMedicineUsageBySpecCodes"
+            resultType="com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO">
+        select pwms.id,
+        pwms.spec_code as medicineCode,
+        pwms.spec_name,
+        pmu.relation_id,
+        pmu.relation_type,
+        pmu.medication_frequency,
+        pmu.each_dosage_count,
+        pmu.each_dose_unit,
+        pmu.usage_method,
+        pmu.usage_time
+        from pms_western_medicine_specifications pwms
+        left join pms_medicine_usage pmu on pwms.id = pmu.relation_id
+        where pwms.del_flag = 0
+        and pmu.del_flag = 0
+        and pmu.relation_type = 1
+        and pwms.spec_code in
+        <foreach collection="specCodes" separator="," open="(" close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
 </mapper>

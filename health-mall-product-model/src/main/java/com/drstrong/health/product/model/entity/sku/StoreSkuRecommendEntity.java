@@ -52,6 +52,16 @@ public class StoreSkuRecommendEntity extends BaseStandardEntity implements Seria
     @TableField(value = "recommend_detail_info", typeHandler = RecommendDetailInfoTypeHandler.class)
     private List<RecommendDetailInfoEntity> recommendDetailInfoList;
 
+    /**
+     * 虚拟列，存储所有的拼音信息
+     */
+    private List<String> recommendDetailInfoPinyinArray;
+
+    /**
+     * 虚拟列，存储所有的搜索关键字信息
+     */
+    private List<String> recommendDetailInfoKeywordArray;
+
     @AllArgsConstructor
     @NoArgsConstructor
     @Data

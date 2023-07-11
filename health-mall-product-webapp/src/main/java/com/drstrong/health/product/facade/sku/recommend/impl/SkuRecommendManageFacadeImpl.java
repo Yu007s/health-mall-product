@@ -3,7 +3,9 @@ package com.drstrong.health.product.facade.sku.recommend.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.drstrong.health.product.facade.sku.SkuBusinessFacadeHolder;
 import com.drstrong.health.product.facade.sku.recommend.SkuRecommendManageFacade;
+import com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO;
 import com.drstrong.health.product.model.dto.product.SkuBaseDTO;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuRecommendEntity;
@@ -25,7 +27,9 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +49,9 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
 
     @Resource
     StoreSkuRecommendService storeSkuRecommendService;
+
+    @Resource
+    SkuBusinessFacadeHolder skuBusinessFacadeHolder;
 
     @Override
     public void saveOrUpdateRecommend(SaveRecommendRequest saveRecommendRequest) {
@@ -94,9 +101,28 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
             log.info("未查询到任何sku推荐数据，参数为：{}", JSONUtil.toJsonStr(pageSkuRecommendRequest));
             return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(pageSkuRecommendRequest.getPageNo()).pageSize(pageSkuRecommendRequest.getPageSize()).build();
         }
-        // 2.
+        List<StoreSkuRecommendEntity> storeSkuRecommendEntityList = storeSkuRecommendEntityPage.getRecords();
+        Set<String> skuCodes = storeSkuRecommendEntityList.stream().map(StoreSkuRecommendEntity::getSkuCode).collect(Collectors.toSet());
+        // 2.获取sku的用法用量
+        Map<String, MedicineUsageDTO> skuCodeMedicineUsageDtoMap = skuBusinessFacadeHolder.queryMedicineUsageBySkuCode(skuCodes).stream()
+                .collect(Collectors.toMap(MedicineUsageDTO::getSkuCode, dto -> dto, (v1, v2) -> v1));
 
-        return null;
+        // 5.组装数据
+        List<SkuRecommendManageResponse> recommendManageResponseList = Lists.newArrayListWithCapacity(storeSkuRecommendEntityList.size());
+        storeSkuRecommendEntityList.forEach(storeSkuRecommendEntity -> {
+            MedicineUsageDTO medicineUsageDTO = skuCodeMedicineUsageDtoMap.getOrDefault(storeSkuRecommendEntity.getSkuCode(), new MedicineUsageDTO());
+
+            SkuRecommendManageResponse skuRecommendManageResponse = SkuRecommendManageResponse.builder()
+                    .skuCode(storeSkuRecommendEntity.getSkuCode())
+                    .skuName(medicineUsageDTO.getSkuName())
+                    .usageDosage(medicineUsageDTO.getMedicineUsage(null))
+                    .keywordList(storeSkuRecommendEntity.getRecommendDetailInfoKeywordArray())
+                    .storeId(storeSkuRecommendEntity.getStoreId())
+//                    .storeName()
+                    .build();
+            recommendManageResponseList.add(skuRecommendManageResponse);
+        });
+        return PageVO.newBuilder().result(recommendManageResponseList).totalCount((int) storeSkuRecommendEntityPage.getTotal()).pageNo(pageSkuRecommendRequest.getPageNo()).pageSize(pageSkuRecommendRequest.getPageSize()).build();
     }
 
     @Override

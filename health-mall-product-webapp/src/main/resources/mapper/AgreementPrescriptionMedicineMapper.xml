@@ -79,16 +79,16 @@
     <select id="queryPageList"
             resultType="com.drstrong.health.product.model.response.medicine.AgreementPrescriptionSimpleInfoVO">
         SELECT m.id,
-            m.medicine_code,
-            m.full_name,
-            m.medicine_name,
-            m.packing_spec packingSpec,
-            m.packing_unit packingUnit,
-            m.created_at createdAt,
-            CASE
-            WHEN u.id IS NOT NULL THEN 1
-            ELSE 0
-            END AS useUsageDosage
+        m.medicine_code,
+        m.full_name,
+        m.medicine_name,
+        m.packing_spec packingSpec,
+        m.packing_unit packingUnit,
+        m.created_at createdAt,
+        CASE
+        WHEN u.id IS NOT NULL THEN 1
+        ELSE 0
+        END AS useUsageDosage
         FROM pms_agreement_prescription_medicine m
         LEFT JOIN pms_medicine_usage u ON u.relation_id = m.id AND u.relation_type = 2 AND u.del_flag = 0
         <where>
@@ -123,5 +123,28 @@
         from pms_agreement_prescription_medicine
         where del_flag = 0 and
         (medicine_code = #{queryParam.searchKey} or full_name like concat('%',#{queryParam.searchKey},'%'))
+    </select>
+
+    <select id="queryMedicineUsageByMedicineCodes"
+            resultType="com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO">
+        select papm.id,
+        papm.medicine_code,
+        papm.medicine_name,
+        pmu.relation_id,
+        pmu.relation_type,
+        pmu.medication_frequency,
+        pmu.each_dosage_count,
+        pmu.each_dose_unit,
+        pmu.usage_method,
+        pmu.usage_time
+        from pms_agreement_prescription_medicine papm
+        left join pms_medicine_usage pmu on papm.id = pmu.relation_id
+        where papm.del_flag = 0
+        and pmu.del_flag = 0
+        and pmu.relation_type = 2
+        and papm.medicine_code in
+        <foreach collection="medicineCodes" separator="," open="(" close=")" item="item">
+            #{item}
+        </foreach>
     </select>
 </mapper>
