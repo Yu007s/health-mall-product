@@ -26,6 +26,9 @@ public class MedicineUsageDTO implements Serializable {
     private static final String MC = "每次";
     private static final String C_COMMA = "，";
 
+    @ApiModelProperty("商品类型")
+    private Integer productType;
+
     @ApiModelProperty("sku编码")
     private String skuCode;
 

@@ -67,6 +67,7 @@ public interface SkuBusinessBaseFacade {
             String medicineCode = storeSkuInfoEntity.getMedicineCode();
 
             MedicineUsageDTO usageDTO = MedicineUsageDTO.builder()
+                    .productType(storeSkuInfoEntity.getSkuType())
                     .skuCode(skuCode)
                     .skuName(skuName)
                     .build();

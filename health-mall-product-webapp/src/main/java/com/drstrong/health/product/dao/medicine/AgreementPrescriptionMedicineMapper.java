@@ -53,5 +53,5 @@ public interface AgreementPrescriptionMedicineMapper extends BaseMapper<Agreemen
      * @author liuqiuyi
      * @date 2023/7/11 11:12
      */
-    List<MedicineUsageDTO> queryMedicineUsageByMedicineCodes(Set<String> medicineCodes);
+    List<MedicineUsageDTO> queryMedicineUsageByMedicineCodes(@Param("medicineCodes") Set<String> medicineCodes);
 }
