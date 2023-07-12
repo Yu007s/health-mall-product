@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.handler.mybatis.RecommendDetailInfoTypeHandler;
+import com.drstrong.health.product.handler.mybatis.StringListTypeHandler;
 import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import lombok.AllArgsConstructor;
@@ -55,13 +56,13 @@ public class StoreSkuRecommendEntity extends BaseStandardEntity implements Seria
     /**
      * 虚拟列，存储所有的拼音信息
      */
-    @TableField(exist = false)
+    @TableField(value = "recommend_detail_info_pinyin_array", typeHandler = StringListTypeHandler.class)
     private List<String> recommendDetailInfoPinyinArray;
 
     /**
      * 虚拟列，存储所有的搜索关键字信息
      */
-    @TableField(exist = false)
+    @TableField(value = "recommend_detail_info_keyword_array", typeHandler = StringListTypeHandler.class)
     private List<String> recommendDetailInfoKeywordArray;
 
     @AllArgsConstructor

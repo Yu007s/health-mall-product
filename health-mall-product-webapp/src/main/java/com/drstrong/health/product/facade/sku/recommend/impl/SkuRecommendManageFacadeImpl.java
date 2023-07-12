@@ -9,8 +9,10 @@ import com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO;
 import com.drstrong.health.product.model.dto.product.SkuBaseDTO;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuRecommendEntity;
+import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.sku.recommend.PageSkuRecommendRequest;
 import com.drstrong.health.product.model.request.sku.recommend.SaveRecommendRequest;
@@ -19,8 +21,10 @@ import com.drstrong.health.product.model.response.product.v3.recommend.SkuRecomm
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import com.drstrong.health.product.service.sku.StoreSkuRecommendService;
+import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.utils.HanZiToPinYinUtil;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +56,9 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
 
     @Resource
     SkuBusinessFacadeHolder skuBusinessFacadeHolder;
+
+    @Resource
+    StoreService storeService;
 
     @Override
     public void saveOrUpdateRecommend(SaveRecommendRequest saveRecommendRequest) {
@@ -102,11 +109,17 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
             return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(pageSkuRecommendRequest.getPageNo()).pageSize(pageSkuRecommendRequest.getPageSize()).build();
         }
         List<StoreSkuRecommendEntity> storeSkuRecommendEntityList = storeSkuRecommendEntityPage.getRecords();
-        Set<String> skuCodes = storeSkuRecommendEntityList.stream().map(StoreSkuRecommendEntity::getSkuCode).collect(Collectors.toSet());
+        Set<String> skuCodes = Sets.newHashSetWithExpectedSize(storeSkuRecommendEntityList.size());
+        Set<Long> storeIds = Sets.newHashSetWithExpectedSize(storeSkuRecommendEntityList.size());
+        storeSkuRecommendEntityList.forEach(storeSkuRecommendEntity -> {
+            skuCodes.add(storeSkuRecommendEntity.getSkuCode());
+            storeIds.add(storeSkuRecommendEntity.getStoreId());
+        });
         // 2.获取sku的用法用量
         Map<String, MedicineUsageDTO> skuCodeMedicineUsageDtoMap = skuBusinessFacadeHolder.queryMedicineUsageBySkuCode(skuCodes).stream()
                 .collect(Collectors.toMap(MedicineUsageDTO::getSkuCode, dto -> dto, (v1, v2) -> v1));
-
+        // 3.获取店铺名称
+        Map<Long, String> storeIdNameMap = storeService.listByIds(storeIds).stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
         // 5.组装数据
         List<SkuRecommendManageResponse> recommendManageResponseList = Lists.newArrayListWithCapacity(storeSkuRecommendEntityList.size());
         storeSkuRecommendEntityList.forEach(storeSkuRecommendEntity -> {
@@ -118,8 +131,10 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
                     .usageDosage(medicineUsageDTO.getMedicineUsage(null))
                     .keywordList(storeSkuRecommendEntity.getRecommendDetailInfoKeywordArray())
                     .storeId(storeSkuRecommendEntity.getStoreId())
-//                    .storeName()
+                    .storeName(storeIdNameMap.get(storeSkuRecommendEntity.getStoreId()))
                     .build();
+            skuRecommendManageResponse.setProductType(medicineUsageDTO.getProductType());
+            skuRecommendManageResponse.setProductTypeName(ProductTypeEnum.getValueByCode(medicineUsageDTO.getProductType()));
             recommendManageResponseList.add(skuRecommendManageResponse);
         });
         return PageVO.newBuilder().result(recommendManageResponseList).totalCount((int) storeSkuRecommendEntityPage.getTotal()).pageNo(pageSkuRecommendRequest.getPageNo()).pageSize(pageSkuRecommendRequest.getPageSize()).build();

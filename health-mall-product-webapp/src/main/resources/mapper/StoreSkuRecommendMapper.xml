@@ -9,6 +9,10 @@
         <result column="sku_code" property="skuCode"/>
         <result column="recommend_detail_info" property="recommendDetailInfoList"
                 typeHandler="com.drstrong.health.product.handler.mybatis.RecommendDetailInfoTypeHandler"/>
+        <result column="recommend_detail_info_pinyin_array" property="recommendDetailInfoPinyinArray"
+                typeHandler="com.drstrong.health.product.handler.mybatis.StringListTypeHandler"/>
+        <result column="recommend_detail_info_keyword_array" property="recommendDetailInfoKeywordArray"
+                typeHandler="com.drstrong.health.product.handler.mybatis.StringListTypeHandler"/>
         <result column="version" property="version"/>
         <result column="del_flag" property="delFlag"/>
         <result column="created_by" property="createdBy"/>
@@ -22,6 +26,8 @@
                 store_id,
                 sku_code,
                 recommend_detail_info,
+                recommend_detail_info_pinyin_array,
+                recommend_detail_info_keyword_array,
                 version,
                 del_flag,
                 created_by,
@@ -31,7 +37,7 @@
     </sql>
 
     <select id="pageQueryByParam"
-            resultType="com.drstrong.health.product.model.entity.sku.StoreSkuRecommendEntity">
+            resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from pms_store_sku_recommend
