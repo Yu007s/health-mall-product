@@ -74,6 +74,4 @@ public interface SkuManageFacade {
 	 * @date 2023/6/15 09:32
 	 */
 	void scheduledSkuUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
-
-	List<ProductListInfoVO> searchProductList(SearchWesternRequestParamBO searchWesternRequestParamBO);
 }

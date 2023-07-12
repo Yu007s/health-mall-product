@@ -64,9 +64,4 @@ public class SkuManageRemoteController implements SkuManageRemoteApi {
 		return ResultVO.success();
 	}
 
-	@Override
-	public ResultVO<List<ProductListInfoVO>> searchProductList(SearchWesternRequestParamBO searchWesternRequestParamBO) {
-		return ResultVO.success(skuManageFacade.searchProductList(searchWesternRequestParamBO));
-	}
-
 }
