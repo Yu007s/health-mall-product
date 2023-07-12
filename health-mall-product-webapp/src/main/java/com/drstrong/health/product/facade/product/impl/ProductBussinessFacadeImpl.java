@@ -105,7 +105,8 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                 .map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
         Map<String, String> agreementSpecificationsEntityListMap = new HashMap<>();
         if (CollectionUtil.isNotEmpty(skuAgreementCodeList)) {
-            agreementSpecificationsEntityListMap = agreementPrescriptionMedicineService.queryByCodeList(skuAgreementCodeList).stream().collect(toMap(AgreementPrescriptionMedicineEntity::getMedicineCode, AgreementPrescriptionMedicineEntity::getImageInfo, (v1, v2) -> v1));
+            agreementSpecificationsEntityListMap = agreementPrescriptionMedicineService.queryByCodeList(skuAgreementCodeList)
+                    .stream().collect(toMap(AgreementPrescriptionMedicineEntity::getMedicineCode, AgreementPrescriptionMedicineEntity::getImageInfo, (v1, v2) -> v1));
         }
 
         //组装返回信息
