@@ -55,11 +55,13 @@ public class StoreSkuRecommendEntity extends BaseStandardEntity implements Seria
     /**
      * 虚拟列，存储所有的拼音信息
      */
+    @TableField(exist = false)
     private List<String> recommendDetailInfoPinyinArray;
 
     /**
      * 虚拟列，存储所有的搜索关键字信息
      */
+    @TableField(exist = false)
     private List<String> recommendDetailInfoKeywordArray;
 
     @AllArgsConstructor
