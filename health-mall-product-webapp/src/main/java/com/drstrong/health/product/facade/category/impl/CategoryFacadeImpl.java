@@ -102,7 +102,7 @@ public class CategoryFacadeImpl implements CategoryFacade {
     @Override
     public List<CategoryVO> queryCategoryByProductType(Integer productType) {
         //中西药+协定方
-        if (CHINESE_WESTERN_AGREEMENT.contains(productType)) {
+        if (ObjectUtil.isNull(productType) || CHINESE_WESTERN_AGREEMENT.contains(productType)) {
             List<CategoryEntity> westernCategoryList = categoryService.queryWesternCategory();
             return BeanUtil.copyToList(westernCategoryList, CategoryVO.class);
         }

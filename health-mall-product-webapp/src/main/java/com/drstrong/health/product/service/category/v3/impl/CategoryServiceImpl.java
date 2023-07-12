@@ -78,6 +78,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, CategoryEnt
 		return baseMapper.selectBatchIds(ids);
 	}
 
+	/**
+	 * 查询中西+协定方分类列表
+	 *
+	 * @return
+	 */
 	@Override
 	public List<CategoryEntity> queryWesternCategory() {
 		LambdaQueryWrapper<CategoryEntity> queryWrapper = new LambdaQueryWrapper<CategoryEntity>()
@@ -100,6 +105,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, CategoryEnt
 		return result;
 	}
 
+	/**
+	 * 查询健康药品分类列表
+	 *
+	 * @return
+	 */
 	@Override
 	public List<CategoryEntity> queryHealthCategory() {
 		LambdaQueryWrapper<CategoryEntity> queryWrapper = new LambdaQueryWrapper<CategoryEntity>()

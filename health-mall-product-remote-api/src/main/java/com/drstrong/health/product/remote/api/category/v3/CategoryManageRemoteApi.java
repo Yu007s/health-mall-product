@@ -48,5 +48,5 @@ public interface CategoryManageRemoteApi {
 
     @ApiOperation("根据商品类型查询分类信息(医生端-空中药房)")
     @PostMapping("/product/category")
-    ResultVO<List<CategoryVO>> queryCategoryByProductType(@RequestParam(value = "productType") Integer productType);
+    ResultVO<List<CategoryVO>> queryCategoryByProductType(@RequestParam(value = "productType", required = false) Integer productType);
 }
