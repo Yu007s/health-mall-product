@@ -14,6 +14,7 @@ import com.drstrong.health.product.facade.sku.SkuManageFacade;
 import com.drstrong.health.product.facade.sku.SkuScheduledConfigFacade;
 import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
+import com.drstrong.health.product.model.dto.product.PackageSkuDetailDTO;
 import com.drstrong.health.product.model.dto.stock.SkuCanStockDTO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
@@ -297,6 +298,17 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         }
         //套餐sku信息
         List<ActivityPackageSkuInfoEntity> packageSkuInfoEntityList = activityPackageSkuInfoSevice.findPackageByCode(activityPackageCode);
+        List<PackageSkuDetailDTO> packageSkuDetailDTOS = new ArrayList<>();
+        for (ActivityPackageSkuInfoEntity activityPackageSkuInfoEntity : packageSkuInfoEntityList) {
+            PackageSkuDetailDTO detailDTO = PackageSkuDetailDTO.builder()
+                    .skuCode(activityPackageSkuInfoEntity.getSkuCode())
+                    .skuName(activityPackageSkuInfoEntity.getSkuName())
+                    .originalPrice(BigDecimalUtil.F2Y(activityPackageSkuInfoEntity.getOriginalPrice()))
+                    .preferentialPrice(BigDecimalUtil.F2Y(activityPackageSkuInfoEntity.getPreferentialPrice()))
+                    .amount(activityPackageSkuInfoEntity.getAmount())
+                    .build();
+            packageSkuDetailDTOS.add(detailDTO);
+        }
         //组装数据
         ActivityPackageDetailDTO activityPackageDetailDTO = ActivityPackageDetailDTO.builder()
                 .activityPackageName(activityPackageInfoEntity.getActivityPackageName())
@@ -311,7 +323,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 .activityPackageImageInfo(activityPackageInfoEntity.getActivityPackageImageInfo())
                 .activityPackageIntroduce(activityPackageInfoEntity.getActivityPackageIntroduce())
                 .activityPackageRemark(activityPackageInfoEntity.getActivityPackageRemark())
-                .activityPackageSkuInfoEntityList(packageSkuInfoEntityList)
+                .activityPackageSkuInfoEntityList(packageSkuDetailDTOS)
                 .build();
         return activityPackageDetailDTO;
     }

@@ -81,6 +81,7 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade {
 
         //组装数据
         ActivityPackageDetailDTO activityPackageDetailDTO = ActivityPackageDetailDTO.builder()
+                .id(activityPackageInfoEntity.getId())
                 .activityPackageName(activityPackageInfoEntity.getActivityPackageName())
                 .activityPackageCode(activityPackageInfoEntity.getActivityPackageCode())
                 .productType(activityPackageInfoEntity.getProductType())

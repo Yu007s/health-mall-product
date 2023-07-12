@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.dto.product;
 
+import com.drstrong.health.product.model.dto.medicine.MedicineImageDTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * huangpeng
@@ -50,7 +52,7 @@ public class ProductAgreementDetailVO implements Serializable {
      * 图片
      */
     @ApiModelProperty(value = "图片")
-    private String imageInfo;
+    private List<MedicineImageDTO> specImageInfo;
 
 
 }

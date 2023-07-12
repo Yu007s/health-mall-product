@@ -2,13 +2,20 @@ package com.drstrong.health.product.facade.product.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.drstrong.health.product.facade.product.ProductBussinessFacade;
+import com.drstrong.health.product.model.dto.medicine.MedicineImageDTO;
 import com.drstrong.health.product.model.dto.product.ProductAgreementDetailVO;
 import com.drstrong.health.product.model.dto.product.ProductDetailInfoVO;
 import com.drstrong.health.product.model.dto.product.ProductListInfoVO;
 import com.drstrong.health.product.model.dto.product.ProductWesternDetailVO;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
+import com.drstrong.health.product.model.entity.medication.WesternMedicineInstructionsEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
@@ -19,11 +26,13 @@ import com.drstrong.health.product.model.request.product.SearchWesternRequestPar
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicineService;
+import com.drstrong.health.product.service.medicine.WesternMedicineInstructionsService;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -60,6 +69,9 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
 
     @Autowired
     private WesternMedicineSpecificationsService westernMedicineSpecificationsService;
+
+    @Autowired
+    private WesternMedicineInstructionsService westernMedicineInstructionsService;
 
     @Autowired
     private AgreementPrescriptionMedicineService agreementPrescriptionMedicineService;
@@ -140,7 +152,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
      */
     @Override
     public ProductDetailInfoVO queryProductDetail(String skuCode) {
-        StoreSkuInfoEntity storeSkuInfoEntity = storeSkuInfoService.queryBySkuCode(skuCode, UpOffEnum.DOWN.getCode());
+        StoreSkuInfoEntity storeSkuInfoEntity = storeSkuInfoService.queryBySkuCode(skuCode, UpOffEnum.UP.getCode());
         if (Objects.isNull(storeSkuInfoEntity)) {
             throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR);
         }
@@ -160,17 +172,33 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
             //西药
             ProductWesternDetailVO productWesternDetailVO = new ProductWesternDetailVO();
             WesternMedicineEntity westernMedicineEntity = westernMedicineService.queryByMedicineCode(storeSkuInfoEntity.getMedicineCode());
+            if (ObjectUtil.isNull(westernMedicineEntity)) {
+                throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR.getCode(), "查询的药品详情规格参数为空。");
+            }
             WesternMedicineSpecificationsEntity westernMedicineSpecificationsEntity = westernMedicineSpecificationsService.queryByCode(storeSkuInfoEntity.getMedicineCode());
-            AgreementPrescriptionMedicineEntity agreementPrescriptionMedicineEntity = agreementPrescriptionMedicineService.queryByCode(storeSkuInfoEntity.getMedicineCode());
+            WesternMedicineInstructionsEntity westernMedicineInstructionsEntity = westernMedicineInstructionsService.queryByMedicineId(westernMedicineEntity.getId());
+
+            if (ObjectUtil.isNull(westernMedicineSpecificationsEntity) ||
+                    ObjectUtil.isNull(westernMedicineInstructionsEntity)) {
+                throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR.getCode(), "查询的药品详情规格参数为空。");
+            }
             BeanUtils.copyProperties(westernMedicineEntity, productWesternDetailVO);
             BeanUtils.copyProperties(westernMedicineSpecificationsEntity, productWesternDetailVO);
-            BeanUtils.copyProperties(agreementPrescriptionMedicineEntity, productWesternDetailVO);
+            BeanUtils.copyProperties(westernMedicineInstructionsEntity, productWesternDetailVO);
+            String specImageInfo = westernMedicineSpecificationsEntity.getSpecImageInfo();
+            List<MedicineImageDTO> medicineImageDTOS = JSONObject.parseArray(specImageInfo, MedicineImageDTO.class);
+            productWesternDetailVO.setSpecImageInfo(medicineImageDTOS);
             detailInfoVO.setProductWesternDetailVO(productWesternDetailVO);
         } else if (storeSkuInfoEntity.getSkuType() == ProductTypeEnum.AGREEMENT.getCode()) {
             //协定方
             ProductAgreementDetailVO productAgreementDetailVO = new ProductAgreementDetailVO();
             AgreementPrescriptionMedicineEntity agreementPrescriptionMedicineEntity = agreementPrescriptionMedicineService.queryByCode(storeSkuInfoEntity.getMedicineCode());
+            if (ObjectUtil.isNull(agreementPrescriptionMedicineEntity)) {
+                throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR.getCode(), "查询的药品详情规格参数为空。");
+            }
             BeanUtils.copyProperties(agreementPrescriptionMedicineEntity, productAgreementDetailVO);
+            List<MedicineImageDTO> medicineImageDTOS = JSONObject.parseArray(agreementPrescriptionMedicineEntity.getImageInfo(), MedicineImageDTO.class);
+            productAgreementDetailVO.setSpecImageInfo(medicineImageDTOS);
             detailInfoVO.setProductAgreementDetailVO(productAgreementDetailVO);
         } else {
             log.error("查询的药品详情不存在,skuCode={}", skuCode);
