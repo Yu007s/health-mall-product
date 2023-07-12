@@ -69,9 +69,14 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade {
         List<ActivityPackageSkuInfoEntity> packageSkuInfoEntityList = activityPackageSkuInfoSevice.findPackageByCode(activityPackageCode);
         List<PackageSkuDetailDTO> packageSkuDetailDTOS = new ArrayList<>();
         for (ActivityPackageSkuInfoEntity activityPackageSkuInfoEntity : packageSkuInfoEntityList) {
-            PackageSkuDetailDTO skuDetailDTO = new PackageSkuDetailDTO();
-            BeanUtils.copyProperties(activityPackageSkuInfoEntity, skuDetailDTO);
-            packageSkuDetailDTOS.add(skuDetailDTO);
+            PackageSkuDetailDTO detailDTO = PackageSkuDetailDTO.builder()
+                    .skuCode(activityPackageSkuInfoEntity.getSkuCode())
+                    .skuName(activityPackageSkuInfoEntity.getSkuName())
+                    .originalPrice(BigDecimalUtil.F2Y(activityPackageSkuInfoEntity.getOriginalPrice()))
+                    .preferentialPrice(BigDecimalUtil.F2Y(activityPackageSkuInfoEntity.getPreferentialPrice()))
+                    .amount(activityPackageSkuInfoEntity.getAmount())
+                    .build();
+            packageSkuDetailDTOS.add(detailDTO);
         }
 
         //组装数据

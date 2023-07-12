@@ -43,13 +43,13 @@ public class PackageSkuDetailDTO implements Serializable {
      * 原价
      */
     @ApiModelProperty("原价")
-    private Long originalPrice;
+    private BigDecimal originalPrice;
 
     /**
      * 优惠价
      */
     @ApiModelProperty(" 优惠价")
-    private Long preferentialPrice;
+    private BigDecimal preferentialPrice;
 
     /**
      * sku数量
