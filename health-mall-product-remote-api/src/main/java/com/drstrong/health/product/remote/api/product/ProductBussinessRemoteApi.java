@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -27,6 +28,6 @@ public interface ProductBussinessRemoteApi {
 
     @ApiOperation("空中药房的查看药品详情")
     @PostMapping("/query/Detail")
-    ResultVO<ProductDetailInfoVO> queryProductDetail(@RequestBody @Valid String skuCode);
+    ResultVO<ProductDetailInfoVO> queryProductDetail(@RequestParam("skuCode") @Valid String skuCode);
 
 }

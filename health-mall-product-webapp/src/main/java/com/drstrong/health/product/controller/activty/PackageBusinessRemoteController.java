@@ -25,7 +25,7 @@ import java.util.List;
  * 2023/7/11 17:55
  */
 @RestController
-@RequestMapping("/inner/package/Business")
+@RequestMapping("/inner/package/bussiness")
 public class PackageBusinessRemoteController implements PackageBussinessRemoteApi {
 
     @Autowired
