@@ -197,7 +197,8 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                 throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR.getCode(), "查询的药品详情规格参数为空。");
             }
             BeanUtils.copyProperties(agreementPrescriptionMedicineEntity, productAgreementDetailVO);
-            List<MedicineImageDTO> medicineImageDTOS = JSONObject.parseArray(agreementPrescriptionMedicineEntity.getImageInfo(), MedicineImageDTO.class);
+            String specImageInfo = agreementPrescriptionMedicineEntity.getImageInfo();
+            List<MedicineImageDTO> medicineImageDTOS = JSONObject.parseArray(specImageInfo, MedicineImageDTO.class);
             productAgreementDetailVO.setSpecImageInfo(medicineImageDTOS);
             detailInfoVO.setProductAgreementDetailVO(productAgreementDetailVO);
         } else {
