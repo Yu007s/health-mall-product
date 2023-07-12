@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
+import com.drstrong.health.product.model.dto.product.PackageSkuDetailDTO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
@@ -21,6 +22,7 @@ import com.drstrong.health.product.util.BigDecimalUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,6 +67,13 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade {
         }
         //套餐sku信息
         List<ActivityPackageSkuInfoEntity> packageSkuInfoEntityList = activityPackageSkuInfoSevice.findPackageByCode(activityPackageCode);
+        List<PackageSkuDetailDTO> packageSkuDetailDTOS = new ArrayList<>();
+        for (ActivityPackageSkuInfoEntity activityPackageSkuInfoEntity : packageSkuInfoEntityList) {
+            PackageSkuDetailDTO skuDetailDTO = new PackageSkuDetailDTO();
+            BeanUtils.copyProperties(activityPackageSkuInfoEntity, skuDetailDTO);
+            packageSkuDetailDTOS.add(skuDetailDTO);
+        }
+
         //组装数据
         ActivityPackageDetailDTO activityPackageDetailDTO = ActivityPackageDetailDTO.builder()
                 .activityPackageName(activityPackageInfoEntity.getActivityPackageName())
@@ -79,7 +88,7 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade {
                 .activityPackageImageInfo(activityPackageInfoEntity.getActivityPackageImageInfo())
                 .activityPackageIntroduce(activityPackageInfoEntity.getActivityPackageIntroduce())
                 .activityPackageRemark(activityPackageInfoEntity.getActivityPackageRemark())
-                .activityPackageSkuInfoEntityList(packageSkuInfoEntityList)
+                .activityPackageSkuInfoEntityList(packageSkuDetailDTOS)
                 .build();
         return activityPackageDetailDTO;
     }

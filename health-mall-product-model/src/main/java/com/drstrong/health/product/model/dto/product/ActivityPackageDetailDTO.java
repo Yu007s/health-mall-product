@@ -66,6 +66,6 @@ public class ActivityPackageDetailDTO implements Serializable {
     private String activityPackageRemark;
 
     @ApiModelProperty("套餐商品列表")
-    private List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntityList;
+    private List<PackageSkuDetailDTO> activityPackageSkuInfoEntityList;
 
 }
