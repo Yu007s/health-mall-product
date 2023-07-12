@@ -37,9 +37,9 @@ public class ProductDetailInfoVO implements Serializable {
     private String skuName;
 
     /**
-     * sku类型(1-药品，2-中药,3-协定方)
+     * sku类型(1-药品,3-协定方)
      */
-    @ApiModelProperty(value = "sku类型(1-药品，2-中药,3-协定方)")
+    @ApiModelProperty(value = "sku类型(1-药品,3-协定方)")
     private Integer skuType;
 
     /**
@@ -61,12 +61,6 @@ public class ProductDetailInfoVO implements Serializable {
     private String storeName;
 
     /**
-     * 商品封面图片
-     */
-    @ApiModelProperty(value = "商品封面图片")
-    private String imageInfo;
-
-    /**
      * 售价
      */
     @ApiModelProperty(value = "售价")
@@ -79,9 +73,9 @@ public class ProductDetailInfoVO implements Serializable {
     private ProductWesternDetailVO productWesternDetailVO;
 
     /**
-     * 规格参数列表(用法用量+功能主治)
+     * 协定方详情
      */
-    @ApiModelProperty(value = "规格参数列表(下)")
-    private List<ProductWesternDetailVO> lower;
+    @ApiModelProperty(value = "协定方详情")
+    private ProductAgreementDetailVO productAgreementDetailVO;
 
 }

@@ -3,9 +3,12 @@ package com.drstrong.health.product.facade.product.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import com.drstrong.health.product.facade.product.ProductBussinessFacade;
+import com.drstrong.health.product.model.dto.product.ProductAgreementDetailVO;
 import com.drstrong.health.product.model.dto.product.ProductDetailInfoVO;
 import com.drstrong.health.product.model.dto.product.ProductListInfoVO;
+import com.drstrong.health.product.model.dto.product.ProductWesternDetailVO;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
+import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
@@ -16,12 +19,14 @@ import com.drstrong.health.product.model.request.product.SearchWesternRequestPar
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicineService;
+import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -49,6 +54,9 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
 
     @Autowired
     private StockRemoteProService stockRemoteProService;
+
+    @Autowired
+    private WesternMedicineService westernMedicineService;
 
     @Autowired
     private WesternMedicineSpecificationsService westernMedicineSpecificationsService;
@@ -124,7 +132,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
     }
 
     /**
-     * 医生端查看药品详情(不包含健康药品)
+     * 医生端查看药品详情(中西药+协定方)
      *
      * @param skuCode
      * @return
@@ -134,13 +142,14 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
         StoreSkuInfoEntity storeSkuInfoEntity = storeSkuInfoService.queryBySkuCode(skuCode, UpOffEnum.DOWN.getCode());
         //店铺信息
         StoreEntity storeEntity = storeService.getById(storeSkuInfoEntity.getStoreId());
-        if(Objects.isNull(storeSkuInfoEntity)||Objects.isNull(storeEntity)){
+        if (Objects.isNull(storeSkuInfoEntity) || Objects.isNull(storeEntity)) {
             throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR);
         }
 
         ProductDetailInfoVO detailInfoVO = ProductDetailInfoVO.builder()
                 .skuCode(storeSkuInfoEntity.getSkuCode())
                 .skuName(storeSkuInfoEntity.getSkuName())
+                .medicineCode(storeSkuInfoEntity.getMedicineCode())
                 .salePrice(BigDecimalUtil.F2Y(storeSkuInfoEntity.getPrice()))
                 .skuType(storeSkuInfoEntity.getSkuType())
                 .storeId(storeEntity.getId())
@@ -148,17 +157,24 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                 .build();
         if (storeSkuInfoEntity.getSkuType() == ProductTypeEnum.MEDICINE.getCode()) {
             //西药
-
-        }
-        if (storeSkuInfoEntity.getSkuType() == ProductTypeEnum.MEDICINE.getCode()) {
-            //中药
-
-        }
-        if (storeSkuInfoEntity.getSkuType() == ProductTypeEnum.MEDICINE.getCode()) {
+            ProductWesternDetailVO productWesternDetailVO = new ProductWesternDetailVO();
+            WesternMedicineEntity westernMedicineEntity = westernMedicineService.queryByMedicineCode(storeSkuInfoEntity.getMedicineCode());
+            WesternMedicineSpecificationsEntity westernMedicineSpecificationsEntity = westernMedicineSpecificationsService.queryByCode(storeSkuInfoEntity.getMedicineCode());
+            AgreementPrescriptionMedicineEntity agreementPrescriptionMedicineEntity = agreementPrescriptionMedicineService.queryByCode(storeSkuInfoEntity.getMedicineCode());
+            BeanUtils.copyProperties(westernMedicineEntity, productWesternDetailVO);
+            BeanUtils.copyProperties(westernMedicineSpecificationsEntity, productWesternDetailVO);
+            BeanUtils.copyProperties(agreementPrescriptionMedicineEntity, productWesternDetailVO);
+            detailInfoVO.setProductWesternDetailVO(productWesternDetailVO);
+        } else if (storeSkuInfoEntity.getSkuType() == ProductTypeEnum.AGREEMENT.getCode()) {
             //协定方
-
+            ProductAgreementDetailVO productAgreementDetailVO = new ProductAgreementDetailVO();
+            AgreementPrescriptionMedicineEntity agreementPrescriptionMedicineEntity = agreementPrescriptionMedicineService.queryByCode(storeSkuInfoEntity.getMedicineCode());
+            BeanUtils.copyProperties(agreementPrescriptionMedicineEntity, productAgreementDetailVO);
+            detailInfoVO.setProductAgreementDetailVO(productAgreementDetailVO);
+        } else {
+            log.error("查询的药品详情不存在,skuCode={}", skuCode);
+            throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR);
         }
-
-        return null;
+        return detailInfoVO;
     }
 }
