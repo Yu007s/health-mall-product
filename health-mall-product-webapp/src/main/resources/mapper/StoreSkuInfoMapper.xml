@@ -148,7 +148,7 @@
         </if>
         <if test="categoryId != null ">
             and FIND_IN_SET(#{categoryId},REPLACE(REPLACE(REPLACE(JSON_UNQUOTE(category_info), '[', ''), ']', '')' ','')
-            ) = 0
+            ) > 0
         </if>
         and FIND_IN_SET(#{cityId},REPLACE(REPLACE(REPLACE(JSON_UNQUOTE(prohibit_area_info), '[', ''), ']', '')' ','') )
         = 0

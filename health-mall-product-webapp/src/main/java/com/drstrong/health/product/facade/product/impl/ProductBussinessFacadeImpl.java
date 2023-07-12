@@ -141,11 +141,11 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
     @Override
     public ProductDetailInfoVO queryProductDetail(String skuCode) {
         StoreSkuInfoEntity storeSkuInfoEntity = storeSkuInfoService.queryBySkuCode(skuCode, UpOffEnum.DOWN.getCode());
-        //店铺信息
-        StoreEntity storeEntity = storeService.getById(storeSkuInfoEntity.getStoreId());
-        if (Objects.isNull(storeSkuInfoEntity) || Objects.isNull(storeEntity)) {
+        if (Objects.isNull(storeSkuInfoEntity)) {
             throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR);
         }
+        //店铺信息
+        StoreEntity storeEntity = storeService.getById(storeSkuInfoEntity.getStoreId());
 
         ProductDetailInfoVO detailInfoVO = ProductDetailInfoVO.builder()
                 .skuCode(storeSkuInfoEntity.getSkuCode())
