@@ -11,6 +11,8 @@ import com.drstrong.health.product.service.sku.StoreSkuRecommendService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author liuqiuyi
  * @date 2023/6/8 15:20
@@ -31,5 +33,17 @@ public class StoreSkuRecommendServiceImpl extends ServiceImpl<StoreSkuRecommendM
     public Page<StoreSkuRecommendEntity> pageQueryByParam(PageSkuRecommendRequest pageSkuRecommendRequest) {
         Page<StoreSkuRecommendEntity> entityPage = new Page<>(pageSkuRecommendRequest.getPageNo(), pageSkuRecommendRequest.getPageSize());
         return baseMapper.pageQueryByParam(entityPage, pageSkuRecommendRequest);
+    }
+
+    /**
+     * 根据条件查询
+     *
+     * @param pageSkuRecommendRequest
+     * @author liuqiuyi
+     * @date 2023/7/13 17:07
+     */
+    @Override
+    public List<StoreSkuRecommendEntity> listQueryByParam(PageSkuRecommendRequest pageSkuRecommendRequest) {
+        return baseMapper.listQueryByParam(pageSkuRecommendRequest);
     }
 }
