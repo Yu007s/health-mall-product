@@ -476,19 +476,14 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         }
         Integer pageNo = querySkuBusinessListRequest.getPageNo();
         Integer pageSize = querySkuBusinessListRequest.getPageSize();
-        int start = (pageNo - 1) * pageSize;
-        int end = pageNo * pageSize - 1;
-        List<SkuBusinessListDTO> result = null;
-        if (start > skuBusinessListDTOList.size() - 1 || end > skuBusinessListDTOList.size() - 1 || start >= end) {
-            result = Lists.newArrayList();
-        }
-        result = skuBusinessListDTOList.subList(start, end);
+        int start = (pageNo - 1) * pageSize > skuBusinessListDTOList.size() ? skuBusinessListDTOList.size() : (pageNo - 1) * pageSize;
+        int end = pageNo * pageSize > skuBusinessListDTOList.size() ? skuBusinessListDTOList.size() : pageNo * pageSize;
+        List<SkuBusinessListDTO> result = skuBusinessListDTOList.subList(start, end);
         PageVO<SkuBusinessListDTO> pageVO = PageVO.newBuilder()
                 .result(result)
-                .totalCount((int) result.size())
+                .totalCount(ObjectUtil.isNull(result) ? null : (int) result.size())
                 .pageNo(querySkuBusinessListRequest.getPageNo())
                 .pageSize(querySkuBusinessListRequest.getPageSize()).build();
-
         return pageVO;
     }
 }
