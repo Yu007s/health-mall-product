@@ -1,6 +1,7 @@
 package com.drstrong.health.product.facade.category.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.drstrong.health.product.facade.category.CategoryFacade;
@@ -64,23 +65,32 @@ public class CategoryFacadeImpl implements CategoryFacade {
      */
     @Override
     public List<CategoryVO> queryAllCategoryByProductType(Integer productType, Boolean needFilter) {
-        List<CategoryVO> categoryVoList = Lists.newArrayList();
         // 1.查询 中西药/协定方 分类,并根据条件是否过滤掉协定方
         if (CHINESE_WESTERN_AGREEMENT.contains(productType)) {
             List<CategoryEntity> westernCategoryList = categoryService.queryWesternAll();
             if (Objects.equals(Boolean.TRUE, needFilter)) {
                 westernCategoryList.removeIf(categoryEntity -> ObjectUtil.equals(categoryEntity.getId(), westernFilterId));
             }
-            categoryVoList = BeanUtil.copyToList(westernCategoryList, CategoryVO.class);
+            // 处理图标的url
+            return buildIconUrl(BeanUtil.copyToList(westernCategoryList, CategoryVO.class));
         }
         // 2.查询健康商品
         if (ObjectUtil.equal(ProductTypeEnum.HEALTH.getCode(), productType)) {
             List<CategoryEntity> healthCategoryEntityList = categoryService.queryHealthAll();
-            categoryVoList = BaseTree.listToTree(BeanUtil.copyToList(healthCategoryEntityList, CategoryVO.class));
+            // 处理图标的url
+            return BaseTree.listToTree(buildIconUrl(BeanUtil.copyToList(healthCategoryEntityList, CategoryVO.class)));
         }
         // 目前就这两种，后续如果有其他类型在扩展....
+        return Lists.newArrayList();
+    }
 
-        // 3.处理图标的url
+    /**
+     * 处理 icon 地址，拼接域名
+     */
+    private List<CategoryVO> buildIconUrl(List<CategoryVO> categoryVoList) {
+        if (CollectionUtil.isEmpty(categoryVoList)) {
+            return Lists.newArrayList();
+        }
         categoryVoList.forEach(categoryVO -> {
             if (StrUtil.isNotBlank(categoryVO.getIcon()) && !categoryVO.getIcon().startsWith(HTTP_STR)) {
                 String iconUrl = categoryVO.getIcon();
