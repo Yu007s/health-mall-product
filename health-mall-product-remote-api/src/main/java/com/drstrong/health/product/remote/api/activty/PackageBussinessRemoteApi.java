@@ -14,7 +14,10 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -27,9 +30,9 @@ public interface PackageBussinessRemoteApi {
 
     @ApiOperation("根据Code查询套餐详情")
     @GetMapping("/query/by-code")
-    ResultVO<ActivityPackageDetailDTO> queryDetailByCode(String activityPackageCode);
+    ResultVO<ActivityPackageDetailDTO> queryDetailByCode(@RequestParam("activityPackageCode") @Valid String activityPackageCode);
 
     @ApiOperation("医生端套餐列表查询")
     @PostMapping("/page/queryList")
-    ResultVO<PageVO<PackageBussinessListVO>> queryActivityPackageList(PackageBussinessQueryListRequest packageBussinessQueryListRequest);
+    ResultVO<PageVO<PackageBussinessListVO>> queryActivityPackageList(@RequestBody @Valid PackageBussinessQueryListRequest packageBussinessQueryListRequest);
 }
