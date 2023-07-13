@@ -136,7 +136,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                     .skuType(storeSkuInfoEntity.getSkuType())
                     .storeId(storeSkuInfoEntity.getStoreId())
                     .storeName(storeIdNameMap.get(storeSkuInfoEntity.getStoreId()))
-                    .salePrice(storeSkuInfoEntity.getPrice().toString())
+                    .salePrice(BigDecimalUtil.F2Y(storeSkuInfoEntity.getPrice()))
                     .imageInfo(imageInfo)
                     .build();
             result.add(productListInfoVO);

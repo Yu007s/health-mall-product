@@ -33,23 +33,6 @@ import java.util.Set;
 public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, StoreSkuInfoEntity> implements StoreSkuInfoService {
 
     /**
-     * 条件查询sku信息
-     *
-     * @param queryStoreSkuInfoRequest
-     * @return
-     */
-    @Override
-    public PageVO<StoreSkuInfoEntity> queryByProductTypeAndKeyAndStoreId(QueryStoreSkuInfoRequest queryStoreSkuInfoRequest) {
-        if (queryStoreSkuInfoRequest == null || queryStoreSkuInfoRequest.getStoreId() == null || queryStoreSkuInfoRequest.getProductType() == null) {
-            throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
-        }
-        queryStoreSkuInfoRequest.setSkuStatus(UpOffEnum.UP.getCode());
-        Page<StoreSkuInfoEntity> entityPage = new Page<>(queryStoreSkuInfoRequest.getPageNo(), queryStoreSkuInfoRequest.getPageSize());
-        return baseMapper.pageQueryStoreSkuInfo(entityPage, queryStoreSkuInfoRequest);
-    }
-
-
-    /**
      * 根据编码查询 sku 信息
      *
      * @param skuCode

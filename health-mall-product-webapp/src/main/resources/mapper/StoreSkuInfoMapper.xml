@@ -110,22 +110,6 @@
         </foreach>
     </update>
 
-    <select id="pageQueryStoreSkuInfo" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from pms_store_sku_info
-        where del_flag = 0
-        and store_id = #{queryParam.store_id}
-        and sku_status = #{queryParam.skuStatus}
-        and sku_type = #{queryParam.productType}
-        <if test="queryParam.key != null and queryParam.key != ''">
-            and(
-            sku_code LIKE concat('%',#{queryParam.key},'%') or sku_name LIKE concat('%',#{queryParam.key},'%')
-            )
-        </if>
-        order by id desc
-    </select>
-
     <select id="queryStoreSkuInfoByCategory" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>

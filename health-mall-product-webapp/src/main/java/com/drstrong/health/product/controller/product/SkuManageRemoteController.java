@@ -2,10 +2,8 @@ package com.drstrong.health.product.controller.product;
 
 import com.drstrong.health.product.enums.ScheduledStatusEnum;
 import com.drstrong.health.product.facade.sku.SkuManageFacade;
-import com.drstrong.health.product.model.dto.product.ProductListInfoVO;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
-import com.drstrong.health.product.model.request.product.SearchWesternRequestParamBO;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
@@ -63,5 +61,4 @@ public class SkuManageRemoteController implements SkuManageRemoteApi {
 		skuManageFacade.scheduledSkuUpDown(scheduledSkuUpDownRequest);
 		return ResultVO.success();
 	}
-
 }

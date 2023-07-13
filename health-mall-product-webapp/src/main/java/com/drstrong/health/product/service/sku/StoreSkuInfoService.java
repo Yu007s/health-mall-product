@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.enums.UpOffEnum;
-import com.drstrong.health.product.model.request.product.QueryStoreSkuInfoRequest;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
-import com.drstrong.health.product.model.response.PageVO;
 
 import java.util.List;
 import java.util.Set;
@@ -16,8 +14,6 @@ import java.util.Set;
  * @date 2023/6/8 14:47
  */
 public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
-
-	PageVO<StoreSkuInfoEntity> queryByProductTypeAndKeyAndStoreId(QueryStoreSkuInfoRequest queryStoreSkuInfoRequest);
 
 	/**
 	 * 根据编码查询 sku 信息

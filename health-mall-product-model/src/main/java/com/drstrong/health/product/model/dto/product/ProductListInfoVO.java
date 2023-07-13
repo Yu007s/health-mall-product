@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -64,7 +65,7 @@ public class ProductListInfoVO implements Serializable {
      * 售价
      */
     @ApiModelProperty(value = "售价")
-    private String salePrice;
+    private BigDecimal salePrice;
 
     /**
      * 常用药标识：0，否；1，是

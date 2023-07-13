@@ -211,7 +211,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         String skuCode = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0).getSkuCode();
         Integer amount = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0).getAmount();
         Map<String, List<SkuCanStockDTO>> stockToMap = stockRemoteProService.getStockToMap(Lists.newArrayList(skuCode));
-        if(CollectionUtils.isEmpty(stockToMap.get(skuCode))||stockToMap.get(skuCode).get(0).getAvailableQuantity()<amount){
+        if (CollectionUtils.isEmpty(stockToMap.get(skuCode)) || stockToMap.get(skuCode).stream().mapToLong(SkuCanStockDTO::getAvailableQuantity).sum() < amount) {
             log.error("套餐内的药品库存不足。");
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_LOCK_INWENTORY);
         }
@@ -225,8 +225,8 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 .productType(saveOrUpdateActivityPackageRequest.getProductType())
                 .storeId(saveOrUpdateActivityPackageRequest.getStoreId())
                 .activityStatus(UpOffEnum.DOWN.getCode())
-                .originalPrice(saveOrUpdateActivityPackageRequest.getOriginalPrice().longValue())
-                .preferentialPrice(saveOrUpdateActivityPackageRequest.getPreferentialPrice().longValue())
+                .originalPrice(BigDecimalUtil.Y2F(saveOrUpdateActivityPackageRequest.getOriginalPrice()))
+                .preferentialPrice(BigDecimalUtil.Y2F(saveOrUpdateActivityPackageRequest.getPreferentialPrice()))
                 .originalAmountDisplay(saveOrUpdateActivityPackageRequest.getOriginalAmountDisplay())
                 .activityPackageImageInfo(saveOrUpdateActivityPackageRequest.getActivityPackageImageInfo())
                 .activityPackageIntroduce(saveOrUpdateActivityPackageRequest.getActivityPackageIntroduce())
@@ -239,8 +239,8 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 .activityPackageCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode())
                 .skuCode(activityPackageSkuRequest.getSkuCode())
                 .skuName(activityPackageSkuRequest.getSkuName())
-                .originalPrice(activityPackageSkuRequest.getOriginalPrice().longValue())
-                .preferentialPrice(activityPackageSkuRequest.getPreferential_price().longValue())
+                .originalPrice(BigDecimalUtil.Y2F(activityPackageSkuRequest.getOriginalPrice()))
+                .preferentialPrice(BigDecimalUtil.Y2F(activityPackageSkuRequest.getPreferential_price()))
                 .amount(activityPackageSkuRequest.getAmount())
                 .build();
         activityPackageSkuInfoEntity.setChangedAt(dateTime);
@@ -435,7 +435,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         List<SkuBusinessListDTO> skuBusinessListDTOList = new ArrayList<>();
         if (ProductTypeEnum.MEDICINE.getCode().equals(querySkuBusinessListRequest.getProductType())) {
             List<AgreementSkuInfoVO> westernSkuInfoVoList = skuInfoSummaryDTO.getWesternSkuInfoVoList();
-            if (CollectionUtil.isNotEmpty(westernSkuInfoVoList)||CollectionUtil.isNotEmpty(skuCanStockList)) {
+            if (CollectionUtil.isNotEmpty(westernSkuInfoVoList) || CollectionUtil.isNotEmpty(skuCanStockList)) {
                 for (AgreementSkuInfoVO agreementSkuInfoVO : westernSkuInfoVoList) {
                     List<SkuCanStockDTO> skuCanStockDTOS = skuCanStockList.get(agreementSkuInfoVO.getSkuCode());
                     if (CollectionUtil.isEmpty(skuCanStockDTOS)) {
@@ -471,7 +471,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                     skuBusinessListDTOList.add(skuBusinessListDTO);
                 }
             }
-        }else{
+        } else {
             log.error("套餐目前只支持中西药和协定方");
         }
         Integer pageNo = querySkuBusinessListRequest.getPageNo();
