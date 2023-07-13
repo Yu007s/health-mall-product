@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -21,9 +22,11 @@ public class QuerySkuBusinessListRequest extends PageRequest implements Serializ
 
     private static final long serialVersionUID = 1232569972108814648L;
 
+    @NotNull(message = "商品类型不能为空")
     @ApiModelProperty("商品类型(1-中西药，3-协定方)")
     private Integer productType;
 
+    @NotNull(message = "店铺信息不能为空")
     @ApiModelProperty("店铺id")
     private Long storeId;
 
