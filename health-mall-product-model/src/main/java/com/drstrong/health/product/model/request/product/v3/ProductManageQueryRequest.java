@@ -42,6 +42,9 @@ public class ProductManageQueryRequest extends PageRequest implements Serializab
 	@ApiModelProperty("sku 编码")
 	private String skuCode;
 
+	@ApiModelProperty("sku编码/sku名称")
+	private String key;
+
 	@ApiModelProperty("sku 状态")
 	private Integer skuStatus;
 

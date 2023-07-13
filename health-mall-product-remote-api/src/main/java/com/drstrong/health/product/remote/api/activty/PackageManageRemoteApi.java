@@ -3,12 +3,14 @@ package com.drstrong.health.product.remote.api.activty;
 import com.drstrong.health.product.enums.ScheduledStatusEnum;
 import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
+import com.drstrong.health.product.model.dto.sku.SkuBusinessListDTO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
+import com.drstrong.health.product.model.request.sku.QuerySkuBusinessListRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.PackageManageListVO;
 import com.drstrong.health.product.model.response.product.v3.AgreementSkuInfoVO;
@@ -52,4 +54,8 @@ public interface PackageManageRemoteApi {
     @ApiOperation("预约上下架")
     @PostMapping("/scheduled/up-or-down")
     ResultVO<Void> scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
+
+    @ApiOperation("添加套餐时的sku搜索")
+    @PostMapping("/page/querySku")
+    ResultVO<PageVO<SkuBusinessListDTO>> getSkuBusinessList(QuerySkuBusinessListRequest querySkuBusinessListRequest);
 }

@@ -3,10 +3,12 @@ package com.drstrong.health.product.controller.activty;
 import com.drstrong.health.product.enums.ScheduledStatusEnum;
 import com.drstrong.health.product.facade.activty.PackageManageFacade;
 import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
+import com.drstrong.health.product.model.dto.sku.SkuBusinessListDTO;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
+import com.drstrong.health.product.model.request.sku.QuerySkuBusinessListRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.product.PackageManageListVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -97,6 +99,18 @@ public class PackageManageRemoteController implements PackageManageRemoteApi {
     public ResultVO<Void> scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest) {
         packageManageFacade.scheduledActivityPackageUpDown(scheduledSkuUpDownRequest);
         return ResultVO.success();
+    }
+
+    /**
+     * 添加套餐时的sku搜索
+     *
+     * @param querySkuBusinessListRequest
+     * @return
+     */
+    @Override
+    public ResultVO<PageVO<SkuBusinessListDTO>> getSkuBusinessList(QuerySkuBusinessListRequest querySkuBusinessListRequest) {
+        PageVO<SkuBusinessListDTO> skuBusinessListList = packageManageFacade.getPackageSkuBusinessList(querySkuBusinessListRequest);
+        return ResultVO.success(skuBusinessListList);
     }
 
 }

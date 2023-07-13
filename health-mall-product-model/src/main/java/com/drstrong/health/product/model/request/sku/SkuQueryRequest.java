@@ -35,6 +35,9 @@ public class SkuQueryRequest implements Serializable {
     @ApiModelProperty("sku名称，支持模糊查询")
     private String skuName;
 
+    @ApiModelProperty("sku名称/sku编码，支持模糊查询")
+    private String key;
+
     /**
      * @see com.drstrong.health.product.model.enums.UpOffEnum
      */

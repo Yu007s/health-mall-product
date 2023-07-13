@@ -10,11 +10,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.facade.incentive.SkuIncentivePolicyFacade;
+import com.drstrong.health.product.facade.sku.SkuBusinessBaseFacade;
+import com.drstrong.health.product.facade.sku.SkuBusinessFacadeHolder;
 import com.drstrong.health.product.facade.sku.SkuManageFacade;
 import com.drstrong.health.product.facade.sku.SkuScheduledConfigFacade;
 import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
 import com.drstrong.health.product.model.dto.product.PackageSkuDetailDTO;
+import com.drstrong.health.product.model.dto.sku.SkuBusinessListDTO;
+import com.drstrong.health.product.model.dto.sku.SkuInfoSummaryDTO;
 import com.drstrong.health.product.model.dto.stock.SkuCanStockDTO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
@@ -30,9 +34,12 @@ import com.drstrong.health.product.model.request.product.ActivityPackageManageQu
 import com.drstrong.health.product.model.request.product.ActivityPackageSkuRequest;
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
+import com.drstrong.health.product.model.request.sku.QuerySkuBusinessListRequest;
+import com.drstrong.health.product.model.request.sku.SkuQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDetailVO;
 import com.drstrong.health.product.model.response.product.PackageManageListVO;
+import com.drstrong.health.product.model.response.product.v3.AgreementSkuInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
@@ -94,6 +101,9 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
 
     @Autowired
     private StockRemoteProService stockRemoteProService;
+
+    @Autowired
+    private SkuBusinessFacadeHolder skuBusinessFacadeHolder;
 
 
     /**
@@ -403,5 +413,82 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             log.error("根据activityPackageCode未找到数据,可能传入的参数为空,或者存在非法的activityPackageCode,参数为:{}", JSONUtil.toJsonStr(updateSkuStateRequest));
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_IS_NULL);
         }
+    }
+
+    /**
+     * 条件检索sku列表
+     *
+     * @param querySkuBusinessListRequest
+     * @return
+     */
+    @Override
+    public PageVO<SkuBusinessListDTO> getPackageSkuBusinessList(QuerySkuBusinessListRequest querySkuBusinessListRequest) {
+        SkuQueryRequest skuQueryRequest = SkuQueryRequest.builder()
+                .key(querySkuBusinessListRequest.getKey())
+                .storeId(querySkuBusinessListRequest.getStoreId())
+                .skuStatus(UpOffEnum.UP.getCode())
+                .needQueryInventory(Boolean.TRUE)
+                .build();
+        SkuBusinessBaseFacade skuBusinessBaseFacade = skuBusinessFacadeHolder.getSkuBusinessBaseFacade(querySkuBusinessListRequest.getProductType());
+        SkuInfoSummaryDTO skuInfoSummaryDTO = skuBusinessBaseFacade.querySkuByParam(skuQueryRequest);
+        Map<String, List<SkuCanStockDTO>> skuCanStockList = skuInfoSummaryDTO.getSkuCanStockList();
+        List<SkuBusinessListDTO> skuBusinessListDTOList = new ArrayList<>();
+        if (ProductTypeEnum.MEDICINE.getCode().equals(querySkuBusinessListRequest.getProductType())) {
+            List<AgreementSkuInfoVO> westernSkuInfoVoList = skuInfoSummaryDTO.getWesternSkuInfoVoList();
+            if (CollectionUtil.isNotEmpty(westernSkuInfoVoList)||CollectionUtil.isNotEmpty(skuCanStockList)) {
+                for (AgreementSkuInfoVO agreementSkuInfoVO : westernSkuInfoVoList) {
+                    List<SkuCanStockDTO> skuCanStockDTOS = skuCanStockList.get(agreementSkuInfoVO.getSkuCode());
+                    if (CollectionUtil.isEmpty(skuCanStockDTOS)) {
+                        continue;
+                    }
+                    SkuBusinessListDTO skuBusinessListDTO = SkuBusinessListDTO.builder()
+                            .skuCode(agreementSkuInfoVO.getSkuCode())
+                            .productType(agreementSkuInfoVO.getProductType())
+                            .skuName(agreementSkuInfoVO.getSkuName())
+                            .storeId(agreementSkuInfoVO.getStoreId())
+                            .storeName(agreementSkuInfoVO.getStoreName())
+                            .salePrice(agreementSkuInfoVO.getSalePrice())
+                            .build();
+                    skuBusinessListDTOList.add(skuBusinessListDTO);
+                }
+            }
+        } else if (ProductTypeEnum.AGREEMENT.getCode().equals(querySkuBusinessListRequest.getProductType())) {
+            List<AgreementSkuInfoVO> agreementSkuInfoVoList = skuInfoSummaryDTO.getAgreementSkuInfoVoList();
+            if (CollectionUtil.isNotEmpty(agreementSkuInfoVoList) || CollectionUtil.isNotEmpty(skuCanStockList)) {
+                for (AgreementSkuInfoVO agreementSkuInfoVO : agreementSkuInfoVoList) {
+                    List<SkuCanStockDTO> skuCanStockDTOS = skuCanStockList.get(agreementSkuInfoVO.getSkuCode());
+                    if (CollectionUtil.isEmpty(skuCanStockDTOS)) {
+                        continue;
+                    }
+                    SkuBusinessListDTO skuBusinessListDTO = SkuBusinessListDTO.builder()
+                            .skuCode(agreementSkuInfoVO.getSkuCode())
+                            .productType(agreementSkuInfoVO.getProductType())
+                            .skuName(agreementSkuInfoVO.getSkuName())
+                            .storeId(agreementSkuInfoVO.getStoreId())
+                            .storeName(agreementSkuInfoVO.getStoreName())
+                            .salePrice(agreementSkuInfoVO.getSalePrice())
+                            .build();
+                    skuBusinessListDTOList.add(skuBusinessListDTO);
+                }
+            }
+        }else{
+            log.error("套餐目前只支持中西药和协定方");
+        }
+        Integer pageNo = querySkuBusinessListRequest.getPageNo();
+        Integer pageSize = querySkuBusinessListRequest.getPageSize();
+        int start = (pageNo - 1) * pageSize;
+        int end = pageNo * pageSize - 1;
+        List<SkuBusinessListDTO> result = null;
+        if (start > skuBusinessListDTOList.size() - 1 || end > skuBusinessListDTOList.size() - 1 || start >= end) {
+            result = Lists.newArrayList();
+        }
+        result = skuBusinessListDTOList.subList(start, end);
+        PageVO<SkuBusinessListDTO> pageVO = PageVO.newBuilder()
+                .result(result)
+                .totalCount((int) result.size())
+                .pageNo(querySkuBusinessListRequest.getPageNo())
+                .pageSize(querySkuBusinessListRequest.getPageSize()).build();
+
+        return pageVO;
     }
 }

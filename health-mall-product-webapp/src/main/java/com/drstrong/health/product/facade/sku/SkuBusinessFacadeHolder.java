@@ -53,7 +53,7 @@ public class SkuBusinessFacadeHolder {
      * @author liuqiuyi
      * @date 2023/6/20 10:53
      */
-    public SkuBusinessBaseFacade getMedicineWarehouseFacade(Integer productTypeCode) {
+    public SkuBusinessBaseFacade getSkuBusinessBaseFacade(Integer productTypeCode) {
         return Optional.ofNullable(ENUM_OPERATE_MAP.get(productTypeCode)).orElseThrow(() -> new BusinessException(StrFormatter.format("未找到code为{}的sku处理类!", productTypeCode)));
     }
 

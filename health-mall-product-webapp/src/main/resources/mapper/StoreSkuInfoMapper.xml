@@ -76,6 +76,9 @@
         <if test="queryParam.productType != null">
             and sku_type = #{queryParam.productType}
         </if>
+        <if test="queryParam.key != null">
+            and (sku_code = LIKE concat('%',#{queryParam.key},'%') or sku_name LIKE concat('%',#{queryParam.key},'%') )
+        </if>
         order by id desc
     </sql>
 
