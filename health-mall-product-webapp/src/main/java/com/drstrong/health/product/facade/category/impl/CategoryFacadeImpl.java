@@ -71,13 +71,11 @@ public class CategoryFacadeImpl implements CategoryFacade {
             if (Objects.equals(Boolean.TRUE, needFilter)) {
                 westernCategoryList.removeIf(categoryEntity -> ObjectUtil.equals(categoryEntity.getId(), westernFilterId));
             }
-            // 处理图标的url
             return buildIconUrl(BeanUtil.copyToList(westernCategoryList, CategoryVO.class));
         }
         // 2.查询健康商品
         if (ObjectUtil.equal(ProductTypeEnum.HEALTH.getCode(), productType)) {
             List<CategoryEntity> healthCategoryEntityList = categoryService.queryHealthAll();
-            // 处理图标的url
             return BaseTree.listToTree(buildIconUrl(BeanUtil.copyToList(healthCategoryEntityList, CategoryVO.class)));
         }
         // 目前就这两种，后续如果有其他类型在扩展....

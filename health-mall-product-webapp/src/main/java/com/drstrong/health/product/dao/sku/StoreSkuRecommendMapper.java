@@ -7,6 +7,8 @@ import com.drstrong.health.product.model.request.sku.recommend.PageSkuRecommendR
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @author liuqiuyi
  * @date 2023/6/8 14:42
@@ -15,4 +17,6 @@ import org.apache.ibatis.annotations.Param;
 public interface StoreSkuRecommendMapper extends BaseMapper<StoreSkuRecommendEntity> {
 
     Page<StoreSkuRecommendEntity> pageQueryByParam(Page<StoreSkuRecommendEntity> entityPage, @Param("queryParam") PageSkuRecommendRequest pageSkuRecommendRequest);
+
+    List<StoreSkuRecommendEntity> listQueryByParam(@Param("queryParam") PageSkuRecommendRequest pageSkuRecommendRequest);
 }

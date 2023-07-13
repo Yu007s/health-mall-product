@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.sku.StoreSkuRecommendEntity;
 import com.drstrong.health.product.model.request.sku.recommend.PageSkuRecommendRequest;
 
+import java.util.List;
+
 /**
  * @author liuqiuyi
  * @date 2023/6/8 14:47
@@ -26,4 +28,12 @@ public interface StoreSkuRecommendService extends IService<StoreSkuRecommendEnti
      * @date 2023/7/10 17:44
      */
     Page<StoreSkuRecommendEntity> pageQueryByParam(PageSkuRecommendRequest pageSkuRecommendRequest);
+
+    /**
+     * 根据条件查询
+     *
+     * @author liuqiuyi
+     * @date 2023/7/13 17:07
+     */
+    List<StoreSkuRecommendEntity> listQueryByParam(PageSkuRecommendRequest pageSkuRecommendRequest);
 }

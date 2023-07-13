@@ -36,8 +36,7 @@
                 changed_at
     </sql>
 
-    <select id="pageQueryByParam"
-            resultMap="BaseResultMap">
+    <sql id="queryByParam">
         select
         <include refid="Base_Column_List"/>
         from pms_store_sku_recommend
@@ -53,5 +52,13 @@
             or
             #{queryParam.keyword} MEMBER OF (recommend_detail_info_keyword_array)
         </if>
+    </sql>
+
+    <select id="pageQueryByParam" resultMap="BaseResultMap">
+        <include refid="queryByParam"/>
+    </select>
+
+    <select id="listQueryByParam" resultMap="BaseResultMap">
+        <include refid="queryByParam"/>
     </select>
 </mapper>

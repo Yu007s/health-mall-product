@@ -108,7 +108,17 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
             log.info("未查询到任何sku推荐数据，参数为：{}", JSONUtil.toJsonStr(pageSkuRecommendRequest));
             return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(pageSkuRecommendRequest.getPageNo()).pageSize(pageSkuRecommendRequest.getPageSize()).build();
         }
-        List<StoreSkuRecommendEntity> storeSkuRecommendEntityList = storeSkuRecommendEntityPage.getRecords();
+        List<SkuRecommendManageResponse> recommendManageResponseList = buildRecommendManageResponseList(storeSkuRecommendEntityPage.getRecords());
+        return PageVO.newBuilder().result(recommendManageResponseList).totalCount((int) storeSkuRecommendEntityPage.getTotal()).pageNo(pageSkuRecommendRequest.getPageNo()).pageSize(pageSkuRecommendRequest.getPageSize()).build();
+    }
+
+    @Override
+    public List<SkuRecommendManageResponse> listQuery(PageSkuRecommendRequest pageSkuRecommendRequest) {
+        List<StoreSkuRecommendEntity> storeSkuRecommendEntityList = storeSkuRecommendService.listQueryByParam(pageSkuRecommendRequest);
+        return buildRecommendManageResponseList(storeSkuRecommendEntityList);
+    }
+
+    private List<SkuRecommendManageResponse> buildRecommendManageResponseList(List<StoreSkuRecommendEntity> storeSkuRecommendEntityList) {
         Set<String> skuCodes = Sets.newHashSetWithExpectedSize(storeSkuRecommendEntityList.size());
         Set<Long> storeIds = Sets.newHashSetWithExpectedSize(storeSkuRecommendEntityList.size());
         storeSkuRecommendEntityList.forEach(storeSkuRecommendEntity -> {
@@ -137,11 +147,6 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
             skuRecommendManageResponse.setProductTypeName(ProductTypeEnum.getValueByCode(medicineUsageDTO.getProductType()));
             recommendManageResponseList.add(skuRecommendManageResponse);
         });
-        return PageVO.newBuilder().result(recommendManageResponseList).totalCount((int) storeSkuRecommendEntityPage.getTotal()).pageNo(pageSkuRecommendRequest.getPageNo()).pageSize(pageSkuRecommendRequest.getPageSize()).build();
-    }
-
-    @Override
-    public List<SkuRecommendManageResponse> listQuery(PageSkuRecommendRequest pageSkuRecommendRequest) {
-        return null;
+        return recommendManageResponseList;
     }
 }
