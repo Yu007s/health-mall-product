@@ -239,7 +239,7 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
      */
     @Override
     public List<StoreSkuInfoEntity> queryStoreSkuInfoByCategoryAndCityId(String key, Long categoryId, Integer cityId, List<Long> storeIds) {
-        if (categoryId == null) {
+        if (CollectionUtil.isEmpty(storeIds) || Objects.isNull(cityId)) {
             return Lists.newArrayList();
         }
         return baseMapper.queryStoreSkuInfoByCategoryAndType(key, UpOffEnum.UP.getCode(), categoryId, cityId, storeIds);

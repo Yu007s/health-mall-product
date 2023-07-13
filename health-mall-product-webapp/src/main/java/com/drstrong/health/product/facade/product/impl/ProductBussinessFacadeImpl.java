@@ -124,11 +124,11 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
         //组装返回信息
         List<ProductListInfoVO> result = new ArrayList<>();
         for (StoreSkuInfoEntity storeSkuInfoEntity : storeSkuInfoEntities) {
-            String imageInfo = null;
+            List<MedicineImageDTO> imageInfo = new ArrayList<>();
             if (ProductTypeEnum.MEDICINE.getCode().equals(storeSkuInfoEntity.getSkuType()) && MapUtil.isNotEmpty(medicineSpecificationsEntityListMap)) {
-                imageInfo = medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode());
+                imageInfo = JSONObject.parseArray(medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()), MedicineImageDTO.class);
             } else if (ProductTypeEnum.AGREEMENT.getCode().equals(storeSkuInfoEntity.getSkuType()) && MapUtil.isNotEmpty(medicineSpecificationsEntityListMap)) {
-                imageInfo = agreementSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode());
+                imageInfo = JSONObject.parseArray(agreementSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()), MedicineImageDTO.class);
             }
             ProductListInfoVO productListInfoVO = ProductListInfoVO.builder()
                     .skuName(storeSkuInfoEntity.getSkuName())
