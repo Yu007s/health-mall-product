@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -38,25 +39,25 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
     @ApiModelProperty("套餐编码")
     private String activityPackageCode;
 
-    @NotBlank(message = "套餐商品类型不能为空")
+    @NotNull(message = "套餐商品类型不能为空")
     @ApiModelProperty("套餐商品类型  1-西成药")
     private Integer productType;
 
-    @NotBlank(message = "店铺ID不能为空")
+    @NotNull(message = "店铺ID不能为空")
     @ApiModelProperty("店铺ID")
     private Long storeId;
 
-    @NotBlank(message = "套餐商品列表不能为空")
+    @NotNull(message = "套餐商品列表不能为空")
     @ApiModelProperty("套餐商品列表")
     private List<ActivityPackageSkuRequest> activityPackageSkuList;
 
-    @NotBlank(message = "套餐原价格不能为空")
+    @NotNull(message = "套餐原价格不能为空")
     @ApiModelProperty("原价格")
     @DecimalMin(value = "0.01", message = "价格不能小于0.01")
     @DecimalMax(value = "9999999", message = "价格不能大于9999999")
     private BigDecimal originalPrice;
 
-    @NotBlank(message = "套餐优惠价格不能为空")
+    @NotNull(message = "套餐优惠价格不能为空")
     @ApiModelProperty("优惠价格")
     @DecimalMin(value = "0.01", message = "价格不能小于0.01")
     @DecimalMax(value = "9999999", message = "价格不能大于9999999")
@@ -65,7 +66,7 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
     @ApiModelProperty("是否展示原价(0不展示,1展示)，默认不展示")
     private Integer originalAmountDisplay;
 
-    @NotBlank(message = "活动套餐的图片信息不能为空")
+    @NotNull(message = "活动套餐的图片信息不能为空")
     @ApiModelProperty("活动套餐的图片信息")
     private List<String> activityPackageImageInfo;
 

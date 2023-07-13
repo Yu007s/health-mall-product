@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -37,23 +38,27 @@ public class ActivityPackageSkuRequest implements Serializable {
     private String skuName;
 
     @ApiModelProperty("商品类型")
+    @NotNull(message = "商品类型不能为空")
     private Integer productType;
 
     @ApiModelProperty("店铺 id")
+    @NotNull(message = "店铺ID不能为空")
     private Long storeId;
 
     @ApiModelProperty("原价")
+    @NotNull(message = "商品原价不能为空")
     @DecimalMin(value = "0.00", message = "原价不能小于0")
     @DecimalMax(value = "99999.99", message = "原价不能大于99999.99")
     private BigDecimal originalPrice;
 
     @ApiModelProperty("优惠价")
+    @NotNull(message = "商品优惠价不能为空")
     @DecimalMin(value = "0.00", message = "优惠价不能小于0")
     @DecimalMax(value = "99999.99", message = "优惠价不能大于99999.99")
     private BigDecimal preferential_price;
 
     @ApiModelProperty("数量")
-    @NotBlank(message = "数量不能为空")
+    @NotNull(message = "数量不能为空")
     private Integer amount;
 
 }

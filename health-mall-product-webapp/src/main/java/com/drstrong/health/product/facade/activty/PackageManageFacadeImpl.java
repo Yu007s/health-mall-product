@@ -481,7 +481,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         List<SkuBusinessListDTO> result = skuBusinessListDTOList.subList(start, end);
         PageVO<SkuBusinessListDTO> pageVO = PageVO.newBuilder()
                 .result(result)
-                .totalCount(ObjectUtil.isNull(result) ? null : (int) result.size())
+                .totalCount(ObjectUtil.isNull(result) ? 0 : (int) result.size())
                 .pageNo(querySkuBusinessListRequest.getPageNo())
                 .pageSize(querySkuBusinessListRequest.getPageSize()).build();
         return pageVO;
