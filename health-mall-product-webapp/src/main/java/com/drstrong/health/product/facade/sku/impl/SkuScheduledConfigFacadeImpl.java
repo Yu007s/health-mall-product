@@ -12,15 +12,20 @@ import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.entity.sku.SkuScheduledConfigEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.service.activty.ActivityPackageSkuInfoSevice;
+import com.drstrong.health.product.service.activty.PackageService;
 import com.drstrong.health.product.service.sku.SkuScheduledConfigService;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +57,9 @@ public class SkuScheduledConfigFacadeImpl implements SkuScheduledConfigFacade {
 
 	@Resource
 	SkuManageFacade skuManageFacade;
+
+	@Autowired
+	private PackageService packageService;
 
 	/**
 	 * 批量修改 skuCode 的定时配置
@@ -133,7 +141,11 @@ public class SkuScheduledConfigFacadeImpl implements SkuScheduledConfigFacade {
 		operationLogSendUtil.sendOperationLog(operationLog);
 		// 5.将 sku 的状态更新为 预约上架或预约下架
 		Integer skuStatus = Objects.equals(ScheduledSkuUpDownRequest.SCHEDULED_UP, scheduledSkuUpDownRequest.getScheduledType()) ? UpOffEnum.SCHEDULED_UP.getCode() : UpOffEnum.SCHEDULED_DOWN.getCode();
-		storeSkuInfoService.batchUpdateSkuStatusByCodes(Sets.newHashSet(scheduledSkuUpDownRequest.getSkuCode()), skuStatus, scheduledSkuUpDownRequest.getOperatorId());
+		if (scheduledSkuUpDownRequest.getSkuCode().startsWith(ProductTypeEnum.PACKAGE.getMark())) {
+			packageService.batchUpdateActivityStatusByCodes(Sets.newHashSet(scheduledSkuUpDownRequest.getSkuCode()), skuStatus, scheduledSkuUpDownRequest.getOperatorId());
+		} else {
+			storeSkuInfoService.batchUpdateSkuStatusByCodes(Sets.newHashSet(scheduledSkuUpDownRequest.getSkuCode()), skuStatus, scheduledSkuUpDownRequest.getOperatorId());
+		}
 	}
 
 	/**
