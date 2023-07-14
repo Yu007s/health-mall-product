@@ -142,7 +142,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	}
 
 	/**
-	 * 修改/报错套餐激励政策
+	 * 修改/保存套餐激励政策
 	 * @param saveOrUpdateSkuPolicyRequest
 	 */
 	@Override

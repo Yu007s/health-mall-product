@@ -31,7 +31,6 @@ public class ProductBussinessController implements ProductBussinessRemoteApi {
 
     @Override
     public ResultVO<ProductDetailInfoVO> queryProductDetail(@Valid String skuCode) {
-
         return ResultVO.success(productBussinessFacade.queryProductDetail(skuCode));
     }
 }
