@@ -63,7 +63,7 @@ public class SkuBusinessFacadeHolder {
      * @author liuqiuyi
      * @date 2023/7/11 17:30
      */
-    public List<MedicineUsageDTO> queryMedicineUsageBySkuCode(Set<String> skuCodes ) {
+    public List<MedicineUsageDTO> queryMedicineUsageBySkuCode(Set<String> skuCodes) {
         List<MedicineUsageDTO> medicineUsageDTOList = Lists.newArrayListWithCapacity(skuCodes.size());
         skuBusinessFacadeList.forEach(skuBusinessBaseFacade -> medicineUsageDTOList.addAll(skuBusinessBaseFacade.queryMedicineUsageBySkuCode(skuCodes)));
         return medicineUsageDTOList;

@@ -69,6 +69,7 @@
         select pwms.id,
         pwms.spec_code as medicineCode,
         pwms.spec_name,
+        pwms.packing_unit,
         pmu.relation_id,
         pmu.relation_type,
         pmu.medication_frequency,

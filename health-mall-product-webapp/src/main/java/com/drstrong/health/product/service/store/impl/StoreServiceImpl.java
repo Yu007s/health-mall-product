@@ -1,7 +1,9 @@
 package com.drstrong.health.product.service.store.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -16,6 +18,7 @@ import com.drstrong.health.product.model.entity.store.StoreLinkSupplierEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.StoreTypeEnum;
+import com.drstrong.health.product.model.request.store.QueryStoreRequest;
 import com.drstrong.health.product.model.request.store.SaveDeliveryRequest;
 import com.drstrong.health.product.model.request.store.SaveStoreSupplierPostageRequest;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
@@ -424,4 +427,22 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, StoreEntity> impl
         }
     }
 
+    /**
+     * 根据条件查询店铺信息，该方法可公用
+     *
+     * @param queryStoreRequest
+     * @author liuqiuyi
+     * @date 2023/7/14 10:09
+     */
+    @Override
+    public List<StoreEntity> queryStoreByParam(QueryStoreRequest queryStoreRequest) {
+        LambdaQueryWrapper<StoreEntity> queryWrapper = new LambdaQueryWrapper<StoreEntity>()
+                .eq(StoreEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .like(StrUtil.isNotBlank(queryStoreRequest.getStoreName()), StoreEntity::getStoreName, queryStoreRequest.getStoreName())
+                .eq(Objects.nonNull(queryStoreRequest.getStoreType()), StoreEntity::getStoreType, queryStoreRequest.getStoreType())
+                .in(CollectionUtil.isNotEmpty(queryStoreRequest.getAgencyIds()), StoreEntity::getAgencyId, queryStoreRequest.getAgencyIds())
+                .in(CollectionUtil.isNotEmpty(queryStoreRequest.getStoreIds()), StoreEntity::getId, queryStoreRequest.getStoreIds());
+
+        return baseMapper.selectList(queryWrapper);
+    }
 }

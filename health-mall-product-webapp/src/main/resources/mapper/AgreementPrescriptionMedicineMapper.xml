@@ -130,6 +130,7 @@
         select papm.id,
         papm.medicine_code,
         papm.medicine_name,
+        papm.packing_unit,
         pmu.relation_id,
         pmu.relation_type,
         pmu.medication_frequency,

@@ -44,13 +44,16 @@ public class MedicineUsageDTO implements Serializable {
     @ApiModelProperty("关联类型 1：西药规格 2：协定方")
     private Integer relationType;
 
+    @ApiModelProperty("外包装单位（盒,瓶...)")
+    private String packingUnit;
+
     @ApiModelProperty("用药频次")
     private String medicationFrequency;
 
     @ApiModelProperty("每次几片,几毫克,几粒等等:有适量的情况")
     private String eachDosageCount;
 
-    @ApiModelProperty("药品单位")
+    @ApiModelProperty("药品服用单位")
     private String eachDoseUnit;
 
     @ApiModelProperty("服用时间")

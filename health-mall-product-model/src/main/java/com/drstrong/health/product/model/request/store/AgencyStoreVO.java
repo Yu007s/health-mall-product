@@ -3,7 +3,10 @@ package com.drstrong.health.product.model.request.store;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -11,6 +14,9 @@ import java.io.Serializable;
  * @author liuqiuyi
  * @date 2022/8/8 19:36
  */
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Data
 @ApiModel("店铺和互联网 id 的对应关系")
 @JsonIgnoreProperties(ignoreUnknown = true)

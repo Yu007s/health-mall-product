@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service.store;
 
 import com.drstrong.health.product.model.entity.store.StoreEntity;
+import com.drstrong.health.product.model.request.store.QueryStoreRequest;
 import com.drstrong.health.product.model.request.store.StoreInfoDetailSaveRequest;
 import com.drstrong.health.product.model.response.store.StoreInfoEditResponse;
 import com.drstrong.health.product.model.response.store.StoreInfoResponse;
@@ -103,4 +104,12 @@ public interface StoreService {
 	 * @date 2022/8/8 19:57
 	 */
 	List<StoreEntity> getStoreByAgencyIds(Set<Long> agencyIds);
+
+	/**
+	 * 根据条件查询店铺信息
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/7/14 10:09
+	 */
+	List<StoreEntity> queryStoreByParam(QueryStoreRequest queryStoreRequest);
 }
