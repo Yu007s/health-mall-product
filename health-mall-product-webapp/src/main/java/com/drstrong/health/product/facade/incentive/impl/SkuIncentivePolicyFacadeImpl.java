@@ -149,8 +149,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	public void saveOrUpdatePackagePolicy(SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest) {
 		// 校验套餐
 		ActivityPackageInfoEntity packageByCode = packageService.findPackageByCode(saveOrUpdateSkuPolicyRequest.getSkuCode(), null);
-		storeSkuInfoService.checkSkuExistByCode(saveOrUpdateSkuPolicyRequest.getSkuCode(), null);
-		// 1.判断是保存还是更新激励政策
+		// 判断是保存还是更新激励政策
 		SkuIncentivePolicyEntity skuIncentivePolicyEntity = skuIncentivePolicyService.queryBySkuCode(saveOrUpdateSkuPolicyRequest.getSkuCode());
 		// 记录日志
 		OperationLog operationLog = OperationLog.buildOperationLog(saveOrUpdateSkuPolicyRequest.getSkuCode(), OperationLogConstant.MALL_PRODUCT_SKU_CHANGE,

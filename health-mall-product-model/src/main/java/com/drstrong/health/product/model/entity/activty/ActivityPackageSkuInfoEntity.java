@@ -29,11 +29,6 @@ public class ActivityPackageSkuInfoEntity  extends BaseStandardEntity implements
      */
     public final static Integer LIMITED_NUMBER_OF_PACHAGES_SKUS = 1;
 
-    /**
-     * 目前套餐限制的图片数量
-     */
-    public final static Integer LIMITED_NUMBER_OF_IMAGES = 5;
-
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
