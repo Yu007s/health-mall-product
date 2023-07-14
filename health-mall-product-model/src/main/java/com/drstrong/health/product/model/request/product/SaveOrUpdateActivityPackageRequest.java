@@ -47,7 +47,7 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
 
     @NotNull(message = "套餐商品列表不能为空")
     @ApiModelProperty("套餐商品列表")
-    @Size(max = ActivityPackageSkuInfoEntity.LIMITED_NUMBER_OF_PACHAGES_SKUS, message = "套餐商品列表数量超过限制")
+    @Size(max = 1, message = "套餐商品列表数量超过限制")
     private List<ActivityPackageSkuRequest> activityPackageSkuList;
 
     @NotNull(message = "套餐原价格不能为空")
@@ -67,7 +67,7 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
 
     @NotNull(message = "活动套餐的图片信息不能为空")
     @ApiModelProperty("活动套餐的图片信息")
-    @Size(max = ActivityPackageSkuInfoEntity.LIMITED_NUMBER_OF_IMAGES, message = "活动套餐的图片数量超过限制")
+    @Size(max = 5, message = "活动套餐的图片数量超过限制")
     private List<String> activityPackageImageInfo;
 
     @NotBlank(message = "活动套餐介绍不能为空")
