@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.request.product;
 
+import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
 import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,10 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -49,6 +47,7 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
 
     @NotNull(message = "套餐商品列表不能为空")
     @ApiModelProperty("套餐商品列表")
+    @Size(max = ActivityPackageSkuInfoEntity.LIMITED_NUMBER_OF_PACHAGES_SKUS, message = "套餐商品列表数量超过限制")
     private List<ActivityPackageSkuRequest> activityPackageSkuList;
 
     @NotNull(message = "套餐原价格不能为空")
@@ -68,6 +67,7 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
 
     @NotNull(message = "活动套餐的图片信息不能为空")
     @ApiModelProperty("活动套餐的图片信息")
+    @Size(max = ActivityPackageSkuInfoEntity.LIMITED_NUMBER_OF_IMAGES, message = "活动套餐的图片数量超过限制")
     private List<String> activityPackageImageInfo;
 
     @NotBlank(message = "活动套餐介绍不能为空")
