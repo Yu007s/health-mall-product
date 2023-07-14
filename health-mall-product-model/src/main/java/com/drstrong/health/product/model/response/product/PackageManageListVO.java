@@ -51,6 +51,9 @@ public class PackageManageListVO implements Serializable {
     @ApiModelProperty("套餐状态(0-已下架，1-已上架, 2-预约上架中, 3-预约下架中)")
     private Integer activityStatus;
 
+    @ApiModelProperty("套餐状态名称")
+    private String activityStatusName;
+
     @ApiModelProperty("原价格")
     private BigDecimal originalPrice;
 

@@ -120,7 +120,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageManageQueryRequest));
             return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(activityPackageManageQueryRequest.getPageNo()).pageSize(activityPackageManageQueryRequest.getPageSize()).build();
         }
-        List<PackageManageListVO> activityPackageInfoVOList = buildAgreementActivityPackageInfoVo(activityPackageInfoEntityPage.getRecords());
+        List<PackageManageListVO> activityPackageInfoVOList = buildActivityPackageInfoVo(activityPackageInfoEntityPage.getRecords());
         return PageVO.newBuilder()
                 .result(activityPackageInfoVOList)
                 .totalCount((int) activityPackageInfoEntityPage.getTotal())
@@ -135,7 +135,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
      * @param pageListRecords
      * @return
      */
-    private List<PackageManageListVO> buildAgreementActivityPackageInfoVo(List<ActivityPackageInfoEntity> pageListRecords) {
+    private List<PackageManageListVO> buildActivityPackageInfoVo(List<ActivityPackageInfoEntity> pageListRecords) {
         //店铺信息
         Set<Long> storeIds = pageListRecords.stream().map(ActivityPackageInfoEntity::getStoreId).collect(Collectors.toSet());
         Map<Long, String> storeIdNameMap = storeService.listByIds(storeIds).stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
@@ -149,6 +149,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                     .storeId(record.getStoreId())
                     .storeName(storeIdNameMap.get(record.getStoreId()))
                     .activityStatus(record.getActivityStatus())
+                    .activityStatusName(UpOffEnum.getValueByCode(record.getActivityStatus()))
                     .originalPrice(BigDecimalUtil.F2Y(record.getOriginalPrice()))
                     .preferentialPrice(BigDecimalUtil.F2Y(record.getPreferentialPrice()))
                     .originalAmountDisplay(record.getOriginalAmountDisplay())
@@ -173,7 +174,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             log.info("未查询到任何套餐数据,参数为:{}", JSONUtil.toJsonStr(activityPackageInfoEntityList));
             return Lists.newArrayList();
         }
-        List<PackageManageListVO> activityPackageInfoVOList = buildAgreementActivityPackageInfoVo(activityPackageInfoEntityList);
+        List<PackageManageListVO> activityPackageInfoVOList = buildActivityPackageInfoVo(activityPackageInfoEntityList);
         return activityPackageInfoVOList;
     }
 
