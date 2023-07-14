@@ -39,7 +39,7 @@ public class ActivityPackageManageQueryRequest extends PageRequest implements Se
     private Integer activityStatus;
 
     @ApiModelProperty("套餐创建时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createdAt;
 
 }
