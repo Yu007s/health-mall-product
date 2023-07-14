@@ -61,7 +61,7 @@
             and activity_status = #{queryParam.activityStatus}
         </if>
         <if test="queryParam.createdAt != null">
-            and created_at LIKE concat(#{queryParam.activityPackageName},'%')
+            and created_at LIKE concat(#{queryParam.createdAt},'%')
         </if>
         order by id desc
     </sql>
