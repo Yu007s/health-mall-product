@@ -432,49 +432,9 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 .build();
         SkuBusinessBaseFacade skuBusinessBaseFacade = skuBusinessFacadeHolder.getSkuBusinessBaseFacade(querySkuBusinessListRequest.getProductType());
         SkuInfoSummaryDTO skuInfoSummaryDTO = skuBusinessBaseFacade.querySkuByParam(skuQueryRequest);
-        Map<String, List<SkuCanStockDTO>> skuCanStockList = skuInfoSummaryDTO.getSkuCanStockList();
-        List<SkuBusinessListDTO> skuBusinessListDTOList = new ArrayList<>();
-        if (ProductTypeEnum.MEDICINE.getCode().equals(querySkuBusinessListRequest.getProductType())) {
-            List<AgreementSkuInfoVO> westernSkuInfoVoList = skuInfoSummaryDTO.getWesternSkuInfoVoList();
-            if (CollectionUtil.isNotEmpty(westernSkuInfoVoList) || CollectionUtil.isNotEmpty(skuCanStockList)) {
-                for (AgreementSkuInfoVO agreementSkuInfoVO : westernSkuInfoVoList) {
-                    List<SkuCanStockDTO> skuCanStockDTOS = skuCanStockList.get(agreementSkuInfoVO.getSkuCode());
-                    if (CollectionUtil.isEmpty(skuCanStockDTOS)) {
-                        continue;
-                    }
-                    SkuBusinessListDTO skuBusinessListDTO = SkuBusinessListDTO.builder()
-                            .skuCode(agreementSkuInfoVO.getSkuCode())
-                            .productType(agreementSkuInfoVO.getProductType())
-                            .skuName(agreementSkuInfoVO.getSkuName())
-                            .storeId(agreementSkuInfoVO.getStoreId())
-                            .storeName(agreementSkuInfoVO.getStoreName())
-                            .salePrice(agreementSkuInfoVO.getSalePrice())
-                            .build();
-                    skuBusinessListDTOList.add(skuBusinessListDTO);
-                }
-            }
-        } else if (ProductTypeEnum.AGREEMENT.getCode().equals(querySkuBusinessListRequest.getProductType())) {
-            List<AgreementSkuInfoVO> agreementSkuInfoVoList = skuInfoSummaryDTO.getAgreementSkuInfoVoList();
-            if (CollectionUtil.isNotEmpty(agreementSkuInfoVoList) || CollectionUtil.isNotEmpty(skuCanStockList)) {
-                for (AgreementSkuInfoVO agreementSkuInfoVO : agreementSkuInfoVoList) {
-                    List<SkuCanStockDTO> skuCanStockDTOS = skuCanStockList.get(agreementSkuInfoVO.getSkuCode());
-                    if (CollectionUtil.isEmpty(skuCanStockDTOS)) {
-                        continue;
-                    }
-                    SkuBusinessListDTO skuBusinessListDTO = SkuBusinessListDTO.builder()
-                            .skuCode(agreementSkuInfoVO.getSkuCode())
-                            .productType(agreementSkuInfoVO.getProductType())
-                            .skuName(agreementSkuInfoVO.getSkuName())
-                            .storeId(agreementSkuInfoVO.getStoreId())
-                            .storeName(agreementSkuInfoVO.getStoreName())
-                            .salePrice(agreementSkuInfoVO.getSalePrice())
-                            .build();
-                    skuBusinessListDTOList.add(skuBusinessListDTO);
-                }
-            }
-        } else {
-            log.error("套餐目前只支持中西药和协定方");
-        }
+        // 组装参数
+        List<SkuBusinessListDTO> skuBusinessListDTOList = buildSkuBusinessListDTOList(skuInfoSummaryDTO, querySkuBusinessListRequest);
+        // 拼接返回值
         Integer pageNo = querySkuBusinessListRequest.getPageNo();
         Integer pageSize = querySkuBusinessListRequest.getPageSize();
         int start = (pageNo - 1) * pageSize > skuBusinessListDTOList.size() ? skuBusinessListDTOList.size() : (pageNo - 1) * pageSize;
@@ -486,5 +446,40 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 .pageNo(querySkuBusinessListRequest.getPageNo())
                 .pageSize(querySkuBusinessListRequest.getPageSize()).build();
         return pageVO;
+    }
+
+
+    private List<SkuBusinessListDTO> buildSkuBusinessListDTOList(SkuInfoSummaryDTO skuInfoSummaryDTO, QuerySkuBusinessListRequest querySkuBusinessListRequest) {
+        List<AgreementSkuInfoVO> skuInfoVoList = null;
+        if (ProductTypeEnum.MEDICINE.getCode().equals(querySkuBusinessListRequest.getProductType())) {
+            skuInfoVoList = skuInfoSummaryDTO.getWesternSkuInfoVoList();
+        } else if (ProductTypeEnum.AGREEMENT.getCode().equals(querySkuBusinessListRequest.getProductType())) {
+            skuInfoVoList = skuInfoSummaryDTO.getAgreementSkuInfoVoList();
+        } else {
+            log.error("套餐目前只支持中西药和协定方");
+        }
+        if (CollectionUtil.isEmpty(skuInfoVoList)) {
+            return Lists.newArrayList();
+        }
+        List<SkuBusinessListDTO> skuBusinessListDTOList = new ArrayList<>();
+        Map<String, List<SkuCanStockDTO>> skuCanStockListMap = skuInfoSummaryDTO.getSkuCanStockList();
+        for (AgreementSkuInfoVO skuInfoVO : skuInfoVoList) {
+            if (Objects.equals(querySkuBusinessListRequest.getNeedQueryInventory(), 1)) {
+                if (CollectionUtil.isEmpty(skuCanStockListMap) || CollectionUtil.isEmpty(skuCanStockListMap.get(skuInfoVO.getSkuCode()))) {
+                    log.info("当前{}库存不足，不返回", skuInfoVO.getSkuCode());
+                    continue;
+                }
+            }
+            SkuBusinessListDTO skuBusinessListDTO = SkuBusinessListDTO.builder()
+                    .skuCode(skuInfoVO.getSkuCode())
+                    .productType(skuInfoVO.getProductType())
+                    .skuName(skuInfoVO.getSkuName())
+                    .storeId(skuInfoVO.getStoreId())
+                    .storeName(skuInfoVO.getStoreName())
+                    .salePrice(skuInfoVO.getSalePrice())
+                    .build();
+            skuBusinessListDTOList.add(skuBusinessListDTO);
+        }
+        return skuBusinessListDTOList;
     }
 }
