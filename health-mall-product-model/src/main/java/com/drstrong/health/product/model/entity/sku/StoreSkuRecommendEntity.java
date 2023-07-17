@@ -56,13 +56,13 @@ public class StoreSkuRecommendEntity extends BaseStandardEntity implements Seria
     /**
      * 虚拟列，存储所有的拼音信息
      */
-    @TableField(value = "recommend_detail_info_pinyin_array", typeHandler = StringListTypeHandler.class)
+    @TableField(value = "recommend_detail_info_pinyin_array", typeHandler = StringListTypeHandler.class, exist = false)
     private List<String> recommendDetailInfoPinyinArray;
 
     /**
      * 虚拟列，存储所有的搜索关键字信息
      */
-    @TableField(value = "recommend_detail_info_keyword_array", typeHandler = StringListTypeHandler.class)
+    @TableField(value = "recommend_detail_info_keyword_array", typeHandler = StringListTypeHandler.class, exist = false)
     private List<String> recommendDetailInfoKeywordArray;
 
     @AllArgsConstructor

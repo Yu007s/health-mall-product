@@ -48,6 +48,7 @@
             and sku_code = #{queryParam.skuCode}
         </if>
         <if test="queryParam.keyword != null and queryParam.keyword != ''">
+            and
             #{queryParam.keyword} MEMBER OF (recommend_detail_info_pinyin_array)
             or
             #{queryParam.keyword} MEMBER OF (recommend_detail_info_keyword_array)

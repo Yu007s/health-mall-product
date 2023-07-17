@@ -97,7 +97,7 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
         storeSkuRecommendEntity.setDelFlag(DelFlagEnum.IS_DELETED.getCode());
         storeSkuRecommendEntity.setChangedAt(LocalDateTime.now());
         storeSkuRecommendEntity.setChangedBy(skuBaseDTO.getOperatorId());
-        storeSkuRecommendService.updateById(storeSkuRecommendEntity);
+        storeSkuRecommendService.removeById(storeSkuRecommendEntity);
     }
 
     @Override
