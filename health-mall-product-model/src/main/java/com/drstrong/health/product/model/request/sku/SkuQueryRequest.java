@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * @author liuqiuyi
@@ -43,6 +44,9 @@ public class SkuQueryRequest implements Serializable {
      */
     @ApiModelProperty("sku状态")
     private Integer skuStatus;
+
+    @ApiModelProperty("sku状态集合")
+    private Set<Integer> skuStatusList;
 
     @ApiModelProperty("是否需要查询库存")
     private Boolean needQueryInventory;

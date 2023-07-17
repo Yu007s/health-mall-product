@@ -67,6 +67,12 @@
         <if test="queryParam.skuStatus != null">
             and sku_status = #{queryParam.skuStatus}
         </if>
+        <if test="queryParam.skuStatusList != null and queryParam.skuStatusList.size()>0">
+            and sku_status in
+            <foreach collection="queryParam.skuStatusList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
         <if test="queryParam.storeId != null">
             and store_id = #{queryParam.storeId}
         </if>

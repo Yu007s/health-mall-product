@@ -427,8 +427,8 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         SkuQueryRequest skuQueryRequest = SkuQueryRequest.builder()
                 .key(querySkuBusinessListRequest.getKey())
                 .storeId(querySkuBusinessListRequest.getStoreId())
-                .skuStatus(UpOffEnum.UP.getCode())
-                .needQueryInventory(Boolean.TRUE)
+                .skuStatusList(UpOffEnum.getIsUpCode())
+                .needQueryInventory(ObjectUtil.equal(1, querySkuBusinessListRequest.getNeedQueryInventory()))
                 .build();
         SkuBusinessBaseFacade skuBusinessBaseFacade = skuBusinessFacadeHolder.getSkuBusinessBaseFacade(querySkuBusinessListRequest.getProductType());
         SkuInfoSummaryDTO skuInfoSummaryDTO = skuBusinessBaseFacade.querySkuByParam(skuQueryRequest);

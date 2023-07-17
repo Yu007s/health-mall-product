@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class SkuRecommendRemoteController implements SkuRecommendManageRemoteApi
     SkuRecommendManageFacade skuRecommendManageFacade;
 
     @Override
-    public ResultVO<Void> saveOrUpdateRecommend(SaveRecommendRequest saveRecommendRequest) {
+    public ResultVO<Void> saveOrUpdateRecommend(@Valid SaveRecommendRequest saveRecommendRequest) {
         skuRecommendManageFacade.saveOrUpdateRecommend(saveRecommendRequest);
         return ResultVO.success();
     }

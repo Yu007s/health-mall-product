@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -28,5 +29,6 @@ public class SaveRecommendRequest extends SkuBaseDTO implements Serializable {
     private static final long serialVersionUID = -6187083928122352783L;
 
     @ApiModelProperty("关键字列表")
+    @NotNull(message = "关键字列表不能为空")
     private Set<String> keywordList;
 }

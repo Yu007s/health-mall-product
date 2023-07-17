@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.sku.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -23,6 +24,9 @@ public class StoreSkuRecommendServiceImpl extends ServiceImpl<StoreSkuRecommendM
 
     @Override
     public StoreSkuRecommendEntity queryBySkuCode(String skuCode) {
+        if (StrUtil.isBlank(skuCode)) {
+            return null;
+        }
         LambdaQueryWrapper<StoreSkuRecommendEntity> queryWrapper = new LambdaQueryWrapper<StoreSkuRecommendEntity>()
                 .eq(StoreSkuRecommendEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(StoreSkuRecommendEntity::getSkuCode, skuCode);

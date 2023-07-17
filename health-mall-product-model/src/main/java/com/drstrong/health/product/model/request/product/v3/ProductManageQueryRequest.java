@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * @author liuqiuyi
@@ -47,6 +48,9 @@ public class ProductManageQueryRequest extends PageRequest implements Serializab
 
 	@ApiModelProperty("sku 状态")
 	private Integer skuStatus;
+
+	@ApiModelProperty("sku 状态")
+	private Set<Integer> skuStatusList;
 
 	@ApiModelProperty("供应商 id")
 	private Long supplierId;
