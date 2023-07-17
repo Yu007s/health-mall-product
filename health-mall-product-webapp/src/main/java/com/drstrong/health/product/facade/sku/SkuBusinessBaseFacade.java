@@ -2,6 +2,7 @@ package com.drstrong.health.product.facade.sku;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO;
 import com.drstrong.health.product.model.dto.sku.SkuInfoSummaryDTO;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
@@ -46,6 +47,14 @@ public interface SkuBusinessBaseFacade {
     SkuInfoSummaryDTO queryBySkuCode(String skuCode);
 
     /**
+     * 根据 productType 过滤skuCode
+     *
+     * @author liuqiuyi
+     * @date 2023/7/17 14:41
+     */
+    Set<String> filterSkuCodesByProductType(Set<String> skuCodes);
+
+    /**
      * 根据skuCode查询用法用量
      *
      * @author liuqiuyi
@@ -73,7 +82,7 @@ public interface SkuBusinessBaseFacade {
                     .build();
             if (medicineCodeUsageDtoMap.containsKey(medicineCode)) {
                 MedicineUsageDTO medicineUsageDTO = medicineCodeUsageDtoMap.get(medicineCode);
-                BeanUtil.copyProperties(medicineUsageDTO, usageDTO);
+                BeanUtil.copyProperties(medicineUsageDTO, usageDTO, new CopyOptions().setIgnoreNullValue(true));
             }
             medicineUsageDTOList.add(usageDTO);
         }
