@@ -29,6 +29,9 @@ public class MedicineUsageDTO implements Serializable {
     @ApiModelProperty("商品类型")
     private Integer productType;
 
+    @ApiModelProperty("skuId")
+    private Long skuId;
+
     @ApiModelProperty("sku编码")
     private String skuCode;
 
