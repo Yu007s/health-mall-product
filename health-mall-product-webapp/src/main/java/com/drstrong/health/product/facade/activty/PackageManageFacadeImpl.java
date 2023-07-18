@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.product.constants.OperationLogConstant;
-import com.drstrong.health.product.enums.ActivitytatusEnum;
+import com.drstrong.health.product.enums.ActivityStatusEnum;
 import com.drstrong.health.product.facade.incentive.SkuIncentivePolicyFacade;
 import com.drstrong.health.product.facade.sku.SkuBusinessBaseFacade;
 import com.drstrong.health.product.facade.sku.SkuBusinessFacadeHolder;
@@ -150,7 +150,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                     .storeId(record.getStoreId())
                     .storeName(storeIdNameMap.get(record.getStoreId()))
                     .activityStatus(record.getActivityStatus())
-                    .activityStatusName(ActivitytatusEnum.getValueByCode(record.getActivityStatus()).getValue())
+                    .activityStatusName(ActivityStatusEnum.getValueByCode(record.getActivityStatus()).getValue())
                     .price(BigDecimalUtil.F2Y(record.getPrice()))
                     .activityStartTime(Date.from(record.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant()))
                     .activityEndTime(Date.from(record.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant()))
@@ -222,7 +222,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         if (updateFlag) {
             //进行中的套餐活动，不能修改skuid、价格和数量，结束时间只能往后延迟
             ActivityPackageInfoEntity activityPackageInfoEntity = packageService.findPackageByCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode(), null);
-            if (!ObjectUtil.isNull(activityPackageInfoEntity) && ActivitytatusEnum.UNDER_WAY.getCode().equals(activityPackageInfoEntity.getActivityStatus())) {
+            if (!ObjectUtil.isNull(activityPackageInfoEntity) && ActivityStatusEnum.UNDER_WAY.getCode().equals(activityPackageInfoEntity.getActivityStatus())) {
                 Date endTime0 = Date.from(activityPackageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
                 Date startTime0 = Date.from(activityPackageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
                 if (endTime.getTime() > endTime0.getTime() || startTime0.getTime() != startTime.getTime()) {
@@ -257,7 +257,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 .activityPackageCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode())
                 .productType(saveOrUpdateActivityPackageRequest.getProductType())
                 .storeId(saveOrUpdateActivityPackageRequest.getStoreId())
-                .activityStatus(ActivitytatusEnum.TO_BE_STARTED.getCode())
+                .activityStatus(ActivityStatusEnum.TO_BE_STARTED.getCode())
                 .price(BigDecimalUtil.Y2F(saveOrUpdateActivityPackageRequest.getPrice()))
                 .activityStartTime(saveOrUpdateActivityPackageRequest.getActivityStartTime())
                 .activityEndTime(saveOrUpdateActivityPackageRequest.getActivityEndTime())
@@ -319,10 +319,10 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
      * @param activityPackageSkuInfoEntityList
      */
     private void checkActivity(Date startTime, Date endTime, List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntityList) {
-        List<String> activityPackageCodeList = activityPackageSkuInfoEntityList.stream().map(ActivityPackageSkuInfoEntity::getActivityPackageCode).collect(Collectors.toList());
-        List<ActivityPackageInfoEntity> packageInfoEntityList = packageService.findPackageByCodes(activityPackageCodeList);
+        Set<String> activityPackageCodeList = activityPackageSkuInfoEntityList.stream().map(ActivityPackageSkuInfoEntity::getActivityPackageCode).collect(Collectors.toSet());
+        List<ActivityPackageInfoEntity> packageInfoEntityList = packageService.queryByActivityPackageCode(activityPackageCodeList);
         if (CollectionUtil.isNotEmpty(packageInfoEntityList)) {
-            List<ActivityPackageInfoEntity> packageInfoEntities = packageInfoEntityList.stream().filter(x -> ActivitytatusEnum.TO_BE_STARTED.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
+            List<ActivityPackageInfoEntity> packageInfoEntities = packageInfoEntityList.stream().filter(x -> ActivityStatusEnum.TO_BE_STARTED.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
             if (CollectionUtil.isNotEmpty(packageInfoEntities)) {
                 log.error("已存在相同状态的活动，请勿重复创建。");
                 throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SAVE_THE_SAME);
@@ -348,7 +348,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
      */
     private void checkActivity(Date startTime, Date endTime, String activityPackageCode) {
         ActivityPackageInfoEntity packageInfoEntity = packageService.findPackageByCode(activityPackageCode, null);
-        if (!Objects.isNull(packageInfoEntity) && ActivitytatusEnum.TO_BE_STARTED.equals(packageInfoEntity.getActivityStatus())) {
+        if (!Objects.isNull(packageInfoEntity) && ActivityStatusEnum.TO_BE_STARTED.equals(packageInfoEntity.getActivityStatus())) {
             log.error("已存在相同状态的活动，请勿重复创建。");
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SAVE_THE_SAME);
         }
@@ -409,7 +409,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 .storeId(storeEntity.getId())
                 .storeName(storeEntity.getStoreName())
                 .activityStatus(activityPackageInfoEntity.getActivityStatus())
-                .activityStatusName(ActivitytatusEnum.getValueByCode(activityPackageInfoEntity.getActivityStatus()).getValue())
+                .activityStatusName(ActivityStatusEnum.getValueByCode(activityPackageInfoEntity.getActivityStatus()).getValue())
                 .price(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPrice()))
                 .activityStartTime(Date.from(activityPackageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant()))
                 .activityEndTime(Date.from(activityPackageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant()))
@@ -495,8 +495,8 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             return;
         }
         long nowTime = System.currentTimeMillis();
-        List<ActivityPackageInfoEntity> activityListNotStart = activityPackageInfoEntityList.stream().filter(x -> ActivitytatusEnum.TO_BE_STARTED.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
-        List<ActivityPackageInfoEntity> activityListNotEnd = activityPackageInfoEntityList.stream().filter(x -> ActivitytatusEnum.UNDER_WAY.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
+        List<ActivityPackageInfoEntity> activityListNotStart = activityPackageInfoEntityList.stream().filter(x -> ActivityStatusEnum.TO_BE_STARTED.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
+        List<ActivityPackageInfoEntity> activityListNotEnd = activityPackageInfoEntityList.stream().filter(x -> ActivityStatusEnum.UNDER_WAY.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
         if (CollectionUtil.isNotEmpty(activityListNotStart)) {
             Set<String> updateActivityCode = new HashSet<>();
             for (ActivityPackageInfoEntity activityPackageInfoEntity : activityListNotStart) {
@@ -506,7 +506,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                     updateActivityCode.add(activityPackageInfoEntity.getActivityPackageCode());
                 }
             }
-            packageService.updateActivityStatus(updateActivityCode, ActivitytatusEnum.UNDER_WAY.getCode());
+            packageService.updateActivityStatus(updateActivityCode, ActivityStatusEnum.UNDER_WAY.getCode());
         }
         if (CollectionUtil.isNotEmpty(activityListNotEnd)) {
             Set<String> updateActivityCode = new HashSet<>();
@@ -517,7 +517,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                     updateActivityCode.add(activityPackageInfoEntity.getActivityPackageCode());
                 }
             }
-            packageService.updateActivityStatus(updateActivityCode, ActivitytatusEnum.ALREADY_ENDED.getCode());
+            packageService.updateActivityStatus(updateActivityCode, ActivityStatusEnum.ALREADY_ENDED.getCode());
         }
         log.info("invoke doScheduledUpDown end");
     }

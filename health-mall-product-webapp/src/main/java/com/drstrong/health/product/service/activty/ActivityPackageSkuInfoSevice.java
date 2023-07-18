@@ -5,6 +5,7 @@ import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntit
 import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * huangpeng
@@ -15,4 +16,8 @@ public interface ActivityPackageSkuInfoSevice extends IService<ActivityPackageSk
     List<ActivityPackageSkuInfoEntity> findPackageByCode(String activityPackageCode);
 
     List<ActivityPackageSkuInfoEntity>  queryBySkuCodeAndAmount(String skuCode, Integer amount);
+
+    List<ActivityPackageSkuInfoEntity> queryBySkuCodes(List<String> skuCodes);
+
+    List<ActivityPackageSkuInfoEntity> queryUpPackageSku();
 }

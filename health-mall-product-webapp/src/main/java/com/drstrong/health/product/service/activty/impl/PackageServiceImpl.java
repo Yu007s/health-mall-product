@@ -7,8 +7,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.activty.ActivityPackageInfoMapper;
 import com.drstrong.health.product.dao.sku.StoreSkuInfoMapper;
-import com.drstrong.health.product.enums.ActivitytatusEnum;
+import com.drstrong.health.product.enums.ActivityStatusEnum;
+import com.drstrong.health.product.model.dto.product.PackageInfoVO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
+import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
@@ -16,14 +18,16 @@ import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
 import com.drstrong.health.product.model.request.product.PackageBussinessQueryListRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
+import com.drstrong.health.product.service.activty.ActivityPackageSkuInfoSevice;
 import com.drstrong.health.product.service.activty.PackageService;
+import com.drstrong.health.product.util.BigDecimalUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * huangpeng
@@ -32,6 +36,9 @@ import java.util.Set;
 @Slf4j
 @Service
 public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, ActivityPackageInfoEntity> implements PackageService {
+
+    @Autowired
+    private ActivityPackageSkuInfoSevice activityPackageSkuInfoSevice;
 
     /**
      * 套餐编码查询套餐信息
@@ -57,23 +64,6 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
     }
 
     /**
-     * 套餐编码查询套餐信息
-     *
-     * @param activityPackageCode
-     * @return
-     */
-    @Override
-    public List<ActivityPackageInfoEntity> findPackageByCodes(List<String> activityPackageCode) {
-        if (CollectionUtil.isEmpty(activityPackageCode)) {
-            return null;
-        }
-        LambdaQueryWrapper<ActivityPackageInfoEntity> queryWrapper = new LambdaQueryWrapper<ActivityPackageInfoEntity>()
-                .eq(ActivityPackageInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .in(ActivityPackageInfoEntity::getActivityPackageCode, activityPackageCode);
-        return baseMapper.selectList(queryWrapper);
-    }
-
-    /**
      * 条件分页列表查询
      *
      * @param activityPackageManageQueryRequest
@@ -85,6 +75,12 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
         return baseMapper.pageQueryByParam(entityPage, activityPackageManageQueryRequest);
     }
 
+    /**
+     * 条件列表查询(不分页)
+     *
+     * @param activityPackageManageQueryRequest
+     * @return
+     */
     @Override
     public List<ActivityPackageInfoEntity> listQueryByParam(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
         return baseMapper.listQueryByParam(activityPackageManageQueryRequest);
@@ -156,7 +152,7 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
      */
     @Override
     public List<ActivityPackageInfoEntity> findScheduledPackage() {
-        List<Integer> activityStatusList = Lists.newArrayList(ActivitytatusEnum.TO_BE_STARTED.getCode(), ActivitytatusEnum.UNDER_WAY.getCode());
+        List<Integer> activityStatusList = Lists.newArrayList(ActivityStatusEnum.TO_BE_STARTED.getCode(), ActivityStatusEnum.UNDER_WAY.getCode());
         LambdaQueryWrapper<ActivityPackageInfoEntity> queryWrapper = new LambdaQueryWrapper<ActivityPackageInfoEntity>()
                 .eq(ActivityPackageInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .in(ActivityPackageInfoEntity::getActivityStatus, activityStatusList);
@@ -175,7 +171,45 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
             return;
         }
         int size = baseMapper.batchUpdateActivityStatusByCodes(packageCodes, code);
+    }
 
+    /**
+     * 查询套餐商品和关联的套餐信息
+     *
+     * @return
+     */
+    @Override
+    public Map<String, List<PackageInfoVO>> getUpPackageInfo() {
+        Map<String, List<PackageInfoVO>> result = new HashMap<>();
+        List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoSevice.queryUpPackageSku();
+        if (CollectionUtil.isEmpty(activityPackageSkuInfoEntities)) {
+            return null;
+        }
+        Map<String, List<ActivityPackageSkuInfoEntity>> activityPackageSkuInfoEntitiesMap = activityPackageSkuInfoEntities.stream().collect(Collectors.groupingBy(ActivityPackageSkuInfoEntity::getSkuCode));
+        for (String key : activityPackageSkuInfoEntitiesMap.keySet()) {
+            List<ActivityPackageSkuInfoEntity> skuInfoEntities = activityPackageSkuInfoEntitiesMap.get(key);
+            List<String> activityPackageCodeList = skuInfoEntities.stream().map(ActivityPackageSkuInfoEntity::getActivityPackageCode).collect(Collectors.toList());
+            LambdaQueryWrapper<ActivityPackageInfoEntity> queryWrapper = new LambdaQueryWrapper<ActivityPackageInfoEntity>()
+                    .eq(ActivityPackageInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                    .eq(ActivityPackageInfoEntity::getActivityStatus, ActivityStatusEnum.UNDER_WAY.getCode())
+                    .in(ActivityPackageInfoEntity::getActivityPackageCode, activityPackageCodeList);
+            List<ActivityPackageInfoEntity> activityPackageInfoEntityList = baseMapper.selectList(queryWrapper);
+            if (CollectionUtil.isEmpty(activityPackageInfoEntityList)) {
+                continue;
+            }
+            List<PackageInfoVO> packageInfoVOList = new ArrayList<>();
+            for (ActivityPackageInfoEntity activityPackageInfoEntity : activityPackageInfoEntityList) {
+                PackageInfoVO packageInfoVO = PackageInfoVO.builder()
+                        .activityPackageName(activityPackageInfoEntity.getActivityPackageName())
+                        .activityPackageCode(activityPackageInfoEntity.getActivityPackageCode())
+                        .price(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPrice()))
+                        .activityPackageRemark(activityPackageInfoEntity.getActivityPackageRemark())
+                        .build();
+                packageInfoVOList.add(packageInfoVO);
+            }
+            result.put(key, packageInfoVOList);
+        }
+        return result;
     }
 
 }

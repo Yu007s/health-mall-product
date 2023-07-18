@@ -10,7 +10,7 @@ import java.util.Objects;
  * @author huangpeng
  * @date 2023/7/18 16:48
  */
-public enum ActivitytatusEnum {
+public enum ActivityStatusEnum {
 
 	TO_BE_STARTED(0, "待开始"),
 	UNDER_WAY(1, "进行中"),
@@ -20,7 +20,7 @@ public enum ActivitytatusEnum {
 
 	private String value;
 
-	ActivitytatusEnum(Integer code, String value) {
+	ActivityStatusEnum(Integer code, String value) {
 		this.code = code;
 		this.value = value;
 	}
@@ -41,11 +41,11 @@ public enum ActivitytatusEnum {
 		this.value = value;
 	}
 
-	public static ActivitytatusEnum getValueByCode(Integer code) {
+	public static ActivityStatusEnum getValueByCode(Integer code) {
 		if (Objects.isNull(code)) {
 			return null;
 		}
-		for (ActivitytatusEnum activitytatusEnum : ActivitytatusEnum.values()) {
+		for (ActivityStatusEnum activitytatusEnum : ActivityStatusEnum.values()) {
 			if (code.equals(activitytatusEnum.getCode())) {
 				return activitytatusEnum;
 			}

@@ -7,12 +7,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.drstrong.health.product.enums.ActivityStatusEnum;
 import com.drstrong.health.product.facade.product.ProductBussinessFacade;
 import com.drstrong.health.product.model.dto.medicine.MedicineImageDTO;
-import com.drstrong.health.product.model.dto.product.ProductAgreementDetailVO;
-import com.drstrong.health.product.model.dto.product.ProductDetailInfoVO;
-import com.drstrong.health.product.model.dto.product.ProductListInfoVO;
-import com.drstrong.health.product.model.dto.product.ProductWesternDetailVO;
+import com.drstrong.health.product.model.dto.product.*;
+import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
+import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
+import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineInstructionsEntity;
@@ -25,6 +26,8 @@ import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.SearchWesternRequestParamBO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
+import com.drstrong.health.product.service.activty.ActivityPackageSkuInfoSevice;
+import com.drstrong.health.product.service.activty.PackageService;
 import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicineService;
 import com.drstrong.health.product.service.medicine.WesternMedicineInstructionsService;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
@@ -35,6 +38,7 @@ import com.drstrong.health.product.util.BigDecimalUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,6 +79,12 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
 
     @Autowired
     private AgreementPrescriptionMedicineService agreementPrescriptionMedicineService;
+
+    @Autowired
+    private PackageService packageService;
+
+    @Autowired
+    private ActivityPackageSkuInfoSevice activityPackageSkuInfoSevice;
 
     /**
      * 医生端搜索商品列表(不包含健康药品)
@@ -121,6 +131,9 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                     .stream().collect(toMap(AgreementPrescriptionMedicineEntity::getMedicineCode, AgreementPrescriptionMedicineEntity::getImageInfo, (v1, v2) -> v1));
         }
 
+        //获取所有正在进行的套餐信息
+        Map<String, List<PackageInfoVO>> activityPackageInfoListMap = packageService.getUpPackageInfo();
+
         //组装返回信息
         List<ProductListInfoVO> result = new ArrayList<>();
         for (StoreSkuInfoEntity storeSkuInfoEntity : storeSkuInfoEntities) {
@@ -130,6 +143,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
             } else if (ProductTypeEnum.AGREEMENT.getCode().equals(storeSkuInfoEntity.getSkuType()) && MapUtil.isNotEmpty(medicineSpecificationsEntityListMap)) {
                 imageInfo = JSONObject.parseArray(agreementSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()), MedicineImageDTO.class);
             }
+            List<PackageInfoVO> packageInfoVOList = activityPackageInfoListMap.get(storeSkuInfoEntity.getSkuCode());
             ProductListInfoVO productListInfoVO = ProductListInfoVO.builder()
                     .skuName(storeSkuInfoEntity.getSkuName())
                     .skuCode(storeSkuInfoEntity.getSkuCode())
@@ -138,6 +152,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                     .storeName(storeIdNameMap.get(storeSkuInfoEntity.getStoreId()))
                     .salePrice(BigDecimalUtil.F2Y(storeSkuInfoEntity.getPrice()))
                     .imageInfo(imageInfo)
+                    .packageInfoVOList(CollectionUtil.isEmpty(packageInfoVOList) ? null : packageInfoVOList)
                     .build();
             result.add(productListInfoVO);
         }

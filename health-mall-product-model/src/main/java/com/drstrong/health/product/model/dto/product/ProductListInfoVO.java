@@ -73,4 +73,10 @@ public class ProductListInfoVO implements Serializable {
     @ApiModelProperty(value = "常用药标识：0，否；1，是")
     private Integer boxTag;
 
+    /**
+     * 商品关联的套餐信息
+     */
+    @ApiModelProperty(value = "商品关联的套餐信息")
+    private List<PackageInfoVO> packageInfoVOList;
+
 }

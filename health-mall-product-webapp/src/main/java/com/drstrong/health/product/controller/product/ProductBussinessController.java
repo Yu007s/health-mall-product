@@ -24,11 +24,23 @@ public class ProductBussinessController implements ProductBussinessRemoteApi {
     @Autowired
     private ProductBussinessFacade productBussinessFacade;
 
+    /**
+     * 医生端搜索商品列表(不包含健康药品)
+     *
+     * @param searchWesternRequestParamBO
+     * @return
+     */
     @Override
     public ResultVO<List<ProductListInfoVO>> searchProductList(@Valid SearchWesternRequestParamBO searchWesternRequestParamBO) {
         return ResultVO.success(productBussinessFacade.searchProductList(searchWesternRequestParamBO));
     }
 
+    /**
+     * 医生端查看药品详情(中西药+协定方)
+     *
+     * @param skuCode
+     * @return
+     */
     @Override
     public ResultVO<ProductDetailInfoVO> queryProductDetail(@Valid String skuCode) {
         return ResultVO.success(productBussinessFacade.queryProductDetail(skuCode));
