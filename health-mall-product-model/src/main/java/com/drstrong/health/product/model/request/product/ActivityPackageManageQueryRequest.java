@@ -26,7 +26,7 @@ public class ActivityPackageManageQueryRequest extends PageRequest implements Se
     @ApiModelProperty("套餐名称(模糊检索)")
     private String activityPackageName;
 
-    @ApiModelProperty("套餐名称(模糊检索)")
+    @ApiModelProperty("套餐商品名称(模糊检索)")
     private String skuName;
 
     @ApiModelProperty("店铺id")

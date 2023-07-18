@@ -14,10 +14,7 @@ import com.drstrong.health.product.model.response.product.PackageManageListVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.activty.PackageManageRemoteApi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -76,7 +73,8 @@ public class PackageManageRemoteController implements PackageManageRemoteApi {
      * @return
      */
     @Override
-    public ResultVO<ActivityPackageDetailDTO> queryDetailByCode(String activityPackageCode) {
+    @GetMapping("queryDetailByCode")
+    public ResultVO<ActivityPackageDetailDTO> queryDetailByCode(@RequestParam("activityPackageCode") String activityPackageCode) {
         return ResultVO.success(packageManageFacade.queryDetailByCode(activityPackageCode));
     }
 

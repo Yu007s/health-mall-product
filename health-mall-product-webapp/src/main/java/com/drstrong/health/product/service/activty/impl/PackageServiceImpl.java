@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.activty.ActivityPackageInfoMapper;
 import com.drstrong.health.product.dao.sku.StoreSkuInfoMapper;
+import com.drstrong.health.product.enums.ActivitytatusEnum;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
@@ -107,21 +108,6 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
     }
 
     /**
-     * 状态修改
-     *
-     * @param activityPackageCodeList
-     * @param skuState
-     * @param operatorId
-     */
-    @Override
-    public void batchUpdateActivityStatusByCodes(Set<String> activityPackageCodeList, Integer skuState, Long operatorId) {
-        int size = baseMapper.batchUpdateActivityStatusByCodes(activityPackageCodeList, skuState, operatorId);
-        if (size > 0) {
-            log.info("套餐Activity信息表,已将activityPackageCodeList列表:{} 的状态更新为:{},操作人是:{}", activityPackageCodeList, skuState, operatorId);
-        }
-    }
-
-    /**
      * 根据套餐ID获取详情
      *
      * @param activityPackageId
@@ -161,6 +147,35 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
     public Page<ActivityPackageInfoEntity> pageQueryList(PackageBussinessQueryListRequest packageBussinessQueryListRequest) {
         Page<ActivityPackageInfoEntity> entityPage = new Page<>(packageBussinessQueryListRequest.getPageNo(), packageBussinessQueryListRequest.getPageSize());
         return baseMapper.pageQueryList(entityPage, packageBussinessQueryListRequest);
+    }
+
+    /**
+     * 套餐定时上下架检索套餐
+     *
+     * @return
+     */
+    @Override
+    public List<ActivityPackageInfoEntity> findScheduledPackage() {
+        List<Integer> activityStatusList = Lists.newArrayList(ActivitytatusEnum.TO_BE_STARTED.getCode(), ActivitytatusEnum.UNDER_WAY.getCode());
+        LambdaQueryWrapper<ActivityPackageInfoEntity> queryWrapper = new LambdaQueryWrapper<ActivityPackageInfoEntity>()
+                .eq(ActivityPackageInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(ActivityPackageInfoEntity::getActivityStatus, activityStatusList);
+        return baseMapper.selectList(queryWrapper);
+    }
+
+    /**
+     * 批量更新套餐活动状态
+     *
+     * @param packageCodes
+     * @param code
+     */
+    @Override
+    public void updateActivityStatus(Set<String> packageCodes, Integer code) {
+        if (CollectionUtil.isEmpty(packageCodes) || Objects.isNull(code)) {
+            return;
+        }
+        int size = baseMapper.batchUpdateActivityStatusByCodes(packageCodes, code);
+
     }
 
 }

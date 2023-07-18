@@ -29,4 +29,7 @@ public interface PackageManageFacade {
     ActivityPackageDetailDTO queryDetailByCode(String activityPackageCode);
 
     PageVO<SkuBusinessListDTO> getPackageSkuBusinessList(QuerySkuBusinessListRequest querySkuBusinessListRequest);
+
+    void doScheduledUpDown();
+
 }

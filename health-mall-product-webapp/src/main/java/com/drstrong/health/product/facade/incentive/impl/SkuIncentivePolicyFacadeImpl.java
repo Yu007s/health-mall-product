@@ -279,7 +279,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 					.activityPackageName(activityPackageInfoEntity.getActivityPackageName())
 					.storeId(activityPackageInfoEntity.getStoreId())
 					.storeName(storeIdNameMap.get(activityPackageInfoEntity.getStoreId()))
-					.price(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPreferentialPrice()))
+					.price(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPrice()))
 					.costPrice(ObjectUtil.isNull(skuIncentivePolicyEntity) ? new BigDecimal("-1") : BigDecimalUtil.F2Y(skuIncentivePolicyEntity.getCostPrice()))
 					.build();
 			// 计算利润率(零售价-成本价)/成本价,只有当成本价大于 0 时才计算,避免除 0 异常

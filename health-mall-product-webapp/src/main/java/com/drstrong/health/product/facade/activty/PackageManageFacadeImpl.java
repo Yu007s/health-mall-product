@@ -463,6 +463,46 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         return pageVO;
     }
 
+    /**
+     * 定时任务：套餐定时上下架
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void doScheduledUpDown() {
+        log.info("invoke doScheduledUpDown start");
+        List<ActivityPackageInfoEntity> activityPackageInfoEntityList = packageService.findScheduledPackage();
+        if (CollectionUtil.isEmpty(activityPackageInfoEntityList)) {
+            log.info("invoke doScheduledUpDown end,activityPackageInfoEntityList is null");
+            return;
+        }
+        long nowTime = System.currentTimeMillis();
+        List<ActivityPackageInfoEntity> activityListNotStart = activityPackageInfoEntityList.stream().filter(x -> ActivitytatusEnum.TO_BE_STARTED.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
+        List<ActivityPackageInfoEntity> activityListNotEnd = activityPackageInfoEntityList.stream().filter(x -> ActivitytatusEnum.UNDER_WAY.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
+        if (CollectionUtil.isNotEmpty(activityListNotStart)) {
+            Set<String> updateActivityCode = new HashSet<>();
+            for (ActivityPackageInfoEntity activityPackageInfoEntity : activityListNotStart) {
+                Date startTime = Date.from(activityPackageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
+                Date endTime = Date.from(activityPackageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
+                if (nowTime >= startTime.getTime() && nowTime < endTime.getTime()) {
+                    updateActivityCode.add(activityPackageInfoEntity.getActivityPackageCode());
+                }
+            }
+            packageService.updateActivityStatus(updateActivityCode, ActivitytatusEnum.UNDER_WAY.getCode());
+        }
+        if (CollectionUtil.isNotEmpty(activityListNotEnd)) {
+            Set<String> updateActivityCode = new HashSet<>();
+            for (ActivityPackageInfoEntity activityPackageInfoEntity : activityListNotEnd) {
+                Date startTime = Date.from(activityPackageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
+                Date endTime = Date.from(activityPackageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
+                if (nowTime >= endTime.getTime()) {
+                    updateActivityCode.add(activityPackageInfoEntity.getActivityPackageCode());
+                }
+            }
+            packageService.updateActivityStatus(updateActivityCode, ActivitytatusEnum.ALREADY_ENDED.getCode());
+        }
+        log.info("invoke doScheduledUpDown end");
+    }
+
 
     private List<SkuBusinessListDTO> buildSkuBusinessListDTOList(SkuInfoSummaryDTO skuInfoSummaryDTO, QuerySkuBusinessListRequest querySkuBusinessListRequest) {
         List<AgreementSkuInfoVO> skuInfoVoList = null;
