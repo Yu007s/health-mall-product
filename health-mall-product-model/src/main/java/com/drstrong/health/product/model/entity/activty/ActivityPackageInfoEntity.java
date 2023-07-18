@@ -7,10 +7,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.drstrong.health.product.handler.mybatis.LongListTypeHandler;
 import com.drstrong.health.product.handler.mybatis.StringListTypeHandler;
 import com.drstrong.health.product.model.entity.category.BaseStandardEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -21,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 @TableName(value = "pms_activity_package_manage", autoResultMap = true)
 public class ActivityPackageInfoEntity extends BaseStandardEntity implements Serializable {
 
@@ -55,38 +58,32 @@ public class ActivityPackageInfoEntity extends BaseStandardEntity implements Ser
     private Long storeId;
 
     /**
-     * 套餐上下架状态；0-已下架，1-已上架, 2-预约上架中, 3-预约下架中
+     * 套餐活动状态:0-待开始，1-进行中, 2-已结束
      */
     private int activityStatus;
 
     /**
-     * 活动套餐原价，单位：分
+     * 活动套餐价格，单位：分
      */
-    private Long originalPrice;
+    private Long price;
 
     /**
-     * 活动套餐优惠价，单位：分
+     * 活动开始时间
      */
-    private Long preferentialPrice;
+    private LocalDateTime activityStartTime;
 
     /**
-     * 页面是否展示原价(0不展示,1展示)
+     * 活动结束时间
      */
-    private Integer originalAmountDisplay;
-
-    /**
-     * 活动套餐的图片信息(json存储)
-     */
-    @TableField(value = "activity_package_image_info", typeHandler = StringListTypeHandler.class)
-    private List<String> activityPackageImageInfo;
-
-    /**
-     * 活动套餐介绍
-     */
-    private String activityPackageIntroduce;
+    private LocalDateTime activityEndTime;
 
     /**
      * 活动套餐备注
      */
     private String activityPackageRemark;
+
+    /**
+     * 套餐商品列表
+     */
+    private String activityPackageSkuName;
 }

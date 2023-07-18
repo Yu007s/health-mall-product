@@ -56,6 +56,23 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
     }
 
     /**
+     * 套餐编码查询套餐信息
+     *
+     * @param activityPackageCode
+     * @return
+     */
+    @Override
+    public List<ActivityPackageInfoEntity> findPackageByCodes(List<String> activityPackageCode) {
+        if (CollectionUtil.isEmpty(activityPackageCode)) {
+            return null;
+        }
+        LambdaQueryWrapper<ActivityPackageInfoEntity> queryWrapper = new LambdaQueryWrapper<ActivityPackageInfoEntity>()
+                .eq(ActivityPackageInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(ActivityPackageInfoEntity::getActivityPackageCode, activityPackageCode);
+        return baseMapper.selectList(queryWrapper);
+    }
+
+    /**
      * 条件分页列表查询
      *
      * @param activityPackageManageQueryRequest
@@ -136,6 +153,7 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
 
     /**
      * 医生端的列表套餐搜索
+     *
      * @param packageBussinessQueryListRequest
      * @return
      */

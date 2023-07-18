@@ -26,10 +26,6 @@ public class PackageManageListVO implements Serializable {
 
     private static final long serialVersionUID = 1700078824601387245L;
 
-    public static final int MEDICATION_BOX_TAG_YEAH = 1;
-
-    public static final int MEDICATION_BOX_TAG_NO = 0;
-
     @ApiModelProperty("套餐ID")
     private Long id;
 
@@ -39,7 +35,10 @@ public class PackageManageListVO implements Serializable {
     @ApiModelProperty("套餐编码")
     private String activityPackageCode;
 
-    @ApiModelProperty("套餐商品类型  1-西成药")
+    @ApiModelProperty("套餐商品名称(目前套餐只支持一个商品)")
+    private String activitySkuName;
+
+    @ApiModelProperty("套餐商品类型:1-西/成药,3-协定方")
     private Integer productType;
 
     @ApiModelProperty("店铺 id")
@@ -48,21 +47,27 @@ public class PackageManageListVO implements Serializable {
     @ApiModelProperty("店铺名称")
     private String storeName;
 
-    @ApiModelProperty("套餐状态(0-已下架，1-已上架, 2-预约上架中, 3-预约下架中)")
+    @ApiModelProperty("套餐状态(0-待开始，1-进行中, 2-已结束)")
     private Integer activityStatus;
 
+    /**
+     * ActivitytatusEnum
+     */
     @ApiModelProperty("套餐状态名称")
     private String activityStatusName;
 
-    @ApiModelProperty("原价格")
-    private BigDecimal originalPrice;
+    @ApiModelProperty("价格")
+    private BigDecimal price;
 
-    @ApiModelProperty("优惠价格")
-    private BigDecimal preferentialPrice;
+    @ApiModelProperty("活动开始时间")
+    private Date activityStartTime;
 
-    @ApiModelProperty("是否展示原价(0不展示,1展示)")
-    private Integer originalAmountDisplay;
+    @ApiModelProperty("活动结束时间")
+    private Date activityEndTime;
 
     @ApiModelProperty("创建时间")
     private Date createdAt;
+
+    @ApiModelProperty("活动套餐备注")
+    private String activityPackageRemark;
 }

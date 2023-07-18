@@ -14,4 +14,5 @@ public interface ActivityPackageSkuInfoSevice extends IService<ActivityPackageSk
 
     List<ActivityPackageSkuInfoEntity> findPackageByCode(String activityPackageCode);
 
+    List<ActivityPackageSkuInfoEntity>  queryBySkuCodeAndAmount(String skuCode, Integer amount);
 }

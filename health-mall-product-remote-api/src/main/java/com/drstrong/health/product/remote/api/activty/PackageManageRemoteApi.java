@@ -31,7 +31,7 @@ import java.util.List;
  * 2023/7/8 14:47
  */
 @Api("健康商城-套餐服务-套餐管理页面的远程接口")
-@FeignClient(value = "health-mall-product", path = "/inner/package/manage")
+@FeignClient(value = "health-mall-product", path = "/inner/package/manage", url = "http://localhost:9092/")
 public interface PackageManageRemoteApi {
 
     @ApiOperation("套餐管理页面查询")
@@ -49,14 +49,6 @@ public interface PackageManageRemoteApi {
     @ApiOperation("根据Code查询套餐详情")
     @GetMapping("/query/by-code")
     ResultVO<ActivityPackageDetailDTO> queryDetailByCode(@RequestParam("activityPackageCode") String activityPackageCode);
-
-    @ApiOperation("批量上下架")
-    @PostMapping("/update/status")
-    ResultVO<Void> updateActivityPackageStatus(@RequestBody @Valid UpdateSkuStateRequest updateSkuStateRequest);
-
-    @ApiOperation("预约上下架")
-    @PostMapping("/scheduled/up-or-down")
-    ResultVO<Void> scheduledActivityPackageUpDown(@RequestBody @Valid ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
 
     @ApiOperation("添加套餐时的sku搜索")
     @PostMapping("/page/querySku")

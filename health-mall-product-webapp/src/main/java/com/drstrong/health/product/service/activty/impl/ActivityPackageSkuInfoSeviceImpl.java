@@ -50,4 +50,24 @@ public class ActivityPackageSkuInfoSeviceImpl extends ServiceImpl<ActivityPackag
         }
         return activityPackageSkuInfoEntities;
     }
+
+    /**
+     * 根据套餐商品编码和数量查询
+     *
+     * @param skuCode
+     * @param amount
+     * @return
+     */
+    @Override
+    public List<ActivityPackageSkuInfoEntity> queryBySkuCodeAndAmount(String skuCode, Integer amount) {
+        if (StrUtil.isBlank(skuCode) || Objects.isNull(amount)) {
+            return null;
+        }
+        LambdaQueryWrapper<ActivityPackageSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<ActivityPackageSkuInfoEntity>()
+                .eq(ActivityPackageSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .eq(ActivityPackageSkuInfoEntity::getAmount, amount)
+                .eq(ActivityPackageSkuInfoEntity::getSkuCode, skuCode);
+        List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntity = baseMapper.selectList(queryWrapper);
+        return activityPackageSkuInfoEntity;
+    }
 }

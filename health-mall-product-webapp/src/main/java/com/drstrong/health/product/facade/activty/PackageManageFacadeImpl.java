@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.product.constants.OperationLogConstant;
+import com.drstrong.health.product.enums.ActivitytatusEnum;
 import com.drstrong.health.product.facade.incentive.SkuIncentivePolicyFacade;
 import com.drstrong.health.product.facade.sku.SkuBusinessBaseFacade;
 import com.drstrong.health.product.facade.sku.SkuBusinessFacadeHolder;
@@ -149,11 +150,13 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                     .storeId(record.getStoreId())
                     .storeName(storeIdNameMap.get(record.getStoreId()))
                     .activityStatus(record.getActivityStatus())
-                    .activityStatusName(UpOffEnum.getValueByCode(record.getActivityStatus()))
-                    .originalPrice(BigDecimalUtil.F2Y(record.getOriginalPrice()))
-                    .preferentialPrice(BigDecimalUtil.F2Y(record.getPreferentialPrice()))
-                    .originalAmountDisplay(record.getOriginalAmountDisplay())
+                    .activityStatusName(ActivitytatusEnum.getValueByCode(record.getActivityStatus()).getValue())
+                    .price(BigDecimalUtil.F2Y(record.getPrice()))
+                    .activityStartTime(Date.from(record.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant()))
+                    .activityEndTime(Date.from(record.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant()))
                     .createdAt(Date.from(record.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant()))
+                    .activityPackageRemark(record.getActivityPackageRemark())
+                    .activitySkuName(record.getActivityPackageSkuName())
                     .build();
             activityPackageInfoVOList.add(activityPackageInfoVO);
         }
@@ -208,29 +211,37 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             log.error("目前套餐药品种类大于支持的药品种类数量。");
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE);
         }
-        //sku库存校验
-        String skuCode = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0).getSkuCode();
-        Integer amount = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0).getAmount();
-        Map<String, List<SkuCanStockDTO>> stockToMap = stockRemoteProService.getStockToMap(Lists.newArrayList(skuCode));
-        if (CollectionUtils.isEmpty(stockToMap.get(skuCode)) || stockToMap.get(skuCode).stream().mapToLong(SkuCanStockDTO::getAvailableQuantity).sum() < amount) {
-            log.error("套餐内的药品库存不足。");
-            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_LOCK_INWENTORY);
+        //套餐活动时间校验
+        Date startTime = Date.from(saveOrUpdateActivityPackageRequest.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
+        Date endTime = Date.from(saveOrUpdateActivityPackageRequest.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
+        if (startTime.getTime() >= endTime.getTime()) {
+            log.error("套餐活动开始时间必须小于套餐活动结束时间。");
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_ERROR);
         }
 
+        //套餐校验：根据skuid和数量检索套餐信息，只能存在一个待开始和进行中的套餐 是否存在时间交集的
         ActivityPackageSkuRequest activityPackageSkuRequest = activityPackageSkuList.get(0);
-        LocalDateTime dateTime = LocalDateTime.now();
+        List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntityList = activityPackageSkuInfoSevice.queryBySkuCodeAndAmount(activityPackageSkuRequest.getSkuCode(), activityPackageSkuRequest.getAmount());
+        if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntityList) && updateFlag) {
+            //更新 -- 过滤掉原先的activityPackageCode
+            List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoEntityList.stream().filter(x -> !x.getActivityPackageCode().equals(saveOrUpdateActivityPackageRequest.getActivityPackageCode())).collect(Collectors.toList());
+            checkActivity(startTime, endTime, activityPackageSkuInfoEntityList);
+        } else if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntityList) && !updateFlag) {
+            //新增
+            checkActivity(startTime, endTime, activityPackageSkuInfoEntityList);
+        }
+
         //套餐
+        LocalDateTime dateTime = LocalDateTime.now();
         ActivityPackageInfoEntity packageInfoEntity = ActivityPackageInfoEntity.builder()
                 .activityPackageName(saveOrUpdateActivityPackageRequest.getActivityPackageName())
                 .activityPackageCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode())
                 .productType(saveOrUpdateActivityPackageRequest.getProductType())
                 .storeId(saveOrUpdateActivityPackageRequest.getStoreId())
-                .activityStatus(UpOffEnum.DOWN.getCode())
-                .originalPrice(BigDecimalUtil.Y2F(saveOrUpdateActivityPackageRequest.getOriginalPrice()))
-                .preferentialPrice(BigDecimalUtil.Y2F(saveOrUpdateActivityPackageRequest.getPreferentialPrice()))
-                .originalAmountDisplay(saveOrUpdateActivityPackageRequest.getOriginalAmountDisplay())
-                .activityPackageImageInfo(saveOrUpdateActivityPackageRequest.getActivityPackageImageInfo())
-                .activityPackageIntroduce(saveOrUpdateActivityPackageRequest.getActivityPackageIntroduce())
+                .activityStatus(ActivitytatusEnum.TO_BE_STARTED.getCode())
+                .price(BigDecimalUtil.Y2F(saveOrUpdateActivityPackageRequest.getPrice()))
+                .activityStartTime(saveOrUpdateActivityPackageRequest.getActivityStartTime())
+                .activityEndTime(saveOrUpdateActivityPackageRequest.getActivityEndTime())
                 .activityPackageRemark(saveOrUpdateActivityPackageRequest.getActivityPackageRemark())
                 .build();
         packageInfoEntity.setChangedAt(dateTime);
@@ -282,6 +293,56 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     }
 
     /**
+     * 套餐校验
+     *
+     * @param startTime
+     * @param endTime
+     * @param activityPackageSkuInfoEntityList
+     */
+    private void checkActivity(Date startTime, Date endTime, List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntityList) {
+        List<String> activityPackageCodeList = activityPackageSkuInfoEntityList.stream().map(ActivityPackageSkuInfoEntity::getActivityPackageCode).collect(Collectors.toList());
+        List<ActivityPackageInfoEntity> packageInfoEntityList = packageService.findPackageByCodes(activityPackageCodeList);
+        if (CollectionUtil.isNotEmpty(packageInfoEntityList)) {
+            List<ActivityPackageInfoEntity> packageInfoEntities = packageInfoEntityList.stream().filter(x -> ActivitytatusEnum.TO_BE_STARTED.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
+            if (CollectionUtil.isNotEmpty(packageInfoEntities)) {
+                log.error("已存在相同状态的活动，请勿重复创建。");
+                throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SAVE_THE_SAME);
+            }
+            for (ActivityPackageInfoEntity packageInfoEntity : packageInfoEntityList) {
+                //时间交集判断
+                Date startTime0 = Date.from(packageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
+                Date endTime0 = Date.from(packageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
+                if (!(endTime0.getTime() < startTime.getTime() || startTime0.getTime() > endTime.getTime())) {
+                    log.error("已存在相同活动且活动时间存在冲突，请勿重复创建。");
+                    throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SAVE_TIME_CONFLICT);
+                }
+            }
+        }
+    }
+
+    /**
+     * 套餐校验
+     *
+     * @param startTime
+     * @param endTime
+     * @param activityPackageCode
+     */
+    private void checkActivity(Date startTime, Date endTime, String activityPackageCode) {
+        ActivityPackageInfoEntity packageInfoEntity = packageService.findPackageByCode(activityPackageCode, null);
+        if (!Objects.isNull(packageInfoEntity) && ActivitytatusEnum.TO_BE_STARTED.equals(packageInfoEntity.getActivityStatus())) {
+            log.error("已存在相同状态的活动，请勿重复创建。");
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SAVE_THE_SAME);
+        }
+        //时间交集判断
+        Date startTime0 = Date.from(packageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
+        Date endTime0 = Date.from(packageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
+        if (!(endTime0.getTime() < startTime.getTime() || startTime0.getTime() > endTime.getTime())) {
+            log.error("已存在相同活动且活动时间存在冲突，请勿重复创建。");
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SAVE_TIME_CONFLICT);
+        }
+    }
+
+    /**
      * 生成activityPackageCode
      *
      * @param storeId
@@ -322,67 +383,21 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         }
         //组装数据
         ActivityPackageDetailDTO activityPackageDetailDTO = ActivityPackageDetailDTO.builder()
+                .id(activityPackageInfoEntity.getId())
                 .activityPackageName(activityPackageInfoEntity.getActivityPackageName())
                 .activityPackageCode(activityPackageInfoEntity.getActivityPackageCode())
                 .productType(activityPackageInfoEntity.getProductType())
                 .storeId(storeEntity.getId())
                 .storeName(storeEntity.getStoreName())
                 .activityStatus(activityPackageInfoEntity.getActivityStatus())
-                .originalPrice(BigDecimalUtil.F2Y(activityPackageInfoEntity.getOriginalPrice()))
-                .preferentialPrice(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPreferentialPrice()))
-                .originalAmountDisplay(activityPackageInfoEntity.getOriginalAmountDisplay())
-                .activityPackageImageInfo(activityPackageInfoEntity.getActivityPackageImageInfo())
-                .activityPackageIntroduce(activityPackageInfoEntity.getActivityPackageIntroduce())
+                .activityStatusName(ActivitytatusEnum.getValueByCode(activityPackageInfoEntity.getActivityStatus()).getValue())
+                .price(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPrice()))
+                .activityStartTime(Date.from(activityPackageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant()))
+                .activityEndTime(Date.from(activityPackageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant()))
                 .activityPackageRemark(activityPackageInfoEntity.getActivityPackageRemark())
                 .activityPackageSkuInfoEntityList(packageSkuDetailDTOS)
                 .build();
         return activityPackageDetailDTO;
-    }
-
-    /**
-     * 上下架处理
-     *
-     * @param updateSkuStateRequest
-     */
-    @Override
-    public void updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest) {
-        log.info("invoke updateActivityPackageStatus param:{}", JSONUtil.toJsonStr(updateSkuStateRequest));
-        List<ActivityPackageInfoEntity> activityPackageInfoEntityList = packageService.queryByActivityPackageCode(updateSkuStateRequest.getSkuCodeList());
-        //信息校验
-        checkActivityPackageStatus(updateSkuStateRequest, activityPackageInfoEntityList);
-        //修改状态
-        packageService.batchUpdateActivityStatusByCodes(updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getSkuState(), updateSkuStateRequest.getOperatorId());
-        // 操作日志
-        sendActivityStatusUpdateLog(activityPackageInfoEntityList, updateSkuStateRequest.getSkuCodeList(), updateSkuStateRequest.getOperatorId(), updateSkuStateRequest.getOperatorName());
-        //定时上下架处理
-        skuScheduledConfigFacade.batchUpdateScheduledStatusByCodes(updateSkuStateRequest);
-    }
-
-    /**
-     * 预约上下架处理
-     *
-     * @param scheduledSkuUpDownRequest
-     */
-    @Override
-    public void scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest) {
-        //时间校验
-        long time = Date.from(scheduledSkuUpDownRequest.getScheduledDateTime().atZone(ZoneId.systemDefault()).toInstant()).getTime();
-        if (time < System.currentTimeMillis()) {
-            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_ERROR);
-        }
-        //校验套餐是否存在
-        ActivityPackageInfoEntity packageInfoEntity = packageService.findPackageByCode(scheduledSkuUpDownRequest.getSkuCode(), null);
-        //状态校验
-        if (Objects.equals(UpOffEnum.UP.getCode(), packageInfoEntity.getActivityStatus()) && Objects.equals(ScheduledSkuUpDownRequest.SCHEDULED_UP, scheduledSkuUpDownRequest.getScheduledType())) {
-            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_IS_UP_ERROR);
-        }
-        if (Objects.equals(UpOffEnum.DOWN.getCode(), packageInfoEntity.getActivityStatus()) && Objects.equals(ScheduledSkuUpDownRequest.SCHEDULED_DOWN, scheduledSkuUpDownRequest.getScheduledType())) {
-            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_IS_DOWN_ERROR);
-        }
-        // 操作日志
-        sendActivityStatusUpdateLog(Lists.newArrayList(packageInfoEntity), Sets.newHashSet(scheduledSkuUpDownRequest.getSkuCode()), scheduledSkuUpDownRequest.getOperatorId(), scheduledSkuUpDownRequest.getOperatorName());
-        //定时上下架处理
-        skuScheduledConfigFacade.saveOrUpdateSkuConfig(scheduledSkuUpDownRequest);
     }
 
     /**

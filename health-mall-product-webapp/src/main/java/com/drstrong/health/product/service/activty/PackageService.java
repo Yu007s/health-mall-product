@@ -18,6 +18,8 @@ public interface PackageService extends IService<ActivityPackageInfoEntity> {
 
     ActivityPackageInfoEntity findPackageByCode(String activityPackageCode, Integer activityStatus);
 
+    List<ActivityPackageInfoEntity> findPackageByCodes(List<String> activityPackageCode);
+
     Page<ActivityPackageInfoEntity> pageQueryByParam(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);
 
     List<ActivityPackageInfoEntity> listQueryByParam(ActivityPackageManageQueryRequest activityPackageManageQueryRequest);

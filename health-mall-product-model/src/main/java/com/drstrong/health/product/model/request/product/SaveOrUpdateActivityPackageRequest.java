@@ -2,6 +2,7 @@ package com.drstrong.health.product.model.request.product;
 
 import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
 import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -50,30 +52,23 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
     @Size(max = 1, message = "套餐商品列表数量超过限制")
     private List<ActivityPackageSkuRequest> activityPackageSkuList;
 
-    @NotNull(message = "套餐原价格不能为空")
+    @NotNull(message = "套餐价格不能为空")
     @ApiModelProperty("原价格")
-    @DecimalMin(value = "0.01", message = "价格不能小于0.01")
-    @DecimalMax(value = "9999999", message = "价格不能大于9999999")
-    private BigDecimal originalPrice;
+    @DecimalMin(value = "0.01", message = "请填写正确的套餐价")
+    @DecimalMax(value = "9999999", message = "请填写正确的套餐价")
+    private BigDecimal price;
 
-    @NotNull(message = "套餐优惠价格不能为空")
-    @ApiModelProperty("优惠价格")
-    @DecimalMin(value = "0.01", message = "价格不能小于0.01")
-    @DecimalMax(value = "9999999", message = "价格不能大于9999999")
-    private BigDecimal preferentialPrice;
+    @ApiModelProperty("套餐活动开始时间")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @Future(message = "套餐活动开始时间必须晚于当前时间")
+    @NotNull(message = "套餐活动开始时间不能为空")
+    private LocalDateTime activityStartTime;
 
-    @ApiModelProperty("是否展示原价(0不展示,1展示)，默认不展示")
-    private Integer originalAmountDisplay;
-
-    @NotNull(message = "活动套餐的图片信息不能为空")
-    @ApiModelProperty("活动套餐的图片信息")
-    @Size(max = 5, message = "活动套餐的图片数量超过限制")
-    private List<String> activityPackageImageInfo;
-
-    @NotBlank(message = "活动套餐介绍不能为空")
-    @ApiModelProperty("活动套餐介绍")
-    @Length(max = 2000, message = "活动套餐介绍不能超过2000字符")
-    private String activityPackageIntroduce;
+    @ApiModelProperty("套餐活动结束时间")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @Future(message = "套餐活动结束时间必须晚于当前时间")
+    @NotNull(message = "套餐活动结束时间不能为空")
+    private LocalDateTime activityEndTime;
 
     @ApiModelProperty("活动套餐备注")
     @Length(max = 500, message = "活动套餐备注不能超过500字符")

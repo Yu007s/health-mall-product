@@ -35,7 +35,7 @@ public class ActivityPackageDetailDTO implements Serializable {
     @ApiModelProperty("套餐编码")
     private String activityPackageCode;
 
-    @ApiModelProperty("套餐商品类型  1-西成药")
+    @ApiModelProperty("套餐商品类型  1-西成药,3-协定方")
     private Integer productType;
 
     @ApiModelProperty("店铺id")
@@ -44,26 +44,26 @@ public class ActivityPackageDetailDTO implements Serializable {
     @ApiModelProperty("店铺名称")
     private String storeName;
 
-    @ApiModelProperty("套餐状态(0-已下架，1-已上架, 2-预约上架中, 3-预约下架中)")
+    @ApiModelProperty("套餐状态(0-待开始，1-进行中, 2-已结束)")
     private Integer activityStatus;
 
-    @ApiModelProperty("原价格")
-    private BigDecimal originalPrice;
+    /**
+     * ActivitytatusEnum
+     */
+    @ApiModelProperty("套餐状态名称")
+    private String activityStatusName;
 
-    @ApiModelProperty("优惠价格")
-    private BigDecimal preferentialPrice;
-
-    @ApiModelProperty("是否展示原价(0不展示,1展示)")
-    private Integer originalAmountDisplay;
-
-    @ApiModelProperty("活动套餐的图片信息")
-    private List<String> activityPackageImageInfo;
-
-    @ApiModelProperty("活动套餐介绍")
-    private String activityPackageIntroduce;
+    @ApiModelProperty("价格")
+    private BigDecimal price;
 
     @ApiModelProperty("活动套餐备注")
     private String activityPackageRemark;
+
+    @ApiModelProperty("活动开始时间")
+    private Date activityStartTime;
+
+    @ApiModelProperty("活动结束时间")
+    private Date activityEndTime;
 
     @ApiModelProperty("套餐商品列表")
     private List<PackageSkuDetailDTO> activityPackageSkuInfoEntityList;

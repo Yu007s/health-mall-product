@@ -23,23 +23,15 @@ public class ActivityPackageManageQueryRequest extends PageRequest implements Se
 
     private static final long serialVersionUID = 1842569972108814648L;
 
-    @ApiModelProperty("套餐名称")
+    @ApiModelProperty("套餐名称(模糊检索)")
     private String activityPackageName;
+
+    @ApiModelProperty("套餐名称(模糊检索)")
+    private String skuName;
 
     @ApiModelProperty("店铺id")
     private Long storeId;
 
-    @ApiModelProperty("医生所在互联网医院的ID")
-    private Integer agencyId;
-
-    /**
-     * 套餐上下架状态；0-已下架，1-已上架, 2-预约上架中, 3-预约下架中
-     */
-    @ApiModelProperty("套餐状态")
+    @ApiModelProperty("套餐状态(0-待开始，1-进行中, 2-已结束)")
     private Integer activityStatus;
-
-    @ApiModelProperty("套餐创建时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private String createdAt;
-
 }

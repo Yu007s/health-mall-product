@@ -58,7 +58,7 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade {
      */
     @Override
     public ActivityPackageDetailDTO queryDetailByCode(String activityPackageCode) {
-        //根据activityPackageCode查询套餐
+/*        //根据activityPackageCode查询套餐
         ActivityPackageInfoEntity activityPackageInfoEntity = packageService.findPackageByCode(activityPackageCode, null);
         //套餐关联的店铺信息
         StoreEntity storeEntity = storeService.getById(activityPackageInfoEntity.getStoreId());
@@ -96,7 +96,8 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade {
                 .activityPackageRemark(activityPackageInfoEntity.getActivityPackageRemark())
                 .activityPackageSkuInfoEntityList(packageSkuDetailDTOS)
                 .build();
-        return activityPackageDetailDTO;
+        return activityPackageDetailDTO;*/
+        return null;
     }
 
     /**
@@ -107,7 +108,7 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade {
      */
     @Override
     public PageVO<PackageBussinessListVO> queryActivityPackageList(PackageBussinessQueryListRequest packageBussinessQueryListRequest) {
-        log.info("invoke queryActivityPackageList(),param:{}", JSONUtil.toJsonStr(packageBussinessQueryListRequest));
+/*        log.info("invoke queryActivityPackageList(),param:{}", JSONUtil.toJsonStr(packageBussinessQueryListRequest));
         //店铺信息
         List<StoreEntity> storeEntityList = storeService.getStoreByAgencyIds(Sets.newHashSet(Long.valueOf(packageBussinessQueryListRequest.getAgencyId())));
         List<Long> storeIds = storeEntityList.stream().map(StoreEntity::getId).collect(Collectors.toList());
@@ -141,6 +142,7 @@ public class PackageBussinessFacadeImpl implements PackageBussinessFacade {
                 .totalCount((int) activityPackageInfoEntityPage.getTotal())
                 .pageNo(packageBussinessQueryListRequest.getPageNo())
                 .pageSize(packageBussinessQueryListRequest.getPageSize())
-                .build();
+                .build();*/
+        return null;
     }
 }

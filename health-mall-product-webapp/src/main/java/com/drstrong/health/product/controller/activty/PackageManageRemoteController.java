@@ -14,6 +14,8 @@ import com.drstrong.health.product.model.response.product.PackageManageListVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.activty.PackageManageRemoteApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +40,8 @@ public class PackageManageRemoteController implements PackageManageRemoteApi {
      * @return
      */
     @Override
-    public ResultVO<PageVO<PackageManageListVO>> pageQuerySkuManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
+    @PostMapping("pageQuerySkuManageInfo")
+    public ResultVO<PageVO<PackageManageListVO>> pageQuerySkuManageInfo(@RequestBody ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
         return ResultVO.success(packageManageFacade.queryActivityPackageManageInfo(activityPackageManageQueryRequest));
     }
 
@@ -60,7 +63,8 @@ public class PackageManageRemoteController implements PackageManageRemoteApi {
      * @return
      */
     @Override
-    public ResultVO<Void> saveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest) {
+    @PostMapping("saveOrUpdateActivityPackage")
+    public ResultVO<Void> saveOrUpdateActivityPackage(@RequestBody SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest) {
         packageManageFacade.addLocksaveOrUpdateActivityPackage(saveOrUpdateActivityPackageRequest, saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0).getSkuCode());
         return ResultVO.success();
     }
@@ -74,31 +78,6 @@ public class PackageManageRemoteController implements PackageManageRemoteApi {
     @Override
     public ResultVO<ActivityPackageDetailDTO> queryDetailByCode(String activityPackageCode) {
         return ResultVO.success(packageManageFacade.queryDetailByCode(activityPackageCode));
-    }
-
-    /**
-     * 上下架
-     *
-     * @param updateSkuStateRequest
-     * @return
-     */
-    @Override
-    public ResultVO<Void> updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest) {
-        updateSkuStateRequest.setScheduledStatus(ScheduledStatusEnum.CANCEL.getCode());
-        packageManageFacade.updateActivityPackageStatus(updateSkuStateRequest);
-        return ResultVO.success();
-    }
-
-    /**
-     * 预约上下架
-     *
-     * @param scheduledSkuUpDownRequest
-     * @return
-     */
-    @Override
-    public ResultVO<Void> scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest) {
-        packageManageFacade.scheduledActivityPackageUpDown(scheduledSkuUpDownRequest);
-        return ResultVO.success();
     }
 
     /**

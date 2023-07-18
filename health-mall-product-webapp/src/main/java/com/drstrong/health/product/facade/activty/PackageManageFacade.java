@@ -28,9 +28,5 @@ public interface PackageManageFacade {
 
     ActivityPackageDetailDTO queryDetailByCode(String activityPackageCode);
 
-    void updateActivityPackageStatus(UpdateSkuStateRequest updateSkuStateRequest);
-
-    void scheduledActivityPackageUpDown(ScheduledSkuUpDownRequest scheduledSkuUpDownRequest);
-
     PageVO<SkuBusinessListDTO> getPackageSkuBusinessList(QuerySkuBusinessListRequest querySkuBusinessListRequest);
 }
