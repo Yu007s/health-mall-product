@@ -82,6 +82,8 @@ public enum ErrorEnums implements IBaseResult {
 	ACTIVTY_PACKAGE_SKU_LOCK_INWENTORY("14010", "套餐内的药品库存不足"),
 	ACTIVTY_PACKAGE_SAVE_THE_SAME("14011", "已存在相同状态的活动，请勿重复创建。"),
 	ACTIVTY_PACKAGE_SAVE_TIME_CONFLICT("14012", "已存在相同活动且活动时间存在冲突，请勿重复创建。"),
+	ACTIVTY_PACKAGE_UPDATE_ERROR("14013", "正在进行中的套餐活动不能修改套餐商品信息。"),
+	ACTIVTY_PACKAGE_UPDATE_TIME_ERROR("14014", "正在进行中的套餐活动结束时间只能向后延长且活动开始时间无法修改。"),
 	;
 
 	private String code;

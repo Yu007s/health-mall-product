@@ -218,9 +218,28 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             log.error("套餐活动开始时间必须小于套餐活动结束时间。");
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_ERROR);
         }
+        ActivityPackageSkuRequest activityPackageSkuRequest = activityPackageSkuList.get(0);
+        if (updateFlag) {
+            //进行中的套餐活动，不能修改skuid、价格和数量，结束时间只能往后延迟
+            ActivityPackageInfoEntity activityPackageInfoEntity = packageService.findPackageByCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode(), null);
+            if (!ObjectUtil.isNull(activityPackageInfoEntity) && ActivitytatusEnum.UNDER_WAY.getCode().equals(activityPackageInfoEntity.getActivityStatus())) {
+                Date endTime0 = Date.from(activityPackageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
+                Date startTime0 = Date.from(activityPackageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
+                if (endTime.getTime() > endTime0.getTime() || startTime0.getTime() != startTime.getTime()) {
+                    log.error("正在进行中的套餐活动结束时间只能向后延长且活动开始时间无法修改。");
+                    throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_UPDATE_TIME_ERROR);
+                }
+                ActivityPackageSkuInfoEntity activityPackageSkuInfoEntity = activityPackageSkuInfoSevice.findPackageByCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode()).get(0);
+                if (!activityPackageSkuRequest.getSkuCode().equals(activityPackageSkuInfoEntity.getSkuCode()) ||
+                        !activityPackageSkuRequest.getAmount().equals(activityPackageSkuInfoEntity.getAmount()) ||
+                        !activityPackageSkuRequest.getPreferential_price().equals(activityPackageSkuInfoEntity.getPreferentialPrice())) {
+                    log.error("正在进行中的套餐活动不能修改套餐商品信息。");
+                    throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_UPDATE_ERROR);
+                }
+            }
+        }
 
         //套餐校验：根据skuid和数量检索套餐信息，只能存在一个待开始和进行中的套餐 是否存在时间交集的
-        ActivityPackageSkuRequest activityPackageSkuRequest = activityPackageSkuList.get(0);
         List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntityList = activityPackageSkuInfoSevice.queryBySkuCodeAndAmount(activityPackageSkuRequest.getSkuCode(), activityPackageSkuRequest.getAmount());
         if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntityList) && updateFlag) {
             //更新 -- 过滤掉原先的activityPackageCode
