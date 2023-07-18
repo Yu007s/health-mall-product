@@ -36,6 +36,7 @@ import java.util.*;
 @RequestMapping("/product/remote")
 @Slf4j
 @Api(tags = {"商品远程接口"})
+@Deprecated
 public class ProductRemoteController implements ProductRemoteFacade {
 	@Resource
 	ProductRemoteService productRemoteService;

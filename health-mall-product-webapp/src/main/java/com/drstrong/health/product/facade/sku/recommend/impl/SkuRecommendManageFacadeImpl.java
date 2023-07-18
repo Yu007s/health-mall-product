@@ -76,7 +76,7 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
         List<StoreSkuRecommendEntity.RecommendDetailInfoEntity> recommendDetailInfoEntityList = saveRecommendRequest.getKeywordList().stream().map(keyword -> {
             String replaceName = keyword.replaceAll(NOT_CHINESE_CHARACTERS, "");
             String pinyin = HanZiToPinYinUtil.toFirstChar(replaceName);
-            return StoreSkuRecommendEntity.RecommendDetailInfoEntity.builder().keyword(replaceName).pinyin(pinyin).build();
+            return StoreSkuRecommendEntity.RecommendDetailInfoEntity.builder().keyword(keyword).pinyin(pinyin).build();
         }).collect(Collectors.toList());
 
         storeSkuRecommendEntity.setStoreId(saveRecommendRequest.getStoreId());

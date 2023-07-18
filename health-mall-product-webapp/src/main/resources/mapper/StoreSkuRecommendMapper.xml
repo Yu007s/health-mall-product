@@ -38,21 +38,42 @@
 
     <sql id="queryByParam">
         select
-        <include refid="Base_Column_List"/>
-        from pms_store_sku_recommend
-        where del_flag = 0
+        pssr.id,
+        pssr.store_id,
+        pssr.sku_code,
+        pssr.recommend_detail_info,
+        pssr.recommend_detail_info_pinyin_array,
+        pssr.recommend_detail_info_keyword_array,
+        pssr.version,
+        pssr.del_flag,
+        pssr.created_by,
+        pssr.created_at,
+        pssr.changed_by,
+        pssr.changed_at
+        from pms_store_sku_recommend pssr
+        <if test="queryParam.skuName == null or queryParam.skuName = ''">
+            where pssr.del_flag = 0
+        </if>
+        <if test="queryParam.skuName != null and queryParam.skuName != ''">
+            left join pms_store_sku_info pssi on pssr.sku_code = pssi.sku_code
+            where pssi.del_flag = 0 and pssr.del_flag = 0
+        </if>
         <if test="queryParam.storeId != null">
-            and store_id = #{queryParam.storeId}
+            and pssr.store_id = #{queryParam.storeId}
         </if>
         <if test="queryParam.skuCode != null and queryParam.skuCode != ''">
-            and sku_code = #{queryParam.skuCode}
+            and pssr.sku_code = #{queryParam.skuCode}
+        </if>
+        <if test="queryParam.skuName != null and queryParam.skuName != ''">
+            and pssi.sku_name LIKE concat('%',#{queryParam.skuName},'%')
         </if>
         <if test="queryParam.keyword != null and queryParam.keyword != ''">
             and
-            #{queryParam.keyword} MEMBER OF (recommend_detail_info_pinyin_array)
+            #{queryParam.keyword} MEMBER OF (pssr.recommend_detail_info_pinyin_array)
             or
-            #{queryParam.keyword} MEMBER OF (recommend_detail_info_keyword_array)
+            #{queryParam.keyword} MEMBER OF (pssr.recommend_detail_info_keyword_array)
         </if>
+        order by pssr.id desc
     </sql>
 
     <select id="pageQueryByParam" resultMap="BaseResultMap">

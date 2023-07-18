@@ -65,7 +65,12 @@ public class SkuBusinessFacadeHolder {
      */
     public List<MedicineUsageDTO> queryMedicineUsageBySkuCode(Set<String> skuCodes) {
         List<MedicineUsageDTO> medicineUsageDTOList = Lists.newArrayListWithCapacity(skuCodes.size());
-        skuBusinessFacadeList.forEach(skuBusinessBaseFacade -> medicineUsageDTOList.addAll(skuBusinessBaseFacade.queryMedicineUsageBySkuCode(skuCodes)));
+        skuBusinessFacadeList.forEach(skuBusinessBaseFacade -> {
+            Set<String> filterSkuCodes = skuBusinessBaseFacade.filterSkuCodesByProductType(skuCodes);
+            if (CollectionUtil.isNotEmpty(filterSkuCodes)) {
+                medicineUsageDTOList.addAll(skuBusinessBaseFacade.queryMedicineUsageBySkuCode(filterSkuCodes));
+            }
+        });
         return medicineUsageDTOList;
     }
 }

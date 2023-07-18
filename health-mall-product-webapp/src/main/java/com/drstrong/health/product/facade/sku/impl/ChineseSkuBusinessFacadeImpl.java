@@ -2,6 +2,7 @@ package com.drstrong.health.product.facade.sku.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.drstrong.health.product.facade.ChineseManagerFacade;
@@ -14,6 +15,7 @@ import com.drstrong.health.product.model.request.sku.SkuQueryRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseManagerSkuVO;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -70,6 +72,21 @@ public class ChineseSkuBusinessFacadeImpl implements SkuBusinessBaseFacade {
     public SkuInfoSummaryDTO queryBySkuCode(String skuCode) {
         SkuQueryRequest skuQueryRequest = SkuQueryRequest.builder().skuCode(skuCode).build();
         return SpringUtil.getBean(ChineseSkuBusinessFacadeImpl.class).querySkuByParam(skuQueryRequest);
+    }
+
+    /**
+     * 根据 productType 过滤skuCode
+     *
+     * @param skuCodes
+     * @author liuqiuyi
+     * @date 2023/7/17 14:41
+     */
+    @Override
+    public Set<String> filterSkuCodesByProductType(Set<String> skuCodes) {
+        if (CollectionUtil.isEmpty(skuCodes)) {
+            return Sets.newHashSet();
+        }
+        return skuCodes.stream().filter(skuCode -> StrUtil.isNotBlank(skuCode) && skuCode.startsWith(getProductType().getMark())).collect(Collectors.toSet());
     }
 
     @Override
