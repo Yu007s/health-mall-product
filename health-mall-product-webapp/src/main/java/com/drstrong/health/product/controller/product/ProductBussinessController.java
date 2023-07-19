@@ -50,13 +50,12 @@ public class ProductBussinessController implements ProductBussinessRemoteApi {
 
     /**
      * 医生端的常用药列表查询
+     *
      * @param skuCodes
      * @return
      */
     @Override
-    public ResultVO<List<FrequentlyUsedProductInfoVO>> getFrequentlyUsedProductList(Set<String> skuCodes){
+    public ResultVO<List<FrequentlyUsedProductInfoVO>> getFrequentlyUsedProductList(Set<String> skuCodes) {
         return ResultVO.success(productBussinessFacade.getFrequentlyUsedProductList(skuCodes));
     }
-
-
 }

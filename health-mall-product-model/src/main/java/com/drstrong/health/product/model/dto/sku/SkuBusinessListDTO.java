@@ -36,6 +36,9 @@ public class SkuBusinessListDTO extends SkuBaseDTO implements Serializable {
     @ApiModelProperty("店铺名称")
     private String storeName;
 
+    @ApiModelProperty("sku状态")
+    private Integer skuStatus;
+
     @ApiModelProperty("销售价格,单位:元")
     private BigDecimal salePrice;
 

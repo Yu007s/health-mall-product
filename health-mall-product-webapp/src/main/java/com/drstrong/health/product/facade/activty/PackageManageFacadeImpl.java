@@ -64,6 +64,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -232,7 +234,9 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 ActivityPackageSkuInfoEntity activityPackageSkuInfoEntity = activityPackageSkuInfoSevice.findPackageByCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode()).get(0);
                 if (!activityPackageSkuRequest.getSkuCode().equals(activityPackageSkuInfoEntity.getSkuCode()) ||
                         !activityPackageSkuRequest.getAmount().equals(activityPackageSkuInfoEntity.getAmount()) ||
-                        !activityPackageSkuRequest.getPreferential_price().equals(activityPackageSkuInfoEntity.getPreferentialPrice())) {
+                        !activityPackageSkuRequest.getPreferential_price().equals(activityPackageSkuInfoEntity.getPreferentialPrice()) ||
+                        !saveOrUpdateActivityPackageRequest.getStoreId().equals(activityPackageInfoEntity.getStoreId()) ||
+                        !saveOrUpdateActivityPackageRequest.getProductType().equals(activityPackageInfoEntity.getProductType())) {
                     log.error("正在进行中的套餐活动不能修改套餐商品信息。");
                     throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_UPDATE_ERROR);
                 }
@@ -522,7 +526,6 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         log.info("invoke doScheduledUpDown end");
     }
 
-
     private List<SkuBusinessListDTO> buildSkuBusinessListDTOList(SkuInfoSummaryDTO skuInfoSummaryDTO, QuerySkuBusinessListRequest querySkuBusinessListRequest) {
         List<AgreementSkuInfoVO> skuInfoVoList = null;
         if (ProductTypeEnum.MEDICINE.getCode().equals(querySkuBusinessListRequest.getProductType())) {
@@ -551,6 +554,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                     .storeId(skuInfoVO.getStoreId())
                     .storeName(skuInfoVO.getStoreName())
                     .salePrice(skuInfoVO.getSalePrice())
+                    .skuStatus(skuInfoVO.getSkuStatus())
                     .build();
             skuBusinessListDTOList.add(skuBusinessListDTO);
         }
