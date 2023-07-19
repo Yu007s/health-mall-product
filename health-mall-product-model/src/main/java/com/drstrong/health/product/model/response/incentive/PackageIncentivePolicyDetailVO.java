@@ -33,6 +33,12 @@ public class PackageIncentivePolicyDetailVO implements Serializable {
 	@ApiModelProperty("套餐名称")
 	private String activityPackageName;
 
+	@ApiModelProperty("套餐商品类型  1-西成药,3-协定方")
+	private Integer productType;
+
+	@ApiModelProperty("套餐商品名称")
+	private String skuName;
+
 	@ApiModelProperty("店铺 id")
 	private Long storeId;
 

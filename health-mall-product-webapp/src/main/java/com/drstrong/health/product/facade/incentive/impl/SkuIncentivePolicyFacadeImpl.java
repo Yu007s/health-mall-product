@@ -11,9 +11,11 @@ import com.drstrong.health.product.facade.incentive.SkuIncentivePolicyFacade;
 import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.dto.label.LabelDTO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
+import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
 import com.drstrong.health.product.model.entity.incentive.IncentivePolicyConfigEntity;
 import com.drstrong.health.product.model.entity.incentive.SkuIncentivePolicyEntity;
 import com.drstrong.health.product.model.entity.label.LabelInfoEntity;
+import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.EarningPolicyTypeEnum;
@@ -28,6 +30,7 @@ import com.drstrong.health.product.model.response.incentive.excel.SkuIncentivePo
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.store.v3.SupplierInfoVO;
 import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
+import com.drstrong.health.product.service.activty.ActivityPackageSkuInfoSevice;
 import com.drstrong.health.product.service.activty.PackageService;
 import com.drstrong.health.product.service.incentive.IncentivePolicyConfigService;
 import com.drstrong.health.product.service.incentive.SkuIncentivePolicyService;
@@ -86,6 +89,9 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 
 	@Autowired
 	private PackageService packageService;
+
+	@Autowired
+	private ActivityPackageSkuInfoSevice activityPackageSkuInfoSevice;
 
 	/**
 	 * 保存店铺下的收益名称
@@ -259,6 +265,9 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 		activityPackageInfoEntityList.forEach(activityPackageInfoEntity -> {
 			packageCodes.add(activityPackageInfoEntity.getActivityPackageCode());
 		});
+		List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoSevice.queryByPackageCodes(packageCodes);
+		Map<String, String> skuNameMap = activityPackageSkuInfoEntities.stream().collect(Collectors.toMap(ActivityPackageSkuInfoEntity::getActivityPackageCode, ActivityPackageSkuInfoEntity::getSkuName, (v1, v2) -> v1));
+
 		//根据店铺id和类型获取店铺下的自定义收益单元
 		if (CollectionUtil.isEmpty(storePolicyConfigIdsMap)) {
 			storePolicyConfigIdsMap = getStorePolicyConfigIdsMap(storeIds, productType);
@@ -278,6 +287,8 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 					.activityPackageCode(activityPackageInfoEntity.getActivityPackageCode())
 					.activityPackageName(activityPackageInfoEntity.getActivityPackageName())
 					.storeId(activityPackageInfoEntity.getStoreId())
+					.productType(activityPackageInfoEntity.getProductType())
+					.skuName(skuNameMap.get(activityPackageInfoEntity.getActivityPackageCode()))
 					.storeName(storeIdNameMap.get(activityPackageInfoEntity.getStoreId()))
 					.price(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPrice()))
 					.costPrice(ObjectUtil.isNull(skuIncentivePolicyEntity) ? new BigDecimal("-1") : BigDecimalUtil.F2Y(skuIncentivePolicyEntity.getCostPrice()))

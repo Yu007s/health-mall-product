@@ -20,4 +20,6 @@ public interface ActivityPackageSkuInfoSevice extends IService<ActivityPackageSk
     List<ActivityPackageSkuInfoEntity> queryBySkuCodes(List<String> skuCodes);
 
     List<ActivityPackageSkuInfoEntity> queryUpPackageSku();
+
+    List<ActivityPackageSkuInfoEntity> queryByPackageCodes(Set<String> packageCodes);
 }

@@ -227,18 +227,9 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             if (!ObjectUtil.isNull(activityPackageInfoEntity) && ActivityStatusEnum.UNDER_WAY.getCode().equals(activityPackageInfoEntity.getActivityStatus())) {
                 Date endTime0 = Date.from(activityPackageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
                 Date startTime0 = Date.from(activityPackageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
-                if (endTime.getTime() > endTime0.getTime() || startTime0.getTime() != startTime.getTime()) {
-                    log.error("正在进行中的套餐活动结束时间只能向后延长且活动开始时间无法修改。");
+                if (endTime.getTime() > endTime0.getTime()) {
+                    log.error("正在进行中的套餐活动结束时间只能向后延长。");
                     throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_UPDATE_TIME_ERROR);
-                }
-                ActivityPackageSkuInfoEntity activityPackageSkuInfoEntity = activityPackageSkuInfoSevice.findPackageByCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode()).get(0);
-                if (!activityPackageSkuRequest.getSkuCode().equals(activityPackageSkuInfoEntity.getSkuCode()) ||
-                        !activityPackageSkuRequest.getAmount().equals(activityPackageSkuInfoEntity.getAmount()) ||
-                        !activityPackageSkuRequest.getPreferential_price().equals(activityPackageSkuInfoEntity.getPreferentialPrice()) ||
-                        !saveOrUpdateActivityPackageRequest.getStoreId().equals(activityPackageInfoEntity.getStoreId()) ||
-                        !saveOrUpdateActivityPackageRequest.getProductType().equals(activityPackageInfoEntity.getProductType())) {
-                    log.error("正在进行中的套餐活动不能修改套餐商品信息。");
-                    throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_UPDATE_ERROR);
                 }
             }
         }
