@@ -1,7 +1,6 @@
 package com.drstrong.health.product.controller.activty;
 
 import com.drstrong.health.product.facade.activty.PackageManageFacade;
-import com.drstrong.health.product.facade.sku.SkuScheduledConfigFacade;
 import com.drstrong.health.product.model.response.result.ResultVO;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -9,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
 
 /**
  * 套餐定时上下架
@@ -27,7 +24,7 @@ public class PackageScheduledJobController {
 	private PackageManageFacade packageManageFacade;
 
 	@ApiOperation("sku定时上下架")
-	@GetMapping({"up-or-down"})
+	@GetMapping("up-or-down")
 	public ResultVO<Void> doScheduledSkuUpDown() {
 		packageManageFacade.doScheduledUpDown();
 		return ResultVO.success();
