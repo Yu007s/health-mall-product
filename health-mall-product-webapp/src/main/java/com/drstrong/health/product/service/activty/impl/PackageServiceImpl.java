@@ -6,15 +6,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.drstrong.health.product.dao.activty.ActivityPackageInfoMapper;
-import com.drstrong.health.product.dao.sku.StoreSkuInfoMapper;
 import com.drstrong.health.product.enums.ActivityStatusEnum;
 import com.drstrong.health.product.model.dto.product.PackageInfoVO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
-import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
-import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
 import com.drstrong.health.product.model.request.product.PackageBussinessQueryListRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
@@ -189,6 +186,45 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
         for (String key : activityPackageSkuInfoEntitiesMap.keySet()) {
             List<ActivityPackageSkuInfoEntity> skuInfoEntities = activityPackageSkuInfoEntitiesMap.get(key);
             List<String> activityPackageCodeList = skuInfoEntities.stream().map(ActivityPackageSkuInfoEntity::getActivityPackageCode).collect(Collectors.toList());
+            LambdaQueryWrapper<ActivityPackageInfoEntity> queryWrapper = new LambdaQueryWrapper<ActivityPackageInfoEntity>()
+                    .eq(ActivityPackageInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                    .eq(ActivityPackageInfoEntity::getActivityStatus, ActivityStatusEnum.UNDER_WAY.getCode())
+                    .in(ActivityPackageInfoEntity::getActivityPackageCode, activityPackageCodeList);
+            List<ActivityPackageInfoEntity> activityPackageInfoEntityList = baseMapper.selectList(queryWrapper);
+            if (CollectionUtil.isEmpty(activityPackageInfoEntityList)) {
+                continue;
+            }
+            List<PackageInfoVO> packageInfoVOList = new ArrayList<>();
+            for (ActivityPackageInfoEntity activityPackageInfoEntity : activityPackageInfoEntityList) {
+                PackageInfoVO packageInfoVO = PackageInfoVO.builder()
+                        .activityPackageName(activityPackageInfoEntity.getActivityPackageName())
+                        .activityPackageCode(activityPackageInfoEntity.getActivityPackageCode())
+                        .price(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPrice()))
+                        .activityPackageRemark(activityPackageInfoEntity.getActivityPackageRemark())
+                        .build();
+                packageInfoVOList.add(packageInfoVO);
+            }
+            result.put(key, packageInfoVOList);
+        }
+        return result;
+    }
+
+    /**
+     * 查询套餐商品和关联的套餐信息
+     *
+     * @return
+     */
+    @Override
+    public Map<String, List<PackageInfoVO>> getUpPackageInfo(List<String> skuCodeList) {
+        List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoSevice.queryBySkuCodes(skuCodeList);
+        if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntities)) {
+            return null;
+        }
+        Map<String, List<PackageInfoVO>> result = new HashMap<>();
+        Map<String, List<ActivityPackageSkuInfoEntity>> activityPackageSkuInfoEntitiesMap = activityPackageSkuInfoEntities.stream().collect(Collectors.groupingBy(ActivityPackageSkuInfoEntity::getSkuCode));
+        for (String key : activityPackageSkuInfoEntitiesMap.keySet()) {
+            List<String> activityPackageCodeList = activityPackageSkuInfoEntitiesMap.get(key).stream()
+                    .map(ActivityPackageSkuInfoEntity::getActivityPackageCode).collect(Collectors.toList());
             LambdaQueryWrapper<ActivityPackageInfoEntity> queryWrapper = new LambdaQueryWrapper<ActivityPackageInfoEntity>()
                     .eq(ActivityPackageInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                     .eq(ActivityPackageInfoEntity::getActivityStatus, ActivityStatusEnum.UNDER_WAY.getCode())

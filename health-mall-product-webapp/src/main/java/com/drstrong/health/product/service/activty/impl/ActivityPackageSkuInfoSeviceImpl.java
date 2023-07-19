@@ -57,17 +57,17 @@ public class ActivityPackageSkuInfoSeviceImpl extends ServiceImpl<ActivityPackag
     /**
      * 根据套餐编码获取套餐sku列表信息
      *
-     * @param skuCodes
+     * @param packageCodes
      * @return
      */
     @Override
-    public List<ActivityPackageSkuInfoEntity> queryBySkuCodes(List<String> skuCodes) {
-        if (CollectionUtil.isEmpty(skuCodes)) {
+    public List<ActivityPackageSkuInfoEntity> queryBySkuCodes(List<String> packageCodes) {
+        if (CollectionUtil.isEmpty(packageCodes)) {
             return null;
         }
         LambdaQueryWrapper<ActivityPackageSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<ActivityPackageSkuInfoEntity>()
                 .eq(ActivityPackageSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .in(ActivityPackageSkuInfoEntity::getSkuCode, skuCodes);
+                .in(ActivityPackageSkuInfoEntity::getSkuCode, packageCodes);
         return baseMapper.selectList(queryWrapper);
     }
 
@@ -93,6 +93,7 @@ public class ActivityPackageSkuInfoSeviceImpl extends ServiceImpl<ActivityPackag
 
     /**
      * 查询商品管理已上架的套餐信息
+     *
      * @return
      */
     @Override

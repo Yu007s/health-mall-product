@@ -1,5 +1,6 @@
 package com.drstrong.health.product.remote.api.product;
 
+import com.drstrong.health.product.model.dto.product.FrequentlyUsedProductInfoVO;
 import com.drstrong.health.product.model.dto.product.ProductDetailInfoVO;
 import com.drstrong.health.product.model.dto.product.ProductListInfoVO;
 import com.drstrong.health.product.model.request.product.SearchWesternRequestParamBO;
@@ -13,13 +14,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 /**
  * huangpengp
  * 2023/7/11 21:08
  */
 @Api("客户端药品远程接口")
-@FeignClient(value = "health-mall-product", path = "/inner/product/bussiness", url = "http://localhost:9092/")
+@FeignClient(value = "health-mall-product", path = "/inner/product/bussiness")
 public interface ProductBussinessRemoteApi {
 
     @ApiOperation("空中药房的药品列表搜索")
@@ -29,5 +31,9 @@ public interface ProductBussinessRemoteApi {
     @ApiOperation("空中药房的查看药品详情")
     @PostMapping("/query/Detail")
     ResultVO<ProductDetailInfoVO> queryProductDetail(@RequestParam("skuCode") @Valid String skuCode);
+
+    @ApiOperation("空中药房的常用药列表查询")
+    @PostMapping("/query/frequent/productList")
+    ResultVO<List<FrequentlyUsedProductInfoVO>> getFrequentlyUsedProductList(@RequestParam("skuCodes") Set<String> skuCodes);
 
 }

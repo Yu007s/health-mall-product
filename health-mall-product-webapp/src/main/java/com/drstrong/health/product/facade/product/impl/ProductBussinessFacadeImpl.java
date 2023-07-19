@@ -11,6 +11,7 @@ import com.drstrong.health.product.enums.ActivityStatusEnum;
 import com.drstrong.health.product.facade.product.ProductBussinessFacade;
 import com.drstrong.health.product.model.dto.medicine.MedicineImageDTO;
 import com.drstrong.health.product.model.dto.product.*;
+import com.drstrong.health.product.model.dto.stock.SkuCanStockDTO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
 import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
@@ -221,5 +222,75 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
             throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR);
         }
         return detailInfoVO;
+    }
+
+
+    /**
+     * 医生端的常用药列表查询
+     *
+     * @param skuCodes
+     * @return
+     */
+    @Override
+    public List<FrequentlyUsedProductInfoVO> getFrequentlyUsedProductList(Set<String> skuCodes) {
+        //sku商品信息
+        List<StoreSkuInfoEntity> storeSkuInfoEntities = storeSkuInfoService.querySkuCodes(skuCodes);
+        //店铺信息
+        Set<Long> storeIds = storeSkuInfoEntities.stream().map(StoreSkuInfoEntity::getStoreId).collect(Collectors.toSet());
+        Map<Long, String> storeInfoMap = storeService.listByIds(storeIds).stream().collect(toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
+
+        //库存信息
+        List<String> skuCodeList = storeSkuInfoEntities.stream().map(StoreSkuInfoEntity::getSkuCode).collect(Collectors.toList());
+        Map<String, List<SkuCanStockDTO>> stockToMap = stockRemoteProService.getStockToMap(skuCodeList);
+
+        //关联的套餐信息(正在进行状态)
+        Map<String, List<PackageInfoVO>> activityPackageInfoListMap = packageService.getUpPackageInfo(skuCodeList);
+
+        //规格信息
+        List<String> skuMedicineCodeList = storeSkuInfoEntities.stream()
+                .filter(StoreSkuInfoEntity -> ProductTypeEnum.MEDICINE.equals(StoreSkuInfoEntity.getSkuType()))
+                .map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
+        Map<String, String> medicineSpecificationsEntityListMap = new HashMap<>();
+        if (CollectionUtil.isNotEmpty(skuMedicineCodeList)) {
+            medicineSpecificationsEntityListMap = westernMedicineSpecificationsService.queryByCodeList(skuMedicineCodeList).stream()
+                    .collect(Collectors.toMap(WesternMedicineSpecificationsEntity::getSpecCode, WesternMedicineSpecificationsEntity::getSpecImageInfo, (v1, v2) -> v1));
+        }
+
+        List<String> skuAgreementCodeList = storeSkuInfoEntities.stream()
+                .filter(StoreSkuInfoEntity -> ProductTypeEnum.AGREEMENT.equals(StoreSkuInfoEntity.getSkuType()))
+                .map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
+        Map<String, String> agreementSpecificationsEntityListMap = new HashMap<>();
+        if (CollectionUtil.isNotEmpty(skuAgreementCodeList)) {
+            agreementSpecificationsEntityListMap = agreementPrescriptionMedicineService.queryByCodeList(skuAgreementCodeList)
+                    .stream().collect(toMap(AgreementPrescriptionMedicineEntity::getMedicineCode, AgreementPrescriptionMedicineEntity::getImageInfo, (v1, v2) -> v1));
+        }
+
+        //组装信息
+        List<FrequentlyUsedProductInfoVO> result = new ArrayList<>();
+        for (StoreSkuInfoEntity storeSkuInfoEntity : storeSkuInfoEntities) {
+            List<MedicineImageDTO> imageInfo = new ArrayList<>();
+            if (ProductTypeEnum.MEDICINE.getCode().equals(storeSkuInfoEntity.getSkuType()) && MapUtil.isNotEmpty(medicineSpecificationsEntityListMap)) {
+                imageInfo = JSONObject.parseArray(medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()), MedicineImageDTO.class);
+            } else if (ProductTypeEnum.AGREEMENT.getCode().equals(storeSkuInfoEntity.getSkuType()) && MapUtil.isNotEmpty(medicineSpecificationsEntityListMap)) {
+                imageInfo = JSONObject.parseArray(agreementSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()), MedicineImageDTO.class);
+            }
+            List<PackageInfoVO> packageInfoVOList = activityPackageInfoListMap.get(storeSkuInfoEntity.getSkuCode());
+            List<SkuCanStockDTO> skuCanStockDTOS = stockToMap.get(storeSkuInfoEntity.getSkuCode());
+            Long quantity = CollectionUtils.isEmpty(skuCanStockDTOS) ? 0L : skuCanStockDTOS.stream().mapToLong(SkuCanStockDTO::getAvailableQuantity).sum();
+            FrequentlyUsedProductInfoVO productInfoVO = FrequentlyUsedProductInfoVO.builder()
+                    .skuName(storeSkuInfoEntity.getSkuName())
+                    .skuCode(storeSkuInfoEntity.getSkuCode())
+                    .skuStatus(storeSkuInfoEntity.getSkuStatus())
+                    .storeId(storeSkuInfoEntity.getStoreId())
+                    .storeName(storeInfoMap.get(storeSkuInfoEntity.getStoreId()))
+                    .skuType(storeSkuInfoEntity.getSkuType())
+                    .salePrice(BigDecimalUtil.F2Y(storeSkuInfoEntity.getPrice()))
+                    .imageInfo(imageInfo)
+                    .quantity(quantity)
+                    .packageInfoVOList(CollectionUtil.isEmpty(packageInfoVOList) ? null : packageInfoVOList)
+                    .build();
+            result.add(productInfoVO);
+        }
+        return null;
     }
 }

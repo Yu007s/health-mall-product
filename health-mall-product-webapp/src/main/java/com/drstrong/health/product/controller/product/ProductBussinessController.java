@@ -1,6 +1,7 @@
 package com.drstrong.health.product.controller.product;
 
 import com.drstrong.health.product.facade.product.ProductBussinessFacade;
+import com.drstrong.health.product.model.dto.product.FrequentlyUsedProductInfoVO;
 import com.drstrong.health.product.model.dto.product.ProductDetailInfoVO;
 import com.drstrong.health.product.model.dto.product.ProductListInfoVO;
 import com.drstrong.health.product.model.request.product.SearchWesternRequestParamBO;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 /**
  * huangpeng
@@ -45,4 +47,16 @@ public class ProductBussinessController implements ProductBussinessRemoteApi {
     public ResultVO<ProductDetailInfoVO> queryProductDetail(@Valid String skuCode) {
         return ResultVO.success(productBussinessFacade.queryProductDetail(skuCode));
     }
+
+    /**
+     * 医生端的常用药列表查询
+     * @param skuCodes
+     * @return
+     */
+    @Override
+    public ResultVO<List<FrequentlyUsedProductInfoVO>> getFrequentlyUsedProductList(Set<String> skuCodes){
+        return ResultVO.success(productBussinessFacade.getFrequentlyUsedProductList(skuCodes));
+    }
+
+
 }

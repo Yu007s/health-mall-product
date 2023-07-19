@@ -37,4 +37,7 @@ public interface PackageService extends IService<ActivityPackageInfoEntity> {
     void updateActivityStatus(Set<String> packageCodes, Integer code);
 
     Map<String, List<PackageInfoVO>> getUpPackageInfo();
+
+    Map<String, List<PackageInfoVO>> getUpPackageInfo(List<String> skuCodeList);
+
 }
