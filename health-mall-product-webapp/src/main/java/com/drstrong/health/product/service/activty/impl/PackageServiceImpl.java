@@ -10,6 +10,7 @@ import com.drstrong.health.product.enums.ActivityStatusEnum;
 import com.drstrong.health.product.model.dto.product.PackageInfoVO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
+import com.drstrong.health.product.model.entity.product.ProductSkuRevenueEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * huangpeng
@@ -151,11 +154,30 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
      */
     @Override
     public Map<String, List<PackageInfoVO>> getUpPackageInfo() {
-        Map<String, List<PackageInfoVO>> result = new HashMap<>();
         List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoSevice.queryUpPackageSku();
         if (CollectionUtil.isEmpty(activityPackageSkuInfoEntities)) {
             return null;
         }
+        return buildPackageInfoResult(activityPackageSkuInfoEntities);
+    }
+
+    /**
+     * 查询套餐商品和关联的套餐信息
+     *
+     * @return
+     */
+    @Override
+    public Map<String, List<PackageInfoVO>> getUpPackageInfo(List<String> skuCodeList) {
+        List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoSevice.queryBySkuCodes(skuCodeList);
+        if (CollectionUtil.isEmpty(activityPackageSkuInfoEntities)) {
+            return null;
+        }
+        return buildPackageInfoResult(activityPackageSkuInfoEntities);
+    }
+
+    private Map<String, List<PackageInfoVO>> buildPackageInfoResult(List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities) {
+        Map<String, List<PackageInfoVO>> result = new HashMap<>();
+        Map<String, ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntityMap = activityPackageSkuInfoEntities.stream().collect(toMap(ActivityPackageSkuInfoEntity::getActivityPackageCode, dto -> dto, (v1, v2) -> v1));
         Map<String, List<ActivityPackageSkuInfoEntity>> activityPackageSkuInfoEntitiesMap = activityPackageSkuInfoEntities.stream().collect(Collectors.groupingBy(ActivityPackageSkuInfoEntity::getSkuCode));
         for (String key : activityPackageSkuInfoEntitiesMap.keySet()) {
             List<ActivityPackageSkuInfoEntity> skuInfoEntities = activityPackageSkuInfoEntitiesMap.get(key);
@@ -175,45 +197,10 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
                         .activityPackageCode(activityPackageInfoEntity.getActivityPackageCode())
                         .price(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPrice()))
                         .activityPackageRemark(activityPackageInfoEntity.getActivityPackageRemark())
-                        .build();
-                packageInfoVOList.add(packageInfoVO);
-            }
-            result.put(key, packageInfoVOList);
-        }
-        return result;
-    }
-
-    /**
-     * 查询套餐商品和关联的套餐信息
-     *
-     * @return
-     */
-    @Override
-    public Map<String, List<PackageInfoVO>> getUpPackageInfo(List<String> skuCodeList) {
-        List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoSevice.queryBySkuCodes(skuCodeList);
-        if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntities)) {
-            return null;
-        }
-        Map<String, List<PackageInfoVO>> result = new HashMap<>();
-        Map<String, List<ActivityPackageSkuInfoEntity>> activityPackageSkuInfoEntitiesMap = activityPackageSkuInfoEntities.stream().collect(Collectors.groupingBy(ActivityPackageSkuInfoEntity::getSkuCode));
-        for (String key : activityPackageSkuInfoEntitiesMap.keySet()) {
-            List<String> activityPackageCodeList = activityPackageSkuInfoEntitiesMap.get(key).stream()
-                    .map(ActivityPackageSkuInfoEntity::getActivityPackageCode).collect(Collectors.toList());
-            LambdaQueryWrapper<ActivityPackageInfoEntity> queryWrapper = new LambdaQueryWrapper<ActivityPackageInfoEntity>()
-                    .eq(ActivityPackageInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                    .eq(ActivityPackageInfoEntity::getActivityStatus, ActivityStatusEnum.UNDER_WAY.getCode())
-                    .in(ActivityPackageInfoEntity::getActivityPackageCode, activityPackageCodeList);
-            List<ActivityPackageInfoEntity> activityPackageInfoEntityList = baseMapper.selectList(queryWrapper);
-            if (CollectionUtil.isEmpty(activityPackageInfoEntityList)) {
-                continue;
-            }
-            List<PackageInfoVO> packageInfoVOList = new ArrayList<>();
-            for (ActivityPackageInfoEntity activityPackageInfoEntity : activityPackageInfoEntityList) {
-                PackageInfoVO packageInfoVO = PackageInfoVO.builder()
-                        .activityPackageName(activityPackageInfoEntity.getActivityPackageName())
-                        .activityPackageCode(activityPackageInfoEntity.getActivityPackageCode())
-                        .price(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPrice()))
-                        .activityPackageRemark(activityPackageInfoEntity.getActivityPackageRemark())
+                        .amount(activityPackageSkuInfoEntityMap.get(activityPackageInfoEntity.getActivityPackageCode()).getAmount())
+                        .skuName(activityPackageSkuInfoEntityMap.get(activityPackageInfoEntity.getActivityPackageCode()).getSkuName())
+                        .skuPrice(BigDecimalUtil.F2Y(activityPackageSkuInfoEntityMap.get(activityPackageInfoEntity.getActivityPackageCode()).getPreferentialPrice()))
+                        .skuCode(activityPackageSkuInfoEntityMap.get(activityPackageInfoEntity.getActivityPackageCode()).getSkuCode())
                         .build();
                 packageInfoVOList.add(packageInfoVO);
             }

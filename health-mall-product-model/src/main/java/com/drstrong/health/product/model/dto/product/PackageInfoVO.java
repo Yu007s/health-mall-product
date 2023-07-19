@@ -30,10 +30,23 @@ public class PackageInfoVO implements Serializable {
     @ApiModelProperty("套餐编码")
     private String activityPackageCode;
 
-    @ApiModelProperty("价格")
+    @ApiModelProperty("套餐价格")
     private BigDecimal price;
 
     @ApiModelProperty("活动套餐备注")
     private String activityPackageRemark;
+
+    @ApiModelProperty("套餐商品编码")
+    private String skuCode;
+
+    @ApiModelProperty("活动套餐商品名称")
+    private String skuName;
+
+    @ApiModelProperty("套餐商品数量")
+    private Integer amount;
+
+    @ApiModelProperty("套餐价格")
+    private BigDecimal skuPrice;
+
 
 }

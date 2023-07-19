@@ -8,8 +8,7 @@ import com.drstrong.health.product.model.request.product.SearchWesternRequestPar
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.product.ProductBussinessRemoteApi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -55,7 +54,8 @@ public class ProductBussinessController implements ProductBussinessRemoteApi {
      * @return
      */
     @Override
-    public ResultVO<List<FrequentlyUsedProductInfoVO>> getFrequentlyUsedProductList(Set<String> skuCodes) {
+    @PostMapping("/getFrequentlyUsedProductList")
+    public ResultVO<List<FrequentlyUsedProductInfoVO>> getFrequentlyUsedProductList(@RequestBody Set<String> skuCodes) {
         return ResultVO.success(productBussinessFacade.getFrequentlyUsedProductList(skuCodes));
     }
 }

@@ -114,7 +114,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
 
         //西药规格信息
         List<String> skuMedicineCodeList = storeSkuInfoEntities.stream()
-                .filter(StoreSkuInfoEntity -> ProductTypeEnum.MEDICINE.equals(StoreSkuInfoEntity.getSkuType()))
+                .filter(StoreSkuInfoEntity -> ProductTypeEnum.MEDICINE.getCode().equals(StoreSkuInfoEntity.getSkuType()))
                 .map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
         Map<String, String> medicineSpecificationsEntityListMap = new HashMap<>();
         if (CollectionUtil.isNotEmpty(skuMedicineCodeList)) {
@@ -124,7 +124,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
 
         //协定方规格信息
         List<String> skuAgreementCodeList = storeSkuInfoEntities.stream()
-                .filter(StoreSkuInfoEntity -> ProductTypeEnum.AGREEMENT.equals(StoreSkuInfoEntity.getSkuType()))
+                .filter(StoreSkuInfoEntity -> ProductTypeEnum.AGREEMENT.getCode().equals(StoreSkuInfoEntity.getSkuType()))
                 .map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
         Map<String, String> agreementSpecificationsEntityListMap = new HashMap<>();
         if (CollectionUtil.isNotEmpty(skuAgreementCodeList)) {
@@ -248,7 +248,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
 
         //规格信息
         List<String> skuMedicineCodeList = storeSkuInfoEntities.stream()
-                .filter(StoreSkuInfoEntity -> ProductTypeEnum.MEDICINE.equals(StoreSkuInfoEntity.getSkuType()))
+                .filter(StoreSkuInfoEntity -> ProductTypeEnum.MEDICINE.getCode().equals(StoreSkuInfoEntity.getSkuType()))
                 .map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
         Map<String, String> medicineSpecificationsEntityListMap = new HashMap<>();
         if (CollectionUtil.isNotEmpty(skuMedicineCodeList)) {
@@ -257,7 +257,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
         }
 
         List<String> skuAgreementCodeList = storeSkuInfoEntities.stream()
-                .filter(StoreSkuInfoEntity -> ProductTypeEnum.AGREEMENT.equals(StoreSkuInfoEntity.getSkuType()))
+                .filter(StoreSkuInfoEntity -> ProductTypeEnum.AGREEMENT.getCode().equals(StoreSkuInfoEntity.getSkuType()))
                 .map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
         Map<String, String> agreementSpecificationsEntityListMap = new HashMap<>();
         if (CollectionUtil.isNotEmpty(skuAgreementCodeList)) {
@@ -291,6 +291,6 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                     .build();
             result.add(productInfoVO);
         }
-        return null;
+        return result;
     }
 }
