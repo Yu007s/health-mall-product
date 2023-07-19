@@ -1,6 +1,7 @@
 package com.drstrong.health.product.facade.sku.recommend.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.product.facade.sku.SkuBusinessFacadeHolder;
@@ -62,28 +63,50 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
 
     @Override
     public void saveOrUpdateRecommend(SaveRecommendRequest saveRecommendRequest) {
-        // 1.校验skuCode是否存在,并且按照之前的老逻辑，已下架的sku不能配置
-        StoreSkuInfoEntity storeSkuInfoEntity = storeSkuInfoService.checkSkuExistByCode(saveRecommendRequest.getSkuCode(), null);
-        if (UpOffEnum.checkIsDown(storeSkuInfoEntity.getSkuStatus())) {
-            throw new BusinessException(ErrorEnums.SKU_IS_NULL);
-        }
-        // 2.查询sku的推荐信息是否存在
-        StoreSkuRecommendEntity storeSkuRecommendEntity = storeSkuRecommendService.queryBySkuCode(saveRecommendRequest.getSkuCode());
-        if (Objects.isNull(storeSkuRecommendEntity)) {
-            storeSkuRecommendEntity = StoreSkuRecommendEntity.buildDefault(saveRecommendRequest.getOperatorId());
-        }
-        // 3.组装推荐信息列表（拼音+关键字）,参照之前b2c的处理代码
+        boolean isSave = ObjectUtil.isNull(saveRecommendRequest.getSkuRecommendId());
+        // 1.入参数据判断
+        checkSaveOrUpdateRecommendParam(saveRecommendRequest, isSave);
+        // 2.组装推荐信息列表（拼音+关键字）,参照之前b2c的处理代码
         List<StoreSkuRecommendEntity.RecommendDetailInfoEntity> recommendDetailInfoEntityList = saveRecommendRequest.getKeywordList().stream().map(keyword -> {
             String replaceName = keyword.replaceAll(NOT_CHINESE_CHARACTERS, "");
             String pinyin = HanZiToPinYinUtil.toFirstChar(replaceName);
             return StoreSkuRecommendEntity.RecommendDetailInfoEntity.builder().keyword(keyword).pinyin(pinyin).build();
         }).collect(Collectors.toList());
-
+        // 3.新增或者保存
+        StoreSkuRecommendEntity storeSkuRecommendEntity;
+        if (isSave) {
+            storeSkuRecommendEntity = StoreSkuRecommendEntity.buildDefault(saveRecommendRequest.getOperatorId());
+        } else {
+            storeSkuRecommendEntity = storeSkuRecommendService.queryBySkuRecommendId(saveRecommendRequest.getSkuRecommendId());
+            storeSkuRecommendEntity.setChangedBy(saveRecommendRequest.getOperatorId());
+            storeSkuRecommendEntity.setChangedAt(LocalDateTime.now());
+        }
         storeSkuRecommendEntity.setStoreId(saveRecommendRequest.getStoreId());
         storeSkuRecommendEntity.setSkuCode(saveRecommendRequest.getSkuCode());
         storeSkuRecommendEntity.setRecommendDetailInfoList(recommendDetailInfoEntityList);
-        // 4.新增或者保存
         storeSkuRecommendService.saveOrUpdate(storeSkuRecommendEntity);
+    }
+
+    private void checkSaveOrUpdateRecommendParam(SaveRecommendRequest saveRecommendRequest, boolean isSave) {
+        // 校验sku是否存在
+        storeSkuInfoService.checkSkuExistByCode(saveRecommendRequest.getSkuCode(), null);
+        // 校验入参
+        StoreSkuRecommendEntity storeSkuRecommendEntity = storeSkuRecommendService.queryBySkuCode(saveRecommendRequest.getSkuCode());
+        if (isSave) {
+            // 如果是新增，且sku推荐记录存在，报错
+            if (ObjectUtil.isNotNull(storeSkuRecommendEntity)) {
+                throw new BusinessException(ErrorEnums.RECOMMEND_IS_REPEAT);
+            }
+        } else {
+            // 如果是修改，根据id未找到数据，或者找到的数据id不一致，均报错
+            StoreSkuRecommendEntity storeSkuRecommendEntityById = storeSkuRecommendService.queryBySkuRecommendId(saveRecommendRequest.getSkuRecommendId());
+            if (ObjectUtil.isNull(storeSkuRecommendEntityById)) {
+                throw new BusinessException(ErrorEnums.RECOMMEND_IS_NULL);
+            }
+            if (ObjectUtil.notEqual(saveRecommendRequest.getSkuRecommendId(), storeSkuRecommendEntity.getId())) {
+                throw new BusinessException(ErrorEnums.RECOMMEND_IS_REPEAT);
+            }
+        }
     }
 
     @Override
@@ -102,6 +125,7 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
 
     @Override
     public PageVO<SkuRecommendManageResponse> pageQuery(PageSkuRecommendRequest pageSkuRecommendRequest) {
+        log.info("invoke pageQuery() param:{}", JSONUtil.toJsonStr(pageSkuRecommendRequest));
         // 1.根据入参分页查询
         Page<StoreSkuRecommendEntity> storeSkuRecommendEntityPage = storeSkuRecommendService.pageQueryByParam(pageSkuRecommendRequest);
         if (Objects.isNull(storeSkuRecommendEntityPage) || CollectionUtil.isEmpty(storeSkuRecommendEntityPage.getRecords())) {
@@ -114,6 +138,7 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
 
     @Override
     public List<SkuRecommendManageResponse> listQuery(PageSkuRecommendRequest pageSkuRecommendRequest) {
+        log.info("invoke listQuery() param:{}", JSONUtil.toJsonStr(pageSkuRecommendRequest));
         List<StoreSkuRecommendEntity> storeSkuRecommendEntityList = storeSkuRecommendService.listQueryByParam(pageSkuRecommendRequest);
         return buildRecommendManageResponseList(storeSkuRecommendEntityList);
     }
@@ -136,12 +161,13 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
             MedicineUsageDTO medicineUsageDTO = skuCodeMedicineUsageDtoMap.getOrDefault(storeSkuRecommendEntity.getSkuCode(), new MedicineUsageDTO());
 
             SkuRecommendManageResponse skuRecommendManageResponse = SkuRecommendManageResponse.builder()
+                    .skuRecommendId(storeSkuRecommendEntity.getId())
                     .skuCode(storeSkuRecommendEntity.getSkuCode())
                     .skuName(medicineUsageDTO.getSkuName())
-                    .usageDosage(medicineUsageDTO.getMedicineUsage(null))
                     .keywordList(storeSkuRecommendEntity.getRecommendDetailInfoKeywordArray())
                     .storeId(storeSkuRecommendEntity.getStoreId())
                     .storeName(storeIdNameMap.get(storeSkuRecommendEntity.getStoreId()))
+                    .createTime(storeSkuRecommendEntity.getCreatedAt())
                     .build();
             skuRecommendManageResponse.setProductType(medicineUsageDTO.getProductType());
             skuRecommendManageResponse.setProductTypeName(ProductTypeEnum.getValueByCode(medicineUsageDTO.getProductType()));
