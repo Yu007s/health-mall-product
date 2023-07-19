@@ -41,7 +41,4 @@ public class QuerySkuBusinessListRequest extends PageRequest implements Serializ
 
     @ApiModelProperty("是否需要查询库存 0-不需要  1-需要")
     private Integer needQueryInventory;
-
-    @ApiModelProperty("sku状态")
-    private Integer skuStatus;
 }
