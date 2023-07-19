@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service.activty.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -156,7 +157,7 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
     public Map<String, List<PackageInfoVO>> getUpPackageInfo() {
         List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoSevice.queryUpPackageSku();
         if (CollectionUtil.isEmpty(activityPackageSkuInfoEntities)) {
-            return null;
+            return MapUtil.newHashMap();
         }
         return buildPackageInfoResult(activityPackageSkuInfoEntities);
     }
@@ -170,7 +171,7 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
     public Map<String, List<PackageInfoVO>> getUpPackageInfo(List<String> skuCodeList) {
         List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoSevice.queryBySkuCodes(skuCodeList);
         if (CollectionUtil.isEmpty(activityPackageSkuInfoEntities)) {
-            return null;
+            return MapUtil.newHashMap();
         }
         return buildPackageInfoResult(activityPackageSkuInfoEntities);
     }

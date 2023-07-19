@@ -13,7 +13,6 @@ import com.drstrong.health.product.enums.ActivityStatusEnum;
 import com.drstrong.health.product.facade.incentive.SkuIncentivePolicyFacade;
 import com.drstrong.health.product.facade.sku.SkuBusinessBaseFacade;
 import com.drstrong.health.product.facade.sku.SkuBusinessFacadeHolder;
-import com.drstrong.health.product.facade.sku.SkuManageFacade;
 import com.drstrong.health.product.facade.sku.SkuScheduledConfigFacade;
 import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.dto.product.ActivityPackageDetailDTO;
@@ -23,22 +22,17 @@ import com.drstrong.health.product.model.dto.sku.SkuInfoSummaryDTO;
 import com.drstrong.health.product.model.dto.stock.SkuCanStockDTO;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
-import com.drstrong.health.product.model.entity.sku.SkuScheduledConfigEntity;
-import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
-import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
 import com.drstrong.health.product.model.request.product.ActivityPackageManageQueryRequest;
 import com.drstrong.health.product.model.request.product.ActivityPackageSkuRequest;
 import com.drstrong.health.product.model.request.product.SaveOrUpdateActivityPackageRequest;
-import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
 import com.drstrong.health.product.model.request.sku.QuerySkuBusinessListRequest;
 import com.drstrong.health.product.model.request.sku.SkuQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
-import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDetailVO;
 import com.drstrong.health.product.model.response.product.PackageManageListVO;
 import com.drstrong.health.product.model.response.product.v3.AgreementSkuInfoVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
@@ -46,7 +40,6 @@ import com.drstrong.health.product.model.response.result.ResultStatus;
 import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.service.activty.ActivityPackageSkuInfoSevice;
 import com.drstrong.health.product.service.activty.PackageService;
-import com.drstrong.health.product.service.activty.impl.ActivityPackageSkuInfoSeviceImpl;
 import com.drstrong.health.product.service.sku.SkuScheduledConfigService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
@@ -54,18 +47,13 @@ import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.klock.annotation.Dlock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -379,7 +367,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         ActivityPackageInfoEntity activityPackageInfoEntity = packageService.findPackageByCode(activityPackageCode, null);
         //套餐关联的店铺信息
         StoreEntity storeEntity = storeService.getById(activityPackageInfoEntity.getStoreId());
-        if (storeEntity == null) {
+        if (ObjectUtil.isNull(storeEntity)) {
             throw new BusinessException(ResultStatus.PARAM_ERROR.getCode(), "错误的店铺类型名称");
         }
         //套餐sku信息
