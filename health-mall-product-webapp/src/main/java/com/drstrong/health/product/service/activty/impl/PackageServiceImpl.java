@@ -101,20 +101,6 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
     }
 
     /**
-     * 根据套餐ID获取详情
-     *
-     * @param activityPackageId
-     * @return
-     */
-    @Override
-    public ActivityPackageInfoEntity findPackageById(Long activityPackageId) {
-        LambdaQueryWrapper<ActivityPackageInfoEntity> queryWrapper = new LambdaQueryWrapper<ActivityPackageInfoEntity>()
-                .eq(ActivityPackageInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .eq(ActivityPackageInfoEntity::getId, activityPackageId);
-        return baseMapper.selectOne(queryWrapper);
-    }
-
-    /**
      * 根据storeId和productType获取套餐列表
      *
      * @param storeId
@@ -128,18 +114,6 @@ public class PackageServiceImpl extends ServiceImpl<ActivityPackageInfoMapper, A
                 .eq(ActivityPackageInfoEntity::getStoreId, storeId)
                 .eq(ActivityPackageInfoEntity::getProductType, productType);
         return baseMapper.selectList(queryWrapper);
-    }
-
-    /**
-     * 医生端的列表套餐搜索
-     *
-     * @param packageBussinessQueryListRequest
-     * @return
-     */
-    @Override
-    public Page<ActivityPackageInfoEntity> pageQueryList(PackageBussinessQueryListRequest packageBussinessQueryListRequest) {
-        Page<ActivityPackageInfoEntity> entityPage = new Page<>(packageBussinessQueryListRequest.getPageNo(), packageBussinessQueryListRequest.getPageSize());
-        return baseMapper.pageQueryList(entityPage, packageBussinessQueryListRequest);
     }
 
     /**

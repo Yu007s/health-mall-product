@@ -26,5 +26,4 @@ public interface ActivityPackageInfoMapper extends BaseMapper<ActivityPackageInf
 
     int batchUpdateActivityStatusByCodes(@Param("activityPackageCodeList") Set<String> activityPackageCodeList, @Param("activityStatus") Integer activityStatus);
 
-    Page<ActivityPackageInfoEntity> pageQueryList(Page<ActivityPackageInfoEntity> entityPage, @Param("queryParam")  PackageBussinessQueryListRequest queryParam);
 }

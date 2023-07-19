@@ -26,11 +26,7 @@ public interface PackageService extends IService<ActivityPackageInfoEntity> {
 
     List<ActivityPackageInfoEntity> queryByActivityPackageCode(Set<String> skuCodeList);
 
-    ActivityPackageInfoEntity findPackageById(Long activityPackageId);
-
     List<ActivityPackageInfoEntity> queryAllByProductType(Long storeId, Integer productType);
-
-    Page<ActivityPackageInfoEntity> pageQueryList(PackageBussinessQueryListRequest packageBussinessQueryListRequest);
 
     List<ActivityPackageInfoEntity> findScheduledPackage();
 

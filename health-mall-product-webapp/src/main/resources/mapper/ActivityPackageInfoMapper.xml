@@ -3,49 +3,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.drstrong.health.product.dao.activty.ActivityPackageInfoMapper">
 
-    <sql id="Base_Column_List">
-                id,
-                activity_package_name,
-                activity_package_code,
-                product_type,
-                store_id,
-                activity_status,
-                original_price,
-                preferential_price,
-                original_amount_display,
-                activity_package_image_info,
-                activity_package_introduce,
-                activity_package_remark,
-                version,
-                del_flag,
-                created_at,
-                created_by,
-                changed_at,
-                changed_by
-    </sql>
-
-    <resultMap id="BaseResultMap" type="com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity">
-        <result column="id" property="id"/>
-        <result column="activity_package_name" property="activityPackageName"/>
-        <result column="activity_package_code" property="activityPackageCode"/>
-        <result column="product_type" property="productType"/>
-        <result column="store_id" property="storeId"/>
-        <result column="activity_status" property="activityStatus"/>
-        <result column="original_price" property="originalPrice"/>
-        <result column="preferential_price" property="preferentialPrice"/>
-        <result column="original_amount_display" property="originalAmountDisplay"/>
-        <result column="activity_package_image_info" property="activityPackageImageInfo"
-                typeHandler="com.drstrong.health.product.handler.mybatis.StringListTypeHandler"/>
-        <result column="activity_package_introduce" property="activityPackageIntroduce"/>
-        <result column="activity_package_remark" property="activityPackageRemark"/>
-        <result column="version" property="version"/>
-        <result column="del_flag" property="delFlag"/>
-        <result column="created_at" property="createdAt"/>
-        <result column="created_by" property="createdBy"/>
-        <result column="changed_at" property="changedAt"/>
-        <result column="changed_by" property="changedBy"/>
-    </resultMap>
-
     <resultMap id="ParamQueryResultMap" type="com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity">
         <id property="id" column="id"></id>
         <result property="activity_package_name" column="activityPackageName"></result>
@@ -121,23 +78,5 @@
             #{item}
         </foreach>
     </update>
-
-    <select id="pageQueryList" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from pms_activity_package_manage
-        where del_flag = 0
-        and store_id in
-        <foreach collection="queryParam.storeIds" item="item" open="(" close=")" separator=",">
-            #{item}
-        </foreach>
-        <if test="queryParam.activityPackageName != null and queryParam.activityPackageName != ''">
-            and activity_package_name LIKE concat('%',#{queryParam.activityPackageName},'%')
-        </if>
-        <if test="activityStatus != null">
-            and activity_status = #{queryParam.activityStatus}
-        </if>
-        order by id desc
-    </select>
 
 </mapper>
