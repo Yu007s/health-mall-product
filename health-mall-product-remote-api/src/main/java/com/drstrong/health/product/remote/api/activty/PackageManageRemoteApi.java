@@ -31,7 +31,7 @@ import java.util.List;
  * 2023/7/8 14:47
  */
 @Api("健康商城-套餐服务-套餐管理页面的远程接口")
-@FeignClient(value = "health-mall-product", path = "/inner/package/manage", url = "http://localhost:9092/")
+@FeignClient(value = "health-mall-product", path = "/inner/package/manage")
 public interface PackageManageRemoteApi {
 
     @ApiOperation("套餐管理页面查询")
