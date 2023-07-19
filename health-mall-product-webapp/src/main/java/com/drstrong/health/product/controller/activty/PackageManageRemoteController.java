@@ -34,8 +34,7 @@ public class PackageManageRemoteController implements PackageManageRemoteApi {
      * @return
      */
     @Override
-    @PostMapping("pageQuerySkuManageInfo")
-    public ResultVO<PageVO<PackageManageListVO>> pageQuerySkuManageInfo(@RequestBody ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
+    public ResultVO<PageVO<PackageManageListVO>> pageQuerySkuManageInfo(ActivityPackageManageQueryRequest activityPackageManageQueryRequest) {
         return ResultVO.success(packageManageFacade.queryActivityPackageManageInfo(activityPackageManageQueryRequest));
     }
 
@@ -57,8 +56,7 @@ public class PackageManageRemoteController implements PackageManageRemoteApi {
      * @return
      */
     @Override
-    @PostMapping("saveOrUpdateActivityPackage")
-    public ResultVO<Void> saveOrUpdateActivityPackage(@RequestBody SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest) {
+    public ResultVO<Void> saveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest) {
         packageManageFacade.addLocksaveOrUpdateActivityPackage(saveOrUpdateActivityPackageRequest, saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0).getSkuCode());
         return ResultVO.success();
     }
@@ -70,8 +68,7 @@ public class PackageManageRemoteController implements PackageManageRemoteApi {
      * @return
      */
     @Override
-    @GetMapping("queryDetailByCode")
-    public ResultVO<ActivityPackageDetailDTO> queryDetailByCode(@RequestParam("activityPackageCode") String activityPackageCode) {
+    public ResultVO<ActivityPackageDetailDTO> queryDetailByCode(String activityPackageCode) {
         return ResultVO.success(packageManageFacade.queryDetailByCode(activityPackageCode));
     }
 
