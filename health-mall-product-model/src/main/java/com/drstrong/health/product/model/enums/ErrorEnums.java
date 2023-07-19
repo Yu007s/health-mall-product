@@ -17,6 +17,8 @@ import com.drstrong.health.product.model.response.result.IBaseResult;
  * 			12: 配送费
  * 		    13: 标签
  * 		    14: 激励政策
+ * 		    15: 单品套餐
+ * 		    16: 商品推荐
  * 			21:导入导出
  * </p>
  *
@@ -71,18 +73,22 @@ public enum ErrorEnums implements IBaseResult {
 	STORE_LABEL_NOT_EXIST("13002", "店铺下标签不存在"),
 
 	INCENTIVE_POLICY_CONFIG_REPEAT("14001", "店铺下收益名称重复"),
-	ACTIVTY_PACKAGE_IS_NULL("14002", "套餐不存在或已下架"),
-	ACTIVTY_PACKAGE_SKU_IS_NULL("14003", "套餐sku不存在或已下架"),
-	ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE("14004", "套餐sku商品超过种类一个"),
-	ACTIVTY_PACKAGE_SCHEDULED_TIME_ERROE("14005", "套餐的上下架时间错误"),
-	ACTIVTY_PACKAGE_IS_UP_ERROR("14006", "当前sku已上架,不能设置预约上架"),
-	ACTIVTY_PACKAGE_IS_DOWN_ERROR("14007", "当前sku已下架,不能设置预约下架"),
-	ACTIVTY_PACKAGE_SKU_AT_LEAST_ONE("14008", "套餐sku商品种类至少一个"),
-	ACTIVTY_PACKAGE_TIME_ERROR("14009", "套餐活动开始时间必须小于套餐活动结束时间"),
-	ACTIVTY_PACKAGE_SKU_LOCK_INWENTORY("14010", "套餐内的药品库存不足"),
-	ACTIVTY_PACKAGE_SAVE_THE_SAME("14011", "已存在相同状态的活动，请勿重复创建。"),
-	ACTIVTY_PACKAGE_SAVE_TIME_CONFLICT("14012", "已存在相同活动且活动时间存在冲突，请勿重复创建。"),
-	ACTIVTY_PACKAGE_UPDATE_TIME_ERROR("14013", "正在进行中的套餐活动结束时间只能向后延长。"),
+
+	ACTIVTY_PACKAGE_IS_NULL("15002", "套餐不存在或已下架"),
+	ACTIVTY_PACKAGE_SKU_IS_NULL("15003", "套餐sku不存在或已下架"),
+	ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE("15004", "套餐sku商品超过种类一个"),
+	ACTIVTY_PACKAGE_SCHEDULED_TIME_ERROE("15005", "套餐的上下架时间错误"),
+	ACTIVTY_PACKAGE_IS_UP_ERROR("15006", "当前sku已上架,不能设置预约上架"),
+	ACTIVTY_PACKAGE_IS_DOWN_ERROR("15007", "当前sku已下架,不能设置预约下架"),
+	ACTIVTY_PACKAGE_SKU_AT_LEAST_ONE("15008", "套餐sku商品种类至少一个"),
+	ACTIVTY_PACKAGE_TIME_ERROR("15009", "套餐活动开始时间必须小于套餐活动结束时间"),
+	ACTIVTY_PACKAGE_SKU_LOCK_INWENTORY("15010", "套餐内的药品库存不足"),
+	ACTIVTY_PACKAGE_SAVE_THE_SAME("15011", "已存在相同状态的活动，请勿重复创建。"),
+	ACTIVTY_PACKAGE_SAVE_TIME_CONFLICT("15012", "已存在相同活动且活动时间存在冲突，请勿重复创建。"),
+	ACTIVTY_PACKAGE_UPDATE_TIME_ERROR("15013", "正在进行中的套餐活动结束时间只能向后延长。"),
+
+	RECOMMEND_IS_REPEAT("16001", "该sku已存在推荐记录，请勿重复添加"),
+	RECOMMEND_IS_NULL("16002", "推荐记录不存在"),
 	;
 
 	private String code;

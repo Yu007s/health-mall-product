@@ -14,7 +14,15 @@ import java.util.List;
 public interface StoreSkuRecommendService extends IService<StoreSkuRecommendEntity> {
 
     /**
-     * 根据 skuCode 参加推荐信息
+     * 根据 主键id 查询推荐信息
+     *
+     * @author liuqiuyi
+     * @date 2023/7/10 17:08
+     */
+    StoreSkuRecommendEntity queryBySkuRecommendId(Long skuRecommendId);
+
+    /**
+     * 根据 skuCode 查询推荐信息
      *
      * @author liuqiuyi
      * @date 2023/7/10 17:08
