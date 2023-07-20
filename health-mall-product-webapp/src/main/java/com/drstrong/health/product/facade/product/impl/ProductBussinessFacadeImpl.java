@@ -146,8 +146,10 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
             Integer medicineAttributeId = null;
             if (ObjectUtil.isNotNull(storeSkuInfoEntity.getLabelInfo())) {
                 for (MedicineAttributeEnum value : MedicineAttributeEnum.values()) {
-                    storeSkuInfoEntity.getLabelInfo().contains(value.getCode());
-                    break;
+                    if (storeSkuInfoEntity.getLabelInfo().contains(value.getCode())) {
+                        medicineAttributeId = value.getCode().intValue();
+                        break;
+                    }
                 }
             }
             if (ProductTypeEnum.MEDICINE.getCode().equals(storeSkuInfoEntity.getSkuType()) && ObjectUtil.isNotNull(medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()))
