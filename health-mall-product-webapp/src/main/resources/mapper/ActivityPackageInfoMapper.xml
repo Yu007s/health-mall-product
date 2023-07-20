@@ -5,7 +5,7 @@
 
     <resultMap id="ParamQueryResultMap" type="com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity">
         <id property="id" column="id"></id>
-        <result property="activity_package_name" column="activityPackageName"></result>
+        <result column="activity_package_name" property="activityPackageName"></result>
         <result column="activity_package_code" property="activityPackageCode"/>
         <result column="product_type" property="productType"/>
         <result column="store_id" property="storeId"/>
