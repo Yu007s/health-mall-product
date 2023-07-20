@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.medicine.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.response.medicine.*;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
@@ -36,6 +37,7 @@ import com.drstrong.health.product.remote.log.LogApiServicePlus;
 import com.drstrong.health.product.service.medicine.WesternMedicineInstructionsService;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -142,6 +144,17 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
                 .eq(WesternMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(WesternMedicineEntity::getMedicineCode, medicineCode);
         return baseMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public List<WesternMedicineEntity> queryByMedicineCodeList(List<String> medicineCodes) {
+        if (CollectionUtil.isEmpty(medicineCodes)) {
+            return Lists.newArrayList();
+        }
+        LambdaQueryWrapper<WesternMedicineEntity> queryWrapper = new LambdaQueryWrapper<WesternMedicineEntity>()
+                .eq(WesternMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(WesternMedicineEntity::getMedicineCode, medicineCodes);
+        return baseMapper.selectList(queryWrapper);
     }
 
     @Override

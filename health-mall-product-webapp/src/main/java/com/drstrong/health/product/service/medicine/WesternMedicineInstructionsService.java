@@ -5,6 +5,8 @@ import com.drstrong.health.product.model.entity.medication.WesternMedicineInstru
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineInstructionsRequest;
 
+import java.util.List;
+
 /**
  * <p>
  * 西/成药品说明 服务类
@@ -31,4 +33,6 @@ public interface WesternMedicineInstructionsService extends IService<WesternMedi
      * @return
      */
     WesternMedicineInstructionsEntity queryByMedicineId(Long medicineId);
+
+    List<WesternMedicineInstructionsEntity> queryByMedicineIdList(List<Long> medicineIdList);
 }

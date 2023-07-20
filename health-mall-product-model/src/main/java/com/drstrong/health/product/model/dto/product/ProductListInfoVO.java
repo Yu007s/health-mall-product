@@ -44,6 +44,12 @@ public class ProductListInfoVO implements Serializable {
     private Integer skuType;
 
     /**
+     * sku上下架状态；0-已下架，1-已上架, 2-预约上架中, 3-预约下架中
+     */
+    @ApiModelProperty(value = "sku上下架状态；0-已下架，1-已上架, 2-预约上架中, 3-预约下架中")
+    private Integer skuStatus;
+
+    /**
      * 店铺ID
      */
     @ApiModelProperty("店铺ID")
@@ -56,6 +62,12 @@ public class ProductListInfoVO implements Serializable {
     private String storeName;
 
     /**
+     * 企业名称
+     */
+    @ApiModelProperty(value = "企业名称")
+    private String company;
+
+    /**
      * 商品封面图片
      */
     @ApiModelProperty(value = "商品封面图片")
@@ -64,8 +76,32 @@ public class ProductListInfoVO implements Serializable {
     /**
      * 售价
      */
-    @ApiModelProperty(value = "售价")
+    @ApiModelProperty(value = "售价(元为单位)")
     private BigDecimal salePrice;
+
+    /**
+     * 售价值
+     */
+    @ApiModelProperty(value = "售价值(分为单位)")
+    private Integer salePriceValue;
+
+    /**
+     * 库存数量
+     */
+    @ApiModelProperty(value = "库存数量")
+    private Long quantity;
+
+    /**
+     * 规格
+     */
+    @ApiModelProperty(value = "规格")
+    private String spec;
+
+    /**
+     * 用法用量
+     */
+    @ApiModelProperty(value = "用法用量")
+    private String usage;
 
     /**
      * 常用药标识：0，否；1，是
@@ -78,5 +114,4 @@ public class ProductListInfoVO implements Serializable {
      */
     @ApiModelProperty(value = "商品关联的套餐信息")
     private List<PackageInfoVO> packageInfoVOList;
-
 }
