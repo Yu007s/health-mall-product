@@ -3,18 +3,12 @@ package com.drstrong.health.product.facade.product.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.drstrong.health.product.enums.ActivityStatusEnum;
+import com.drstrong.health.product.enums.MedicineAttributeEnum;
 import com.drstrong.health.product.facade.product.ProductBussinessFacade;
 import com.drstrong.health.product.model.dto.medicine.MedicineImageDTO;
 import com.drstrong.health.product.model.dto.product.*;
 import com.drstrong.health.product.model.dto.stock.SkuCanStockDTO;
-import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
-import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
-import com.drstrong.health.product.model.entity.chinese.ChineseSkuInfoEntity;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineEntity;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineInstructionsEntity;
@@ -22,6 +16,7 @@ import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecif
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.enums.MedicineClassificationEnum;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.product.SearchWesternRequestParamBO;
@@ -36,7 +31,6 @@ import com.drstrong.health.product.service.medicine.WesternMedicineSpecification
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
@@ -148,6 +142,14 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
             String company = null;
             String spec = null;
             String usage = null;
+            Integer rx = null;
+            Integer medicineAttributeId = null;
+            if (ObjectUtil.isNotNull(storeSkuInfoEntity.getLabelInfo())) {
+                for (MedicineAttributeEnum value : MedicineAttributeEnum.values()) {
+                    storeSkuInfoEntity.getLabelInfo().contains(value.getCode());
+                    break;
+                }
+            }
             if (ProductTypeEnum.MEDICINE.getCode().equals(storeSkuInfoEntity.getSkuType()) && ObjectUtil.isNotNull(medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()))
                     && ObjectUtil.isNotNull(westernMedicineEntityMap.get(storeSkuInfoEntity.getMedicineCode()))
                     && ObjectUtil.isNotNull(medicineInstructionsEntityMap.get(westernMedicineEntityMap.get(storeSkuInfoEntity.getMedicineCode()).getId()))) {
@@ -155,7 +157,9 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                 company = medicineInstructionsEntityMap.get(westernMedicineEntityMap.get(storeSkuInfoEntity.getMedicineCode()).getId()).getProductionEnterprise();
                 spec = medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()).getPackingSpec();
                 usage = medicineInstructionsEntityMap.get(westernMedicineEntityMap.get(storeSkuInfoEntity.getMedicineCode()).getId()).getUsageDosage();
-            } else if (ProductTypeEnum.AGREEMENT.getCode().equals(storeSkuInfoEntity.getSkuType()) && MapUtil.isNotEmpty(medicineSpecificationsEntityListMap)) {
+                Map<String, Integer> map = (Map<String, Integer>) JSONObject.parse(westernMedicineEntityMap.get(storeSkuInfoEntity.getMedicineCode()).getMedicineClassificationInfo());
+                rx = map.get(MedicineClassificationEnum.SECURITY_CLASSIFICATION.getValue());
+            } else if (ProductTypeEnum.AGREEMENT.getCode().equals(storeSkuInfoEntity.getSkuType()) && ObjectUtil.isNotNull(medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()))) {
                 imageInfo = JSONObject.parseArray(agreementSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()).getImageInfo(), MedicineImageDTO.class);
                 spec = agreementSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()).getPackingSpec();
                 usage = agreementSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()).getUsageMethod();
@@ -174,6 +178,8 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                     .salePrice(BigDecimalUtil.F2Y(storeSkuInfoEntity.getPrice()))
                     .salePriceValue(storeSkuInfoEntity.getPrice().intValue())
                     .quantity(quantity)
+                    .rx(rx)
+                    .medicineAttributeId(medicineAttributeId)
                     .spec(spec)
                     .usage(usage)
                     .packageInfoVOList(CollectionUtil.isEmpty(packageInfoVOList) ? null : packageInfoVOList)

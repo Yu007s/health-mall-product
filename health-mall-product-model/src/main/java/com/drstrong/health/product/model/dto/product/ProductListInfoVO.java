@@ -92,6 +92,18 @@ public class ProductListInfoVO implements Serializable {
     private Long quantity;
 
     /**
+     * 安全类别：相当于药品类别：1-处方药；2-OTC药品
+     */
+    @ApiModelProperty(value = "药品类别：1，处方药；2，OTC药品")
+    private Integer rx;
+
+    /**
+     * 药品标签：相当于原来的药品属性，1常用药，2特效药
+     */
+    @ApiModelProperty(value = "药品标签")
+    private Integer medicineAttributeId;
+
+    /**
      * 规格
      */
     @ApiModelProperty(value = "规格")
