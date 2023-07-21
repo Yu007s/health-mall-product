@@ -86,7 +86,7 @@ public enum ErrorEnums implements IBaseResult {
 	ACTIVTY_PACKAGE_SAVE_THE_SAME("15011", "已存在相同状态的活动，请勿重复创建。"),
 	ACTIVTY_PACKAGE_SAVE_TIME_CONFLICT("15012", "已存在相同活动且活动时间存在冲突，请勿重复创建。"),
 	ACTIVTY_PACKAGE_UPDATE_TIME_ERROR("15013", "正在进行中的套餐活动结束时间只能向后延长。"),
-
+	ACTIVTY_PACKAGE_TIME_MORE_THAN_NOW("15014", "套餐活动开始时间必须大于等于当前时间"),
 	RECOMMEND_IS_REPEAT("16001", "该sku已存在推荐记录，请勿重复添加"),
 	RECOMMEND_IS_NULL("16002", "推荐记录不存在"),
 	;
