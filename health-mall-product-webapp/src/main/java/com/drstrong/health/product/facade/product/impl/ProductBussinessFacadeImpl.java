@@ -120,7 +120,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
             westernMedicineEntityList = westernMedicineService.queryByMedicineCodeList(skuMedicineCodeList);
             westernMedicineEntityMap = westernMedicineEntityList.stream().collect(toMap(WesternMedicineEntity::getMedicineCode, dto -> dto, (v1, v2) -> v1));
             westernMedicineInstructionsEntities = westernMedicineInstructionsService.queryByMedicineIdList(westernMedicineEntityList.stream().map(WesternMedicineEntity::getId).collect(toList()));
-            medicineInstructionsEntityMap = westernMedicineInstructionsEntities.stream().collect(toMap(WesternMedicineInstructionsEntity::getId, dto -> dto, (v1, v2) -> v1));
+            medicineInstructionsEntityMap = westernMedicineInstructionsEntities.stream().collect(toMap(WesternMedicineInstructionsEntity::getMedicineId, dto -> dto, (v1, v2) -> v1));
         }
 
         //协定方规格信息
@@ -152,15 +152,13 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                     }
                 }
             }
-            if (ProductTypeEnum.MEDICINE.getCode().equals(storeSkuInfoEntity.getSkuType()) && ObjectUtil.isNotNull(medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()))
-                    && ObjectUtil.isNotNull(westernMedicineEntityMap.get(storeSkuInfoEntity.getMedicineCode()))
-                    && ObjectUtil.isNotNull(medicineInstructionsEntityMap.get(westernMedicineEntityMap.get(storeSkuInfoEntity.getMedicineCode()).getId()))) {
+            if (ProductTypeEnum.MEDICINE.getCode().equals(storeSkuInfoEntity.getSkuType()) && ObjectUtil.isNotNull(medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()))) {
                 imageInfo = JSONObject.parseArray(medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()).getSpecImageInfo(), MedicineImageDTO.class);
                 company = medicineInstructionsEntityMap.get(westernMedicineEntityMap.get(storeSkuInfoEntity.getMedicineCode()).getId()).getProductionEnterprise();
                 spec = medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()).getPackingSpec();
                 usage = medicineInstructionsEntityMap.get(westernMedicineEntityMap.get(storeSkuInfoEntity.getMedicineCode()).getId()).getUsageDosage();
                 Map<String, Integer> map = (Map<String, Integer>) JSONObject.parse(westernMedicineEntityMap.get(storeSkuInfoEntity.getMedicineCode()).getMedicineClassificationInfo());
-                rx = map.get(MedicineClassificationEnum.SECURITY_CLASSIFICATION.getValue());
+                rx = map.get(MedicineClassificationEnum.SECURITY_CLASSIFICATION.getName());
             } else if (ProductTypeEnum.AGREEMENT.getCode().equals(storeSkuInfoEntity.getSkuType()) && ObjectUtil.isNotNull(medicineSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()))) {
                 imageInfo = JSONObject.parseArray(agreementSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()).getImageInfo(), MedicineImageDTO.class);
                 spec = agreementSpecificationsEntityListMap.get(storeSkuInfoEntity.getMedicineCode()).getPackingSpec();

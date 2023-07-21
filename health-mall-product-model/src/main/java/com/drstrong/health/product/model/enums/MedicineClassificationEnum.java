@@ -10,14 +10,15 @@ import java.util.Objects;
  */
 public enum MedicineClassificationEnum {
 
-    PHARMACOLOGICAL_CLASSIFICATION(1, "药理分类"),
-    TYPE_AGENT_CLASSIFICATION(2, "型剂分类"),
-    DRUG_CLASSIFICATION(3, "药品分类"),
-    SECURITY_CLASSIFICATION(4, "安全分类"),
-    RAW_MATERIAL_CLASSIFICATION(5, "原料分类");
+    PHARMACOLOGICAL_CLASSIFICATION(1, "药理分类", "pharmacologyClassificationId"),
+    TYPE_AGENT_CLASSIFICATION(2, "型剂分类", "agentClassificationId"),
+    DRUG_CLASSIFICATION(3, "药品分类", "drugClassificationId"),
+    SECURITY_CLASSIFICATION(4, "安全分类", "securityClassificationId"),
+    RAW_MATERIAL_CLASSIFICATION(5, "原料分类", "materialsClassificationId");
 
     private Integer code;
     private String value;
+    private String name;
 
     public static String getValueByCode(Integer code) {
         for (MedicineClassificationEnum attributeEnum : MedicineClassificationEnum.values()) {
@@ -28,9 +29,10 @@ public enum MedicineClassificationEnum {
         return "";
     }
 
-    MedicineClassificationEnum(Integer code, String value) {
+    MedicineClassificationEnum(Integer code, String value, String name) {
         this.code = code;
         this.value = value;
+        this.name = name;
     }
 
     public Integer getCode() {
@@ -47,5 +49,13 @@ public enum MedicineClassificationEnum {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
