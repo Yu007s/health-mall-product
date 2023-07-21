@@ -284,6 +284,8 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             activityPackageSkuInfoEntity.setCreatedBy(saveOrUpdateActivityPackageRequest.getOperatorId());
             activityPackageSkuInfoSevice.save(activityPackageSkuInfoEntity);
         }
+        //触发定时任务-套餐上下架
+        this.doScheduledUpDown();
         //组装操作日志
         OperationLog operationLog = OperationLog.buildOperationLog(null, OperationLogConstant.MALL_PRODUCT_PACKAGE_CHANGE,
                 OperationLogConstant.SAVE_UPDATE_SKU, saveOrUpdateActivityPackageRequest.getOperatorId(), saveOrUpdateActivityPackageRequest.getOperatorName(),
@@ -468,7 +470,6 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
      * 定时任务：套餐定时上下架
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void doScheduledUpDown() {
         log.info("invoke doScheduledUpDown start");
         List<ActivityPackageInfoEntity> activityPackageInfoEntityList = packageService.findScheduledPackage();

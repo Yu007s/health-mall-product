@@ -60,7 +60,6 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
 
     @ApiModelProperty("套餐活动开始时间")
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    @Future(message = "套餐活动开始时间必须晚于当前时间")
     @NotNull(message = "套餐活动开始时间不能为空")
     private LocalDateTime activityStartTime;
 
