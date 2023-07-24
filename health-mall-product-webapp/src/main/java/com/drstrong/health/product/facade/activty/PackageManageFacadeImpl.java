@@ -96,7 +96,6 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     @Autowired
     private SkuBusinessFacadeHolder skuBusinessFacadeHolder;
 
-
     /**
      * 条件分页列表查询
      *
@@ -192,53 +191,11 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     public void saveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest) {
         log.info("invoke saveOrUpdateActivityPackage(),param:{}", JSONUtil.toJsonStr(saveOrUpdateActivityPackageRequest));
         boolean updateFlag = StrUtil.isNotBlank(saveOrUpdateActivityPackageRequest.getActivityPackageCode());
-        List<ActivityPackageSkuRequest> activityPackageSkuList = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList();
-        if (CollectionUtils.isEmpty(activityPackageSkuList)) {
-            log.error("套餐至少包含一种药品种类。");
-            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_AT_LEAST_ONE);
-        }
-        if (activityPackageSkuList.size() != ActivityPackageSkuInfoEntity.LIMITED_NUMBER_OF_PACHAGES_SKUS) {
-            log.error("目前套餐药品种类大于支持的药品种类数量。");
-            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE);
-        }
-        //套餐活动时间校验
-        Date startTime = Date.from(saveOrUpdateActivityPackageRequest.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
-        Date endTime = Date.from(saveOrUpdateActivityPackageRequest.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
-        if (startTime.getTime() >= endTime.getTime()) {
-            log.error("套餐活动开始时间必须小于套餐活动结束时间。");
-            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_ERROR);
-        }
-        if (startTime.getTime() >= System.currentTimeMillis() && !updateFlag) {
-            //更新的时候无需判断开始时间
-            log.error("套餐活动开始时间必须大于等于当前时间。");
-            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_MORE_THAN_NOW);
-        }
-        ActivityPackageSkuRequest activityPackageSkuRequest = activityPackageSkuList.get(0);
-        if (updateFlag) {
-            //进行中的套餐活动，不能修改skuid、价格和数量，结束时间只能往后延迟
-            ActivityPackageInfoEntity activityPackageInfoEntity = packageService.findPackageByCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode(), null);
-            if (!ObjectUtil.isNull(activityPackageInfoEntity) && ActivityStatusEnum.UNDER_WAY.getCode().equals(activityPackageInfoEntity.getActivityStatus())) {
-                Date endTime0 = Date.from(activityPackageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
-                Date startTime0 = Date.from(activityPackageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
-                if (endTime.getTime() > endTime0.getTime()) {
-                    log.error("正在进行中的套餐活动结束时间只能向后延长。");
-                    throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_UPDATE_TIME_ERROR);
-                }
-            }
-        }
+        //参数校验
+        checkPackagePrams(saveOrUpdateActivityPackageRequest, updateFlag);
 
-        //套餐校验：根据skuid和数量检索套餐信息，只能存在一个待开始和进行中的套餐 是否存在时间交集的
-        List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntityList = activityPackageSkuInfoSevice.queryBySkuCodeAndAmount(activityPackageSkuRequest.getSkuCode(), activityPackageSkuRequest.getAmount());
-        if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntityList) && updateFlag) {
-            //更新 -- 过滤掉原先的activityPackageCode
-            List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoEntityList.stream().filter(x -> !x.getActivityPackageCode().equals(saveOrUpdateActivityPackageRequest.getActivityPackageCode())).collect(Collectors.toList());
-            checkActivity(startTime, endTime, activityPackageSkuInfoEntityList);
-        } else if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntityList) && !updateFlag) {
-            //新增
-            checkActivity(startTime, endTime, activityPackageSkuInfoEntityList);
-        }
-
-        //套餐
+        //套餐信息
+        ActivityPackageSkuRequest activityPackageSkuRequest = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0);
         LocalDateTime dateTime = LocalDateTime.now();
         ActivityPackageInfoEntity packageInfoEntity = ActivityPackageInfoEntity.builder()
                 .activityPackageName(saveOrUpdateActivityPackageRequest.getActivityPackageName())
@@ -253,6 +210,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 .build();
         packageInfoEntity.setChangedAt(dateTime);
         packageInfoEntity.setChangedBy(saveOrUpdateActivityPackageRequest.getOperatorId());
+
         //套餐sku信息
         ActivityPackageSkuInfoEntity activityPackageSkuInfoEntity = ActivityPackageSkuInfoEntity.builder()
                 .activityPackageCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode())
@@ -299,6 +257,60 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         ActivityPackageInfoEntity afterEntity = packageService.findPackageByCode(packageInfoEntity.getActivityPackageCode(), null);
         operationLog.setChangeAfterData(JSONUtil.toJsonStr(afterEntity));
         operationLogSendUtil.sendOperationLog(operationLog);
+    }
+
+    /**
+     * 校验参数(保存/修改套餐)
+     *
+     * @param saveOrUpdateActivityPackageRequest
+     * @param updateFlag
+     */
+    private void checkPackagePrams(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest, boolean updateFlag) {
+        List<ActivityPackageSkuRequest> activityPackageSkuList = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList();
+        if (CollectionUtils.isEmpty(activityPackageSkuList)) {
+            log.error("套餐至少包含一种药品种类。");
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_AT_LEAST_ONE);
+        }
+        if (activityPackageSkuList.size() != ActivityPackageSkuInfoEntity.LIMITED_NUMBER_OF_PACHAGES_SKUS) {
+            log.error("目前套餐药品种类大于支持的药品种类数量。");
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE);
+        }
+        //套餐活动时间校验
+        Date startTime = Date.from(saveOrUpdateActivityPackageRequest.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
+        Date endTime = Date.from(saveOrUpdateActivityPackageRequest.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
+        if (startTime.getTime() >= endTime.getTime()) {
+            log.error("套餐活动开始时间必须小于套餐活动结束时间。");
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_ERROR);
+        }
+        if (startTime.getTime() >= System.currentTimeMillis() && !updateFlag) {
+            //更新的时候无需判断开始时间
+            log.error("套餐活动开始时间必须大于等于当前时间。");
+            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_MORE_THAN_NOW);
+        }
+        ActivityPackageSkuRequest activityPackageSkuRequest = activityPackageSkuList.get(0);
+        if (updateFlag) {
+            //进行中的套餐活动，不能修改skuid、价格和数量，结束时间只能往后延迟
+            ActivityPackageInfoEntity activityPackageInfoEntity = packageService.findPackageByCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode(), null);
+            if (!ObjectUtil.isNull(activityPackageInfoEntity) && ActivityStatusEnum.UNDER_WAY.getCode().equals(activityPackageInfoEntity.getActivityStatus())) {
+                Date endTime0 = Date.from(activityPackageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
+                Date startTime0 = Date.from(activityPackageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
+                if (endTime.getTime() > endTime0.getTime()) {
+                    log.error("正在进行中的套餐活动结束时间只能向后延长。");
+                    throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_UPDATE_TIME_ERROR);
+                }
+            }
+        }
+
+        //套餐校验：根据skuid和数量检索套餐信息，只能存在一个待开始和进行中的套餐 是否存在时间交集的
+        List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntityList = activityPackageSkuInfoSevice.queryBySkuCodeAndAmount(activityPackageSkuRequest.getSkuCode(), activityPackageSkuRequest.getAmount());
+        if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntityList) && updateFlag) {
+            //更新 -- 过滤掉原先的activityPackageCode
+            List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoEntityList.stream().filter(x -> !x.getActivityPackageCode().equals(saveOrUpdateActivityPackageRequest.getActivityPackageCode())).collect(Collectors.toList());
+            checkActivity(startTime, endTime, activityPackageSkuInfoEntityList);
+        } else if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntityList) && !updateFlag) {
+            //新增
+            checkActivity(startTime, endTime, activityPackageSkuInfoEntityList);
+        }
     }
 
     /**
@@ -352,7 +364,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     }
 
     /**
-     * 生成activityPackageCode
+     * 生成套餐编码
      *
      * @param storeId
      * @return
@@ -510,6 +522,13 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         log.info("invoke doScheduledUpDown end");
     }
 
+    /**
+     * 构建SkuBusinessList列表返回值信息
+     *
+     * @param skuInfoSummaryDTO
+     * @param querySkuBusinessListRequest
+     * @return
+     */
     private List<SkuBusinessListDTO> buildSkuBusinessListDTOList(SkuInfoSummaryDTO skuInfoSummaryDTO, QuerySkuBusinessListRequest querySkuBusinessListRequest) {
         List<AgreementSkuInfoVO> skuInfoVoList = null;
         if (ProductTypeEnum.MEDICINE.getCode().equals(querySkuBusinessListRequest.getProductType())) {

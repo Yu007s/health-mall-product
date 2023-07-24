@@ -29,5 +29,5 @@ public interface StoreSkuInfoMapper extends BaseMapper<StoreSkuInfoEntity> {
 
     List<StoreSkuInfoEntity> queryStoreSkuInfoByCategory(@Param("skuStatus") Integer skuStatus, @Param("categoryId") Long categoryId);
 
-    List<StoreSkuInfoEntity> queryStoreSkuInfoByCategoryAndType(@Param("key") String key, @Param("skuStatus") Integer skuStatus, @Param("categoryId") Long categoryId, @Param("cityId") Integer cityId, @Param("storeIds") List<Long> storeIds);
+    List<StoreSkuInfoEntity> queryStoreSkuInfoByCategoryAndType(@Param("productType") Integer productType, @Param("key") String key, @Param("skuStatus") Integer skuStatus, @Param("categoryId") Long categoryId, @Param("cityId") Integer cityId, @Param("storeIds") List<Long> storeIds);
 }

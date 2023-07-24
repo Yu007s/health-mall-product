@@ -139,12 +139,17 @@
         <if test="key != null and key != ''">
             and sku_name LIKE concat('%',#{key},'%')
         </if>
+        <if test="productType != null">
+            and sku_type = #{queryParam.productType}
+        </if>
         <if test="categoryId != null ">
             and FIND_IN_SET(#{categoryId},REPLACE(REPLACE(REPLACE(JSON_UNQUOTE(category_info), '[', ''), ']', ''),' ','')
             ) > 0
         </if>
-        and FIND_IN_SET(#{cityId},REPLACE(REPLACE(REPLACE(JSON_UNQUOTE(prohibit_area_info), '[', ''), ']', ''),' ','') )
-        = 0
+        <if test="cityId != null ">
+            and FIND_IN_SET(#{cityId},REPLACE(REPLACE(REPLACE(JSON_UNQUOTE(prohibit_area_info), '[', ''), ']', ''),' ','') )
+            = 0
+        </if>
         order by id desc
     </select>
 
