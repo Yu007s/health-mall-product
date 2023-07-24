@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -26,38 +27,47 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ApiModel("商品管理查询的入参")
 public class ProductManageQueryRequest extends PageRequest implements Serializable {
-	private static final long serialVersionUID = 1842569972108814648L;
+    private static final long serialVersionUID = 1842569972108814648L;
 
-	/**
-	 * @see ProductTypeEnum
-	 */
-	@ApiModelProperty("商品类型")
-	private Integer productType;
+    /**
+     * @see ProductTypeEnum
+     */
+    @ApiModelProperty("商品类型")
+    private Integer productType;
 
-	@ApiModelProperty("规格编码")
-	private String medicineCode;
+    @ApiModelProperty("规格编码")
+    private String medicineCode;
 
-	@ApiModelProperty("sku 名称")
-	private String skuName;
+    @ApiModelProperty("sku 名称")
+    private String skuName;
 
-	@ApiModelProperty("sku 编码")
-	private String skuCode;
+    @ApiModelProperty("sku 编码")
+    private String skuCode;
 
-	@ApiModelProperty("sku编码/sku名称")
-	private String key;
+    @ApiModelProperty("sku编码/sku名称")
+    private String key;
 
-	@ApiModelProperty("sku 状态")
-	private Integer skuStatus;
+    @ApiModelProperty("sku 状态")
+    private Integer skuStatus;
 
-	@ApiModelProperty("sku 状态")
-	private Set<Integer> skuStatusList;
+    @ApiModelProperty("sku 状态")
+    private Set<Integer> skuStatusList;
 
-	@ApiModelProperty("供应商 id")
-	private Long supplierId;
+    @ApiModelProperty("供应商 id")
+    private Long supplierId;
 
-	@ApiModelProperty("店铺id,和agencyId任传其一")
-	private Long storeId;
+    @ApiModelProperty("店铺id,和agencyId任传其一")
+    private Long storeId;
 
-	@ApiModelProperty("互联网医院id,和storeId任传其一")
-	private Long agencyId;
+    @ApiModelProperty("互联网医院id,和storeId任传其一")
+    private Long agencyId;
+
+    @ApiModelProperty("sku分类")
+    private Long categoryId;
+
+    @ApiModelProperty("sku禁售city")
+    private Integer cityId;
+
+    @ApiModelProperty("店铺id列表")
+    private List<Long> storeIds;
 }
