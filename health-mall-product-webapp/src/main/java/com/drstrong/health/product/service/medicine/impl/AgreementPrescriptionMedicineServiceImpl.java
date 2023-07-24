@@ -156,7 +156,7 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
     public List<AgreementPrescriptionMedicineEntity> queryByCodeList(List<String> medicineCode) {
         LambdaQueryWrapper<AgreementPrescriptionMedicineEntity> queryWrapper = new LambdaQueryWrapper<AgreementPrescriptionMedicineEntity>()
                 .eq(AgreementPrescriptionMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
-                .in(AgreementPrescriptionMedicineEntity::getMedicineCode,medicineCode);
+                .in(AgreementPrescriptionMedicineEntity::getMedicineCode, medicineCode);
         return baseMapper.selectList(queryWrapper);
     }
 

@@ -142,6 +142,9 @@ public class WesternSkuBusinessFacadeImpl implements SkuBusinessBaseFacade {
      */
     @Override
     public List<ProductDetailInfoDTO> queryProductDetailsBySkuCodes(Set<String> skuCodes) {
+        if (CollectionUtil.isEmpty(skuCodes)) {
+            return Lists.newArrayList();
+        }
         //西药基本信息
         List<StoreSkuInfoEntity> storeSkuInfoEntities = storeSkuInfoService.querySkuCodes(skuCodes);
         Map<String, StoreSkuInfoEntity> skuCodeAndStoreSkuInfoEntityMap = storeSkuInfoEntities.stream().collect(toMap(StoreSkuInfoEntity::getSkuCode, dto -> dto, (v1, v2) -> v1));

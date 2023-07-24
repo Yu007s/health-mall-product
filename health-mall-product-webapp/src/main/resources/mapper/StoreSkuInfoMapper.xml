@@ -89,7 +89,7 @@
             and #{queryParam.categoryId} MEMBER OF (category_info)
         </if>
         <if test="queryParam.cityId != null ">
-            and  #{queryParam.cityId} MEMBER OF (prohibit_area_info) ! = 1
+            and  #{queryParam.cityId} MEMBER OF (prohibit_area_info) = 0
         </if>
         <if test="queryParam.productType != null">
             and sku_type = #{queryParam.productType}

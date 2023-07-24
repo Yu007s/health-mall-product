@@ -130,21 +130,6 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
         List<ProductDetailInfoDTO> westernProductDetailInfoDTOS = skuWesternBusinessBaseFacade.queryProductDetailsBySkuCodes(skuCodeWesternList);
         Map<String, ProductDetailInfoDTO> skuCodeAndWesternProductDetailInfoDTOMap = westernProductDetailInfoDTOS.stream().collect(toMap(ProductDetailInfoDTO::getSkuCode, dto -> dto, (v1, v2) -> v1));
 
-/*        List<String> skuMedicineCodeList = storeSkuInfoEntities.stream().filter(StoreSkuInfoEntity -> ProductTypeEnum.MEDICINE.getCode().equals(StoreSkuInfoEntity.getSkuType()))
-                .map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
-        Map<String, WesternMedicineSpecificationsEntity> medicineSpecificationsEntityListMap = MapUtil.newHashMap();
-        List<WesternMedicineEntity> westernMedicineEntityList = Lists.newArrayList();
-        Map<String, WesternMedicineEntity> westernMedicineEntityMap = MapUtil.newHashMap();
-        List<WesternMedicineInstructionsEntity> westernMedicineInstructionsEntities = Lists.newArrayList();
-        Map<Long, WesternMedicineInstructionsEntity> medicineInstructionsEntityMap = MapUtil.newHashMap();
-        if (CollectionUtil.isNotEmpty(skuMedicineCodeList)) {
-            medicineSpecificationsEntityListMap = westernMedicineSpecificationsService.queryByCodeList(skuMedicineCodeList).stream()
-                    .collect(toMap(WesternMedicineSpecificationsEntity::getSpecCode, dto -> dto, (v1, v2) -> v1));
-            westernMedicineEntityList = westernMedicineService.queryByMedicineCodeList(skuMedicineCodeList);
-            westernMedicineEntityMap = westernMedicineEntityList.stream().collect(toMap(WesternMedicineEntity::getMedicineCode, dto -> dto, (v1, v2) -> v1));
-            westernMedicineInstructionsEntities = westernMedicineInstructionsService.queryByMedicineIdList(westernMedicineEntityList.stream().map(WesternMedicineEntity::getId).collect(toList()));
-            medicineInstructionsEntityMap = westernMedicineInstructionsEntities.stream().collect(toMap(WesternMedicineInstructionsEntity::getMedicineId, dto -> dto, (v1, v2) -> v1));
-        }*/
 
         //协定方规格信息
         SkuBusinessBaseFacade skuAgreementBusinessBaseFacade = skuBusinessFacadeHolder.getSkuBusinessBaseFacade(ProductTypeEnum.AGREEMENT.getCode());
@@ -152,12 +137,6 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                 .map(StoreSkuInfoEntity::getSkuCode).collect(Collectors.toSet());
         List<ProductDetailInfoDTO> agreementProductDetailInfoDTOS = skuAgreementBusinessBaseFacade.queryProductDetailsBySkuCodes(skuAgreementCodeAgreementList);
         Map<String, ProductDetailInfoDTO> skuCodeAndAgreementProductDetailInfoDTOMap = agreementProductDetailInfoDTOS.stream().collect(toMap(ProductDetailInfoDTO::getSkuCode, dto -> dto, (v1, v2) -> v1));
-
-/*        Map<String, AgreementPrescriptionMedicineEntity> agreementSpecificationsEntityListMap = new HashMap<>();
-        if (CollectionUtil.isNotEmpty(skuAgreementCodeList)) {
-            agreementSpecificationsEntityListMap = agreementPrescriptionMedicineService.queryByCodeList(skuAgreementCodeList)
-                    .stream().collect(toMap(AgreementPrescriptionMedicineEntity::getMedicineCode, dto -> dto, (v1, v2) -> v1));
-        }*/
 
         //获取所有正在进行的套餐信息
         Map<String, List<PackageInfoVO>> activityPackageInfoListMap = packageService.getUpPackageInfo();
