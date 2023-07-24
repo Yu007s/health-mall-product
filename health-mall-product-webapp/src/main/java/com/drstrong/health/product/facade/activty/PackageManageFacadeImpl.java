@@ -461,6 +461,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     @Override
     public PageVO<SkuBusinessListDTO> getPackageSkuBusinessList(QuerySkuBusinessListRequest querySkuBusinessListRequest) {
         SkuQueryRequest skuQueryRequest = SkuQueryRequest.builder()
+                .productType(querySkuBusinessListRequest.getProductType())
                 .key(querySkuBusinessListRequest.getKey())
                 .storeId(querySkuBusinessListRequest.getStoreId())
                 .needQueryInventory(ObjectUtil.equal(1, querySkuBusinessListRequest.getNeedQueryInventory()))

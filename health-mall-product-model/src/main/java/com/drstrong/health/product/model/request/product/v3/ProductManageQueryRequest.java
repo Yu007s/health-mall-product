@@ -55,6 +55,9 @@ public class ProductManageQueryRequest extends PageRequest implements Serializab
 	@ApiModelProperty("供应商 id")
 	private Long supplierId;
 
-	@ApiModelProperty("店铺id")
+	@ApiModelProperty("店铺id,和agencyId任传其一")
 	private Long storeId;
+
+	@ApiModelProperty("互联网医院id,和storeId任传其一")
+	private Long agencyId;
 }
