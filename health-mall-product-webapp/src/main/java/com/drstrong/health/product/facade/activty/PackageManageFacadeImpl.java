@@ -247,8 +247,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             activityPackageSkuInfoEntity.setCreatedBy(saveOrUpdateActivityPackageRequest.getOperatorId());
             activityPackageSkuInfoSevice.save(activityPackageSkuInfoEntity);
         }
-        //触发定时任务-套餐上下架
-        this.doScheduledUpDown();
+
         //组装操作日志
         OperationLog operationLog = OperationLog.buildOperationLog(null, OperationLogConstant.MALL_PRODUCT_PACKAGE_CHANGE,
                 OperationLogConstant.SAVE_UPDATE_SKU, saveOrUpdateActivityPackageRequest.getOperatorId(), saveOrUpdateActivityPackageRequest.getOperatorName(),
@@ -268,23 +267,23 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     private void checkPackagePrams(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest, boolean updateFlag) {
         List<ActivityPackageSkuRequest> activityPackageSkuList = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList();
         if (CollectionUtils.isEmpty(activityPackageSkuList)) {
-            log.error("套餐至少包含一种药品种类。");
+            log.error("套餐至少包含一种药品种类,当前套餐药品种类=0");
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_AT_LEAST_ONE);
         }
         if (activityPackageSkuList.size() != ActivityPackageSkuInfoEntity.LIMITED_NUMBER_OF_PACHAGES_SKUS) {
-            log.error("目前套餐药品种类大于支持的药品种类数量。");
+            log.error("目前套餐药品种类大于支持的药品种类数量,当前套餐药品种类={}", activityPackageSkuList.size());
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SKU_MORE_THAN_ONE);
         }
         //套餐活动时间校验
         Date startTime = Date.from(saveOrUpdateActivityPackageRequest.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
         Date endTime = Date.from(saveOrUpdateActivityPackageRequest.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
         if (startTime.getTime() >= endTime.getTime()) {
-            log.error("套餐活动开始时间必须小于套餐活动结束时间。");
+            log.error("套餐活动开始时间必须小于套餐活动结束时间,开始时间={},结束时间={}", startTime.getTime(), endTime.getTime());
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_ERROR);
         }
         if (startTime.getTime() < System.currentTimeMillis() && !updateFlag) {
             //更新的时候无需判断开始时间
-            log.error("套餐活动开始时间必须大于等于当前时间。");
+            log.error("套餐活动开始时间必须大于等于当前时间，开始时间={}", startTime.getTime());
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_MORE_THAN_NOW);
         }
         ActivityPackageSkuRequest activityPackageSkuRequest = activityPackageSkuList.get(0);
@@ -306,7 +305,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntityList) && updateFlag) {
             //更新 -- 过滤掉原先的activityPackageCode
             List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoEntityList.stream().filter(x -> !x.getActivityPackageCode().equals(saveOrUpdateActivityPackageRequest.getActivityPackageCode())).collect(Collectors.toList());
-            checkActivity(startTime, endTime, activityPackageSkuInfoEntityList);
+            checkActivity(startTime, endTime, activityPackageSkuInfoEntities);
         } else if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntityList) && !updateFlag) {
             //新增
             checkActivity(startTime, endTime, activityPackageSkuInfoEntityList);
@@ -488,6 +487,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
      * 定时任务：套餐定时上下架
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void doScheduledUpDown() {
         log.info("invoke doScheduledUpDown start");
         List<ActivityPackageInfoEntity> activityPackageInfoEntityList = packageService.findScheduledPackage();

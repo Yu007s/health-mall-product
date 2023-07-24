@@ -95,6 +95,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
         Map<Long, String> storeIdNameMap = storeEntityList.stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
         List<StoreSkuInfoEntity> storeSkuInfoEntityList = storeSkuInfoService.queryStoreSkuInfoByCategoryAndCityId(searchWesternRequestParamBO.getProductType(), searchWesternRequestParamBO.getKey(), searchWesternRequestParamBO.getCategoryId(), searchWesternRequestParamBO.getCityId(), storeIds);
         if (CollectionUtils.isEmpty(storeSkuInfoEntityList)) {
+            log.info("searchProductList,商品列表信息为空");
             return null;
         }
 
@@ -103,6 +104,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
         Map<String, List<SkuCanStockDTO>> stockToMap = stockRemoteProService.getStockToMap(skuCodeList);
         List<StoreSkuInfoEntity> storeSkuInfoEntities = storeSkuInfoEntityList.stream().filter(StoreSkuInfoEntity -> stockToMap.keySet().contains(StoreSkuInfoEntity.getSkuCode())).collect(toList());
         if (CollectionUtils.isEmpty(storeSkuInfoEntities)) {
+            log.info("商品列表库存数据为空,skuCodeList={}", skuCodeList);
             return null;
         }
 
