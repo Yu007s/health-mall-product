@@ -4,12 +4,14 @@ package com.drstrong.health.product.facade.sku;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO;
+import com.drstrong.health.product.model.dto.medicine.ProductDetailInfoDTO;
 import com.drstrong.health.product.model.dto.sku.SkuInfoSummaryDTO;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.sku.SkuQueryRequest;
 import com.google.common.collect.Lists;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,4 +91,12 @@ public interface SkuBusinessBaseFacade {
         }
         return medicineUsageDTOList;
     }
+
+    /**
+     * 根据sku编码列表查询药品详情
+     *
+     * @param skuCodes
+     * @return
+     */
+    List<ProductDetailInfoDTO> queryProductDetailsBySkuCodes(Set<String> skuCodes);
 }

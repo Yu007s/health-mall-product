@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.StrFormatter;
 import com.drstrong.health.common.exception.BusinessException;
 import com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO;
+import com.drstrong.health.product.model.dto.medicine.ProductDetailInfoDTO;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -72,5 +73,22 @@ public class SkuBusinessFacadeHolder {
             }
         });
         return medicineUsageDTOList;
+    }
+
+    /**
+     * 根据sku编码列表查询药品详情(通用方法)
+     *
+     * @param skuCodes
+     * @return
+     */
+    public List<ProductDetailInfoDTO> queryProductDetailsBySkuCodes(Set<String> skuCodes) {
+        List<ProductDetailInfoDTO> productDetailInfoDTOS = Lists.newArrayListWithCapacity(skuCodes.size());
+        skuBusinessFacadeList.forEach(skuBusinessBaseFacade -> {
+            Set<String> filterSkuCodes = skuBusinessBaseFacade.filterSkuCodesByProductType(skuCodes);
+            if (CollectionUtil.isNotEmpty(filterSkuCodes)) {
+                productDetailInfoDTOS.addAll(skuBusinessBaseFacade.queryProductDetailsBySkuCodes(filterSkuCodes));
+            }
+        });
+        return productDetailInfoDTOS;
     }
 }

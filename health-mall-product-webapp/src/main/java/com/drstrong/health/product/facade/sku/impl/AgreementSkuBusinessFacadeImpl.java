@@ -9,7 +9,9 @@ import cn.hutool.json.JSONUtil;
 import com.drstrong.health.product.facade.sku.SkuBusinessBaseFacade;
 import com.drstrong.health.product.facade.sku.SkuManageFacade;
 import com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO;
+import com.drstrong.health.product.model.dto.medicine.ProductDetailInfoDTO;
 import com.drstrong.health.product.model.dto.sku.SkuInfoSummaryDTO;
+import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
@@ -28,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * 协定方 facade
@@ -115,5 +119,37 @@ public class AgreementSkuBusinessFacadeImpl implements SkuBusinessBaseFacade {
                 .stream().collect(Collectors.toMap(MedicineUsageDTO::getMedicineCode, dto -> dto, (v1, v2) -> v1));
         // 3.组装返回值
         return buildMedicineCodeUsageDto(storeSkuInfoEntityList, medicineCodeUsageDtoMap);
+    }
+
+    /**
+     * 根据sku编码列表查询药品详情
+     *
+     * @param skuCodes
+     * @return
+     */
+    @Override
+    public List<ProductDetailInfoDTO> queryProductDetailsBySkuCodes(Set<String> skuCodes) {
+        //西药基本信息
+        List<StoreSkuInfoEntity> storeSkuInfoEntities = storeSkuInfoService.querySkuCodes(skuCodes);
+        Map<String, StoreSkuInfoEntity> skuCodeAndStoreSkuInfoEntityMap = storeSkuInfoEntities.stream().collect(toMap(StoreSkuInfoEntity::getSkuCode, dto -> dto, (v1, v2) -> v1));
+
+        //协定方规格信息
+        List<String> skuMedicineCodeList = storeSkuInfoEntities.stream().map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
+        Map<String, AgreementPrescriptionMedicineEntity> medicineCodeAndAgreementPrescriptionMedicineEntityMap = agreementPrescriptionMedicineService.queryByCodeList(skuMedicineCodeList)
+                .stream().collect(toMap(AgreementPrescriptionMedicineEntity::getMedicineCode, dto -> dto, (v1, v2) -> v1));
+
+        //组装返回值
+        List<ProductDetailInfoDTO> result = Lists.newArrayListWithCapacity(skuCodes.size());
+        for (String skuCode : skuCodes) {
+            StoreSkuInfoEntity storeSkuInfoEntity = skuCodeAndStoreSkuInfoEntityMap.get(skuCode);
+            ProductDetailInfoDTO detailInfoDTO = ProductDetailInfoDTO.builder()
+                    .skuCode(storeSkuInfoEntity.getSkuCode())
+                    .productType(storeSkuInfoEntity.getSkuType())
+                    .storeSkuInfoEntity(storeSkuInfoEntity)
+                    .agreementPrescriptionMedicineEntity(medicineCodeAndAgreementPrescriptionMedicineEntityMap.get(storeSkuInfoEntity.getMedicineCode()))
+                    .build();
+            result.add(detailInfoDTO);
+        }
+        return result;
     }
 }

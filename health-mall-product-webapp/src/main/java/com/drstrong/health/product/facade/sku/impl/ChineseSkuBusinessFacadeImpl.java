@@ -8,6 +8,7 @@ import cn.hutool.json.JSONUtil;
 import com.drstrong.health.product.facade.ChineseManagerFacade;
 import com.drstrong.health.product.facade.sku.SkuBusinessBaseFacade;
 import com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO;
+import com.drstrong.health.product.model.dto.medicine.ProductDetailInfoDTO;
 import com.drstrong.health.product.model.dto.sku.SkuInfoSummaryDTO;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.chinese.ChineseManagerSkuRequest;
@@ -92,6 +93,12 @@ public class ChineseSkuBusinessFacadeImpl implements SkuBusinessBaseFacade {
     @Override
     public List<MedicineUsageDTO> queryMedicineUsageBySkuCode(Set<String> skuCodes) {
         log.info("中药暂无用法用量，不处理");
+        return Lists.newArrayList();
+    }
+
+    @Override
+    public List<ProductDetailInfoDTO> queryProductDetailsBySkuCodes(Set<String> skuCodes) {
+        log.info("医生药品列表暂无中药商品，不处理");
         return Lists.newArrayList();
     }
 }
