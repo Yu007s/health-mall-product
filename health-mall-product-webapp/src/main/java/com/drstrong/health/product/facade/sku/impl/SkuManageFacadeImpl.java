@@ -294,14 +294,22 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 	@Override
 	public PageVO<AgreementSkuInfoVO> querySkuManageInfo(ProductManageQueryRequest productManageQueryRequest) {
 		log.info("invoke querySkuManageInfo(),param:{}", JSONUtil.toJsonStr(productManageQueryRequest));
-		// 1.根据入参中的条件,分页查询店铺 sku 表
+		// 1.判断 storeId 是否为空且互联网医院 id 不为空,如果是,换取店铺id
+		if (Objects.isNull(productManageQueryRequest.getStoreId()) && Objects.nonNull(productManageQueryRequest.getAgencyId())) {
+			StoreEntity storeEntity = storeService.getStoreByAgencyIdOrStoreId(productManageQueryRequest.getAgencyId(), productManageQueryRequest.getStoreId());
+			if (Objects.nonNull(storeEntity)) {
+				log.info("根据 agencyId 获取到的店铺 id 为:{}", storeEntity.getId());
+				productManageQueryRequest.setStoreId(storeEntity.getId());
+			}
+		}
+		// 2.根据入参中的条件,分页查询店铺 sku 表
 		Page<StoreSkuInfoEntity> storeSkuInfoEntityPageList = storeSkuInfoService.pageQueryByParam(productManageQueryRequest);
 		List<StoreSkuInfoEntity> pageListRecords = storeSkuInfoEntityPageList.getRecords();
 		if (CollectionUtil.isEmpty(pageListRecords)) {
 			log.info("未查询到任何sku数据,参数为:{}", JSONUtil.toJsonStr(productManageQueryRequest));
 			return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(productManageQueryRequest.getPageNo()).pageSize(productManageQueryRequest.getPageSize()).build();
 		}
-		// 2.组装返回值
+		// 3.组装返回值
 		List<AgreementSkuInfoVO> agreementSkuInfoVoList = buildAgreementSkuInfoVo(pageListRecords);
 		return PageVO.newBuilder()
 				.result(agreementSkuInfoVoList)
