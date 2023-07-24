@@ -111,7 +111,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
         List<StoreSkuInfoEntity> storeSkuInfoEntityList = storeSkuInfoService.listQueryByParam(queryParam);
         if (CollectionUtils.isEmpty(storeSkuInfoEntityList)) {
             log.info("searchProductList,商品列表信息为空");
-            return null;
+            return Lists.newArrayList();
         }
 
         //库存信息-限制库存高于阈值
@@ -120,7 +120,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
         List<StoreSkuInfoEntity> storeSkuInfoEntities = storeSkuInfoEntityList.stream().filter(StoreSkuInfoEntity -> stockToMap.keySet().contains(StoreSkuInfoEntity.getSkuCode())).collect(toList());
         if (CollectionUtils.isEmpty(storeSkuInfoEntities)) {
             log.info("商品列表库存数据为空,skuCodeList={}", skuCodeList);
-            return null;
+            return Lists.newArrayList();
         }
 
         //西药规格信息
@@ -157,7 +157,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                                                              Map<String, List<PackageInfoVO>> activityPackageInfoListMap) {
         List<ProductListInfoVO> result = Lists.newArrayList();
         for (StoreSkuInfoEntity storeSkuInfoEntity : storeSkuInfoEntities) {
-            List<MedicineImageDTO> imageInfo = new ArrayList<>();
+            List<MedicineImageDTO> imageInfo = Lists.newArrayList();
             String company = null;
             String spec = null;
             String usage = null;

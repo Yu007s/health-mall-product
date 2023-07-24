@@ -249,10 +249,13 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         }
 
         //组装操作日志
-        OperationLog operationLog = OperationLog.buildOperationLog(null, OperationLogConstant.MALL_PRODUCT_PACKAGE_CHANGE,
-                OperationLogConstant.SAVE_UPDATE_SKU, saveOrUpdateActivityPackageRequest.getOperatorId(), saveOrUpdateActivityPackageRequest.getOperatorName(),
-                OperateTypeEnum.CMS.getCode(), JSONUtil.toJsonStr(packageInfoEntity));
-        operationLog.setBusinessId(packageInfoEntity.getActivityPackageCode());
+        OperationLog operationLog = OperationLog.buildOperationLog(packageInfoEntity.getActivityPackageCode(),
+                OperationLogConstant.MALL_PRODUCT_PACKAGE_CHANGE,
+                OperationLogConstant.SAVE_UPDATE_SKU,
+                saveOrUpdateActivityPackageRequest.getOperatorId(),
+                saveOrUpdateActivityPackageRequest.getOperatorName(),
+                OperateTypeEnum.CMS.getCode(),
+                JSONUtil.toJsonStr(packageInfoEntity));
         ActivityPackageInfoEntity afterEntity = packageService.findPackageByCode(packageInfoEntity.getActivityPackageCode(), null);
         operationLog.setChangeAfterData(JSONUtil.toJsonStr(afterEntity));
         operationLogSendUtil.sendOperationLog(operationLog);
