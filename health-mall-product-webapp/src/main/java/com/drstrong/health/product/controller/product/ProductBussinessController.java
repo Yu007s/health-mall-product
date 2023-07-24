@@ -54,8 +54,7 @@ public class ProductBussinessController implements ProductBussinessRemoteApi {
      * @return
      */
     @Override
-    @PostMapping("/getFrequentlyUsedProductList")
-    public ResultVO<List<FrequentlyUsedProductInfoVO>> getFrequentlyUsedProductList(@RequestBody Set<String> skuCodes) {
+    public ResultVO<List<FrequentlyUsedProductInfoVO>> getFrequentlyUsedProductList(Set<String> skuCodes) {
         return ResultVO.success(productBussinessFacade.getFrequentlyUsedProductList(skuCodes));
     }
 }
