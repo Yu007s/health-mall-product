@@ -282,7 +282,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             log.error("套餐活动开始时间必须小于套餐活动结束时间。");
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_ERROR);
         }
-        if (startTime.getTime() <= System.currentTimeMillis() && !updateFlag) {
+        if (startTime.getTime() < System.currentTimeMillis() && !updateFlag) {
             //更新的时候无需判断开始时间
             log.error("套餐活动开始时间必须大于等于当前时间。");
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_MORE_THAN_NOW);
