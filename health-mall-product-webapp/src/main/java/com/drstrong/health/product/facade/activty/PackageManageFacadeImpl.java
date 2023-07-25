@@ -292,11 +292,6 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             log.error("套餐活动结束时间必须大于等于当前时间,结束时间={}", endTime.getTime());
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_MORE_THAN_NOW);
         }
-        if (startTime.getTime() < DateUtil.getCurrentTime() && !updateFlag) {
-            //更新的时候无需判断开始时间
-            log.error("套餐活动开始时间必须大于等于当前时间，开始时间={}", startTime.getTime());
-            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_MORE_THAN_NOW);
-        }
         ActivityPackageSkuRequest activityPackageSkuRequest = activityPackageSkuList.get(0);
         if (updateFlag) {
             //进行中的套餐活动，不能修改skuid、价格和数量，结束时间只能往后延迟
