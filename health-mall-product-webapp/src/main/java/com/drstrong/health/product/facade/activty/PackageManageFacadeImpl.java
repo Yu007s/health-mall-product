@@ -500,7 +500,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             log.info("invoke doScheduledUpDown end,activityPackageInfoEntityList is null");
             return;
         }
-        long nowTime = System.currentTimeMillis();
+        long nowTime = DateUtil.getCurrentTime();
         List<ActivityPackageInfoEntity> activityListNotStart = activityPackageInfoEntityList.stream().filter(x -> ActivityStatusEnum.TO_BE_STARTED.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
         List<ActivityPackageInfoEntity> activityListNotEnd = activityPackageInfoEntityList.stream().filter(x -> ActivityStatusEnum.UNDER_WAY.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
         if (CollectionUtil.isNotEmpty(activityListNotStart)) {
