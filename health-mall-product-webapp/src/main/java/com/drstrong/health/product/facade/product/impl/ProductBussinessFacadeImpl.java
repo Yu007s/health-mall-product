@@ -234,18 +234,19 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                 .storeId(storeEntity.getId())
                 .storeName(storeEntity.getStoreName())
                 .build();
-        if (storeSkuInfoEntity.getSkuType() == ProductTypeEnum.MEDICINE.getCode()) {
+        if (ProductTypeEnum.MEDICINE.getCode().equals(storeSkuInfoEntity.getSkuType())) {
             //西药
             ProductWesternDetailVO productWesternDetailVO = new ProductWesternDetailVO();
             WesternMedicineEntity westernMedicineEntity = westernMedicineService.queryByMedicineCode(storeSkuInfoEntity.getMedicineCode());
             if (ObjectUtil.isNull(westernMedicineEntity)) {
+                log.error("查询的药品详情规格参数为空,skuCode={}", skuCode);
                 throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR.getCode(), "查询的药品详情规格参数为空。");
             }
             WesternMedicineSpecificationsEntity westernMedicineSpecificationsEntity = westernMedicineSpecificationsService.queryByCode(storeSkuInfoEntity.getMedicineCode());
             WesternMedicineInstructionsEntity westernMedicineInstructionsEntity = westernMedicineInstructionsService.queryByMedicineId(westernMedicineEntity.getId());
 
-            if (ObjectUtil.isNull(westernMedicineSpecificationsEntity) ||
-                    ObjectUtil.isNull(westernMedicineInstructionsEntity)) {
+            if (ObjectUtil.isNull(westernMedicineSpecificationsEntity) || ObjectUtil.isNull(westernMedicineInstructionsEntity)) {
+                log.error("查询的药品详情规格参数为空,skuCode={}", skuCode);
                 throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR.getCode(), "查询的药品详情规格参数为空。");
             }
             BeanUtils.copyProperties(westernMedicineEntity, productWesternDetailVO);
@@ -255,12 +256,13 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
             List<MedicineImageDTO> medicineImageDTOS = JSONObject.parseArray(specImageInfo, MedicineImageDTO.class);
             productWesternDetailVO.setSpecImageInfo(medicineImageDTOS);
             detailInfoVO.setProductWesternDetailVO(productWesternDetailVO);
-        } else if (storeSkuInfoEntity.getSkuType() == ProductTypeEnum.AGREEMENT.getCode()) {
+        } else if (ProductTypeEnum.AGREEMENT.getCode().equals(storeSkuInfoEntity.getSkuType())) {
             //协定方
             ProductAgreementDetailVO productAgreementDetailVO = new ProductAgreementDetailVO();
             AgreementPrescriptionMedicineEntity agreementPrescriptionMedicineEntity = agreementPrescriptionMedicineService.queryByCode(storeSkuInfoEntity.getMedicineCode());
             if (ObjectUtil.isNull(agreementPrescriptionMedicineEntity)) {
-                throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR.getCode(), "查询的药品详情规格参数为空。");
+                log.error("查询的协定方药品详情规格参数为空,skuCode={}", skuCode);
+                throw new BusinessException(ErrorEnums.SKU_DETAIL_QUERY_ERROR.getCode(), "查询的协定方药品详情规格参数为空。");
             }
             BeanUtils.copyProperties(agreementPrescriptionMedicineEntity, productAgreementDetailVO);
             String specImageInfo = agreementPrescriptionMedicineEntity.getImageInfo();
@@ -296,9 +298,8 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
         //关联的套餐信息(正在进行状态)
         Map<String, List<PackageInfoVO>> activityPackageInfoListMap = packageService.getUpPackageInfo(skuCodeList);
 
-        //规格信息
-        List<String> skuMedicineCodeList = storeSkuInfoEntities.stream()
-                .filter(StoreSkuInfoEntity -> ProductTypeEnum.MEDICINE.getCode().equals(StoreSkuInfoEntity.getSkuType()))
+        //西药规格信息
+        List<String> skuMedicineCodeList = storeSkuInfoEntities.stream().filter(StoreSkuInfoEntity -> ProductTypeEnum.MEDICINE.getCode().equals(StoreSkuInfoEntity.getSkuType()))
                 .map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
         Map<String, String> medicineSpecificationsEntityListMap = new HashMap<>();
         if (CollectionUtil.isNotEmpty(skuMedicineCodeList)) {
@@ -306,8 +307,8 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                     .collect(Collectors.toMap(WesternMedicineSpecificationsEntity::getSpecCode, WesternMedicineSpecificationsEntity::getSpecImageInfo, (v1, v2) -> v1));
         }
 
-        List<String> skuAgreementCodeList = storeSkuInfoEntities.stream()
-                .filter(StoreSkuInfoEntity -> ProductTypeEnum.AGREEMENT.getCode().equals(StoreSkuInfoEntity.getSkuType()))
+        //协定方规格信息
+        List<String> skuAgreementCodeList = storeSkuInfoEntities.stream().filter(StoreSkuInfoEntity -> ProductTypeEnum.AGREEMENT.getCode().equals(StoreSkuInfoEntity.getSkuType()))
                 .map(StoreSkuInfoEntity::getMedicineCode).collect(Collectors.toList());
         Map<String, String> agreementSpecificationsEntityListMap = new HashMap<>();
         if (CollectionUtil.isNotEmpty(skuAgreementCodeList)) {
@@ -316,6 +317,13 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
         }
 
         //组装信息
+        return buildFrequentlyUsedProductList(storeSkuInfoEntities, storeInfoMap, stockToMap, activityPackageInfoListMap, medicineSpecificationsEntityListMap, agreementSpecificationsEntityListMap);
+    }
+
+    /**
+     * 医生端的常用药列表返回值
+     */
+    private List<FrequentlyUsedProductInfoVO> buildFrequentlyUsedProductList(List<StoreSkuInfoEntity> storeSkuInfoEntities, Map<Long, String> storeInfoMap, Map<String, List<SkuCanStockDTO>> stockToMap, Map<String, List<PackageInfoVO>> activityPackageInfoListMap, Map<String, String> medicineSpecificationsEntityListMap, Map<String, String> agreementSpecificationsEntityListMap) {
         List<FrequentlyUsedProductInfoVO> result = new ArrayList<>();
         for (StoreSkuInfoEntity storeSkuInfoEntity : storeSkuInfoEntities) {
             List<MedicineImageDTO> imageInfo = new ArrayList<>();
