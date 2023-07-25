@@ -59,12 +59,12 @@ public class SaveOrUpdateActivityPackageRequest implements Serializable {
     private BigDecimal price;
 
     @ApiModelProperty("套餐活动开始时间")
-    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
     @NotNull(message = "套餐活动开始时间不能为空")
     private LocalDateTime activityStartTime;
 
     @ApiModelProperty("套餐活动结束时间")
-    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
     @Future(message = "套餐活动结束时间必须晚于当前时间")
     @NotNull(message = "套餐活动结束时间不能为空")
     private LocalDateTime activityEndTime;
