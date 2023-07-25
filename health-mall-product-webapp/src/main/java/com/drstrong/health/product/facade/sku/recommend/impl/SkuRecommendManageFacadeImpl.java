@@ -103,7 +103,7 @@ public class SkuRecommendManageFacadeImpl implements SkuRecommendManageFacade {
             if (ObjectUtil.isNull(storeSkuRecommendEntityById)) {
                 throw new BusinessException(ErrorEnums.RECOMMEND_IS_NULL);
             }
-            if (ObjectUtil.notEqual(saveRecommendRequest.getSkuRecommendId(), storeSkuRecommendEntity.getId())) {
+            if (ObjectUtil.notEqual(saveRecommendRequest.getSkuRecommendId(), storeSkuRecommendEntityById.getId())) {
                 throw new BusinessException(ErrorEnums.RECOMMEND_IS_REPEAT);
             }
         }
