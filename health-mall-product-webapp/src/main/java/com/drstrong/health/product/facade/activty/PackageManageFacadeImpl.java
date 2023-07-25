@@ -248,6 +248,9 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             activityPackageSkuInfoSevice.save(activityPackageSkuInfoEntity);
         }
 
+        //触发定时任务
+        this.doScheduledUpDown();
+
         //组装操作日志
         OperationLog operationLog = OperationLog.buildOperationLog(packageInfoEntity.getActivityPackageCode(),
                 OperationLogConstant.MALL_PRODUCT_PACKAGE_CHANGE,
@@ -280,7 +283,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         //套餐活动时间校验
         Date startTime = Date.from(saveOrUpdateActivityPackageRequest.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
         Date endTime = Date.from(saveOrUpdateActivityPackageRequest.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
-        if (startTime.getTime() >= endTime.getTime()) {
+        if (startTime.getTime() > endTime.getTime()) {
             log.error("套餐活动开始时间必须小于套餐活动结束时间,开始时间={},结束时间={}", startTime.getTime(), endTime.getTime());
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_ERROR);
         }
@@ -490,7 +493,6 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
      * 定时任务：套餐定时上下架
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void doScheduledUpDown() {
         log.info("invoke doScheduledUpDown start");
         List<ActivityPackageInfoEntity> activityPackageInfoEntityList = packageService.findScheduledPackage();
