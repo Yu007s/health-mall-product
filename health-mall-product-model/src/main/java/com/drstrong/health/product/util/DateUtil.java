@@ -1,6 +1,9 @@
 package com.drstrong.health.product.util;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -37,6 +40,17 @@ public class DateUtil {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
 
 		return dateFormat.format(date);
+	}
+
+	/**
+	 * 获取当前时间戳(精确到毫秒)
+	 *
+	 * @return
+	 */
+	public static Long getCurrentTime() {
+		LocalDateTime currentTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+		Date date = Date.from(currentTime.atZone(ZoneId.systemDefault()).toInstant());
+		return date.getTime();
 	}
 
 }

@@ -43,6 +43,7 @@ import com.drstrong.health.product.service.activty.PackageService;
 import com.drstrong.health.product.service.sku.SkuScheduledConfigService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
+import com.drstrong.health.product.util.DateUtil;
 import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
@@ -287,11 +288,11 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             log.error("套餐活动开始时间必须小于套餐活动结束时间,开始时间={},结束时间={}", startTime.getTime(), endTime.getTime());
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_ERROR);
         }
-        if (startTime.getTime() < System.currentTimeMillis() || endTime.getTime() < endTime.getTime()) {
+        if (startTime.getTime() < DateUtil.getCurrentTime() || endTime.getTime() < DateUtil.getCurrentTime()) {
             log.error("套餐活动开始或者结束时间必须大于等于当前时间,开始时间={},结束时间={}", startTime.getTime(), endTime.getTime());
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_MORE_THAN_NOW);
         }
-        if (startTime.getTime() < System.currentTimeMillis() && !updateFlag) {
+        if (startTime.getTime() < DateUtil.getCurrentTime() && !updateFlag) {
             //更新的时候无需判断开始时间
             log.error("套餐活动开始时间必须大于等于当前时间，开始时间={}", startTime.getTime());
             throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_TIME_MORE_THAN_NOW);
