@@ -23,6 +23,9 @@ import java.io.Serializable;
 public class ChineseManagerSkuRequest extends PageRequest implements Serializable {
     private static final long serialVersionUID = 3476606891336123039L;
 
+    @ApiModelProperty("商品类型,参照 ProductTypeEnum")
+    private Integer productType;
+
     @ApiModelProperty("sku名称")
     private String skuName;
 
