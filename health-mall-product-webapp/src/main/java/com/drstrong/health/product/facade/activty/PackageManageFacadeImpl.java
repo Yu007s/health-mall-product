@@ -48,6 +48,7 @@ import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.klock.annotation.Dlock;
@@ -504,18 +505,22 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         List<ActivityPackageInfoEntity> activityListNotStart = activityPackageInfoEntityList.stream().filter(x -> ActivityStatusEnum.TO_BE_STARTED.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
         List<ActivityPackageInfoEntity> activityListNotEnd = activityPackageInfoEntityList.stream().filter(x -> ActivityStatusEnum.UNDER_WAY.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
         if (CollectionUtil.isNotEmpty(activityListNotStart)) {
-            Set<String> updateActivityCode = new HashSet<>();
+            Set<String> updateUnderWayActivityCodes = Sets.newHashSet();
+            Set<String> updateEndActivityCodes = Sets.newHashSet();
             for (ActivityPackageInfoEntity activityPackageInfoEntity : activityListNotStart) {
                 Date startTime = Date.from(activityPackageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
                 Date endTime = Date.from(activityPackageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
                 if (nowTime >= startTime.getTime() && nowTime < endTime.getTime()) {
-                    updateActivityCode.add(activityPackageInfoEntity.getActivityPackageCode());
+                    updateUnderWayActivityCodes.add(activityPackageInfoEntity.getActivityPackageCode());
+                } else if (nowTime > startTime.getTime() && nowTime > endTime.getTime()) {
+                    updateEndActivityCodes.add(activityPackageInfoEntity.getActivityPackageCode());
                 }
             }
-            packageService.updateActivityStatus(updateActivityCode, ActivityStatusEnum.UNDER_WAY.getCode());
+            packageService.updateActivityStatus(updateUnderWayActivityCodes, ActivityStatusEnum.UNDER_WAY.getCode());
+            packageService.updateActivityStatus(updateEndActivityCodes, ActivityStatusEnum.ALREADY_ENDED.getCode());
         }
         if (CollectionUtil.isNotEmpty(activityListNotEnd)) {
-            Set<String> updateActivityCode = new HashSet<>();
+            Set<String> updateActivityCode = Sets.newHashSet();
             for (ActivityPackageInfoEntity activityPackageInfoEntity : activityListNotEnd) {
                 Date startTime = Date.from(activityPackageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
                 Date endTime = Date.from(activityPackageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
