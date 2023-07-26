@@ -376,28 +376,6 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     }
 
     /**
-     * 套餐校验
-     *
-     * @param startTime
-     * @param endTime
-     * @param activityPackageCode
-     */
-    private void checkActivity(Date startTime, Date endTime, String activityPackageCode) {
-        ActivityPackageInfoEntity packageInfoEntity = packageService.findPackageByCode(activityPackageCode, null);
-        if (!Objects.isNull(packageInfoEntity) && ActivityStatusEnum.TO_BE_STARTED.equals(packageInfoEntity.getActivityStatus())) {
-            log.error("已存在相同状态的活动，请勿重复创建。");
-            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SAVE_THE_SAME);
-        }
-        //时间交集判断
-        Date startTime0 = Date.from(packageInfoEntity.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
-        Date endTime0 = Date.from(packageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
-        if (!(endTime0.getTime() < startTime.getTime() || startTime0.getTime() > endTime.getTime())) {
-            log.error("已存在相同活动且活动时间存在冲突，请勿重复创建。");
-            throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SAVE_TIME_CONFLICT);
-        }
-    }
-
-    /**
      * 生成套餐编码
      *
      * @param storeId
