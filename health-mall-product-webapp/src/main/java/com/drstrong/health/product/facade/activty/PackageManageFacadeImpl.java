@@ -193,8 +193,11 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     public void saveOrUpdateActivityPackage(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest) {
         log.info("invoke saveOrUpdateActivityPackage(),param:{}", JSONUtil.toJsonStr(saveOrUpdateActivityPackageRequest));
         boolean updateFlag = StrUtil.isNotBlank(saveOrUpdateActivityPackageRequest.getActivityPackageCode());
+        //套餐活动状态
+        Integer activityStatus = getActivityStatus(saveOrUpdateActivityPackageRequest);
+
         //参数校验
-        checkPackagePrams(saveOrUpdateActivityPackageRequest, updateFlag);
+        checkPackagePrams(saveOrUpdateActivityPackageRequest, updateFlag, activityStatus);
 
         //套餐信息
         ActivityPackageSkuRequest activityPackageSkuRequest = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList().get(0);
@@ -204,7 +207,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 .activityPackageCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode())
                 .productType(saveOrUpdateActivityPackageRequest.getProductType())
                 .storeId(saveOrUpdateActivityPackageRequest.getStoreId())
-                .activityStatus(ActivityStatusEnum.TO_BE_STARTED.getCode())
+                .activityStatus(activityStatus)
                 .price(BigDecimalUtil.Y2F(saveOrUpdateActivityPackageRequest.getPrice()))
                 .activityStartTime(saveOrUpdateActivityPackageRequest.getActivityStartTime())
                 .activityEndTime(saveOrUpdateActivityPackageRequest.getActivityEndTime())
@@ -250,9 +253,6 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
             activityPackageSkuInfoSevice.save(activityPackageSkuInfoEntity);
         }
 
-        //触发定时任务
-        this.doScheduledUpDown();
-
         //组装操作日志
         OperationLog operationLog = OperationLog.buildOperationLog(packageInfoEntity.getActivityPackageCode(),
                 OperationLogConstant.MALL_PRODUCT_PACKAGE_CHANGE,
@@ -267,12 +267,31 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     }
 
     /**
+     * 判断新增/修改套餐的活动状态
+     *
+     * @param saveOrUpdateActivityPackageRequest
+     * @return
+     */
+    private Integer getActivityStatus(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest) {
+        Date startTime = Date.from(saveOrUpdateActivityPackageRequest.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant());
+        Date endTime = Date.from(saveOrUpdateActivityPackageRequest.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
+        Long currentTime = DateUtil.getCurrentTime();
+        Integer activityStatus = 0;
+        if (currentTime > startTime.getTime() && endTime.getTime() > currentTime) {
+            activityStatus = ActivityStatusEnum.UNDER_WAY.getCode();
+        } else if (currentTime >= endTime.getTime()) {
+            activityStatus = ActivityStatusEnum.ALREADY_ENDED.getCode();
+        }
+        return activityStatus;
+    }
+
+    /**
      * 校验参数(保存/修改套餐)
      *
      * @param saveOrUpdateActivityPackageRequest
      * @param updateFlag
      */
-    private void checkPackagePrams(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest, boolean updateFlag) {
+    private void checkPackagePrams(SaveOrUpdateActivityPackageRequest saveOrUpdateActivityPackageRequest, boolean updateFlag, Integer activityStatus) {
         List<ActivityPackageSkuRequest> activityPackageSkuList = saveOrUpdateActivityPackageRequest.getActivityPackageSkuList();
         if (CollectionUtils.isEmpty(activityPackageSkuList)) {
             log.error("套餐至少包含一种药品种类,当前套餐药品种类=0");
@@ -312,10 +331,10 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntityList) && updateFlag) {
             //更新 -- 过滤掉原先的activityPackageCode
             List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoEntityList.stream().filter(x -> !x.getActivityPackageCode().equals(saveOrUpdateActivityPackageRequest.getActivityPackageCode())).collect(Collectors.toList());
-            checkActivity(startTime, endTime, activityPackageSkuInfoEntities);
+            checkActivity(startTime, endTime, activityPackageSkuInfoEntities, activityStatus);
         } else if (CollectionUtil.isNotEmpty(activityPackageSkuInfoEntityList) && !updateFlag) {
             //新增
-            checkActivity(startTime, endTime, activityPackageSkuInfoEntityList);
+            checkActivity(startTime, endTime, activityPackageSkuInfoEntityList, activityStatus);
         }
     }
 
@@ -326,11 +345,20 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
      * @param endTime
      * @param activityPackageSkuInfoEntityList
      */
-    private void checkActivity(Date startTime, Date endTime, List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntityList) {
+    private void checkActivity(Date startTime, Date endTime, List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntityList, Integer activityStatus) {
+        if (ActivityStatusEnum.ALREADY_ENDED.getCode().equals(activityStatus)) {
+            //已结束的套餐不需要下面的逻辑判断
+            return;
+        }
         Set<String> activityPackageCodeList = activityPackageSkuInfoEntityList.stream().map(ActivityPackageSkuInfoEntity::getActivityPackageCode).collect(Collectors.toSet());
-        List<ActivityPackageInfoEntity> packageInfoEntityList = packageService.queryByActivityPackageCode(activityPackageCodeList);
+        //过滤调已结束的套餐活动
+        List<ActivityPackageInfoEntity> packageInfoEntityList = packageService.queryByActivityPackageCode(activityPackageCodeList).stream()
+                .filter(x -> !ActivityStatusEnum.ALREADY_ENDED.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
         if (CollectionUtil.isNotEmpty(packageInfoEntityList)) {
-            List<ActivityPackageInfoEntity> packageInfoEntities = packageInfoEntityList.stream().filter(x -> ActivityStatusEnum.TO_BE_STARTED.getCode().equals(x.getActivityStatus())).collect(Collectors.toList());
+            //判断是否存在相同的套餐状态
+            List<ActivityPackageInfoEntity> packageInfoEntities = packageInfoEntityList.stream()
+                    .filter(x -> activityStatus.equals(x.getActivityStatus())).collect(Collectors.toList());
+
             if (CollectionUtil.isNotEmpty(packageInfoEntities)) {
                 log.error("已存在相同状态的活动，请勿重复创建。");
                 throw new BusinessException(ErrorEnums.ACTIVTY_PACKAGE_SAVE_THE_SAME);
