@@ -512,7 +512,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 Date endTime = Date.from(activityPackageInfoEntity.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant());
                 if (nowTime >= startTime.getTime() && nowTime < endTime.getTime()) {
                     updateUnderWayActivityCodes.add(activityPackageInfoEntity.getActivityPackageCode());
-                } else if (nowTime > startTime.getTime() && nowTime > endTime.getTime()) {
+                } else if (nowTime >= startTime.getTime() && nowTime >= endTime.getTime()) {
                     updateEndActivityCodes.add(activityPackageInfoEntity.getActivityPackageCode());
                 }
             }
