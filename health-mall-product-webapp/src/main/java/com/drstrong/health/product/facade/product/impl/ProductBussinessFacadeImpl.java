@@ -156,7 +156,6 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                                                              Map<String, List<PackageInfoVO>> activityPackageInfoListMap) {
         List<ProductListInfoVO> result = Lists.newArrayList();
         for (StoreSkuInfoEntity storeSkuInfoEntity : storeSkuInfoEntities) {
-            List<MedicineImageDTO> imageInfo = Lists.newArrayList();
             String company = null;
             String spec = null;
             String usage = null;
@@ -173,7 +172,6 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
             }
             if (ProductTypeEnum.MEDICINE.getCode().equals(storeSkuInfoEntity.getSkuType()) && ObjectUtil.isNotNull(skuCodeAndWesternProductDetailInfoDTOMap.get(storeSkuInfoEntity.getSkuCode()))) {
                 ProductDetailInfoDTO productDetailInfoDTO = skuCodeAndWesternProductDetailInfoDTOMap.get(storeSkuInfoEntity.getSkuCode());
-                imageInfo = JSONObject.parseArray(productDetailInfoDTO.getWesternMedicineSpecificationsEntity().getSpecImageInfo(), MedicineImageDTO.class);
                 company = productDetailInfoDTO.getWesternMedicineInstructionsEntity().getProductionEnterprise();
                 spec = productDetailInfoDTO.getWesternMedicineSpecificationsEntity().getPackingSpec();
                 usage = productDetailInfoDTO.getWesternMedicineInstructionsEntity().getUsageDosage();
@@ -183,7 +181,6 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                 icon = imageInfoMap.get(MedicineImageTypeEnum.TYPE_ICON.getCode());
             } else if (ProductTypeEnum.AGREEMENT.getCode().equals(storeSkuInfoEntity.getSkuType()) && ObjectUtil.isNotNull(skuCodeAndAgreementProductDetailInfoDTOMap.get(storeSkuInfoEntity.getSkuCode()))) {
                 ProductDetailInfoDTO productDetailInfoDTO = skuCodeAndAgreementProductDetailInfoDTOMap.get(storeSkuInfoEntity.getSkuCode());
-                imageInfo = JSONObject.parseArray(productDetailInfoDTO.getAgreementPrescriptionMedicineEntity().getImageInfo(), MedicineImageDTO.class);
                 spec = productDetailInfoDTO.getAgreementPrescriptionMedicineEntity().getPackingSpec();
                 usage = productDetailInfoDTO.getAgreementPrescriptionMedicineEntity().getUsageMethod();
                 Map<Integer, String> imageInfoMap = (Map<Integer, String>) JSONObject.parse(productDetailInfoDTO.getAgreementPrescriptionMedicineEntity().getImageInfo());
@@ -199,7 +196,6 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                     .storeId(storeSkuInfoEntity.getStoreId())
                     .storeName(storeIdNameMap.get(storeSkuInfoEntity.getStoreId()))
                     .company(company)
-                    .imageInfo(imageInfo)
                     .salePrice(BigDecimalUtil.F2Y(storeSkuInfoEntity.getPrice()))
                     .salePriceValue(storeSkuInfoEntity.getPrice().intValue())
                     .quantity(quantity)
@@ -258,7 +254,8 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
             BeanUtils.copyProperties(westernMedicineSpecificationsEntity, productWesternDetailVO);
             BeanUtils.copyProperties(westernMedicineInstructionsEntity, productWesternDetailVO);
             String specImageInfo = westernMedicineSpecificationsEntity.getSpecImageInfo();
-            List<MedicineImageDTO> medicineImageDTOS = JSONObject.parseArray(specImageInfo, MedicineImageDTO.class);
+            List<MedicineImageDTO> medicineImageDTOS = JSONObject.parseArray(specImageInfo, MedicineImageDTO.class)
+                    .stream().filter(x -> !x.getType().equals(MedicineImageTypeEnum.TYPE_ICON)).collect(toList());
             productWesternDetailVO.setSpecImageInfo(medicineImageDTOS);
             detailInfoVO.setProductWesternDetailVO(productWesternDetailVO);
         } else if (ProductTypeEnum.AGREEMENT.getCode().equals(storeSkuInfoEntity.getSkuType())) {
@@ -271,7 +268,8 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
             }
             BeanUtils.copyProperties(agreementPrescriptionMedicineEntity, productAgreementDetailVO);
             String specImageInfo = agreementPrescriptionMedicineEntity.getImageInfo();
-            List<MedicineImageDTO> medicineImageDTOS = JSONObject.parseArray(specImageInfo, MedicineImageDTO.class);
+            List<MedicineImageDTO> medicineImageDTOS = JSONObject.parseArray(specImageInfo, MedicineImageDTO.class)
+                    .stream().filter(x -> !x.getType().equals(MedicineImageTypeEnum.TYPE_ICON)).collect(toList());
             productAgreementDetailVO.setSpecImageInfo(medicineImageDTOS);
             detailInfoVO.setProductAgreementDetailVO(productAgreementDetailVO);
         } else {

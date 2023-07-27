@@ -68,12 +68,6 @@ public class ProductListInfoVO implements Serializable {
     private String company;
 
     /**
-     * 商品封面图片
-     */
-    @ApiModelProperty(value = "商品封面图片")
-    private List<MedicineImageDTO> imageInfo;
-
-    /**
      * 售价
      */
     @ApiModelProperty(value = "售价(元为单位)")
