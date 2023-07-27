@@ -3,7 +3,9 @@ package com.drstrong.health.product.facade.product.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.drstrong.health.product.enums.MedicineAttributeEnum;
 import com.drstrong.health.product.facade.product.ProductBussinessFacade;
 import com.drstrong.health.product.facade.sku.SkuBusinessBaseFacade;
@@ -18,10 +20,7 @@ import com.drstrong.health.product.model.entity.medication.WesternMedicineInstru
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
-import com.drstrong.health.product.model.enums.ErrorEnums;
-import com.drstrong.health.product.model.enums.MedicineClassificationEnum;
-import com.drstrong.health.product.model.enums.ProductTypeEnum;
-import com.drstrong.health.product.model.enums.UpOffEnum;
+import com.drstrong.health.product.model.enums.*;
 import com.drstrong.health.product.model.request.product.SearchWesternRequestParamBO;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import com.drstrong.health.product.model.response.result.BusinessException;
@@ -163,6 +162,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
             String usage = null;
             Integer rx = null;
             Integer medicineAttributeId = null;
+            String icon = null;
             if (ObjectUtil.isNotNull(storeSkuInfoEntity.getLabelInfo())) {
                 for (MedicineAttributeEnum value : MedicineAttributeEnum.values()) {
                     if (storeSkuInfoEntity.getLabelInfo().contains(value.getCode())) {
@@ -179,11 +179,15 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                 usage = productDetailInfoDTO.getWesternMedicineInstructionsEntity().getUsageDosage();
                 Map<String, Integer> map = (Map<String, Integer>) JSONObject.parse(productDetailInfoDTO.getWesternMedicineEntity().getMedicineClassificationInfo());
                 rx = map.get(MedicineClassificationEnum.SECURITY_CLASSIFICATION.getName());
+                Map<Integer, String> imageInfoMap = (Map<Integer, String>) JSONObject.parse(productDetailInfoDTO.getWesternMedicineSpecificationsEntity().getSpecImageInfo());
+                icon = imageInfoMap.get(MedicineImageTypeEnum.TYPE_ICON.getCode());
             } else if (ProductTypeEnum.AGREEMENT.getCode().equals(storeSkuInfoEntity.getSkuType()) && ObjectUtil.isNotNull(skuCodeAndAgreementProductDetailInfoDTOMap.get(storeSkuInfoEntity.getSkuCode()))) {
                 ProductDetailInfoDTO productDetailInfoDTO = skuCodeAndAgreementProductDetailInfoDTOMap.get(storeSkuInfoEntity.getSkuCode());
                 imageInfo = JSONObject.parseArray(productDetailInfoDTO.getAgreementPrescriptionMedicineEntity().getImageInfo(), MedicineImageDTO.class);
                 spec = productDetailInfoDTO.getAgreementPrescriptionMedicineEntity().getPackingSpec();
                 usage = productDetailInfoDTO.getAgreementPrescriptionMedicineEntity().getUsageMethod();
+                Map<Integer, String> imageInfoMap = (Map<Integer, String>) JSONObject.parse(productDetailInfoDTO.getAgreementPrescriptionMedicineEntity().getImageInfo());
+                icon = imageInfoMap.get(MedicineImageTypeEnum.TYPE_ICON.getCode());
             }
             List<PackageInfoVO> packageInfoVOList = activityPackageInfoListMap.get(storeSkuInfoEntity.getSkuCode());
             Long quantity = stockToMap.get(storeSkuInfoEntity.getSkuCode()).stream().mapToLong(SkuCanStockDTO::getAvailableQuantity).sum();
@@ -204,6 +208,7 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                     .spec(spec)
                     .usage(usage)
                     .packageInfoVOList(CollectionUtil.isEmpty(packageInfoVOList) ? null : packageInfoVOList)
+                    .icon(icon)
                     .build();
             result.add(productListInfoVO);
         }

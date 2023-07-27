@@ -126,4 +126,10 @@ public class ProductListInfoVO implements Serializable {
      */
     @ApiModelProperty(value = "商品关联的套餐信息")
     private List<PackageInfoVO> packageInfoVOList;
+
+    /**
+     * 商品封面图片
+     */
+    @ApiModelProperty(value = "商品封面图片")
+    private String icon;
 }
