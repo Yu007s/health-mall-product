@@ -26,6 +26,12 @@ public class ProductListInfoVO implements Serializable {
     private static final long serialVersionUID = 3791913589559446114L;
 
     /**
+     * 商品ID
+     */
+    @ApiModelProperty(value = "商品ID")
+    private Long productId;
+
+    /**
      * sku编码
      */
     @ApiModelProperty(value = "sku编码")
