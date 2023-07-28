@@ -67,14 +67,16 @@ public class LabelInfoServiceImpl extends ServiceImpl<LabelInfoMapper, LabelInfo
 	 * @date 2023/6/7 11:29
 	 */
 	@Override
-	public LabelInfoEntity queryByStoreIdAndName(Long storeId, String labelName) {
-		if (Objects.isNull(storeId) || StrUtil.isBlank(labelName)) {
+	public LabelInfoEntity queryByStoreIdAndNameAndType(Long storeId, String labelName, Integer labelType) {
+		if (Objects.isNull(storeId) || StrUtil.isBlank(labelName) || Objects.isNull(labelType)) {
+			log.error("invoke queryByStoreIdAndNameAndType param has null.param:{},{},{}", storeId, labelName, labelType);
 			return null;
 		}
 		LambdaQueryWrapper<LabelInfoEntity> queryWrapper = new LambdaQueryWrapper<LabelInfoEntity>()
 				.eq(LabelInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
 				.eq(LabelInfoEntity::getStoreId, storeId)
-				.eq(LabelInfoEntity::getLabelName, labelName);
+				.eq(LabelInfoEntity::getLabelName, labelName)
+				.eq(LabelInfoEntity::getLabelType, labelType);
 		return baseMapper.selectOne(queryWrapper);
 	}
 
