@@ -1,6 +1,7 @@
 package com.drstrong.health.product.facade.label.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.drstrong.health.product.facade.label.LabelInfoManageFacade;
 import com.drstrong.health.product.model.dto.label.LabelExtendDTO;
 import com.drstrong.health.product.model.entity.label.LabelInfoEntity;
@@ -65,8 +66,8 @@ public class LabelInfoManageFacadeImpl implements LabelInfoManageFacade {
 	@Override
 	public void saveOrUpdate(SaveLabelRequest saveLabelRequest) {
 		// 1.校验同一个店铺下的标签名称不能重复
-		LabelInfoEntity labelInfoEntity = labelInfoService.queryByStoreIdAndName(saveLabelRequest.getStoreId(), saveLabelRequest.getLabelName());
-		if (Objects.nonNull(labelInfoEntity)) {
+		LabelInfoEntity labelInfoEntity = labelInfoService.queryByStoreIdAndNameAndType(saveLabelRequest.getStoreId(), saveLabelRequest.getLabelName(), saveLabelRequest.getLabelType());
+		if (Objects.nonNull(labelInfoEntity) && ObjectUtil.notEqual(saveLabelRequest.getId(), labelInfoEntity.getId())) {
 			throw new BusinessException(ErrorEnums.STORE_LABEL_REPEAT);
 		}
 		// 2.判断是新增还是更新
