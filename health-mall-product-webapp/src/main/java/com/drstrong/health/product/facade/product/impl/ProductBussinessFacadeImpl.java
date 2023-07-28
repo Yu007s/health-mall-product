@@ -177,14 +177,18 @@ public class ProductBussinessFacadeImpl implements ProductBussinessFacade {
                 usage = productDetailInfoDTO.getWesternMedicineInstructionsEntity().getUsageDosage();
                 Map<String, Integer> map = (Map<String, Integer>) JSONObject.parse(productDetailInfoDTO.getWesternMedicineEntity().getMedicineClassificationInfo());
                 rx = map.get(MedicineClassificationEnum.SECURITY_CLASSIFICATION.getName());
-                Map<Integer, String> imageInfoMap = (Map<Integer, String>) JSONObject.parse(productDetailInfoDTO.getWesternMedicineSpecificationsEntity().getSpecImageInfo());
-                icon = imageInfoMap.get(MedicineImageTypeEnum.TYPE_ICON.getCode());
+                String specImageInfo = productDetailInfoDTO.getWesternMedicineSpecificationsEntity().getSpecImageInfo();
+                List<MedicineImageDTO> medicineImageDTOS = JSONObject.parseArray(specImageInfo, MedicineImageDTO.class)
+                        .stream().filter(x -> x.getType().equals(MedicineImageTypeEnum.TYPE_ICON)).collect(toList());
+                icon = medicineImageDTOS.toString();
             } else if (ProductTypeEnum.AGREEMENT.getCode().equals(storeSkuInfoEntity.getSkuType()) && ObjectUtil.isNotNull(skuCodeAndAgreementProductDetailInfoDTOMap.get(storeSkuInfoEntity.getSkuCode()))) {
                 ProductDetailInfoDTO productDetailInfoDTO = skuCodeAndAgreementProductDetailInfoDTOMap.get(storeSkuInfoEntity.getSkuCode());
                 spec = productDetailInfoDTO.getAgreementPrescriptionMedicineEntity().getPackingSpec();
                 usage = productDetailInfoDTO.getAgreementPrescriptionMedicineEntity().getUsageMethod();
-                Map<Integer, String> imageInfoMap = (Map<Integer, String>) JSONObject.parse(productDetailInfoDTO.getAgreementPrescriptionMedicineEntity().getImageInfo());
-                icon = imageInfoMap.get(MedicineImageTypeEnum.TYPE_ICON.getCode());
+                String specImageInfo = productDetailInfoDTO.getAgreementPrescriptionMedicineEntity().getImageInfo();
+                List<MedicineImageDTO> medicineImageDTOS = JSONObject.parseArray(specImageInfo, MedicineImageDTO.class)
+                        .stream().filter(x -> x.getType().equals(MedicineImageTypeEnum.TYPE_ICON)).collect(toList());
+                icon = medicineImageDTOS.toString();
             }
             List<PackageInfoVO> packageInfoVOList = activityPackageInfoListMap.get(storeSkuInfoEntity.getSkuCode());
             Long quantity = stockToMap.get(storeSkuInfoEntity.getSkuCode()).stream().mapToLong(SkuCanStockDTO::getAvailableQuantity).sum();
