@@ -63,10 +63,8 @@
             and pssi.sku_name LIKE concat('%',#{queryParam.skuName},'%')
         </if>
         <if test="queryParam.keyword != null and queryParam.keyword != ''">
-            and
-            #{queryParam.keyword} MEMBER OF (pssr.recommend_detail_info_pinyin_array)
-            or
-            #{queryParam.keyword} MEMBER OF (pssr.recommend_detail_info_keyword_array)
+            and pssr.recommend_detail_info_keyword_array LIKE concat('%',#{queryParam.keyword},'%')
+            or pssr.recommend_detail_info_pinyin_array LIKE concat('%',#{queryParam.keyword},'%')
         </if>
         order by pssr.id desc
     </sql>
