@@ -51,13 +51,8 @@
         pssr.changed_by,
         pssr.changed_at
         from pms_store_sku_recommend pssr
-        <if test="queryParam.skuName == null or queryParam.skuName = ''">
-            where pssr.del_flag = 0
-        </if>
-        <if test="queryParam.skuName != null and queryParam.skuName != ''">
-            left join pms_store_sku_info pssi on pssr.sku_code = pssi.sku_code
-            where pssi.del_flag = 0 and pssr.del_flag = 0
-        </if>
+        left join pms_store_sku_info pssi on pssr.sku_code = pssi.sku_code
+        where pssi.del_flag = 0 and pssr.del_flag = 0
         <if test="queryParam.storeId != null">
             and pssr.store_id = #{queryParam.storeId}
         </if>
