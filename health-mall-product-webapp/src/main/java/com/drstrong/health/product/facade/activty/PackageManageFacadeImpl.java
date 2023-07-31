@@ -219,6 +219,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         //套餐sku信息
         ActivityPackageSkuInfoEntity activityPackageSkuInfoEntity = ActivityPackageSkuInfoEntity.builder()
                 .activityPackageCode(saveOrUpdateActivityPackageRequest.getActivityPackageCode())
+                .skuType(saveOrUpdateActivityPackageRequest.getProductType())
                 .skuCode(activityPackageSkuRequest.getSkuCode())
                 .skuName(activityPackageSkuRequest.getSkuName())
                 .originalPrice(BigDecimalUtil.Y2F(activityPackageSkuRequest.getOriginalPrice()))

@@ -43,6 +43,11 @@ public class ActivityPackageSkuInfoEntity  extends BaseStandardEntity implements
     private String skuCode;
 
     /**
+     * skutype
+     */
+    private Integer skuType;
+
+    /**
      * sku名称
      */
     private String skuName;
