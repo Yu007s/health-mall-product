@@ -76,12 +76,14 @@ public interface SkuBusinessBaseFacade {
             String skuCode = storeSkuInfoEntity.getSkuCode();
             String skuName = storeSkuInfoEntity.getSkuName();
             String medicineCode = storeSkuInfoEntity.getMedicineCode();
+            Integer skuStatus = storeSkuInfoEntity.getSkuStatus();
 
             MedicineUsageDTO usageDTO = MedicineUsageDTO.builder()
                     .productType(storeSkuInfoEntity.getSkuType())
                     .skuId(storeSkuInfoEntity.getId())
                     .skuCode(skuCode)
                     .skuName(skuName)
+                    .skuStatus(skuStatus)
                     .build();
             if (medicineCodeUsageDtoMap.containsKey(medicineCode)) {
                 MedicineUsageDTO medicineUsageDTO = medicineCodeUsageDtoMap.get(medicineCode);

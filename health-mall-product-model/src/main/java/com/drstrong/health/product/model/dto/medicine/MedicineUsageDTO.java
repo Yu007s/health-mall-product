@@ -2,6 +2,7 @@ package com.drstrong.health.product.model.dto.medicine;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -38,6 +39,9 @@ public class MedicineUsageDTO implements Serializable {
     @ApiModelProperty("sku名称")
     private String skuName;
 
+    @ApiModelProperty("sku状态，和UpOffEnum中一致")
+    private Integer skuStatus;
+
     @ApiModelProperty("药材code")
     private String medicineCode;
 
@@ -65,6 +69,12 @@ public class MedicineUsageDTO implements Serializable {
     @ApiModelProperty("服用方式")
     private String usageMethod;
 
+    /**
+     * 设置用法用量
+     *
+     * @author liuqiuyi
+     * @date 2023/8/1 14:47
+     */
     public String getMedicineUsage(String separate) {
         // 如果传入的分隔符为空，则默认取中文逗号
         separate = ObjectUtil.defaultIfNull(separate, C_COMMA);
@@ -75,5 +85,15 @@ public class MedicineUsageDTO implements Serializable {
                 ObjectUtil.defaultIfNull(eachDoseUnit, CharSequenceUtil.EMPTY) + separate +
                 ObjectUtil.defaultIfNull(usageTime, CharSequenceUtil.EMPTY) +
                 ObjectUtil.defaultIfNull(usageMethod, CharSequenceUtil.EMPTY);
+    }
+
+    /**
+     * 判断是否存在用法用量
+     *
+     * @author liuqiuyi
+     * @date 2023/8/1 14:48
+     */
+    public Boolean hasMedicineUsage() {
+        return StrUtil.isNotBlank(medicationFrequency) && StrUtil.isNotBlank(usageMethod);
     }
 }
