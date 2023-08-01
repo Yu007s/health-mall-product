@@ -43,7 +43,7 @@ public class SaveStoreSupplierPostageRequest extends OperatorUserInfo implements
 	@ApiModelProperty("供应商全局邮费")
 	@NotNull(message = "供应商邮费不能为空")
 	@DecimalMin(value = "0.00", message = "价格不能小于0")
-	@DecimalMax(value = "99999.99", message = "价格不能大于99999.99")
+	@DecimalMax(value = "999999.99", message = "价格不能大于999999.99")
 	private BigDecimal freePostage;
 
 	@ApiModelProperty("店铺供应商各区域的邮费设置")
@@ -67,7 +67,7 @@ public class SaveStoreSupplierPostageRequest extends OperatorUserInfo implements
 		@ApiModelProperty("配送费,单位:元")
 		@NotNull(message = "配送费不能为空")
 		@DecimalMin(value = "0.00", message = "价格不能小于0")
-		@DecimalMax(value = "99999.99", message = "价格不能大于99999.99")
+		@DecimalMax(value = "999999.99", message = "价格不能大于999999.99")
 		private BigDecimal postage;
 	}
 }

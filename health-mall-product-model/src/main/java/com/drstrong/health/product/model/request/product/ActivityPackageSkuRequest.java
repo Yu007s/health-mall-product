@@ -48,13 +48,13 @@ public class ActivityPackageSkuRequest implements Serializable {
     @ApiModelProperty("原价")
     @NotNull(message = "商品原价不能为空")
     @DecimalMin(value = "0.00", message = "原价不能小于0")
-    @DecimalMax(value = "99999.99", message = "原价不能大于99999.99")
+    @DecimalMax(value = "999999.99", message = "原价不能大于999999.99")
     private BigDecimal originalPrice;
 
     @ApiModelProperty("优惠价")
     @NotNull(message = "商品优惠价不能为空")
     @DecimalMin(value = "0.00", message = "优惠价不能小于0")
-    @DecimalMax(value = "99999.99", message = "优惠价不能大于99999.99")
+    @DecimalMax(value = "999999.99", message = "优惠价不能大于999999.99")
     private BigDecimal preferential_price;
 
     @ApiModelProperty("数量")

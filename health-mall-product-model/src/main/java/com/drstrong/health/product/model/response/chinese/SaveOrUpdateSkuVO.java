@@ -41,7 +41,7 @@ public class SaveOrUpdateSkuVO implements Serializable{
     @ApiModelProperty("价格/克,单位：元")
     @NotNull(message = "价格不能为空")
     @DecimalMin(value = "0.00", message = "价格不能小于0")
-    @DecimalMax(value = "9999.99", message = "价格不能大于9999.99")
+    @DecimalMax(value = "999999.99", message = "价格不能大于999999.99")
     private BigDecimal price;
 
     @ApiModelProperty("店铺id")

@@ -40,7 +40,7 @@ public class SaveOrUpdateSkuPolicyRequest extends OperatorUserInfo implements Se
 
 	@ApiModelProperty("成本价")
 	@DecimalMin(value = "0.00", message = "成本价不能小于0")
-	@DecimalMax(value = "99999.99", message = "成本价不能大于99999.99")
+	@DecimalMax(value = "999999.99", message = "成本价不能大于999999.99")
 	private BigDecimal costPrice;
 
 	@ApiModelProperty("政策值")
@@ -66,7 +66,7 @@ public class SaveOrUpdateSkuPolicyRequest extends OperatorUserInfo implements Se
 
 		@ApiModelProperty("政策值")
 		@DecimalMin(value = "0.00", message = "政策值不能小于0")
-		@DecimalMax(value = "99999.99", message = "政策值不能大于99999.99")
+		@DecimalMax(value = "999999.99", message = "政策值不能大于999999.99")
 		private BigDecimal policyValue;
 	}
 }
