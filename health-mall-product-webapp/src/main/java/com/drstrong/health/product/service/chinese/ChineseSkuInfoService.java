@@ -54,16 +54,17 @@ public interface ChineseSkuInfoService extends IService<ChineseSkuInfoEntity> {
      */
     ChineseSkuInfoEntity getByMedicineCodeAndStoreId(String medicineCode, Long storeId);
 
-    /**
-     * 根据 skuName 和店铺 id 获取 sku 信息
+	/**
+	 * 根据 skuName 和店铺 id 获取 sku 信息 (忽略自己本身)
 	 * <p> skuName 完全匹配,用于判断店铺中 skuName 是否重复,重复抛出异常 </>
 	 *
 	 * @param skuName sku 名称
 	 * @param storeId 店铺 id
-     * @author liuqiuyi
-     * @date 2022/8/18 10:33
-     */
-    void checkSkuNameIsRepeat(String skuName, Long storeId);
+	 * @param skuCode sku编码，如果名称和自己重复，忽略
+	 * @author liuqiuyi
+	 * @date 2022/8/18 10:33
+	 */
+	void checkSkuNameIsRepeat(String skuName, Long storeId, String skuCode);
 
 	/**
 	 * 根据药材 code 集合和店铺id，获取中药信息

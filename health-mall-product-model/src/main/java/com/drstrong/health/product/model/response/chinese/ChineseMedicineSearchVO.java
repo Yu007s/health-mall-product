@@ -15,7 +15,7 @@ import java.util.List;
 public class ChineseMedicineSearchVO implements Serializable {
     private final static long serialVersionUID = 1578412369433532564L;
     private List<ChineseMedicineResponse> medicineResponses;
-    private Integer total;
+    private Long total;
     private Integer pageNo;
     private Integer pageSize;
 }

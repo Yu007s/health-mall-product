@@ -20,6 +20,8 @@ import java.util.Objects;
  */
 public class UniqueCodeUtils {
 
+    private static final String HAN_ZI = "[^\\u4e00-\\u9fa5]";
+
     /**
      * 获取 spuCode
      * <p> 参照之前的写法 </>
@@ -58,7 +60,10 @@ public class UniqueCodeUtils {
     }
 
     public static String getNextMedicineCode(String medicineName){
-        String firstLetter = PinyinUtil.getFirstLetter(medicineName.substring(0,Math.min(2,medicineName.length())), "");
+        // 生成编码的时候，去除特殊字符，仅保留汉字
+        String replaceName = medicineName.replaceAll(HAN_ZI, "");
+        String firstLetter = PinyinUtil.getFirstLetter(replaceName.substring(0, Math.min(2, replaceName.length())), "");
+
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Z");
         stringBuilder.append(firstLetter);

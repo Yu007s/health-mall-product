@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.chinese.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -127,17 +128,17 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
     }
 
     /**
-     * 根据 skuName 和店铺 id 获取 sku 信息
+     * 根据 skuName 和店铺 id 获取 sku 信息 (忽略自己本身)
      * <p> skuName 完全匹配,用于判断店铺中 skuName 是否重复,重复抛出异常 </>
      *
      * @param skuName sku 名称
      * @param storeId 店铺 id
-     * @return sku 信息
+     * @param skuCode sku编码，如果名称和自己重复，忽略
      * @author liuqiuyi
      * @date 2022/8/18 10:33
      */
     @Override
-    public void checkSkuNameIsRepeat(String skuName, Long storeId) {
+    public void checkSkuNameIsRepeat(String skuName, Long storeId, String skuCode) {
         if (StringUtils.isBlank(skuName) || Objects.isNull(storeId)) {
             throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
         }
@@ -147,7 +148,7 @@ public class ChineseSkuInfoServiceImpl extends ServiceImpl<ChineseSkuInfoMapper,
                 .eq(ChineseSkuInfoEntity::getStoreId, storeId)
                 .last("limit 1");
         ChineseSkuInfoEntity skuInfoEntity = getOne(queryWrapper);
-        if (Objects.nonNull(skuInfoEntity)) {
+        if (Objects.nonNull(skuInfoEntity) && ObjectUtil.notEqual(skuInfoEntity.getSkuCode(), skuCode)) {
             throw new BusinessException(ErrorEnums.SKU_NAME_IS_REPEAT);
         }
     }

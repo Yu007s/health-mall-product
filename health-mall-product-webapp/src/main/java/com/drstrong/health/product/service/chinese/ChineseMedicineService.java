@@ -146,4 +146,12 @@ public interface ChineseMedicineService {
 	 * @return 查找所得
 	 */
 	List<ChineseMedicineEntity> getByIds(List<Long> ids);
+
+	/**
+	 * 查询所有药材并导出
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/8/2 16:54
+	 */
+	List<ChineseMedicineResponse> queryMedicineExport(String medicineCode, String medicineName);
 }

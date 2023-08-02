@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service.chinese.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.pinyin.PinyinUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -220,26 +221,83 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
 
     @Override
     public ChineseMedicineSearchVO queryPage(String medicineCode, String medicineName, Integer pageNo, Integer pageSize) {
-        LambdaQueryWrapper<ChineseMedicineEntity> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName,
-                ChineseMedicineEntity::getMedicineAlias, ChineseMedicineEntity::getMaxDosage);
-        if (StringUtils.isNotBlank(medicineCode)) {
-            wrapper.eq(ChineseMedicineEntity::getMedicineCode, medicineCode);
-        }
-        if (StringUtils.isNotBlank(medicineName)) {
-            wrapper.like(ChineseMedicineEntity::getMedicineName, medicineName);
-        }
-        wrapper.orderByDesc(ChineseMedicineEntity::getCreatedAt);
-        Page<ChineseMedicineEntity> page = new Page<>(pageNo, pageSize);
-        List<ChineseMedicineEntity> records = page(page, wrapper).getRecords();
-        long total = page.getTotal();
-        List<ChineseMedicineResponse> chineseMedicineResponses = buildChineseMedicineResponse(records);
         ChineseMedicineSearchVO chineseMedicineSearchVO = new ChineseMedicineSearchVO();
+        chineseMedicineSearchVO.setMedicineResponses(Lists.newArrayList());
         chineseMedicineSearchVO.setPageNo(pageNo);
         chineseMedicineSearchVO.setPageSize(pageSize);
-        chineseMedicineSearchVO.setTotal((int) total);
+        chineseMedicineSearchVO.setTotal(0L);
+        // 1.根据条件分页查询中药材库
+        LambdaQueryWrapper<ChineseMedicineEntity> wrapper = new LambdaQueryWrapper<ChineseMedicineEntity>()
+                .select(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName, ChineseMedicineEntity::getMedicineAlias, ChineseMedicineEntity::getMaxDosage)
+                .eq(StringUtils.isNotBlank(medicineCode), ChineseMedicineEntity::getMedicineCode, medicineCode)
+                .like(StringUtils.isNotBlank(medicineName), ChineseMedicineEntity::getMedicineName, medicineName)
+                .orderByDesc(ChineseMedicineEntity::getId);
+        Page<ChineseMedicineEntity> chineseMedicineEntityPage = page(new Page<>(pageNo, pageSize), wrapper);
+        List<ChineseMedicineEntity> records = chineseMedicineEntityPage.getRecords();
+        if (CollectionUtil.isEmpty(records)) {
+            log.info("未查询到任何药材信息，查询参数为：{},{}", medicineCode, medicineName);
+            return chineseMedicineSearchVO;
+        }
+        // 2.组装参数返回
+        List<ChineseMedicineResponse> chineseMedicineResponses = buildChineseResponse(records);
+        chineseMedicineSearchVO.setTotal(chineseMedicineEntityPage.getTotal());
         chineseMedicineSearchVO.setMedicineResponses(chineseMedicineResponses);
         return chineseMedicineSearchVO;
+    }
+
+    /**
+     * 查询所有药材并导出
+     *
+     * @param medicineCode
+     * @param medicineName
+     * @author liuqiuyi
+     * @date 2023/8/2 16:54
+     */
+    @Override
+    public List<ChineseMedicineResponse> queryMedicineExport(String medicineCode, String medicineName) {
+        // 1.查询所有药材信息
+        LambdaQueryWrapper<ChineseMedicineEntity> wrapper = new LambdaQueryWrapper<ChineseMedicineEntity>()
+                .select(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName, ChineseMedicineEntity::getMedicineAlias, ChineseMedicineEntity::getMaxDosage)
+                .eq(StringUtils.isNotBlank(medicineCode), ChineseMedicineEntity::getMedicineCode, medicineCode)
+                .like(StringUtils.isNotBlank(medicineName), ChineseMedicineEntity::getMedicineName, medicineName)
+                .orderByDesc(ChineseMedicineEntity::getId);
+        List<ChineseMedicineEntity> chineseMedicineEntityList = baseMapper.selectList(wrapper);
+        if (CollectionUtil.isEmpty(chineseMedicineEntityList)) {
+            log.info("未查询到任何药材信息，查询参数为：{},{}", medicineCode, medicineName);
+            return Lists.newArrayList();
+        }
+        // 2.组装参数后返回
+        return buildChineseResponse(chineseMedicineEntityList);
+    }
+
+    private List<ChineseMedicineResponse> buildChineseResponse(List<ChineseMedicineEntity> records) {
+        // 2.查询所有的相反药材
+        Map<String, List<String>> medicineCodeMedicineConflictCodesMap = chineseMedicineConflictService.listAllConflictEntity().stream()
+                .filter(chineseMedicineConflictEntity -> StrUtil.isNotBlank(chineseMedicineConflictEntity.getMedicineConflictCodes()))
+                .collect(Collectors.toMap(ChineseMedicineConflictEntity::getMedicineCode, dto -> Lists.newArrayList(dto.getMedicineConflictCodes().split(",")), (v1, v2) -> v1));
+        // 3.根据相反药材的code，查询药材表
+        Set<String> conflictCodes = medicineCodeMedicineConflictCodesMap.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
+        Map<String, String> conflictCodeNameMap = getByMedicineCode(conflictCodes).stream().collect(Collectors.toMap(ChineseMedicineEntity::getMedicineCode, ChineseMedicineEntity::getMedicineName, (v1, v2) -> v1));
+        // 4.组装最终的结果
+        return records.stream().map(chineseMedicineEntity -> {
+            ChineseMedicineResponse chineseMedicineResponse = ChineseMedicineResponse.builder()
+                    .medicineId(chineseMedicineEntity.getId())
+                    .medicineCode(chineseMedicineEntity.getMedicineCode())
+                    .name(chineseMedicineEntity.getMedicineName())
+                    .aliNames(chineseMedicineEntity.getMedicineAlias())
+                    .maxDosage(chineseMedicineEntity.getMaxDosage())
+                    .build();
+            // 设置相反药材
+            if (medicineCodeMedicineConflictCodesMap.containsKey(chineseMedicineEntity.getMedicineCode())) {
+                List<ChineseMedicineResponse.ChineseConflictMedicine> chineseConflictMedicineList = medicineCodeMedicineConflictCodesMap.get(chineseMedicineEntity.getMedicineCode()).stream().map(conflictCode ->
+                        ChineseMedicineResponse.ChineseConflictMedicine.builder()
+                                .medicineCode(conflictCode)
+                                .name(conflictCodeNameMap.get(conflictCode))
+                                .build()).collect(Collectors.toList());
+                chineseMedicineResponse.setChineseConflictMedicineList(chineseConflictMedicineList);
+            }
+            return chineseMedicineResponse;
+        }).collect(Collectors.toList());
     }
 
     /**

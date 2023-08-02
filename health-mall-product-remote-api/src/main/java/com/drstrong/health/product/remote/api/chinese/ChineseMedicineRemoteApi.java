@@ -59,6 +59,16 @@ public interface ChineseMedicineRemoteApi {
     ResultVO<ChineseMedicineSearchVO> queryMedicinePage(@RequestBody ChineseMedicineSearchRequest chineseMedicineSearchRequest);
 
     /**
+     * 药材信息导出
+     *
+     * @author liuqiuyi
+     * @date 2023/8/2 16:52
+     */
+    @ApiOperation("药材信息导出")
+    @PostMapping("/searchList/export")
+    ResultVO<List<ChineseMedicineResponse>> queryMedicineExport(@RequestBody ChineseMedicineSearchRequest chineseMedicineSearchRequest);
+
+    /**
      *
      * 所有药材查询  用于新增药材添加相反药材时检索所有药材
      * @param chineseMedicineSearchRequest 请求体

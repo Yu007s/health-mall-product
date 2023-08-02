@@ -62,6 +62,10 @@ public class ChineseMedicineController implements ChineseMedicineRemoteApi {
         return ResultVO.success(chineseMedicineSearchVO);
     }
 
+    @Override
+    public ResultVO<List<ChineseMedicineResponse>> queryMedicineExport(ChineseMedicineSearchRequest chineseMedicineSearchRequest) {
+        return ResultVO.success(chineseMedicineService.queryMedicineExport(chineseMedicineSearchRequest.getMedicineCode(), chineseMedicineSearchRequest.getMedicineName()));
+    }
 
     @ApiOperation("所有药材查询")
     @Override

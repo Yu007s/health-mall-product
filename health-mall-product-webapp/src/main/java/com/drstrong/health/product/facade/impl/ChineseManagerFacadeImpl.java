@@ -415,7 +415,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 			}
 			// 如果是修改,且修改前后 skuName 不一样,也需要校验 skuName 是否重复
 			if (!Objects.equals(skuInfoEntity.getSkuName(), saveOrUpdateSkuVO.getSkuName())) {
-				chineseSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateSkuVO.getSkuName(), saveOrUpdateSkuVO.getStoreId());
+				chineseSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateSkuVO.getSkuName(), saveOrUpdateSkuVO.getStoreId(), saveOrUpdateSkuVO.getSkuCode());
 			}
 			operationLog.setChangeBeforeData(JSONUtil.toJsonStr(skuInfoEntity));
 		} else {
@@ -425,7 +425,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 				throw new BusinessException(ErrorEnums.CHINESE_IS_REPEAT);
 			}
 			// 5.校验相同店铺下,sku名称是否重复添加
-			chineseSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateSkuVO.getSkuName(), saveOrUpdateSkuVO.getStoreId());
+			chineseSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateSkuVO.getSkuName(), saveOrUpdateSkuVO.getStoreId(), null);
 		}
 	}
 
