@@ -3,6 +3,7 @@ package com.drstrong.health.product.facade.medicine;
 
 import com.drstrong.health.product.model.dto.medicine.MedicineWarehouseBaseDTO;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
+import com.drstrong.health.product.model.request.medicine.MedicineCodeRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
 
@@ -32,9 +33,19 @@ public interface MedicineWarehouseBaseFacade {
 
     /**
      * 根据code查询
+     * fixme 刘秋意 该方法废弃，全部统一使用下面的方法
      *
      * @author liuqiuyi
      * @date 2023/6/20 14:55
      */
+    @Deprecated
     MedicineWarehouseBaseDTO queryByCode(String code);
+
+    /**
+     * 根据code参数查询
+     *
+     * @author liuqiuyi
+     * @date 2023/8/3 16:29
+     */
+    com.drstrong.health.product.model.dto.medicine.v2.MedicineWarehouseBaseDTO queryBaseDtoByTypeAndCode(MedicineCodeRequest medicineCodeRequest);
 }

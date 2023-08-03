@@ -9,6 +9,7 @@ import com.drstrong.health.product.model.dto.medicine.ChineseMedicineBaseDTO;
 import com.drstrong.health.product.model.dto.medicine.MedicineWarehouseBaseDTO;
 import com.drstrong.health.product.model.entity.chinese.ChineseMedicineEntity;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
+import com.drstrong.health.product.model.request.medicine.MedicineCodeRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
@@ -76,6 +77,33 @@ public class ChineseMedicineFacadeImpl implements MedicineWarehouseBaseFacade {
             return null;
         }
         return buildChineseMedicineBaseDTO(chineseMedicineEntity);
+    }
+
+    /**
+     * 根据code参数查询
+     *
+     * @param medicineCodeRequest
+     * @author liuqiuyi
+     * @date 2023/8/3 16:29
+     */
+    @Override
+    public com.drstrong.health.product.model.dto.medicine.v2.MedicineWarehouseBaseDTO queryBaseDtoByTypeAndCode(MedicineCodeRequest medicineCodeRequest) {
+        com.drstrong.health.product.model.dto.medicine.v2.MedicineWarehouseBaseDTO medicineWarehouseBaseDTO = new com.drstrong.health.product.model.dto.medicine.v2.MedicineWarehouseBaseDTO();
+        medicineWarehouseBaseDTO.setProductType(queryProductType().getCode());
+        medicineWarehouseBaseDTO.setProductTypeName(queryProductType().getValue());
+        ChineseMedicineEntity chineseMedicineEntity = chineseMedicineService.getByMedicineCode(medicineCodeRequest.getMedicineCode());
+        if (ObjectUtil.isNull(chineseMedicineEntity)) {
+            log.info("未查询到中药材信息，查询的参数为：{}", JSONUtil.toJsonStr(medicineCodeRequest));
+            return medicineWarehouseBaseDTO;
+        }
+        com.drstrong.health.product.model.dto.medicine.v2.ChineseMedicineBaseDTO chineseMedicineBaseDTO = new com.drstrong.health.product.model.dto.medicine.v2.ChineseMedicineBaseDTO();
+        chineseMedicineBaseDTO.setMedicineId(chineseMedicineEntity.getId());
+        chineseMedicineBaseDTO.setMedicineCode(chineseMedicineEntity.getMedicineCode());
+        chineseMedicineBaseDTO.setMedicineName(chineseMedicineEntity.getMedicineName());
+        chineseMedicineBaseDTO.setAliNames(chineseMedicineEntity.getMedicineAlias());
+        chineseMedicineBaseDTO.setMaxDosage(chineseMedicineEntity.getMaxDosage());
+        medicineWarehouseBaseDTO.setChineseMedicineBaseDTO(chineseMedicineBaseDTO);
+        return medicineWarehouseBaseDTO;
     }
 
     /**

@@ -3,6 +3,8 @@ package com.drstrong.health.product.remote.api.medicine;
 import com.drstrong.health.product.model.dto.medicine.AgreementPrescriptionMedicineBaseDTO;
 import com.drstrong.health.product.model.dto.medicine.ChineseMedicineBaseDTO;
 import com.drstrong.health.product.model.dto.medicine.WesternMedicineBaseDTO;
+import com.drstrong.health.product.model.dto.medicine.v2.MedicineWarehouseBaseDTO;
+import com.drstrong.health.product.model.request.medicine.MedicineCodeRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 药材库的远程接口
@@ -48,4 +51,13 @@ public interface MedicineWarehouseRemoteApi {
      */
     @PostMapping("/page/chinese/query")
     ResultVO<PageVO<ChineseMedicineBaseDTO>> pageChineseQuery(@RequestBody @Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest);
+
+    /**
+     * 根据类型查询药材库基础信息
+     *
+     * @author liuqiuyi
+     * @date 2023/8/3 16:26
+     */
+    @PostMapping("/query-by-type")
+    ResultVO<MedicineWarehouseBaseDTO> queryBaseDtoByTypeAndCode(@RequestBody @Valid MedicineCodeRequest medicineCodeRequest);
 }

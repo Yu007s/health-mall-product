@@ -9,6 +9,7 @@ import com.drstrong.health.product.model.dto.medicine.MedicineWarehouseBaseDTO;
 import com.drstrong.health.product.model.dto.medicine.WesternMedicineBaseDTO;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
+import com.drstrong.health.product.model.request.medicine.MedicineCodeRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
@@ -84,6 +85,30 @@ public class WesternMedicineSpecificationFacadeImpl implements MedicineWarehouse
             return null;
         }
         return buildWesternMedicineBaseDTO(westernMedicineSpecificationsEntity);
+    }
+
+    /**
+     * 根据code参数查询
+     *
+     * @param medicineCodeRequest
+     * @author liuqiuyi
+     * @date 2023/8/3 16:29
+     */
+    @Override
+    public com.drstrong.health.product.model.dto.medicine.v2.MedicineWarehouseBaseDTO queryBaseDtoByTypeAndCode(MedicineCodeRequest medicineCodeRequest) {
+        com.drstrong.health.product.model.dto.medicine.v2.MedicineWarehouseBaseDTO medicineWarehouseBaseDTO = new com.drstrong.health.product.model.dto.medicine.v2.MedicineWarehouseBaseDTO();
+        medicineWarehouseBaseDTO.setProductType(queryProductType().getCode());
+        medicineWarehouseBaseDTO.setProductTypeName(queryProductType().getValue());
+        WesternMedicineSpecificationsEntity westernMedicineSpecificationsEntity = westernMedicineSpecificationsService.queryByCode(medicineCodeRequest.getMedicineCode());
+        if (ObjectUtil.isNull(westernMedicineSpecificationsEntity)) {
+            log.info("未查询到西药信息，查询的参数为：{}", JSONUtil.toJsonStr(medicineCodeRequest));
+            return medicineWarehouseBaseDTO;
+        }
+        com.drstrong.health.product.model.dto.medicine.v2.WesternMedicineBaseDTO westernMedicineBaseDTO = new com.drstrong.health.product.model.dto.medicine.v2.WesternMedicineBaseDTO();
+        westernMedicineBaseDTO.setMedicineCode(westernMedicineSpecificationsEntity.getSpecCode());
+        westernMedicineBaseDTO.setMedicineName(westernMedicineSpecificationsEntity.getSpecName());
+        medicineWarehouseBaseDTO.setWesternMedicineBaseDTO(westernMedicineBaseDTO);
+        return medicineWarehouseBaseDTO;
     }
 
     private WesternMedicineBaseDTO buildWesternMedicineBaseDTO(WesternMedicineSpecificationsEntity westernMedicineSpecificationsEntity) {

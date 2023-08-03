@@ -9,6 +9,7 @@ import com.drstrong.health.product.model.dto.medicine.AgreementPrescriptionMedic
 import com.drstrong.health.product.model.dto.medicine.MedicineWarehouseBaseDTO;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
+import com.drstrong.health.product.model.request.medicine.MedicineCodeRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicineService;
@@ -84,6 +85,34 @@ public class AgreementPrescriptionMedicineFacadeImpl implements MedicineWarehous
             return null;
         }
         return buildAgreementPrescriptionMedicineBaseDTO(agreementPrescriptionMedicineEntity);
+    }
+
+    /**
+     * 根据参数查询
+     *
+     * @param medicineCodeRequest
+     * @author liuqiuyi
+     * @date 2023/8/3 16:29
+     */
+    @Override
+    public com.drstrong.health.product.model.dto.medicine.v2.MedicineWarehouseBaseDTO queryBaseDtoByTypeAndCode(MedicineCodeRequest medicineCodeRequest) {
+        com.drstrong.health.product.model.dto.medicine.v2.MedicineWarehouseBaseDTO medicineWarehouseBaseDTO = new com.drstrong.health.product.model.dto.medicine.v2.MedicineWarehouseBaseDTO();
+        medicineWarehouseBaseDTO.setProductType(queryProductType().getCode());
+        medicineWarehouseBaseDTO.setProductTypeName(queryProductType().getValue());
+        // 1.查询参数
+        AgreementPrescriptionMedicineEntity agreementPrescriptionMedicineEntity = agreementPrescriptionMedicineService.queryByCode(medicineCodeRequest.getMedicineCode());
+        if (ObjectUtil.isNull(agreementPrescriptionMedicineEntity)) {
+            log.info("未查询到协定方信息，查询的参数为：{}", JSONUtil.toJsonStr(medicineCodeRequest));
+            return medicineWarehouseBaseDTO;
+        }
+        com.drstrong.health.product.model.dto.medicine.v2.AgreementPrescriptionMedicineBaseDTO agreementPrescriptionMedicineBaseDTO = new com.drstrong.health.product.model.dto.medicine.v2.AgreementPrescriptionMedicineBaseDTO();
+        agreementPrescriptionMedicineBaseDTO.setMedicineId(agreementPrescriptionMedicineEntity.getId());
+        agreementPrescriptionMedicineBaseDTO.setMedicineCode(agreementPrescriptionMedicineEntity.getMedicineCode());
+        agreementPrescriptionMedicineBaseDTO.setMedicineName(agreementPrescriptionMedicineEntity.getMedicineName());
+        agreementPrescriptionMedicineBaseDTO.setFullName(agreementPrescriptionMedicineEntity.getFullName());
+
+        medicineWarehouseBaseDTO.setAgreementPrescriptionMedicineBaseDTO(agreementPrescriptionMedicineBaseDTO);
+        return medicineWarehouseBaseDTO;
     }
 
     private AgreementPrescriptionMedicineBaseDTO buildAgreementPrescriptionMedicineBaseDTO(AgreementPrescriptionMedicineEntity agreementPrescriptionMedicineEntity) {

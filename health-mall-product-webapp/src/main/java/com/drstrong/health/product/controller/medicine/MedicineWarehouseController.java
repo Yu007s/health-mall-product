@@ -4,6 +4,8 @@ import com.drstrong.health.product.facade.medicine.MedicineWarehouseFacadeHolder
 import com.drstrong.health.product.model.dto.medicine.AgreementPrescriptionMedicineBaseDTO;
 import com.drstrong.health.product.model.dto.medicine.ChineseMedicineBaseDTO;
 import com.drstrong.health.product.model.dto.medicine.WesternMedicineBaseDTO;
+import com.drstrong.health.product.model.dto.medicine.v2.MedicineWarehouseBaseDTO;
+import com.drstrong.health.product.model.request.medicine.MedicineCodeRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
 import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.result.ResultVO;
@@ -41,5 +43,11 @@ public class MedicineWarehouseController implements MedicineWarehouseRemoteApi {
     public ResultVO<PageVO<ChineseMedicineBaseDTO>> pageChineseQuery(@Valid MedicineWarehouseQueryRequest medicineWarehouseQueryRequest) {
         return ResultVO.success(medicineWarehouseFacadeHolder.getMedicineWarehouseFacade(medicineWarehouseQueryRequest.getProductType())
                 .pageQuery(medicineWarehouseQueryRequest));
+    }
+
+    @Override
+    public ResultVO<MedicineWarehouseBaseDTO> queryBaseDtoByTypeAndCode(@Valid MedicineCodeRequest medicineCodeRequest) {
+        return ResultVO.success(medicineWarehouseFacadeHolder.getMedicineWarehouseFacade(medicineCodeRequest.getProductType())
+                .queryBaseDtoByTypeAndCode(medicineCodeRequest));
     }
 }
