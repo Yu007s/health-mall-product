@@ -1,6 +1,8 @@
 package com.drstrong.health.product.controller.medicine;
 
 
+import cn.hutool.core.lang.Pair;
+import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineSpecRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
@@ -10,12 +12,14 @@ import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.medicine.WesternMedicineRemoteApi;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -36,6 +40,9 @@ public class WesternMedicineController implements WesternMedicineRemoteApi {
 
     @Autowired
     private WesternMedicineSpecificationsService specificationsService;
+
+    @Resource
+    ChangeEventSendUtil changeEventSendUtil;
 
     @Override
     public ResultVO<Long> saveOrUpdateMedicine(@RequestBody @Valid AddOrUpdateMedicineRequest medicineRequest) {
@@ -59,7 +66,9 @@ public class WesternMedicineController implements WesternMedicineRemoteApi {
 
     @Override
     public ResultVO<Long> saveOrUpdateMedicineSpec(@Valid AddOrUpdateMedicineSpecRequest specRequest) {
-        return ResultVO.success(specificationsService.saveOrUpdateMedicineSpec(specRequest));
+        Pair<Long, String> idSpecCodePair = specificationsService.saveOrUpdateMedicineSpec(specRequest);
+        changeEventSendUtil.sendMedicineWarehouseChangeEvent(idSpecCodePair.getValue(), ProductTypeEnum.MEDICINE);
+        return ResultVO.success(idSpecCodePair.getKey());
     }
 
     @Override

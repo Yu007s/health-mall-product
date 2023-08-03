@@ -72,7 +72,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean save(ChineseMedicineVO chineseMedicineVO) {
+    public String saveOrUpdate(ChineseMedicineVO chineseMedicineVO) {
         OperationLog operationLog = new OperationLog();
 
         Long userId = chineseMedicineVO.getUserId();
@@ -143,7 +143,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         chineseMedicineConflictEntity.setMedicineCode(medicineCode);
         chineseMedicineConflictEntity.setMedicineConflictCodes(collect);
         chineseMedicineConflictService.saveOrUpdate(chineseMedicineConflictEntity, userId);
-        boolean saveOrUpdate = super.saveOrUpdate(chineseMedicineEntity);
+        super.saveOrUpdate(chineseMedicineEntity);
         // 组装操作日志
         operationLog.setBusinessId(chineseMedicineEntity.getMedicineCode());
         operationLog.setOperationType(OperationLogConstant.MALL_PRODUCT_CHINESE_MEDICINE_CHANGE);
@@ -152,7 +152,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         operationLog.setOperationUserId(userId);
         operationLog.setOperationUserType(OperateTypeEnum.CMS.getCode());
         changeEventSendUtil.sendOperationLog(operationLog);
-        return saveOrUpdate;
+        return chineseMedicineEntity.getMedicineCode();
     }
 
     @Override

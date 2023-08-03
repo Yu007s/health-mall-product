@@ -11,6 +11,7 @@ import com.drstrong.health.common.utils.IdWorker;
 import com.drstrong.health.product.config.MqTopicConfig;
 import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
+import com.drstrong.health.product.mq.model.change.MedicineWarehouseChangeEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -70,17 +71,20 @@ public class ChangeEventSendUtil extends MqMessageUtil {
 
     /**
      * 发送 药材库名称 变动事件
+	 * <p> 由于ware服务冗余了药材名称，所以需要在信息变更后发送MQ告知修改 </>
      *
      * @author liuqiuyi
      * @date 2023/8/3 10:42
      */
     public void sendMedicineWarehouseChangeEvent(String uniqueCode, ProductTypeEnum productTypeEnum) {
-        try {
-
-
-            super.sendMsg(mqTopicConfig.getLogTopic(), mqTopicConfig.getLogTag(), baseMessage);
+		MedicineWarehouseChangeEvent medicineWarehouseChangeEvent = MedicineWarehouseChangeEvent.builder()
+				.medicineCode(uniqueCode)
+				.productType(productTypeEnum.getCode())
+				.build();
+		try {
+			super.sendMsg(mqTopicConfig.getProductChangeTopic(), mqTopicConfig.getProductChangeTag(), medicineWarehouseChangeEvent);
         } catch (Throwable e) {
-            log.error("发送商品操作日志失败,参数为:{},异常信息为:{}", JSONUtil.toJsonStr(operationLog), e);
+            log.error("发送药材库变更操作失败,参数为:{},异常信息为:{}", JSONUtil.toJsonStr(medicineWarehouseChangeEvent), e);
         }
     }
 }

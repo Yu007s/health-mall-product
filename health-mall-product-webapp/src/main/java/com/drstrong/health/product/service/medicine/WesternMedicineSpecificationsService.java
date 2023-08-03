@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.medicine;
 
+import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
@@ -26,7 +27,7 @@ public interface WesternMedicineSpecificationsService extends IService<WesternMe
      *
      * @param specRequest
      */
-    Long saveOrUpdateMedicineSpec(AddOrUpdateMedicineSpecRequest specRequest);
+    Pair<Long, String> saveOrUpdateMedicineSpec(AddOrUpdateMedicineSpecRequest specRequest);
 
     /**
      * 规格详情

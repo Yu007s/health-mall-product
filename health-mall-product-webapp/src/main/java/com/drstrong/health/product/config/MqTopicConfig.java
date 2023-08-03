@@ -43,4 +43,10 @@ public class MqTopicConfig {
 
 	@Value("${health.log.tag}")
 	private String logTag;
+
+	@Value("${product.change.topic}")
+	private String productChangeTopic;
+
+	@Value("${product.change.tag}")
+	private String productChangeTag;
 }

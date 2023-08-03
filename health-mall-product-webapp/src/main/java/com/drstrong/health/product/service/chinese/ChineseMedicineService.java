@@ -25,7 +25,7 @@ public interface ChineseMedicineService {
      * @param chineseMedicineVO 中药材提交的相应信息
      * @return 成功与否
      */
-    boolean save(ChineseMedicineVO chineseMedicineVO);
+    String saveOrUpdate(ChineseMedicineVO chineseMedicineVO);
 
 
 	/**

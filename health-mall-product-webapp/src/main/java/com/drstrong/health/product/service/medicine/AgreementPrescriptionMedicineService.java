@@ -1,5 +1,6 @@
 package com.drstrong.health.product.service.medicine;
 
+import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
@@ -25,7 +26,7 @@ public interface AgreementPrescriptionMedicineService extends IService<Agreement
      *
      * @param request
      */
-    Long saveOrUpdateAgreementPrescription(AddOrUpdateAgreementRequest request);
+    Pair<Long,String> saveOrUpdateAgreementPrescription(AddOrUpdateAgreementRequest request);
 
 
     /**

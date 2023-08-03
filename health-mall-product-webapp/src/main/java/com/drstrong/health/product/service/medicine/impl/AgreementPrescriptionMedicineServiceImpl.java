@@ -2,6 +2,7 @@ package com.drstrong.health.product.service.medicine.impl;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Pair;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
@@ -55,7 +56,7 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long saveOrUpdateAgreementPrescription(AddOrUpdateAgreementRequest request) {
+    public Pair<Long,String> saveOrUpdateAgreementPrescription(AddOrUpdateAgreementRequest request) {
         AgreementPrescriptionMedicineEntity prescriptionMedicineEntity = buildAgreementPrescriptionEntity(request);
         //保存更新协定方
         saveOrUpdate(prescriptionMedicineEntity);
@@ -79,7 +80,7 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
                 OperateTypeEnum.CMS.getCode(), logJsonStr);
         log.info("协定方操作日志记录,param：{}", JSON.toJSONString(operationLog));
         changeEventSendUtil.sendOperationLog(operationLog);
-        return prescriptionMedicineEntity.getId();
+        return new Pair<>(prescriptionMedicineEntity.getId(), prescriptionMedicineEntity.getMedicineCode());
     }
 
     private String buildOperateContent(boolean updateFlag, String medicineCode) {

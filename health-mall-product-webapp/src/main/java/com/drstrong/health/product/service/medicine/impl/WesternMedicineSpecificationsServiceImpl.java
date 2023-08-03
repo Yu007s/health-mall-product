@@ -2,6 +2,7 @@ package com.drstrong.health.product.service.medicine.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
@@ -65,7 +66,7 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long saveOrUpdateMedicineSpec(AddOrUpdateMedicineSpecRequest specRequest) {
+    public Pair<Long, String> saveOrUpdateMedicineSpec(AddOrUpdateMedicineSpecRequest specRequest) {
         WesternMedicineEntity westernMedicine = westernMedicineService.queryByMedicineId(specRequest.getMedicineId());
         Assert.notNull(westernMedicine, "西药不存在");
         WesternMedicineSpecificationsEntity specifications = BeanUtil.copyProperties(specRequest, WesternMedicineSpecificationsEntity.class);
@@ -103,7 +104,7 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
                 OperateTypeEnum.CMS.getCode(), logJsonStr);
         log.info("药品规格操作日志记录,param：{}", JSON.toJSONString(operationLog));
         changeEventSendUtil.sendOperationLog(operationLog);
-        return specifications.getId();
+        return new Pair<>(specifications.getId(), specifications.getSpecCode());
     }
 
     @Override

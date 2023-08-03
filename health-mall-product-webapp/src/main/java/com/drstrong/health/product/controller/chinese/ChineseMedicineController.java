@@ -1,6 +1,7 @@
 package com.drstrong.health.product.controller.chinese;
 
 
+import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.chinese.ChineseMedicineSearchRequest;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineInfoResponse;
 import com.drstrong.health.product.model.response.chinese.ChineseMedicineResponse;
@@ -11,6 +12,7 @@ import com.drstrong.health.product.remote.api.chinese.ChineseMedicineRemoteApi;
 import com.drstrong.health.product.remote.model.SkuChineseAgencyDTO;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -37,10 +39,14 @@ public class ChineseMedicineController implements ChineseMedicineRemoteApi {
     @Resource
     private ChineseSkuInfoService chineseSkuInfoService;
 
+    @Resource
+    ChangeEventSendUtil changeEventSendUtil;
+
     @Override
     @ApiOperation("新建/编辑药材")
     public ResultVO<String> addMedicine(@RequestBody @Valid ChineseMedicineVO chineseMedicineVO)  {
-        chineseMedicineService.save(chineseMedicineVO);
+        String medicineCode = chineseMedicineService.saveOrUpdate(chineseMedicineVO);
+        changeEventSendUtil.sendMedicineWarehouseChangeEvent(medicineCode, ProductTypeEnum.CHINESE);
         return ResultVO.success("成功");
     }
 

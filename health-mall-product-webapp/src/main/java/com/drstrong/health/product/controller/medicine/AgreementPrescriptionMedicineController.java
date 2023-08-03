@@ -1,5 +1,7 @@
 package com.drstrong.health.product.controller.medicine;
 
+import cn.hutool.core.lang.Pair;
+import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateAgreementRequest;
 import com.drstrong.health.product.model.request.medicine.WesternMedicineRequest;
 import com.drstrong.health.product.model.response.PageVO;
@@ -8,10 +10,13 @@ import com.drstrong.health.product.model.response.medicine.AgreementPrescription
 import com.drstrong.health.product.model.response.result.ResultVO;
 import com.drstrong.health.product.remote.api.medicine.AgreementPrescriptionRemoteApi;
 import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicineService;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * <p>
@@ -29,9 +34,14 @@ public class AgreementPrescriptionMedicineController implements AgreementPrescri
     @Autowired
     private AgreementPrescriptionMedicineService agreementPrescriptionMedicineService;
 
+    @Resource
+    ChangeEventSendUtil changeEventSendUtil;
+
     @Override
     public ResultVO<Long> saveOrUpdateAgreementPrescription(AddOrUpdateAgreementRequest request) {
-        return ResultVO.success(agreementPrescriptionMedicineService.saveOrUpdateAgreementPrescription(request));
+        Pair<Long, String> idCodePair = agreementPrescriptionMedicineService.saveOrUpdateAgreementPrescription(request);
+        changeEventSendUtil.sendMedicineWarehouseChangeEvent(idCodePair.getValue(), ProductTypeEnum.AGREEMENT);
+        return ResultVO.success(idCodePair.getKey());
     }
 
     @Override
