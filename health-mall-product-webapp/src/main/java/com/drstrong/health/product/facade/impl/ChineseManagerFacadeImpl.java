@@ -36,7 +36,7 @@ import com.drstrong.health.product.service.store.StoreLinkSupplierService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.util.RedisKeyUtils;
-import com.drstrong.health.product.utils.OperationLogSendUtil;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import com.drstrong.health.ware.model.response.SkuStockResponse;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.google.common.collect.Lists;
@@ -87,7 +87,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 	StoreLinkSupplierService storeLinkSupplierService;
 
 	@Resource
-	private OperationLogSendUtil operationLogSendUtil;
+	private ChangeEventSendUtil changeEventSendUtil;
 
     /**
      * 中药管理页面，列表查询
@@ -206,7 +206,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 		operationLog.setOperateContent(OperationLogConstant.SAVE_UPDATE_SKU);
 		operationLog.setOperationUserId(saveOrUpdateSkuVO.getOperatorId());
 		operationLog.setOperationUserType(OperateTypeEnum.CMS.getCode());
-		operationLogSendUtil.sendOperationLog(operationLog);
+		changeEventSendUtil.sendOperationLog(operationLog);
     }
 
     /**
@@ -298,7 +298,7 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 					.operationUserId(operatorId)
 					.operationUserType(OperateTypeEnum.CMS.getCode())
 					.build();
-			operationLogSendUtil.sendOperationLog(operationLog);
+			changeEventSendUtil.sendOperationLog(operationLog);
 		});
 	}
 

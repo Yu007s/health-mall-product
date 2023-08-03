@@ -26,7 +26,7 @@ import com.drstrong.health.product.model.response.medicine.AgreementPrescription
 import com.drstrong.health.product.model.response.medicine.AgreementPrescriptionSimpleInfoVO;
 import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicineService;
 import com.drstrong.health.product.service.medicine.MedicineUsageService;
-import com.drstrong.health.product.utils.OperationLogSendUtil;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
     private MedicineUsageService medicineUsageService;
 
     @Autowired
-    private OperationLogSendUtil operationLogSendUtil;
+    private ChangeEventSendUtil changeEventSendUtil;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -78,7 +78,7 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
                 buildOperateContent(ObjectUtil.isNotNull(request.getId()), prescriptionMedicineEntity.getMedicineCode()), request.getUserId(), request.getUserName(),
                 OperateTypeEnum.CMS.getCode(), logJsonStr);
         log.info("协定方操作日志记录,param：{}", JSON.toJSONString(operationLog));
-        operationLogSendUtil.sendOperationLog(operationLog);
+        changeEventSendUtil.sendOperationLog(operationLog);
         return prescriptionMedicineEntity.getId();
     }
 

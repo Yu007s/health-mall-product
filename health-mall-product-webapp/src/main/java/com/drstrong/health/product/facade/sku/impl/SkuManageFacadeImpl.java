@@ -42,7 +42,7 @@ import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.util.RedisKeyUtils;
-import com.drstrong.health.product.utils.OperationLogSendUtil;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.drstrong.health.ware.model.response.SkuStockResponse;
 import com.google.common.collect.Lists;
@@ -81,7 +81,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 	StoreSkuInfoService storeSkuInfoService;
 
 	@Resource
-	OperationLogSendUtil operationLogSendUtil;
+    ChangeEventSendUtil changeEventSendUtil;
 
 	@Resource
 	StockRemoteProService stockRemoteProService;
@@ -158,7 +158,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 		operationLog.setBusinessId(storeSkuInfoEntity.getSkuCode());
 		StoreSkuInfoEntity afterEntity = storeSkuInfoService.checkSkuExistByCode(storeSkuInfoEntity.getSkuCode(), null);
 		operationLog.setChangeAfterData(JSONUtil.toJsonStr(afterEntity));
-		operationLogSendUtil.sendOperationLog(operationLog);
+		changeEventSendUtil.sendOperationLog(operationLog);
 	}
 
 	/**
@@ -416,7 +416,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 					OperationLogConstant.SKU_STATUS_CHANGE, operatorId, operatorName,
 					OperateTypeEnum.CMS.getCode(), JSONUtil.toJsonStr(skuInfoEntity));
 			operationLog.setChangeAfterData(JSONUtil.toJsonStr(skuCodeInfoMap.get(skuInfoEntity.getSkuCode())));
-			operationLogSendUtil.sendOperationLog(operationLog);
+			changeEventSendUtil.sendOperationLog(operationLog);
 		});
 	}
 }

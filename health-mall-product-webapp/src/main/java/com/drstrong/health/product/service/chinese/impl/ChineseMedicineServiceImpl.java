@@ -31,7 +31,7 @@ import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineConflictService;
 import com.drstrong.health.product.service.chinese.ChineseMedicineService;
 import com.drstrong.health.product.service.chinese.ChineseSkuInfoService;
-import com.drstrong.health.product.utils.OperationLogSendUtil;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.google.common.collect.Lists;
@@ -68,7 +68,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
     SupplierRemoteProService supplierRemoteProService;
 
     @Resource
-    OperationLogSendUtil operationLogSendUtil;
+    ChangeEventSendUtil changeEventSendUtil;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -151,7 +151,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         operationLog.setChangeAfterData(JSONUtil.toJsonStr(chineseMedicineEntity));
         operationLog.setOperationUserId(userId);
         operationLog.setOperationUserType(OperateTypeEnum.CMS.getCode());
-        operationLogSendUtil.sendOperationLog(operationLog);
+        changeEventSendUtil.sendOperationLog(operationLog);
         return saveOrUpdate;
     }
 
@@ -196,7 +196,7 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
                 .operationUserId(userId)
                 .operationUserType(OperateTypeEnum.CMS.getCode())
                 .build();
-        operationLogSendUtil.sendOperationLog(operationLog);
+        changeEventSendUtil.sendOperationLog(operationLog);
     }
 
     @Override

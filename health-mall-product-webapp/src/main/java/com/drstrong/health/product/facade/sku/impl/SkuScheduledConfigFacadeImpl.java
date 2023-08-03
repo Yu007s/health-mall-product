@@ -18,7 +18,7 @@ import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRe
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.service.sku.SkuScheduledConfigService;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
-import com.drstrong.health.product.utils.OperationLogSendUtil;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class SkuScheduledConfigFacadeImpl implements SkuScheduledConfigFacade {
 	SkuScheduledConfigService skuScheduledConfigService;
 
 	@Resource
-	OperationLogSendUtil operationLogSendUtil;
+	ChangeEventSendUtil changeEventSendUtil;
 
 	@Resource
 	StoreSkuInfoService storeSkuInfoService;
@@ -89,7 +89,7 @@ public class SkuScheduledConfigFacadeImpl implements SkuScheduledConfigFacade {
 					OperationLogConstant.SKU_SCHEDULED_CONFIG_CHANGE, operatorId, operatorName,
 					OperateTypeEnum.CMS.getCode(), JSONUtil.toJsonStr(skuScheduledConfigEntity));
 			operationLog.setChangeAfterData(JSONUtil.toJsonStr(skuCodeInfoMap.get(skuScheduledConfigEntity.getSkuCode())));
-			operationLogSendUtil.sendOperationLog(operationLog);
+			changeEventSendUtil.sendOperationLog(operationLog);
 		});
 	}
 
@@ -130,7 +130,7 @@ public class SkuScheduledConfigFacadeImpl implements SkuScheduledConfigFacade {
 		// 4.发送操作日志
 		SkuScheduledConfigEntity changeAfterDataEntity = skuScheduledConfigService.getBySkuCode(scheduledSkuUpDownRequest.getSkuCode(), null);
 		operationLog.setChangeAfterData(JSONUtil.toJsonStr(changeAfterDataEntity));
-		operationLogSendUtil.sendOperationLog(operationLog);
+		changeEventSendUtil.sendOperationLog(operationLog);
 		// 5.将 sku 的状态更新为 预约上架或预约下架
 		Integer skuStatus = Objects.equals(ScheduledSkuUpDownRequest.SCHEDULED_UP, scheduledSkuUpDownRequest.getScheduledType()) ? UpOffEnum.SCHEDULED_UP.getCode() : UpOffEnum.SCHEDULED_DOWN.getCode();
 		storeSkuInfoService.batchUpdateSkuStatusByCodes(Sets.newHashSet(scheduledSkuUpDownRequest.getSkuCode()), skuStatus, scheduledSkuUpDownRequest.getOperatorId());

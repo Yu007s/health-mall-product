@@ -30,7 +30,7 @@ import com.drstrong.health.product.service.medicine.MedicineUsageService;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
 import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
 import com.drstrong.health.product.util.RedisKeyUtils;
-import com.drstrong.health.product.utils.OperationLogSendUtil;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import com.naiterui.common.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
     private MedicineUsageService medicineUsageService;
 
     @Autowired
-    private OperationLogSendUtil operationLogSendUtil;
+    private ChangeEventSendUtil changeEventSendUtil;
 
 
     @Override
@@ -102,7 +102,7 @@ public class WesternMedicineSpecificationsServiceImpl extends ServiceImpl<Wester
                 buildOperateContent(ObjectUtil.isNotNull(specRequest.getId()), specifications.getSpecCode()), specRequest.getUserId(), specRequest.getUserName(),
                 OperateTypeEnum.CMS.getCode(), logJsonStr);
         log.info("药品规格操作日志记录,param：{}", JSON.toJSONString(operationLog));
-        operationLogSendUtil.sendOperationLog(operationLog);
+        changeEventSendUtil.sendOperationLog(operationLog);
         return specifications.getId();
     }
 

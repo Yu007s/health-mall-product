@@ -35,7 +35,7 @@ import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.remote.log.LogApiServicePlus;
 import com.drstrong.health.product.service.medicine.WesternMedicineInstructionsService;
 import com.drstrong.health.product.service.medicine.WesternMedicineService;
-import com.drstrong.health.product.utils.OperationLogSendUtil;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,7 +63,7 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
     private WesternMedicineInstructionsService westernMedicineInstructionsService;
 
     @Autowired
-    private OperationLogSendUtil operationLogSendUtil;
+    private ChangeEventSendUtil changeEventSendUtil;
 
     @Autowired
     private LogApiServicePlus logApiService;
@@ -95,7 +95,7 @@ public class WesternMedicineServiceImpl extends ServiceImpl<WesternMedicineMappe
                 buildOperateContent(updateFlag, westernMedicineEntity.getMedicineCode()), addOrUpdateMedicineRequest.getUserId(), addOrUpdateMedicineRequest.getUserName(),
                 OperateTypeEnum.CMS.getCode(), logJsonStr);
         log.info("药品操作日志记录,param：{}", JSON.toJSONString(operationLog));
-        operationLogSendUtil.sendOperationLog(operationLog);
+        changeEventSendUtil.sendOperationLog(operationLog);
         return westernMedicineEntity.getId();
     }
 

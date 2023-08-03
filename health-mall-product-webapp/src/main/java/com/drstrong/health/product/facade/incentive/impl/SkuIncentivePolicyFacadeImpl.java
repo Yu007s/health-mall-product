@@ -31,7 +31,7 @@ import com.drstrong.health.product.service.label.LabelInfoService;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
-import com.drstrong.health.product.utils.OperationLogSendUtil;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -64,7 +64,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	SkuIncentivePolicyService skuIncentivePolicyService;
 
 	@Resource
-	private OperationLogSendUtil operationLogSendUtil;
+	private ChangeEventSendUtil changeEventSendUtil;
 
 	@Resource
 	StoreSkuInfoService storeSkuInfoService;
@@ -129,7 +129,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 		skuIncentivePolicyEntity.setChangedAt(LocalDateTime.now());
 		skuIncentivePolicyService.saveOrUpdate(skuIncentivePolicyEntity);
 		// 2.保存操作日志
-		operationLogSendUtil.sendOperationLog(operationLog);
+		changeEventSendUtil.sendOperationLog(operationLog);
 	}
 
 	/**

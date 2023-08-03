@@ -10,6 +10,7 @@ import com.drstrong.health.common.mq.BaseMessage;
 import com.drstrong.health.common.utils.IdWorker;
 import com.drstrong.health.product.config.MqTopicConfig;
 import com.drstrong.health.product.model.OperationLog;
+import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +20,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 商品、药材库、sku 等变动事件的统一推送入口
+ *
  * @author liuqiuyi
  * @date 2022/11/1 11:24
  */
 @Slf4j
 @Component
-public class OperationLogSendUtil extends MqMessageUtil {
+public class ChangeEventSendUtil extends MqMessageUtil {
 	@Resource
 	MqTopicConfig mqTopicConfig;
 
@@ -64,4 +67,20 @@ public class OperationLogSendUtil extends MqMessageUtil {
 			log.error("发送商品操作日志失败,参数为:{},异常信息为:{}", JSONUtil.toJsonStr(operationLog), e);
 		}
 	}
+
+    /**
+     * 发送 药材库名称 变动事件
+     *
+     * @author liuqiuyi
+     * @date 2023/8/3 10:42
+     */
+    public void sendMedicineWarehouseChangeEvent(String uniqueCode, ProductTypeEnum productTypeEnum) {
+        try {
+
+
+            super.sendMsg(mqTopicConfig.getLogTopic(), mqTopicConfig.getLogTag(), baseMessage);
+        } catch (Throwable e) {
+            log.error("发送商品操作日志失败,参数为:{},异常信息为:{}", JSONUtil.toJsonStr(operationLog), e);
+        }
+    }
 }

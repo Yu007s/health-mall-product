@@ -22,7 +22,7 @@ import com.drstrong.health.product.service.postage.StorePostageService;
 import com.drstrong.health.product.service.store.StoreLinkSupplierService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
-import com.drstrong.health.product.utils.OperationLogSendUtil;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,7 @@ public class StorePostageFacadeImpl implements StorePostageFacade {
 	StorePostageService storePostageService;
 
 	@Resource
-	OperationLogSendUtil operationLogSendUtil;
+	ChangeEventSendUtil changeEventSendUtil;
 
 	@Resource
 	StoreLinkSupplierService storeLinkSupplierService;
@@ -97,7 +97,7 @@ public class StorePostageFacadeImpl implements StorePostageFacade {
 			operationLog.setChangeAfterData(JSONUtil.toJsonStr(storePostageEntity));
 		}
 		// 2.记录操作日志
-		operationLogSendUtil.sendOperationLog(operationLog);
+		changeEventSendUtil.sendOperationLog(operationLog);
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class StorePostageFacadeImpl implements StorePostageFacade {
 		StorePostageEntity afterStorePostageEntity = storePostageService.queryByStoreId(saveStoreSupplierPostageRequest.getStoreId());
 		operationLog.setChangeAfterData(JSONUtil.toJsonStr(afterStorePostageEntity));
 		// 4.记录操作日志
-		operationLogSendUtil.sendOperationLog(operationLog);
+		changeEventSendUtil.sendOperationLog(operationLog);
 	}
 
 	/**
