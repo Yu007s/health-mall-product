@@ -20,6 +20,7 @@ import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.EarningPolicyTypeEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.enums.IncentivePolicyConfigTypeEnum;
 import com.drstrong.health.product.model.request.incentive.SaveEarningNameRequest;
 import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
 import com.drstrong.health.product.model.response.incentive.PackageIncentivePolicyDetailVO;
@@ -270,7 +271,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 
 		//根据店铺id和类型获取店铺下的自定义收益单元
 		if (CollectionUtil.isEmpty(storePolicyConfigIdsMap)) {
-			storePolicyConfigIdsMap = getStorePolicyConfigIdsMap(storeIds, productType);
+			storePolicyConfigIdsMap = getStorePolicyConfigIdsMap(storeIds, IncentivePolicyConfigTypeEnum.SINGLE_PACKAGE.getCode());
 		}
 		//获取sku的收益单元配置
 		Map<String, SkuIncentivePolicyEntity> skuCodePolicyEntityMap = skuIncentivePolicyService.listBySkuCode(packageCodes)

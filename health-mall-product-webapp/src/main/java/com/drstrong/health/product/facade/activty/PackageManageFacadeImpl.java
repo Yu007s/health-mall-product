@@ -56,6 +56,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -133,6 +135,8 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
         Map<Long, String> storeIdNameMap = storeService.listByIds(storeIds).stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
         List<PackageManageListVO> activityPackageInfoVOList = new ArrayList<>();
         for (ActivityPackageInfoEntity record : pageListRecords) {
+            // 金额统一保留两位小数
+            BigDecimal price = BigDecimalUtil.F2Y(record.getPrice()).setScale(2, RoundingMode.HALF_UP);
             PackageManageListVO activityPackageInfoVO = PackageManageListVO.builder()
                     .id(record.getId())
                     .activityPackageName(record.getActivityPackageName())
@@ -142,7 +146,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                     .storeName(storeIdNameMap.get(record.getStoreId()))
                     .activityStatus(record.getActivityStatus())
                     .activityStatusName(ActivityStatusEnum.getValueByCode(record.getActivityStatus()).getValue())
-                    .price(BigDecimalUtil.F2Y(record.getPrice()))
+                    .price(price)
                     .activityStartTime(Date.from(record.getActivityStartTime().atZone(ZoneId.systemDefault()).toInstant()))
                     .activityEndTime(Date.from(record.getActivityEndTime().atZone(ZoneId.systemDefault()).toInstant()))
                     .createdAt(Date.from(record.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant()))

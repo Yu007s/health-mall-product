@@ -66,6 +66,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -360,6 +362,8 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 			List<SupplierInfoDTO> supplierInfoDTOList = storeSkuInfoEntity.getSupplierInfo().stream().map(supplierId -> new SupplierInfoDTO(supplierId, supplierIdNameMap.get(supplierId), null, null)).collect(toList());
 			List<LabelDTO> labelDTOList = storeSkuInfoEntity.getLabelInfo().stream().map(labelId -> new LabelDTO(labelId, labelIdNameMap.get(labelId), null, null)).collect(toList());
 
+			// 金额统一保留两位小数
+			BigDecimal price = BigDecimalUtil.F2Y(storeSkuInfoEntity.getPrice()).setScale(2, RoundingMode.HALF_UP);
 			AgreementSkuInfoVO skuInfoVO = AgreementSkuInfoVO.builder()
 					.skuCode(storeSkuInfoEntity.getSkuCode())
 					.medicineCode(storeSkuInfoEntity.getMedicineCode())
@@ -367,7 +371,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 					.storeId(storeSkuInfoEntity.getStoreId())
 					.storeName(storeIdNameMap.get(storeSkuInfoEntity.getStoreId()))
 					.supplierInfoList(supplierInfoDTOList)
-					.salePrice(BigDecimalUtil.F2Y(storeSkuInfoEntity.getPrice()))
+					.salePrice(price)
 					.labelList(labelDTOList)
 					.skuStatus(storeSkuInfoEntity.getSkuStatus())
 					.skuStatusName(UpOffEnum.getValueByCode(storeSkuInfoEntity.getSkuStatus()))
