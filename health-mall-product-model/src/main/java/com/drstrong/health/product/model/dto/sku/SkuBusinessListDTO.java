@@ -1,6 +1,7 @@
 package com.drstrong.health.product.model.dto.sku;
 
 import com.drstrong.health.product.model.dto.product.SkuBaseDTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -40,6 +41,7 @@ public class SkuBusinessListDTO extends SkuBaseDTO implements Serializable {
     private Integer skuStatus;
 
     @ApiModelProperty("销售价格,单位:元")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal salePrice;
 
 }
