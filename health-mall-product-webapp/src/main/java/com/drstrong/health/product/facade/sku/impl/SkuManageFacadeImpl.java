@@ -2,12 +2,10 @@ package com.drstrong.health.product.facade.sku.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drstrong.health.common.enums.OperateTypeEnum;
 import com.drstrong.health.product.constants.OperationLogConstant;
@@ -19,21 +17,15 @@ import com.drstrong.health.product.model.dto.area.AreaDTO;
 import com.drstrong.health.product.model.dto.category.CategoryDTO;
 import com.drstrong.health.product.model.dto.label.LabelDTO;
 import com.drstrong.health.product.model.dto.medicine.MedicineWarehouseBaseDTO;
-import com.drstrong.health.product.model.dto.product.ProductListInfoVO;
 import com.drstrong.health.product.model.dto.product.StoreSkuDetailDTO;
 import com.drstrong.health.product.model.dto.product.SupplierInfoDTO;
-import com.drstrong.health.product.model.dto.stock.SkuCanStockDTO;
-import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
 import com.drstrong.health.product.model.entity.label.LabelInfoEntity;
-import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
-import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
 import com.drstrong.health.product.model.enums.UpOffEnum;
 import com.drstrong.health.product.model.request.chinese.UpdateSkuStateRequest;
-import com.drstrong.health.product.model.request.product.SearchWesternRequestParamBO;
 import com.drstrong.health.product.model.request.product.v3.ProductManageQueryRequest;
 import com.drstrong.health.product.model.request.product.v3.SaveOrUpdateStoreSkuRequest;
 import com.drstrong.health.product.model.request.product.v3.ScheduledSkuUpDownRequest;
@@ -55,7 +47,6 @@ import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.product.utils.OperationLogSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.drstrong.health.ware.model.response.SkuStockResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
@@ -66,12 +57,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -362,8 +353,6 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 			List<SupplierInfoDTO> supplierInfoDTOList = storeSkuInfoEntity.getSupplierInfo().stream().map(supplierId -> new SupplierInfoDTO(supplierId, supplierIdNameMap.get(supplierId), null, null)).collect(toList());
 			List<LabelDTO> labelDTOList = storeSkuInfoEntity.getLabelInfo().stream().map(labelId -> new LabelDTO(labelId, labelIdNameMap.get(labelId), null, null)).collect(toList());
 
-			// 金额统一保留两位小数
-			BigDecimal price = BigDecimalUtil.F2Y(storeSkuInfoEntity.getPrice()).setScale(2, RoundingMode.HALF_UP);
 			AgreementSkuInfoVO skuInfoVO = AgreementSkuInfoVO.builder()
 					.skuCode(storeSkuInfoEntity.getSkuCode())
 					.medicineCode(storeSkuInfoEntity.getMedicineCode())
@@ -371,7 +360,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 					.storeId(storeSkuInfoEntity.getStoreId())
 					.storeName(storeIdNameMap.get(storeSkuInfoEntity.getStoreId()))
 					.supplierInfoList(supplierInfoDTOList)
-					.salePrice(price)
+					.salePrice(BigDecimalUtil.F2Y(storeSkuInfoEntity.getPrice()))
 					.labelList(labelDTOList)
 					.skuStatus(storeSkuInfoEntity.getSkuStatus())
 					.skuStatusName(UpOffEnum.getValueByCode(storeSkuInfoEntity.getSkuStatus()))

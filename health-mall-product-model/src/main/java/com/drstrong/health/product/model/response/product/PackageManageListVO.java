@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.response.product;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -57,6 +58,7 @@ public class PackageManageListVO implements Serializable {
     private String activityStatusName;
 
     @ApiModelProperty("价格")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal price;
 
     @ApiModelProperty("活动开始时间")
