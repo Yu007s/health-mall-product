@@ -86,6 +86,7 @@ testing:
   needs: ["Image build"]
   only:
     - /^testing-4-.*/
+    - release
 
 
 prod:
