@@ -44,12 +44,12 @@ public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
 	StoreSkuInfoEntity checkSkuExistByCategoryId(Long categoryId);
 
 	/**
-	 * 校验店铺下 skuName 是否重复
+	 * 校验店铺下 skuName 是否重复 (忽略自己本身)
 	 *
 	 * @author liuqiuyi
 	 * @date 2023/6/10 14:07
 	 */
-	void checkSkuNameIsRepeat(String skuName, Long storeId);
+	void checkSkuNameIsRepeat(String skuName, Long storeId, String skuCode);
 
 	/**
 	 * 根据药材编码和店铺 id 校验是否存在

@@ -209,14 +209,14 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 			StoreSkuInfoEntity storeSkuInfoEntity = storeSkuInfoService.checkSkuExistByCode(saveOrUpdateStoreProductRequest.getSkuCode(), null);
 			// 如果是修改,且修改前后 skuName 不一样,也需要校验 skuName 是否重复
 			if (!Objects.equals(storeSkuInfoEntity.getSkuName(), saveOrUpdateStoreProductRequest.getSkuName())) {
-				storeSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateStoreProductRequest.getSkuName(), saveOrUpdateStoreProductRequest.getStoreId());
+				storeSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateStoreProductRequest.getSkuName(), saveOrUpdateStoreProductRequest.getStoreId(), saveOrUpdateStoreProductRequest.getSkuCode());
 			}
 			return storeSkuInfoEntity;
 		} else {
 			// 校验是否重复添加
 			storeSkuInfoService.checkMedicineCodeAndStoreId(saveOrUpdateStoreProductRequest.getMedicineCode(), saveOrUpdateStoreProductRequest.getStoreId());
 			// 校验相同店铺下,sku名称是否重复添加
-			storeSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateStoreProductRequest.getSkuName(), saveOrUpdateStoreProductRequest.getStoreId());
+			storeSkuInfoService.checkSkuNameIsRepeat(saveOrUpdateStoreProductRequest.getSkuName(), saveOrUpdateStoreProductRequest.getStoreId(), null);
 			return null;
 		}
 	}

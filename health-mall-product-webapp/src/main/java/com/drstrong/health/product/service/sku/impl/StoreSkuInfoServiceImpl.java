@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service.sku.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -84,16 +85,16 @@ public class StoreSkuInfoServiceImpl extends ServiceImpl<StoreSkuInfoMapper, Sto
      * @date 2023/6/10 14:07
      */
     @Override
-    public void checkSkuNameIsRepeat(String skuName, Long storeId) {
+    public void checkSkuNameIsRepeat(String skuName, Long storeId, String skuCode) {
         if (StrUtil.isBlank(skuName) || Objects.isNull(storeId)) {
-            return;
+            throw new BusinessException(ErrorEnums.PARAM_IS_NOT_NULL);
         }
         LambdaQueryWrapper<StoreSkuInfoEntity> queryWrapper = new LambdaQueryWrapper<StoreSkuInfoEntity>()
                 .eq(StoreSkuInfoEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(StoreSkuInfoEntity::getSkuName, skuName)
                 .eq(StoreSkuInfoEntity::getStoreId, storeId);
         StoreSkuInfoEntity storeSkuInfoEntity = baseMapper.selectOne(queryWrapper);
-        if (Objects.nonNull(storeSkuInfoEntity)) {
+        if (Objects.nonNull(storeSkuInfoEntity) && ObjectUtil.notEqual(storeSkuInfoEntity.getSkuCode(), skuCode)) {
             throw new BusinessException(ErrorEnums.SKU_NAME_IS_REPEAT);
         }
     }
