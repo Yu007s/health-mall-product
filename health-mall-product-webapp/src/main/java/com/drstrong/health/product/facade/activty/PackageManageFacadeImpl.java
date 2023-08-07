@@ -45,7 +45,7 @@ import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
 import com.drstrong.health.product.util.DateUtil;
 import com.drstrong.health.product.util.RedisKeyUtils;
-import com.drstrong.health.product.utils.OperationLogSendUtil;
+import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -87,7 +87,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
     private SkuScheduledConfigService skuScheduledConfigService;
 
     @Autowired
-    private OperationLogSendUtil operationLogSendUtil;
+    private ChangeEventSendUtil changeEventSendUtil;
 
     @Autowired
     private SkuScheduledConfigFacade skuScheduledConfigFacade;
@@ -264,7 +264,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                 JSONUtil.toJsonStr(packageInfoEntity));
         ActivityPackageInfoEntity afterEntity = packageService.findPackageByCode(packageInfoEntity.getActivityPackageCode(), null);
         operationLog.setChangeAfterData(JSONUtil.toJsonStr(afterEntity));
-        operationLogSendUtil.sendOperationLog(operationLog);
+        changeEventSendUtil.sendOperationLog(operationLog);
     }
 
     /**
@@ -451,7 +451,7 @@ public class PackageManageFacadeImpl implements PackageManageFacade {
                     OperationLogConstant.SKU_STATUS_CHANGE, operatorId, operatorName,
                     OperateTypeEnum.CMS.getCode(), JSONUtil.toJsonStr(activityPackageInfoEntity));
             operationLog.setChangeAfterData(JSONUtil.toJsonStr(skuCodeInfoMap.get(activityPackageInfoEntity.getActivityPackageCode())));
-            operationLogSendUtil.sendOperationLog(operationLog);
+            changeEventSendUtil.sendOperationLog(operationLog);
         });
     }
 

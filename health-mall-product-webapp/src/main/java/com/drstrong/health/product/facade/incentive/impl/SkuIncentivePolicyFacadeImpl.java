@@ -145,7 +145,7 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 		skuIncentivePolicyEntity.setChangedAt(LocalDateTime.now());
 		skuIncentivePolicyService.saveOrUpdate(skuIncentivePolicyEntity);
 		// 保存操作日志
-		operationLogSendUtil.sendOperationLog(operationLog);
+		changeEventSendUtil.sendOperationLog(operationLog);
 	}
 
 	/**
