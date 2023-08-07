@@ -14,6 +14,7 @@ import java.util.Set;
  * @date 2023/6/8 14:47
  */
 public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
+
 	/**
 	 * 根据编码查询 sku 信息
 	 * <p>
@@ -99,4 +100,7 @@ public interface StoreSkuInfoService extends IService<StoreSkuInfoEntity> {
 	 * @date 2023/6/14 15:50
 	 */
 	void batchUpdateSkuStatusByCodes(Set<String> skuCodeList, Integer skuState, Long operatorId);
+
+	List<StoreSkuInfoEntity> queryStoreSkuInfoByCategory(Long categoryId);
+
 }

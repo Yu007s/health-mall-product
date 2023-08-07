@@ -3,6 +3,7 @@ package com.drstrong.health.product.service.medicine;
 import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO;
 import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineSpecRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineWarehouseQueryRequest;
@@ -11,6 +12,9 @@ import com.drstrong.health.product.model.response.PageVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineSimpleInfoVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecInfoVO;
 import com.drstrong.health.product.model.response.medicine.WesternMedicineSpecVO;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -69,4 +73,20 @@ public interface WesternMedicineSpecificationsService extends IService<WesternMe
      * @date 2023/6/20 19:18
      */
     WesternMedicineSpecificationsEntity queryByCode(String code);
+
+    /**
+     * 根据code查询西药规格
+     *
+     * @author liuqiuyi
+     * @date 2023/6/20 19:18
+     */
+    List<WesternMedicineSpecificationsEntity> queryByCodeList(List<String> codeList);
+
+    /**
+     * 根据规格编码，查询用法用量信息
+     *
+     * @author liuqiuyi
+     * @date 2023/7/11 11:12
+     */
+    List<MedicineUsageDTO> queryMedicineUsageBySpecCodes(Set<String> specCodes);
 }

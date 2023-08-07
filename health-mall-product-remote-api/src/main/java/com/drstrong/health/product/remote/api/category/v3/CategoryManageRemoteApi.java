@@ -45,4 +45,8 @@ public interface CategoryManageRemoteApi {
     @ApiOperation("更新分类状态")
     @PostMapping("/update/status")
     ResultVO<Void> updateCategoryStatus(@RequestParam(value = "categoryId") Long categoryId, @RequestParam(value = "status") Integer status, @RequestParam(value = "changedName") String changedName);
+
+    @ApiOperation("根据商品类型查询分类信息(医生端-空中药房)")
+    @PostMapping("/product/category")
+    ResultVO<List<CategoryVO>> queryCategoryByProductType(@RequestParam(value = "productType", required = false) Integer productType);
 }

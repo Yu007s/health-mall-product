@@ -10,21 +10,29 @@ import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.facade.incentive.SkuIncentivePolicyFacade;
 import com.drstrong.health.product.model.OperationLog;
 import com.drstrong.health.product.model.dto.label.LabelDTO;
+import com.drstrong.health.product.model.entity.activty.ActivityPackageInfoEntity;
+import com.drstrong.health.product.model.entity.activty.ActivityPackageSkuInfoEntity;
 import com.drstrong.health.product.model.entity.incentive.IncentivePolicyConfigEntity;
 import com.drstrong.health.product.model.entity.incentive.SkuIncentivePolicyEntity;
 import com.drstrong.health.product.model.entity.label.LabelInfoEntity;
+import com.drstrong.health.product.model.entity.medication.WesternMedicineSpecificationsEntity;
 import com.drstrong.health.product.model.entity.sku.StoreSkuInfoEntity;
 import com.drstrong.health.product.model.entity.store.StoreEntity;
 import com.drstrong.health.product.model.enums.EarningPolicyTypeEnum;
 import com.drstrong.health.product.model.enums.ErrorEnums;
+import com.drstrong.health.product.model.enums.IncentivePolicyConfigTypeEnum;
 import com.drstrong.health.product.model.request.incentive.SaveEarningNameRequest;
 import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
+import com.drstrong.health.product.model.response.incentive.PackageIncentivePolicyDetailVO;
 import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDetailVO;
 import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyVO;
+import com.drstrong.health.product.model.response.incentive.excel.PackageIncentivePolicyDetailExcelVO;
 import com.drstrong.health.product.model.response.incentive.excel.SkuIncentivePolicyDetailExcelVO;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.product.model.response.store.v3.SupplierInfoVO;
 import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
+import com.drstrong.health.product.service.activty.ActivityPackageSkuInfoSevice;
+import com.drstrong.health.product.service.activty.PackageService;
 import com.drstrong.health.product.service.incentive.IncentivePolicyConfigService;
 import com.drstrong.health.product.service.incentive.SkuIncentivePolicyService;
 import com.drstrong.health.product.service.label.LabelInfoService;
@@ -36,7 +44,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -78,6 +88,12 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	@Resource
 	LabelInfoService labelInfoService;
 
+	@Autowired
+	private PackageService packageService;
+
+	@Autowired
+	private ActivityPackageSkuInfoSevice activityPackageSkuInfoSevice;
+
 	/**
 	 * 保存店铺下的收益名称
 	 *
@@ -110,9 +126,37 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	 */
 	@Override
 	public void saveOrUpdateSkuPolicy(SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest) {
-		// 校验 skuCode 是否存在
+		//校验 skuCode 是否存在
 		storeSkuInfoService.checkSkuExistByCode(saveOrUpdateSkuPolicyRequest.getSkuCode(), null);
-		// 1.判断是保存还是更新激励政策
+		//判断是保存还是更新激励政策
+		SkuIncentivePolicyEntity skuIncentivePolicyEntity = skuIncentivePolicyService.queryBySkuCode(saveOrUpdateSkuPolicyRequest.getSkuCode());
+		//记录日志
+		OperationLog operationLog = OperationLog.buildOperationLog(saveOrUpdateSkuPolicyRequest.getSkuCode(), OperationLogConstant.MALL_PRODUCT_SKU_CHANGE,
+				OperationLogConstant.SKU_INCENTIVE_POLICY_CHANGE, saveOrUpdateSkuPolicyRequest.getOperatorId(), saveOrUpdateSkuPolicyRequest.getOperatorName(),
+				OperateTypeEnum.CMS.getCode(), JSONUtil.toJsonStr(skuIncentivePolicyEntity));
+		if (Objects.isNull(skuIncentivePolicyEntity)) {
+			skuIncentivePolicyEntity = SkuIncentivePolicyEntity.buildDefaultEntity(saveOrUpdateSkuPolicyRequest.getOperatorId());
+		}
+		skuIncentivePolicyEntity.setStoreId(saveOrUpdateSkuPolicyRequest.getStoreId());
+		skuIncentivePolicyEntity.setSkuCode(saveOrUpdateSkuPolicyRequest.getSkuCode());
+		skuIncentivePolicyEntity.setCostPrice(BigDecimalUtil.Y2F(saveOrUpdateSkuPolicyRequest.getCostPrice()));
+		skuIncentivePolicyEntity.setIncentivePolicyInfo(BeanUtil.copyToList(saveOrUpdateSkuPolicyRequest.getSkuIncentivePolicyList(), SkuIncentivePolicyEntity.IncentivePolicyInfo.class));
+		skuIncentivePolicyEntity.setChangedBy(saveOrUpdateSkuPolicyRequest.getOperatorId());
+		skuIncentivePolicyEntity.setChangedAt(LocalDateTime.now());
+		skuIncentivePolicyService.saveOrUpdate(skuIncentivePolicyEntity);
+		// 保存操作日志
+		operationLogSendUtil.sendOperationLog(operationLog);
+	}
+
+	/**
+	 * 修改/保存套餐激励政策
+	 * @param saveOrUpdateSkuPolicyRequest
+	 */
+	@Override
+	public void saveOrUpdatePackagePolicy(SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest) {
+		// 校验套餐
+		ActivityPackageInfoEntity packageByCode = packageService.findPackageByCode(saveOrUpdateSkuPolicyRequest.getSkuCode(), null);
+		// 判断是保存还是更新激励政策
 		SkuIncentivePolicyEntity skuIncentivePolicyEntity = skuIncentivePolicyService.queryBySkuCode(saveOrUpdateSkuPolicyRequest.getSkuCode());
 		// 记录日志
 		OperationLog operationLog = OperationLog.buildOperationLog(saveOrUpdateSkuPolicyRequest.getSkuCode(), OperationLogConstant.MALL_PRODUCT_SKU_CHANGE,
@@ -149,6 +193,21 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 	}
 
 	/**
+	 * 根据packageCode查询激励政策信息
+	 *
+	 * @param packageCode
+	 * @return
+	 */
+	@Override
+	public PackageIncentivePolicyDetailVO queryPolicyDetailByPackageCode(String packageCode) {
+		//查询套餐是否存在
+		ActivityPackageInfoEntity packageInfoEntity = packageService.findPackageByCode(packageCode, null);
+		//组装返回值
+		List<PackageIncentivePolicyDetailVO> packageIncentivePolicyDetailVOS = buildPackageIncentivePolicyDetailVO(Lists.newArrayList(packageInfoEntity), packageInfoEntity.getProductType(), null, null);
+		return CollectionUtil.isEmpty(packageIncentivePolicyDetailVOS) ? null : packageIncentivePolicyDetailVOS.get(0);
+	}
+
+	/**
 	 * 查询所有的 sku 政策信息
 	 *
 	 * @author liuqiuyi
@@ -167,6 +226,101 @@ public class SkuIncentivePolicyFacadeImpl implements SkuIncentivePolicyFacade {
 		Map<Long, Map<Long, String>> storePolicyConfigIdsMap = getStorePolicyConfigIdsMap(storeIds, productType);
 		List<SkuIncentivePolicyDetailVO> skuIncentivePolicyDetailVOS = buildSkuIncentivePolicyDetailVO(storeSkuInfoEntityList, productType, storeIds, storePolicyConfigIdsMap);
 		return SkuIncentivePolicyDetailExcelVO.builder().skuIncentivePolicyDetailVOList(skuIncentivePolicyDetailVOS).storePolicyConfigIdsMap(storePolicyConfigIdsMap).build();
+	}
+
+	/**
+	 * 查询所有套餐的政策信息
+	 * @param storeId
+	 * @param productType
+	 * @return
+	 */
+	@Override
+	public PackageIncentivePolicyDetailExcelVO queryPackagePolicyDetailToExcelVO(Long storeId, Integer productType) {
+		//获取店铺下所有的套餐信息
+		List<ActivityPackageInfoEntity> activityPackageInfoEntityList = packageService.queryAllByProductType(storeId, productType);
+		if (CollectionUtils.isEmpty(activityPackageInfoEntityList)) {
+			log.info("没有查询到套餐信息,不处理");
+			return PackageIncentivePolicyDetailExcelVO.builder()
+					.PackageIncentivePolicyDetailVOList(Lists.newArrayList())
+					.storePolicyConfigIdsMap(Maps.newHashMap())
+					.build();
+		}
+		Set<Long> storeIds = activityPackageInfoEntityList.stream().map(ActivityPackageInfoEntity::getStoreId).collect(Collectors.toSet());
+		//获取店铺配置的收益单位
+		Map<Long, Map<Long, String>> storePolicyConfigIdsMap = getStorePolicyConfigIdsMap(storeIds, productType);
+		List<PackageIncentivePolicyDetailVO> packageIncentivePolicyDetailVOS = buildPackageIncentivePolicyDetailVO(activityPackageInfoEntityList, productType, storeIds, storePolicyConfigIdsMap);
+		return PackageIncentivePolicyDetailExcelVO.builder()
+				.PackageIncentivePolicyDetailVOList(packageIncentivePolicyDetailVOS)
+				.storePolicyConfigIdsMap(storePolicyConfigIdsMap)
+				.build();
+	}
+
+	private List<PackageIncentivePolicyDetailVO> buildPackageIncentivePolicyDetailVO(List<ActivityPackageInfoEntity> activityPackageInfoEntityList, Integer productType, Set<Long> storeIds, Map<Long, Map<Long, String>> storePolicyConfigIdsMap){
+		if (CollectionUtil.isEmpty(storeIds)) {
+			storeIds = activityPackageInfoEntityList.stream().map(ActivityPackageInfoEntity::getStoreId).collect(Collectors.toSet());
+		}
+		//获取店铺信息
+		Map<Long, String> storeIdNameMap = storeService.listByIds(storeIds).stream().collect(Collectors.toMap(StoreEntity::getId, StoreEntity::getStoreName, (v1, v2) -> v1));
+		Set<String> packageCodes = Sets.newHashSetWithExpectedSize(activityPackageInfoEntityList.size());
+		activityPackageInfoEntityList.forEach(activityPackageInfoEntity -> {
+			packageCodes.add(activityPackageInfoEntity.getActivityPackageCode());
+		});
+		List<ActivityPackageSkuInfoEntity> activityPackageSkuInfoEntities = activityPackageSkuInfoSevice.queryByPackageCodes(packageCodes);
+		Map<String, String> skuNameMap = activityPackageSkuInfoEntities.stream().collect(Collectors.toMap(ActivityPackageSkuInfoEntity::getActivityPackageCode, ActivityPackageSkuInfoEntity::getSkuName, (v1, v2) -> v1));
+
+		//根据店铺id和类型获取店铺下的自定义收益单元
+		if (CollectionUtil.isEmpty(storePolicyConfigIdsMap)) {
+			storePolicyConfigIdsMap = getStorePolicyConfigIdsMap(storeIds, IncentivePolicyConfigTypeEnum.SINGLE_PACKAGE.getCode());
+		}
+		//获取sku的收益单元配置
+		Map<String, SkuIncentivePolicyEntity> skuCodePolicyEntityMap = skuIncentivePolicyService.listBySkuCode(packageCodes)
+				.stream().collect(Collectors.toMap(SkuIncentivePolicyEntity::getSkuCode, dto -> dto, (v1, v2) -> v1));
+		//组装参数
+		List<PackageIncentivePolicyDetailVO> packageIncentivePolicyDetailVOList = Lists.newArrayListWithCapacity(activityPackageInfoEntityList.size());
+		for (ActivityPackageInfoEntity activityPackageInfoEntity : activityPackageInfoEntityList) {
+			//政策信息
+			SkuIncentivePolicyEntity skuIncentivePolicyEntity = skuCodePolicyEntityMap.get(activityPackageInfoEntity.getActivityPackageCode());
+			// 店铺下配置的收益单元
+			Map<Long, String> policyConfigIdsMap = storePolicyConfigIdsMap.getOrDefault(activityPackageInfoEntity.getStoreId(), Maps.newHashMap());
+
+			PackageIncentivePolicyDetailVO packageIncentivePolicyDetailVO = PackageIncentivePolicyDetailVO.builder()
+					.activityPackageCode(activityPackageInfoEntity.getActivityPackageCode())
+					.activityPackageName(activityPackageInfoEntity.getActivityPackageName())
+					.storeId(activityPackageInfoEntity.getStoreId())
+					.productType(activityPackageInfoEntity.getProductType())
+					.skuName(skuNameMap.get(activityPackageInfoEntity.getActivityPackageCode()))
+					.storeName(storeIdNameMap.get(activityPackageInfoEntity.getStoreId()))
+					.price(BigDecimalUtil.F2Y(activityPackageInfoEntity.getPrice()))
+					.costPrice(ObjectUtil.isNull(skuIncentivePolicyEntity) ? new BigDecimal("-1") : BigDecimalUtil.F2Y(skuIncentivePolicyEntity.getCostPrice()))
+					.build();
+			// 计算利润率(零售价-成本价)/成本价,只有当成本价大于 0 时才计算,避免除 0 异常
+			if (NumberUtil.isGreater(packageIncentivePolicyDetailVO.getCostPrice(), BigDecimal.ZERO)) {
+				BigDecimal profit = packageIncentivePolicyDetailVO.getPrice().subtract(packageIncentivePolicyDetailVO.getCostPrice())
+						.divide(packageIncentivePolicyDetailVO.getCostPrice(), 2, RoundingMode.HALF_UP);
+				// 乘以 100,得到最终利润率
+				packageIncentivePolicyDetailVO.setProfit(profit.multiply(new BigDecimal("100")));
+			}
+
+			//将配置的收益单元转成 map
+			Map<Long, SkuIncentivePolicyEntity.IncentivePolicyInfo> configIdPolicyInfoMap = Optional.ofNullable(skuIncentivePolicyEntity).map(SkuIncentivePolicyEntity::getIncentivePolicyInfo).orElse(Lists.newArrayList())
+					.stream().collect(Collectors.toMap(SkuIncentivePolicyEntity.IncentivePolicyInfo::getPolicyConfigId, dto -> dto, (v1, v2) -> v1));
+			// 组装最终的参数
+			List<SkuIncentivePolicyVO> skuIncentivePolicyList = Lists.newArrayListWithCapacity(policyConfigIdsMap.size());
+			policyConfigIdsMap.forEach((policyConfigEntityId, policyConfigName) -> {
+				SkuIncentivePolicyEntity.IncentivePolicyInfo policyInfo = configIdPolicyInfoMap.getOrDefault(policyConfigEntityId, new SkuIncentivePolicyEntity.IncentivePolicyInfo());
+				SkuIncentivePolicyVO skuIncentivePolicyVO = SkuIncentivePolicyVO.builder()
+						.policyConfigId(policyConfigEntityId)
+						.policyConfigName(policyConfigName)
+						.policyType(ObjectUtil.defaultIfNull(policyInfo.getPolicyType(), EarningPolicyTypeEnum.NONE.getCode()))
+						.policyTypeName(EarningPolicyTypeEnum.getValueByCode(ObjectUtil.defaultIfNull(policyInfo.getPolicyType(), EarningPolicyTypeEnum.NONE.getCode())))
+						.policyValue(policyInfo.getPolicyValue())
+						.build();
+				skuIncentivePolicyList.add(skuIncentivePolicyVO);
+			});
+			packageIncentivePolicyDetailVO.setSkuIncentivePolicyList(skuIncentivePolicyList);
+			packageIncentivePolicyDetailVOList.add(packageIncentivePolicyDetailVO);
+		}
+		return packageIncentivePolicyDetailVOList;
 	}
 
 	private List<SkuIncentivePolicyDetailVO> buildSkuIncentivePolicyDetailVO(List<StoreSkuInfoEntity> storeSkuInfoEntityList, Integer productType, Set<Long> storeIds, Map<Long, Map<Long, String>> storePolicyConfigIdsMap) {

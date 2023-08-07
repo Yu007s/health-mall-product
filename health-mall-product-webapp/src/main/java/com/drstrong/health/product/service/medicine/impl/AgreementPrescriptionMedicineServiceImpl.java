@@ -3,6 +3,7 @@ package com.drstrong.health.product.service.medicine.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Pair;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
@@ -15,6 +16,7 @@ import com.drstrong.health.product.constants.MedicineConstant;
 import com.drstrong.health.product.constants.OperationLogConstant;
 import com.drstrong.health.product.dao.medicine.AgreementPrescriptionMedicineMapper;
 import com.drstrong.health.product.model.OperationLog;
+import com.drstrong.health.product.model.dto.medicine.MedicineUsageDTO;
 import com.drstrong.health.product.model.entity.medication.AgreementPrescriptionMedicineEntity;
 import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.enums.ProductTypeEnum;
@@ -29,12 +31,16 @@ import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicin
 import com.drstrong.health.product.service.medicine.MedicineUsageService;
 import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import com.drstrong.health.product.utils.UniqueCodeUtils;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.List;
 
 /**
  * <p>
@@ -140,5 +146,26 @@ public class AgreementPrescriptionMedicineServiceImpl extends ServiceImpl<Agreem
                 .eq(AgreementPrescriptionMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(AgreementPrescriptionMedicineEntity::getMedicineCode, medicineCode);
         return baseMapper.selectOne(queryWrapper);
+    }
+
+    /**
+     * 根据药材codes查询
+     * @param medicineCode
+     * @return
+     */
+    @Override
+    public List<AgreementPrescriptionMedicineEntity> queryByCodeList(List<String> medicineCode) {
+        LambdaQueryWrapper<AgreementPrescriptionMedicineEntity> queryWrapper = new LambdaQueryWrapper<AgreementPrescriptionMedicineEntity>()
+                .eq(AgreementPrescriptionMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(AgreementPrescriptionMedicineEntity::getMedicineCode, medicineCode);
+        return baseMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<MedicineUsageDTO> queryMedicineUsageByMedicineCodes(Set<String> medicineCodes) {
+        if (CollectionUtil.isEmpty(medicineCodes)) {
+            return Lists.newArrayList();
+        }
+        return baseMapper.queryMedicineUsageByMedicineCodes(medicineCodes);
     }
 }

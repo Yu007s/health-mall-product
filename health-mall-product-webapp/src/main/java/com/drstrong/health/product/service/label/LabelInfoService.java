@@ -34,7 +34,7 @@ public interface LabelInfoService extends IService<LabelInfoEntity> {
 	 * @author liuqiuyi
 	 * @date 2023/6/7 11:29
 	 */
-	LabelInfoEntity queryByStoreIdAndName(Long storeId, String labelName);
+	LabelInfoEntity queryByStoreIdAndNameAndType(Long storeId, String labelName, Integer labelType);
 
 	/**
 	 * 根据店铺 id 和标签类型查询

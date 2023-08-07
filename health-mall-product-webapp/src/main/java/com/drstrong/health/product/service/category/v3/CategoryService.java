@@ -33,4 +33,9 @@ public interface CategoryService extends IService<CategoryEntity> {
 	 * @date 2023/6/12 16:27
 	 */
 	List<CategoryEntity> listByIds(List<Long> ids);
+
+    List<CategoryEntity> queryWesternCategory();
+
+	List<CategoryEntity> queryHealthCategory();
+
 }

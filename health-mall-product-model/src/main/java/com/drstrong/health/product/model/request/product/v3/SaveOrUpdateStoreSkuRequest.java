@@ -47,7 +47,7 @@ public class SaveOrUpdateStoreSkuRequest extends SkuBaseDTO implements Serializa
 	@ApiModelProperty("销售价格,单位:元")
 	@NotNull(message = "包邮金额不能为空")
 	@DecimalMin(value = "0.01", message = "价格不能小于0.01")
-	@DecimalMax(value = "99999.99", message = "价格不能大于99999.99")
+	@DecimalMax(value = "999999.99", message = "价格不能大于999999.99")
 	private BigDecimal salePrice;
 
 	@ApiModelProperty("供应商信息")

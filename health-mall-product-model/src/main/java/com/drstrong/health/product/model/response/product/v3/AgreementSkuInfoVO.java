@@ -2,6 +2,7 @@ package com.drstrong.health.product.model.response.product.v3;
 
 import com.drstrong.health.product.model.dto.label.LabelDTO;
 import com.drstrong.health.product.model.dto.product.SupplierInfoDTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -48,6 +49,7 @@ public class AgreementSkuInfoVO extends ProductManageQueryVO implements Serializ
 	private List<SupplierInfoDTO> supplierInfoList;
 
 	@ApiModelProperty("价格")
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	private BigDecimal salePrice;
 
 	@ApiModelProperty("标签信息")

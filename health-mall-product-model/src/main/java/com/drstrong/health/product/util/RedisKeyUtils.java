@@ -24,6 +24,8 @@ public class RedisKeyUtils {
 
 	public static final String SAVE_OR_UPDATE_SKU = "save_sku";
 
+	public static final String SAVE_OR_UPDATE_PACKAGE = "save_package";
+
 
 	/**
 	 * 获取商品的唯一编号,自增

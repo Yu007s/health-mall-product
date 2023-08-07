@@ -19,10 +19,6 @@ import java.util.List;
 
 /**
  * sku 管理 controller
- * <p>
- * 提供给 cms 管理端使用
- * </>
- *
  * @author liuqiuyi
  * @date 2023/6/5 11:04
  */

@@ -20,4 +20,6 @@ public interface CategoryFacade {
 	 * @date 2023/6/12 16:05
 	 */
 	List<CategoryVO> queryAllCategoryByProductType(Integer productType, Boolean needFilter);
+
+	List<CategoryVO> queryCategoryByProductType(Integer productType);
 }

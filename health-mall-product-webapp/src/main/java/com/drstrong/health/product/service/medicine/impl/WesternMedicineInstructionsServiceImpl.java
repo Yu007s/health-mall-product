@@ -1,6 +1,7 @@
 package com.drstrong.health.product.service.medicine.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -10,9 +11,11 @@ import com.drstrong.health.product.model.enums.DelFlagEnum;
 import com.drstrong.health.product.model.request.medicine.AddOrUpdateMedicineRequest;
 import com.drstrong.health.product.model.request.medicine.MedicineInstructionsRequest;
 import com.drstrong.health.product.service.medicine.WesternMedicineInstructionsService;
+import org.apache.commons.compress.utils.Lists;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -52,5 +55,16 @@ public class WesternMedicineInstructionsServiceImpl extends ServiceImpl<WesternM
                 .eq(WesternMedicineInstructionsEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
                 .eq(WesternMedicineInstructionsEntity::getMedicineId, medicineId);
         return baseMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public List<WesternMedicineInstructionsEntity> queryByMedicineIdList(List<Long> medicineIdList) {
+        if (CollectionUtil.isEmpty(medicineIdList)) {
+            return Lists.newArrayList();
+        }
+        LambdaQueryWrapper<WesternMedicineInstructionsEntity> queryWrapper = new LambdaQueryWrapper<WesternMedicineInstructionsEntity>()
+                .eq(WesternMedicineInstructionsEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode())
+                .in(WesternMedicineInstructionsEntity::getMedicineId, medicineIdList);
+        return baseMapper.selectList(queryWrapper);
     }
 }

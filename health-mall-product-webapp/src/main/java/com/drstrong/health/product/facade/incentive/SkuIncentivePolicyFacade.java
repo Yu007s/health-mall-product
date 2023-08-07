@@ -2,7 +2,9 @@ package com.drstrong.health.product.facade.incentive;
 
 import com.drstrong.health.product.model.request.incentive.SaveEarningNameRequest;
 import com.drstrong.health.product.model.request.incentive.SaveOrUpdateSkuPolicyRequest;
+import com.drstrong.health.product.model.response.incentive.PackageIncentivePolicyDetailVO;
 import com.drstrong.health.product.model.response.incentive.SkuIncentivePolicyDetailVO;
+import com.drstrong.health.product.model.response.incentive.excel.PackageIncentivePolicyDetailExcelVO;
 import com.drstrong.health.product.model.response.incentive.excel.SkuIncentivePolicyDetailExcelVO;
 
 /**
@@ -41,4 +43,11 @@ public interface SkuIncentivePolicyFacade {
 	 * @date 2023/6/13 16:54
 	 */
 	SkuIncentivePolicyDetailExcelVO querySkuPolicyDetailToExcelVO(Long storeId, Integer productType);
+
+	PackageIncentivePolicyDetailExcelVO queryPackagePolicyDetailToExcelVO(Long storeId, Integer productType);
+
+	PackageIncentivePolicyDetailVO queryPolicyDetailByPackageCode(String packageCode);
+
+    void saveOrUpdatePackagePolicy(SaveOrUpdateSkuPolicyRequest saveOrUpdateSkuPolicyRequest);
+
 }

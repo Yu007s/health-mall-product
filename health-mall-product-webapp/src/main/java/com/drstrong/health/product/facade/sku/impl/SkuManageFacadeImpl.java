@@ -38,6 +38,8 @@ import com.drstrong.health.product.remote.pro.StockRemoteProService;
 import com.drstrong.health.product.remote.pro.SupplierRemoteProService;
 import com.drstrong.health.product.service.category.v3.CategoryService;
 import com.drstrong.health.product.service.label.LabelInfoService;
+import com.drstrong.health.product.service.medicine.AgreementPrescriptionMedicineService;
+import com.drstrong.health.product.service.medicine.WesternMedicineSpecificationsService;
 import com.drstrong.health.product.service.sku.StoreSkuInfoService;
 import com.drstrong.health.product.service.store.StoreService;
 import com.drstrong.health.product.util.BigDecimalUtil;
@@ -48,6 +50,7 @@ import com.drstrong.health.ware.model.response.SkuStockResponse;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.klock.annotation.Dlock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,6 +103,12 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 
 	@Resource
 	MedicineWarehouseFacadeHolder medicineWarehouseFacadeHolder;
+
+	@Resource
+	private WesternMedicineSpecificationsService westernMedicineSpecificationsService;
+
+	@Autowired
+	private AgreementPrescriptionMedicineService agreementPrescriptionMedicineService;
 
     /**
      * 添加分布式锁，确保更新或者修改sku时不重复添加
@@ -252,6 +261,7 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 				.map(skuProhibitAreaVO -> new AreaDTO(skuProhibitAreaVO.getId(), skuProhibitAreaVO.getName())).collect(toList());
 		// 组装参数
 		StoreSkuDetailDTO storeSkuDetailDTO = StoreSkuDetailDTO.builder()
+				.id(skuInfoEntity.getId())
 				.medicineCode(skuInfoEntity.getMedicineCode())
 				.storeName(storeEntity.getStoreName())
 				.skuName(skuInfoEntity.getSkuName())
@@ -277,16 +287,28 @@ public class SkuManageFacadeImpl implements SkuManageFacade {
 	@Override
 	public PageVO<AgreementSkuInfoVO> querySkuManageInfo(ProductManageQueryRequest productManageQueryRequest) {
 		log.info("invoke querySkuManageInfo(),param:{}", JSONUtil.toJsonStr(productManageQueryRequest));
-		// 1.根据入参中的条件,分页查询店铺 sku 表
+		// 1.判断 storeId 是否为空且互联网医院 id 不为空,如果是,换取店铺id
+		if (Objects.isNull(productManageQueryRequest.getStoreId()) && Objects.nonNull(productManageQueryRequest.getAgencyId())) {
+			StoreEntity storeEntity = storeService.getStoreByAgencyIdOrStoreId(productManageQueryRequest.getAgencyId(), productManageQueryRequest.getStoreId());
+			if (Objects.nonNull(storeEntity)) {
+				log.info("根据 agencyId 获取到的店铺 id 为:{}", storeEntity.getId());
+				productManageQueryRequest.setStoreId(storeEntity.getId());
+			}
+		}
+		// 2.根据入参中的条件,分页查询店铺 sku 表
 		Page<StoreSkuInfoEntity> storeSkuInfoEntityPageList = storeSkuInfoService.pageQueryByParam(productManageQueryRequest);
 		List<StoreSkuInfoEntity> pageListRecords = storeSkuInfoEntityPageList.getRecords();
 		if (CollectionUtil.isEmpty(pageListRecords)) {
 			log.info("未查询到任何sku数据,参数为:{}", JSONUtil.toJsonStr(productManageQueryRequest));
 			return PageVO.newBuilder().result(Lists.newArrayList()).totalCount(0).pageNo(productManageQueryRequest.getPageNo()).pageSize(productManageQueryRequest.getPageSize()).build();
 		}
-		// 2.组装返回值
+		// 3.组装返回值
 		List<AgreementSkuInfoVO> agreementSkuInfoVoList = buildAgreementSkuInfoVo(pageListRecords);
-		return PageVO.newBuilder().result(agreementSkuInfoVoList).totalCount((int) storeSkuInfoEntityPageList.getTotal()).pageNo(productManageQueryRequest.getPageNo()).pageSize(productManageQueryRequest.getPageSize()).build();
+		return PageVO.newBuilder()
+				.result(agreementSkuInfoVoList)
+				.totalCount((int) storeSkuInfoEntityPageList.getTotal())
+				.pageNo(productManageQueryRequest.getPageNo())
+				.pageSize(productManageQueryRequest.getPageSize()).build();
 	}
 
 	/**

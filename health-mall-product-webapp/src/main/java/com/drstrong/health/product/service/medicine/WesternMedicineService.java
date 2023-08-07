@@ -81,4 +81,6 @@ public interface WesternMedicineService extends IService<WesternMedicineEntity> 
      * @return
      */
     List<WesternMedicineExcelVO> queryMedicineExcelData(WesternMedicineRequest request);
+
+    List<WesternMedicineEntity> queryByMedicineCodeList(List<String> medicineCodes);
 }
