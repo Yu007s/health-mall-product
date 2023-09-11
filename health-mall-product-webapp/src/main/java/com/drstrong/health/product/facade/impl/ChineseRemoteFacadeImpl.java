@@ -288,13 +288,10 @@ public class ChineseRemoteFacadeImpl implements ChineseRemoteFacade {
 		if (CollectionUtil.isNotEmpty(infoResponseList)) {
 			return infoResponseList;
 		}
-		// 4.如果校验通过,则删除这些药材关联供应商对应的店铺 sku 信息以及关联关系
-		Set<String> deleteSkuCodes = chineseSkuInfoEntityList.stream().filter(chineseSkuInfoEntity ->
-				Objects.equals(UpOffEnum.DOWN.getCode(), chineseSkuInfoEntity.getSkuStatus())
-						&& skuCodeAndSupplierIdsMap.getOrDefault(chineseSkuInfoEntity.getSkuCode(), Sets.newHashSet()).contains(supplierId))
-				.map(ChineseSkuInfoEntity::getSkuCode).collect(toSet());
-		chineseSkuInfoService.deleteSkuInfoBySkuCodes(deleteSkuCodes, operatorId);
-		chineseSkuSupplierRelevanceService.deleteRelevanceBySkuCodesAndSupplierId(deleteSkuCodes, supplierId, operatorId);
+		/*
+		 * 如果校验通过,老逻辑是 删除sku表（pms_chinese_sku_info）及 删除sku关联供应商表（pms_chinese_sku_supplier_relevance），但是会导致历史处方查询等地方报错（因为sku没了），
+		 * 且产品认为直接删除sku的逻辑本身就不合理，所以在 2023/09/11 进行了修改，不进行sku的信息删除，但是在sku上架时，需要校验供应商中是否存在药材关联，否则无法上架
+		 */
 		return Lists.newArrayList();
 	}
 

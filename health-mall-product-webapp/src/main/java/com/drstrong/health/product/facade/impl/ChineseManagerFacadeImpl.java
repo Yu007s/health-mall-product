@@ -1,6 +1,9 @@
 package com.drstrong.health.product.facade.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -39,6 +42,7 @@ import com.drstrong.health.product.util.RedisKeyUtils;
 import com.drstrong.health.product.utils.ChangeEventSendUtil;
 import com.drstrong.health.ware.model.response.SkuStockResponse;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
+import com.drstrong.health.ware.model.response.SupplierSkuResponse;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -273,16 +277,49 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
             throw new BusinessException(ErrorEnums.SKU_IS_NULL);
         }
         // 2.校验所属的店铺是否存在
-        Set<Long> storeIds = chineseSkuInfoEntityList.stream().map(ChineseSkuInfoEntity::getStoreId).collect(toSet());
+		Set<Long> storeIds = Sets.newHashSetWithExpectedSize(8);
+		Set<String> medicineCodeList = Sets.newHashSetWithExpectedSize(chineseSkuInfoEntityList.size());
+		chineseSkuInfoEntityList.forEach(chineseSkuInfoEntity -> {
+			storeIds.add(chineseSkuInfoEntity.getStoreId());
+			medicineCodeList.add(chineseSkuInfoEntity.getMedicineCode());
+		});
         List<StoreEntity> storeEntities = storeService.listByIds(storeIds);
         if (CollectionUtils.isEmpty(storeEntities) || !Objects.equals(storeEntities.size(), storeIds.size())) {
             throw new BusinessException(ErrorEnums.STORE_NOT_EXIST);
         }
-        // 3.更新
+        // 3.校验药材是否在供应商中存在关联关系，否则不让上架
+		checkSkuSupplier(skuCodeList, medicineCodeList, chineseSkuInfoEntityList, updateSkuStateRequest.getSkuState());
+		// 4.更新状态
         chineseSkuInfoService.updateSkuStatue(updateSkuStateRequest);
-        // 4.组装发送操作日志
+        // 5.组装发送操作日志
 		sendSkuStatusUpdateLog(chineseSkuInfoEntityList,skuCodeList, updateSkuStateRequest.getOperatorId());
     }
+
+	/**
+	 * 校验是否关联了供应商
+	 */
+	private void checkSkuSupplier(Set<String> skuCodeList, Set<String> medicineCodeList, List<ChineseSkuInfoEntity> chineseSkuInfoEntityList, Integer skuState) {
+		if (ObjectUtil.notEqual(skuState, 1)) {
+			return;
+		}
+		List<SupplierSkuResponse> supplierSkuResponseList = supplierRemoteProService.listSearchSupplierByDicCode(medicineCodeList);
+		// 1.先查询药材关联的供应商id
+		Map<String, Set<Long>> medicineCodeSupplierIdsMap = supplierSkuResponseList.stream().collect(groupingBy(SupplierSkuResponse::getProductDicCode, mapping(SupplierSkuResponse::getSupplierId, toSet())));
+		// 2.获取sku关联的供应商id
+		Map<String, Set<Long>> skuCodeSupplierIdsMap = chineseSkuSupplierRelevanceService.listQueryBySkuCodeList(skuCodeList).stream().collect(groupingBy(ChineseSkuSupplierRelevanceEntity::getSkuCode, mapping(ChineseSkuSupplierRelevanceEntity::getSupplierId, toSet())));
+		// 3.获取skuCode和药材编码的对应关系
+		Map<String, String> skuCodeMedicineCodeMap = chineseSkuInfoEntityList.stream().collect(toMap(ChineseSkuInfoEntity::getSkuCode, ChineseSkuInfoEntity::getMedicineCode, (v1, v2) -> v1));
+		// 4.判断供应商是否符合要求
+		skuCodeList.forEach(skuCode -> {
+			String medicineCode = skuCodeMedicineCodeMap.get(skuCode);
+			Set<Long> skuSupplierIds = skuCodeSupplierIdsMap.get(skuCode);
+			Set<Long> medicineSupplierIds = medicineCodeSupplierIdsMap.get(medicineCode);
+			List<Long> noSupplierIds = skuSupplierIds.stream().filter(skuSupplierId -> !medicineSupplierIds.contains(skuSupplierId)).collect(toList());
+			if (CollectionUtil.isNotEmpty(noSupplierIds)) {
+				throw new BusinessException(String.format("%s 该药材未关联id为 %s 供应商，请先在供应商中进行关联!", medicineCode, StrUtil.join("，", noSupplierIds)));
+			}
+		});
+	}
 
 	private void sendSkuStatusUpdateLog(List<ChineseSkuInfoEntity> beforeDataList, Set<String> skuCodeList, Long operatorId) {
 		Map<String, ChineseSkuInfoEntity> skuCodeInfoMap = chineseSkuInfoService.listBySkuCode(skuCodeList)

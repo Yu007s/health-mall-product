@@ -1,9 +1,11 @@
 package com.drstrong.health.product.remote.pro;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSON;
 import com.drstrong.health.product.model.enums.ErrorEnums;
 import com.drstrong.health.product.model.response.result.BusinessException;
 import com.drstrong.health.ware.model.response.SupplierInfoDTO;
+import com.drstrong.health.ware.model.response.SupplierSkuResponse;
 import com.drstrong.health.ware.model.result.ResultVO;
 import com.drstrong.health.ware.remote.api.SupplierManageRemoteApi;
 import com.drstrong.health.ware.remote.api.SupplierSkuRemoteApi;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -101,6 +104,30 @@ public class SupplierRemoteProService {
 			return listResultVO.getData();
 		} catch (Exception e) {
 			log.error("invoke supplierSkuRemoteApi.searchSupplierByDicCode() an error occurred!", e);
+			return Lists.newArrayList();
+		}
+	}
+
+	/**
+	 * 获取药材关联的供应商信息
+	 *
+	 * @author liuqiuyi
+	 * @date 2023/9/11 14:34
+	 */
+	public List<SupplierSkuResponse> listSearchSupplierByDicCode(Set<String> medicineCodeList) {
+		if (CollectionUtil.isEmpty(medicineCodeList)) {
+			return Lists.newArrayList();
+		}
+		log.info("invoke supplierSkuRemoteApi.listSearchSupplierByDicCode() param:{}", medicineCodeList);
+		try {
+			ResultVO<List<SupplierSkuResponse>> listResultVO = supplierSkuRemoteApi.listSearchSupplierByDicCode(Lists.newArrayList(medicineCodeList));
+			if (Objects.isNull(listResultVO) || !listResultVO.isSuccess()) {
+				log.error("invoke supplierSkuRemoteApi.listSearchSupplierByDicCode() result is error! result:{}", JSON.toJSONString(listResultVO));
+				return Lists.newArrayList();
+			}
+			return listResultVO.getData();
+		} catch (Exception e) {
+			log.error("invoke supplierSkuRemoteApi.listSearchSupplierByDicCode() an error occurred!", e);
 			return Lists.newArrayList();
 		}
 	}
