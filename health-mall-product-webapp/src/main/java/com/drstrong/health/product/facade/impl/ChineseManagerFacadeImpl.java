@@ -312,8 +312,8 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 		// 4.判断供应商是否符合要求
 		skuCodeList.forEach(skuCode -> {
 			String medicineCode = skuCodeMedicineCodeMap.get(skuCode);
-			Set<Long> skuSupplierIds = skuCodeSupplierIdsMap.get(skuCode);
-			Set<Long> medicineSupplierIds = medicineCodeSupplierIdsMap.get(medicineCode);
+			Set<Long> skuSupplierIds = skuCodeSupplierIdsMap.getOrDefault(skuCode, Sets.newHashSet());
+			Set<Long> medicineSupplierIds = medicineCodeSupplierIdsMap.getOrDefault(medicineCode, Sets.newHashSet());
 			List<Long> noSupplierIds = skuSupplierIds.stream().filter(skuSupplierId -> !medicineSupplierIds.contains(skuSupplierId)).collect(toList());
 			if (CollectionUtil.isNotEmpty(noSupplierIds)) {
 				throw new BusinessException(String.format("%s 该药材未关联id为 %s 供应商，请先在供应商中进行关联!", medicineCode, StrUtil.join("，", noSupplierIds)));
