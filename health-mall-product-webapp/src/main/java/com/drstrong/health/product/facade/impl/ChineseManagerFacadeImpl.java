@@ -308,15 +308,21 @@ public class ChineseManagerFacadeImpl implements ChineseManagerFacade {
 		// 2.获取sku关联的供应商id
 		Map<String, Set<Long>> skuCodeSupplierIdsMap = chineseSkuSupplierRelevanceService.listQueryBySkuCodeList(skuCodeList).stream().collect(groupingBy(ChineseSkuSupplierRelevanceEntity::getSkuCode, mapping(ChineseSkuSupplierRelevanceEntity::getSupplierId, toSet())));
 		// 3.获取skuCode和药材编码的对应关系
-		Map<String, String> skuCodeMedicineCodeMap = chineseSkuInfoEntityList.stream().collect(toMap(ChineseSkuInfoEntity::getSkuCode, ChineseSkuInfoEntity::getMedicineCode, (v1, v2) -> v1));
-		// 4.判断供应商是否符合要求
+		Map<String, ChineseSkuInfoEntity> skuCodeSkuInfoEntityMap = chineseSkuInfoEntityList.stream().collect(toMap(ChineseSkuInfoEntity::getSkuCode, dto -> dto, (v1, v2) -> v1));
+		// 5.获取供应商名称
+		List<Long> supplierIds = skuCodeSupplierIdsMap.values().stream().flatMap(Collection::stream).collect(toList());
+		Map<Long, String> supplierIdNameMap = supplierRemoteProService.getSupplierNameByIds(supplierIds).stream().collect(toMap(SupplierInfoDTO::getSupplierId, SupplierInfoDTO::getSupplierName, (v1, v2) -> v1));
+		// 6.判断供应商是否符合要求
 		skuCodeList.forEach(skuCode -> {
-			String medicineCode = skuCodeMedicineCodeMap.get(skuCode);
+			ChineseSkuInfoEntity chineseSkuInfoEntity = skuCodeSkuInfoEntityMap.getOrDefault(skuCode, new ChineseSkuInfoEntity());
+			String medicineCode = chineseSkuInfoEntity.getMedicineCode();
 			Set<Long> skuSupplierIds = skuCodeSupplierIdsMap.getOrDefault(skuCode, Sets.newHashSet());
 			Set<Long> medicineSupplierIds = medicineCodeSupplierIdsMap.getOrDefault(medicineCode, Sets.newHashSet());
 			List<Long> noSupplierIds = skuSupplierIds.stream().filter(skuSupplierId -> !medicineSupplierIds.contains(skuSupplierId)).collect(toList());
 			if (CollectionUtil.isNotEmpty(noSupplierIds)) {
-				throw new BusinessException(String.format("%s 该药材未关联id为 %s 供应商，请先在供应商中进行关联!", medicineCode, StrUtil.join("，", noSupplierIds)));
+				String noSupplierName = noSupplierIds.stream().map(supplierId -> supplierIdNameMap.getOrDefault(supplierId, "")).collect(joining("，"));
+				String errorMsg = String.format("在 %s 中未找到编码为 %s %s 的药材，可以取消与该供应商的关联或在该供应商中重新上架此药材。", noSupplierName, medicineCode, chineseSkuInfoEntity.getSkuName());
+				throw new BusinessException(errorMsg);
 			}
 		});
 	}
