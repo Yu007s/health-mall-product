@@ -4,6 +4,6 @@ apollo:
   autoUpdateInjectedSpringProperties: true
   bootstrap:
     enabled: true
-    namespaces: log4j2-spring.xml,common,config,cache,mq,db,quartz
+    namespaces: log4j2-spring.xml,common,config,cache,mq,db,quartz,hhjk.arthas
     eagerLoad:
       enabled: true
