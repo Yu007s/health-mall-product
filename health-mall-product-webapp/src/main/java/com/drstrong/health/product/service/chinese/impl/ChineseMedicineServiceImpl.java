@@ -79,8 +79,10 @@ public class ChineseMedicineServiceImpl extends ServiceImpl<ChineseMedicineMappe
         String medicineCode = chineseMedicineVO.getMedicineCode();
         ChineseMedicineEntity chineseMedicineEntity = new ChineseMedicineEntity();
         LambdaQueryWrapper<ChineseMedicineEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(ChineseMedicineEntity::getMedicineName,
-                chineseMedicineVO.getName()).eq(ChineseMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
+        lambdaQueryWrapper
+                .eq(ChineseMedicineEntity::getMedicineName, chineseMedicineVO.getName())
+                .eq(ChineseMedicineEntity::getDosageForm,chineseMedicineVO.getDosageForm())
+                .eq(ChineseMedicineEntity::getDelFlag, DelFlagEnum.UN_DELETED.getCode());
         ChineseMedicineEntity getOneByName = getOne(lambdaQueryWrapper);
         if (StringUtils.isNotBlank(medicineCode)) {
             //编辑药材

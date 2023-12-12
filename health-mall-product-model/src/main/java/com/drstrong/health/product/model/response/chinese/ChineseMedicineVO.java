@@ -1,5 +1,6 @@
 package com.drstrong.health.product.model.response.chinese;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -38,5 +39,14 @@ public class ChineseMedicineVO implements Serializable {
 
     @ApiModelProperty("用户id")
     private Long userId;
+
+
+    /**
+     * 剂型 0-配方颗粒 1-饮片 默认0
+     */
+    @NotNull(message = "剂型不能为空")
+    @ApiModelProperty("剂型")
+    private Integer dosageForm;
+
 
 }

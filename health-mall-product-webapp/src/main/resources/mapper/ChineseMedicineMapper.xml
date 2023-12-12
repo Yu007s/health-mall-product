@@ -5,7 +5,7 @@
 
 
     <sql id="Base_Column_List">
-       id,medicine_name,medicine_code,medicine_pinyin,alias_pinyin,medicine_alias,max_dosage
+       id,medicine_name,medicine_code,medicine_pinyin,alias_pinyin,medicine_alias,max_dosage,dosage_form
     </sql>
 
     <select id="likeQueryByKeyword"

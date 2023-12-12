@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
@@ -39,6 +40,9 @@ public class ChineseMedicineResponse implements Serializable {
 
     @ApiModelProperty("最大剂量")
     private BigDecimal maxDosage;
+
+    @ApiModelProperty("剂型")
+    private Integer dosageForm;
 
     @ApiModelProperty("中药的相反药材信息")
     private List<ChineseConflictMedicine> chineseConflictMedicineList;

@@ -4,6 +4,7 @@ package com.drstrong.health.product.model.request.chinese;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -25,4 +26,7 @@ public class ChineseMedicineSearchRequest implements Serializable {
 
     @ApiModelProperty("页条数")
     private Integer pageSize;
+
+    @ApiModelProperty("剂型")
+    private Integer dosageForm;
 }
