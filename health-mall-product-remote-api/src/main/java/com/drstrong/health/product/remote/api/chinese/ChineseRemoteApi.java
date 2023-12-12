@@ -37,6 +37,12 @@ public interface ChineseRemoteApi {
 	@GetMapping("/keyword/search")
 	ResultVO<List<ChineseSkuInfoVO>> keywordSearch(@RequestParam("keyword") String keyword, @RequestParam("agencyId") Long agencyId);
 
+
+	@ApiOperation("中药查询接口，用于医生搜索中药材")
+	@GetMapping("/keyword/search-v2")
+	ResultVO<List<ChineseSkuInfoVO>> keywordSearchV2(@RequestParam("keyword") String keyword, @RequestParam("agencyId") Long agencyId, @RequestParam("dosageForm") Integer dosageForm);
+
+
 	@ApiOperation("中药 sku,查询店铺的 sku 信息")
 	@PostMapping("/sku/query")
 	ResultVO<ProductInfoVO> queryStoreSku(@RequestBody @Valid QueryChineseSkuRequest chineseSkuRequest);
